@@ -8,9 +8,10 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true) {
+  async process(query, enableScoring = true, model = null) {
     try {
-      const searchResponse = await this.#search(query);
+      const searchModel = model || this.searchModel;
+      const searchResponse = await this.#search(query, searchModel);
       const result = {
         query,
         response: searchResponse,
@@ -35,10 +36,10 @@ class CombinedSearchScorer {
   }
 
   /* private */
-  async #search(query) {
+  async #search(query, model = this.searchModel) {
     try {
       const res = await this.ollama.generate({
-        model: this.searchModel,
+        model: model,
         prompt: query,
         stream: false
       });

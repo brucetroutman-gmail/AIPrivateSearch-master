@@ -1,9 +1,30 @@
-import { search } from './services/api.js';
+import { search, getModels } from './services/api.js';
 
 const form       = document.getElementById('searchForm');
+const modelEl    = document.getElementById('model');
 const queryEl    = document.getElementById('query');
 const scoreTglEl = document.getElementById('scoreToggle');
 const outputEl   = document.getElementById('output');
+
+// Load models on page load
+async function loadModels() {
+  try {
+    const { models } = await getModels();
+    modelEl.innerHTML = models.map(model => 
+      `<option value="${model}">${model}</option>`
+    ).join('');
+    
+    // Set default to qwen2:0.5b if available
+    if (models.includes('qwen2:0.5b')) {
+      modelEl.value = 'qwen2:0.5b';
+    }
+  } catch (error) {
+    modelEl.innerHTML = '<option value="">Error loading models</option>';
+    console.error('Failed to load models:', error);
+  }
+}
+
+loadModels();
 
 function render(result) {
   // clear then build markup
@@ -58,10 +79,16 @@ function render(result) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  if (!modelEl.value) {
+    outputEl.textContent = 'Please select a model first.';
+    return;
+  }
+  
   outputEl.textContent = 'Loading…';
 
   try {
-    const result = await search(queryEl.value, scoreTglEl.checked);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value);
     render(result);
   } catch (err) {
     outputEl.textContent = err.message;

@@ -10,7 +10,7 @@ const scorer = new CombinedSearchScorer();
 router.post('/', async (req, res) => {
   try {
     console.log('Received request:', req.body);
-    const { query, score } = req.body;
+    const { query, score, model } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
@@ -18,8 +18,9 @@ router.post('/', async (req, res) => {
 
     console.log('Processing query:', query);
     console.log('Scoring enabled:', score);
+    console.log('Model:', model);
     
-    const result = await scorer.process(query, score);
+    const result = await scorer.process(query, score, model);
     
     console.log('Sending response:', result);
     res.json(result);

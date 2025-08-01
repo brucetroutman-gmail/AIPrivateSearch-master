@@ -1,13 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import searchRouter from './routes/search.mjs';
+import modelsRouter from './routes/models.mjs';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Use the search router
+// Use the routers
 app.use('/api/search', searchRouter);
+app.use('/api/models', modelsRouter);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
