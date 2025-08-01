@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI-Search-Score – Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    h1   { margin-top: 0; }
+    label { font-weight: 600; }
+    textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; }
+    button { padding: .5rem 1rem; }
+    #output { white-space: pre-wrap; margin-top: 2rem; background:#f6f6f6; padding:1rem; border-radius:6px; }
+    .score-table { border-collapse: collapse; margin-top: 1rem; }
+    .score-table th, .score-table td { border: 1px solid #ccc; padding: .4rem .6rem; text-align:center; }
+    .score-table th { background:#fafafa; }
+  </style>
+</head>
+<body>
+  <h1>AI Search + Score</h1>
+
+  <form id="searchForm">
+    <label for="query">Enter your prompt:</label><br />
+    <textarea id="query" required placeholder="Ask me anything…"></textarea><br />
+
+    <label>
+      <input type="checkbox" id="scoreToggle" />
+      Generate scores
+    </label><br /><br />
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <section id="output"></section>
+
+  <script type="module" src="./index.js"></script>
+</body>
+</html>
