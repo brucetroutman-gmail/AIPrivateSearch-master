@@ -21,6 +21,17 @@ class CombinedSearchScorer {
 
       if (enableScoring) {
         result.scores = await this.#score(query, searchResponse);
+        
+        // Retry once if no scores were obtained
+        if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
+          console.log('No scores obtained, retrying once...');
+          result.scores = await this.#score(query, searchResponse);
+          
+          // If still no scores, set message
+          if (result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
+            result.scores.overallComments = 'No scores are available';
+          }
+        }
       }
       return result;
     } catch (error) {
@@ -179,7 +190,7 @@ Please provide the evaluation in this exact format.`;
 
       if (scoreObj.total === null &&
           scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
-        scoreObj.total = scoreObj.accuracy + scoreObj.relevance + scoreObj.organization;
+        scoreObj.total = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
       }
       
       return scoreObj;

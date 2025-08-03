@@ -7,7 +7,10 @@ const ollama = new Ollama({ host: 'http://localhost:11434' });
 router.get('/', async (req, res) => {
   try {
     const response = await ollama.list();
-    const models = response.models.map(model => model.name);
+    const models = response.models
+      .map(model => model.name)
+      .filter(name => !name.includes('nomic-embed-text'))
+      .sort();
     res.json({ models });
   } catch (error) {
     console.error('Error fetching models:', error);

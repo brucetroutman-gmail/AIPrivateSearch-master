@@ -55,7 +55,7 @@ function render(result) {
         <tr><td>Accuracy</td><td>${s.accuracy ?? '-'}</td><td>${s.justifications.accuracy}</td></tr>
         <tr><td>Relevance</td><td>${s.relevance ?? '-'}</td><td>${s.justifications.relevance}</td></tr>
         <tr><td>Organization</td><td>${s.organization ?? '-'}</td><td>${s.justifications.organization}</td></tr>
-        <tr><td><strong>Total</strong></td><td colspan="2"><strong>${s.total ?? '-'}</strong></td></tr>
+        <tr><td><strong>Weighted Score</strong></td><td colspan="2"><strong>${s.total ?? '-'}</strong></td></tr>
       </tbody>
     `;
     outputEl.append(tbl);
