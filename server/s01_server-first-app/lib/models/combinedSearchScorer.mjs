@@ -1,4 +1,5 @@
 import { Ollama } from 'ollama';
+import { execSync } from 'child_process';
 
 class CombinedSearchScorer {
   constructor() {
@@ -14,18 +15,26 @@ class CombinedSearchScorer {
       const searchResponse = await this.#search(query, searchModel);
       const result = {
         query,
-        response: searchResponse,
+        response: searchResponse.response,
         timestamp: new Date().toISOString(),
-        scores: null
+        pcCode: this.#generatePcCode(),
+        scores: null,
+        metrics: {
+          search: searchResponse.metrics
+        }
       };
 
       if (enableScoring) {
-        result.scores = await this.#score(query, searchResponse);
+        const scoreResult = await this.#score(query, searchResponse.response);
+        result.scores = scoreResult.scores;
+        result.metrics.scoring = scoreResult.metrics;
         
         // Retry once if no scores were obtained
         if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
           console.log('No scores obtained, retrying once...');
-          result.scores = await this.#score(query, searchResponse);
+          const retryResult = await this.#score(query, searchResponse.response);
+          result.scores = retryResult.scores;
+          result.metrics.scoringRetry = retryResult.metrics;
           
           // If still no scores, set message
           if (result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
@@ -54,7 +63,18 @@ class CombinedSearchScorer {
         prompt: query,
         stream: false
       });
-      return res.response;
+      return {
+        response: res.response,
+        metrics: {
+          model: res.model,
+          total_duration: res.total_duration,
+          load_duration: res.load_duration,
+          prompt_eval_count: res.prompt_eval_count,
+          prompt_eval_duration: res.prompt_eval_duration,
+          eval_count: res.eval_count,
+          eval_duration: res.eval_duration
+        }
+      };
     } catch (error) {
       console.error('Error in search method:', error);
       throw new Error(`Search failed: ${error.message}`);
@@ -130,7 +150,18 @@ Please provide the evaluation in this exact format.`;
       const scores = this.#parseScores(res.response);
       console.log('Scoring completed successfully:', scores);
       
-      return scores;
+      return {
+        scores,
+        metrics: {
+          model: res.model,
+          total_duration: res.total_duration,
+          load_duration: res.load_duration,
+          prompt_eval_count: res.prompt_eval_count,
+          prompt_eval_duration: res.prompt_eval_duration,
+          eval_count: res.eval_count,
+          eval_duration: res.eval_duration
+        }
+      };
     } catch (error) {
       console.error('Error in scoring method:', error);
       console.error('Query:', query);
@@ -138,17 +169,20 @@ Please provide the evaluation in this exact format.`;
       
       // Return a default score structure instead of null
       return {
-        accuracy: null,
-        relevance: null,
-        organization: null,
-        total: null,
-        justifications: { 
-          accuracy: 'Scoring failed due to error', 
-          relevance: 'Scoring failed due to error', 
-          organization: 'Scoring failed due to error' 
+        scores: {
+          accuracy: null,
+          relevance: null,
+          organization: null,
+          total: null,
+          justifications: { 
+            accuracy: 'Scoring failed due to error', 
+            relevance: 'Scoring failed due to error', 
+            organization: 'Scoring failed due to error' 
+          },
+          overallComments: `Scoring error: ${error.message}`,
+          error: error.message
         },
-        overallComments: `Scoring error: ${error.message}`,
-        error: error.message
+        metrics: null
       };
     }
   }
@@ -213,6 +247,30 @@ Please provide the evaluation in this exact format.`;
   #extract(line) {
     const m = line.match(/\b([0-5])\b/);
     return m ? Number(m[1]) : null;
+  }
+
+  #generatePcCode() {
+    try {
+      console.log('Attempting to get Mac serial number...');
+      
+      const rawOutput = execSync('system_profiler SPHardwareDataType', { encoding: 'utf8' });
+      console.log('Raw system_profiler output:', rawOutput.substring(0, 500));
+      
+      const serial = execSync('system_profiler SPHardwareDataType | grep "Serial Number" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      console.log('Extracted serial:', serial, 'Length:', serial.length);
+      
+      if (serial && serial.length >= 6) {
+        const pcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
+        console.log('Generated PcCode:', pcCode);
+        return pcCode;
+      }
+      console.log('Serial too short or empty, returning UNKNOWN');
+      return 'UNKNOWN';
+    } catch (error) {
+      console.error('Error generating PcCode:', error.message);
+      console.error('Error stack:', error.stack);
+      return 'ERROR';
+    }
   }
 }
 

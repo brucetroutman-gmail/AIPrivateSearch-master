@@ -26,6 +26,16 @@ async function loadModels() {
 
 loadModels();
 
+function formatMetrics(metrics) {
+  if (!metrics) return 'N/A';
+  
+  const totalSecs = (metrics.total_duration / 1000000000).toFixed(1);
+  const loadMs = (metrics.load_duration / 1000000).toFixed(0);
+  const tokensPerSec = (metrics.eval_count / (metrics.eval_duration / 1000000000)).toFixed(1);
+  
+  return `${metrics.model} - Total: ${totalSecs}s, Load: ${loadMs}ms, Eval: ${tokensPerSec} tokens/sec`;
+}
+
 function render(result) {
   // clear then build markup
   outputEl.innerHTML = '';
@@ -69,12 +79,45 @@ function render(result) {
     }
   }
 
-  // 3. metadata
+  // 3. metrics
+  if (result.metrics) {
+    const metricsH = document.createElement('h3');
+    metricsH.textContent = 'Performance Metrics';
+    outputEl.append(metricsH);
+
+    if (result.metrics.search) {
+      const searchMetrics = document.createElement('div');
+      searchMetrics.innerHTML = `<strong>Search:</strong> ${formatMetrics(result.metrics.search)}`;
+      outputEl.append(searchMetrics);
+    }
+
+    if (result.metrics.scoring) {
+      const scoringMetrics = document.createElement('div');
+      scoringMetrics.innerHTML = `<strong>Scoring:</strong> ${formatMetrics(result.metrics.scoring)}`;
+      outputEl.append(scoringMetrics);
+    }
+
+    if (result.metrics.scoringRetry) {
+      const retryMetrics = document.createElement('div');
+      retryMetrics.innerHTML = `<strong>Scoring Retry:</strong> ${formatMetrics(result.metrics.scoringRetry)}`;
+      outputEl.append(retryMetrics);
+    }
+  }
+
+  // 4. metadata
   const meta = document.createElement('p');
   meta.style.fontSize = '.8rem';
   meta.style.color = '#555';
   meta.textContent = `timestamp: ${result.timestamp}`;
   outputEl.append(meta);
+
+  if (result.pcCode) {
+    const pcCode = document.createElement('p');
+    pcCode.style.fontSize = '.8rem';
+    pcCode.style.color = '#555';
+    pcCode.textContent = `PcCode: ${result.pcCode}`;
+    outputEl.append(pcCode);
+  }
 }
 
 form.addEventListener('submit', async (e) => {

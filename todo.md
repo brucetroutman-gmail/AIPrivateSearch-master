@@ -10,7 +10,15 @@ to do AISearchScore
 
 specs-3-scoring
 
-5. show ollama times etc at end of response
+5. show ollama times etc at end of response - done
+
+6. create PcCode - done
+
+7. gather pc mmetics, ram cpu etc
+
+6. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
+
+7.  create way to collect search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md
 
 6. create a json file ??  load database
 
