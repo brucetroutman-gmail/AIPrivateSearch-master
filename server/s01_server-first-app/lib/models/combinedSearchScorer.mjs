@@ -224,7 +224,8 @@ Please provide the evaluation in this exact format.`;
 
       if (scoreObj.total === null &&
           scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
-        scoreObj.total = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
+        const rawScore = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
+        scoreObj.total = Math.round((rawScore / 30) * 100);
       }
       
       return scoreObj;
