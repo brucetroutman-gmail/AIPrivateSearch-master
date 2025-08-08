@@ -4,6 +4,8 @@ const form       = document.getElementById('searchForm');
 const modelEl    = document.getElementById('model');
 const queryEl    = document.getElementById('query');
 const scoreTglEl = document.getElementById('scoreToggle');
+const temperatureEl = document.getElementById('temperature');
+const contextEl  = document.getElementById('context');
 const outputEl   = document.getElementById('output');
 
 // Load models on page load
@@ -32,8 +34,10 @@ function formatMetrics(metrics) {
   const totalSecs = (metrics.total_duration / 1000000000).toFixed(1);
   const loadMs = (metrics.load_duration / 1000000).toFixed(0);
   const tokensPerSec = (metrics.eval_count / (metrics.eval_duration / 1000000000)).toFixed(1);
+  const contextSize = metrics.context_size || 'N/A';
+  const temperature = metrics.temperature || 'N/A';
   
-  return `${metrics.model} - Total: ${totalSecs}s, Load: ${loadMs}ms, Eval: ${tokensPerSec} tokens/sec`;
+  return `${metrics.model} - Duration: ${totalSecs}s, Load: ${loadMs}ms, Eval: ${tokensPerSec} tokens/sec, ContextSize: ${contextSize}, Temperature: ${temperature}`;
 }
 
 function render(result) {
@@ -65,7 +69,7 @@ function render(result) {
         <tr><td>Accuracy</td><td>${s.accuracy ?? '-'}</td><td>${s.justifications.accuracy}</td></tr>
         <tr><td>Relevance</td><td>${s.relevance ?? '-'}</td><td>${s.justifications.relevance}</td></tr>
         <tr><td>Organization</td><td>${s.organization ?? '-'}</td><td>${s.justifications.organization}</td></tr>
-        <tr><td><strong>Weighted Score</strong></td><td colspan="2"><strong>${s.total ? s.total + '%' : '-'}</strong></td></tr>
+        <tr><td><strong>Weighted Score</strong></td><td><strong>${s.total ? s.total + '%' : '-'}</strong></td><td></td></tr>
       </tbody>
     `;
     outputEl.append(tbl);
@@ -85,39 +89,74 @@ function render(result) {
     metricsH.textContent = 'Performance Metrics';
     outputEl.append(metricsH);
 
+    const tbl = document.createElement('table');
+    tbl.className = 'score-table';
+    let tableHTML = `
+      <thead>
+        <tr><th>Operation</th><th>Model</th><th>Duration</th><th>Load</th><th>Eval Rate</th><th>Context</th><th>Temperature</th></tr>
+      </thead>
+      <tbody>`;
+
     if (result.metrics.search) {
-      const searchMetrics = document.createElement('div');
-      searchMetrics.innerHTML = `<strong>Search:</strong> ${formatMetrics(result.metrics.search)}`;
-      outputEl.append(searchMetrics);
+      const m = result.metrics.search;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      tableHTML += `<tr><td>Search</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
 
     if (result.metrics.scoring) {
-      const scoringMetrics = document.createElement('div');
-      scoringMetrics.innerHTML = `<strong>Scoring:</strong> ${formatMetrics(result.metrics.scoring)}`;
-      outputEl.append(scoringMetrics);
+      const m = result.metrics.scoring;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      tableHTML += `<tr><td>Scoring</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
 
     if (result.metrics.scoringRetry) {
-      const retryMetrics = document.createElement('div');
-      retryMetrics.innerHTML = `<strong>Scoring Retry:</strong> ${formatMetrics(result.metrics.scoringRetry)}`;
-      outputEl.append(retryMetrics);
+      const m = result.metrics.scoringRetry;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      tableHTML += `<tr><td>Scoring Retry</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
+
+    tableHTML += '</tbody>';
+    tbl.innerHTML = tableHTML;
+    outputEl.append(tbl);
   }
 
-  // 4. metadata
+  // 4. system info table
+  if (result.pcCode || result.systemInfo) {
+    const systemH = document.createElement('h3');
+    systemH.textContent = 'System Information';
+    outputEl.append(systemH);
+
+    const sysTbl = document.createElement('table');
+    sysTbl.className = 'score-table';
+    let sysTableHTML = `
+      <thead>
+        <tr><th>PcCode</th><th>CPU</th><th>Graphics</th><th>RAM</th><th>OS</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>${result.pcCode || 'Unknown'}</td>
+          <td>${result.systemInfo?.chip || 'Unknown'}</td>
+          <td>${result.systemInfo?.graphics || 'Unknown'}</td>
+          <td>${result.systemInfo?.ram || 'Unknown'}</td>
+          <td>${result.systemInfo?.os || 'Unknown'}</td>
+        </tr>
+      </tbody>`;
+    sysTbl.innerHTML = sysTableHTML;
+    outputEl.append(sysTbl);
+  }
+
+  // 5. created at
   const meta = document.createElement('p');
   meta.style.fontSize = '.8rem';
   meta.style.color = '#555';
-  meta.textContent = `timestamp: ${result.timestamp}`;
+  meta.textContent = `CreatedAt: ${result.createdAt}`;
   outputEl.append(meta);
-
-  if (result.pcCode) {
-    const pcCode = document.createElement('p');
-    pcCode.style.fontSize = '.8rem';
-    pcCode.style.color = '#555';
-    pcCode.textContent = `PcCode: ${result.pcCode}`;
-    outputEl.append(pcCode);
-  }
 }
 
 form.addEventListener('submit', async (e) => {
@@ -131,7 +170,7 @@ form.addEventListener('submit', async (e) => {
   outputEl.textContent = 'Loading…';
 
   try {
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value));
     render(result);
   } catch (err) {
     outputEl.textContent = err.message;

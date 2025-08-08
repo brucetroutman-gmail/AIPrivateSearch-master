@@ -14,9 +14,17 @@ specs-3-scoring
 
 6. create PcCode - done
 
-7. gather pc mmetics, ram cpu etc
+7. gather pc mmetics, ram cpu etc - done
 
-8. 
+8. Use CreatedAt format not TimeStamp - done
+
+9. add model options Temperature and Context Size - done
+
+10. move Temp Cont to under Model drop down
+
+8. Store the results in the MySQL db aisearchscore searches 
+
+8. Can We make an electron app for this that runs on a mac?
 
 6. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
 

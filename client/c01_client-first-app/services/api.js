@@ -1,10 +1,10 @@
 const API_ROOT = 'http://localhost:3001';
 
-export async function search(query, score = false, model = null) {
+export async function search(query, score = false, model = null, temperature = 0.3, context = 0.3) {
   const res = await fetch(`${API_ROOT}/api/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, score, model })
+    body: JSON.stringify({ query, score, model, temperature, context })
   });
   
   if (!res.ok) {

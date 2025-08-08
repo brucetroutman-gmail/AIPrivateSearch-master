@@ -9,15 +9,16 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true, model = null) {
+  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3) {
     try {
       const searchModel = model || this.searchModel;
-      const searchResponse = await this.#search(query, searchModel);
+      const searchResponse = await this.#search(query, searchModel, temperature, context);
       const result = {
         query,
         response: searchResponse.response,
-        timestamp: new Date().toISOString(),
+        createdAt: this.#formatCreatedAt(),
         pcCode: this.#generatePcCode(),
+        systemInfo: this.#getSystemInfo(),
         scores: null,
         metrics: {
           search: searchResponse.metrics
@@ -25,14 +26,14 @@ class CombinedSearchScorer {
       };
 
       if (enableScoring) {
-        const scoreResult = await this.#score(query, searchResponse.response);
+        const scoreResult = await this.#score(query, searchResponse.response, temperature, context);
         result.scores = scoreResult.scores;
         result.metrics.scoring = scoreResult.metrics;
         
         // Retry once if no scores were obtained
         if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
           console.log('No scores obtained, retrying once...');
-          const retryResult = await this.#score(query, searchResponse.response);
+          const retryResult = await this.#score(query, searchResponse.response, temperature, context);
           result.scores = retryResult.scores;
           result.metrics.scoringRetry = retryResult.metrics;
           
@@ -56,12 +57,16 @@ class CombinedSearchScorer {
   }
 
   /* private */
-  async #search(query, model = this.searchModel) {
+  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3) {
     try {
       const res = await this.ollama.generate({
         model: model,
         prompt: query,
-        stream: false
+        stream: false,
+        options: {
+          temperature: temperature,
+          num_ctx: context
+        }
       });
       return {
         response: res.response,
@@ -72,7 +77,9 @@ class CombinedSearchScorer {
           prompt_eval_count: res.prompt_eval_count,
           prompt_eval_duration: res.prompt_eval_duration,
           eval_count: res.eval_count,
-          eval_duration: res.eval_duration
+          eval_duration: res.eval_duration,
+          context_size: context,
+          temperature: temperature
         }
       };
     } catch (error) {
@@ -81,7 +88,7 @@ class CombinedSearchScorer {
     }
   }
 
-  async #score(query, answer) {
+  async #score(query, answer, temperature = 0.3, context = 0.3) {
     try {
       console.log('Starting scoring process...');
       
@@ -143,7 +150,11 @@ Please provide the evaluation in this exact format.`;
       const res = await this.ollama.generate({
         model: this.scoreModel,
         prompt: scoringPrompt,
-        stream: false
+        stream: false,
+        options: {
+          temperature: 0.3,
+          num_ctx: 4096
+        }
       });
 
       console.log('Scoring model response received, parsing...');
@@ -159,7 +170,9 @@ Please provide the evaluation in this exact format.`;
           prompt_eval_count: res.prompt_eval_count,
           prompt_eval_duration: res.prompt_eval_duration,
           eval_count: res.eval_count,
-          eval_duration: res.eval_duration
+          eval_duration: res.eval_duration,
+          context_size: 4096,
+          temperature: 0.3
         }
       };
     } catch (error) {
@@ -252,26 +265,53 @@ Please provide the evaluation in this exact format.`;
 
   #generatePcCode() {
     try {
-      console.log('Attempting to get Mac serial number...');
-      
-      const rawOutput = execSync('system_profiler SPHardwareDataType', { encoding: 'utf8' });
-      console.log('Raw system_profiler output:', rawOutput.substring(0, 500));
-      
       const serial = execSync('system_profiler SPHardwareDataType | grep "Serial Number" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      console.log('Extracted serial:', serial, 'Length:', serial.length);
-      
       if (serial && serial.length >= 6) {
-        const pcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
-        console.log('Generated PcCode:', pcCode);
-        return pcCode;
+        return serial.substring(0, 3) + serial.substring(serial.length - 3);
       }
-      console.log('Serial too short or empty, returning UNKNOWN');
       return 'UNKNOWN';
     } catch (error) {
       console.error('Error generating PcCode:', error.message);
-      console.error('Error stack:', error.stack);
       return 'ERROR';
     }
+  }
+
+  #getSystemInfo() {
+    try {
+      let chip = execSync('system_profiler SPHardwareDataType | grep "Chip" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      if (!chip) {
+        chip = execSync('system_profiler SPHardwareDataType | grep "Processor" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      }
+      const graphics = execSync('system_profiler SPDisplaysDataType | grep "Chipset Model" | head -1 | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      const ram = execSync('system_profiler SPHardwareDataType | grep "Memory" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      const os = execSync('sw_vers -productName && sw_vers -productVersion', { encoding: 'utf8' }).replace('\n', ' ').trim();
+      
+      return {
+        chip: chip || 'Unknown',
+        graphics: graphics || 'Unknown', 
+        ram: ram || 'Unknown',
+        os: os || 'Unknown'
+      };
+    } catch (error) {
+      console.error('Error getting system info:', error.message);
+      return {
+        chip: 'Error',
+        graphics: 'Error',
+        ram: 'Error', 
+        os: 'Error'
+      };
+    }
+  }
+
+  #formatCreatedAt() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
   }
 }
 
