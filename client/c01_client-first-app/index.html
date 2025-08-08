@@ -55,6 +55,17 @@
 
   <section id="output"></section>
 
+  <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 6px;">
+    <label for="exportFormat">Export Format:</label>
+    <select id="exportFormat">
+      <option value="pdf">Printer/PDF</option>
+      <option value="markdown">Markdown</option>
+      <option value="json">JSON</option>
+      <option value="database">Database</option>
+    </select>
+    <button type="button" id="exportBtn">Export</button>
+  </div>
+
   <script type="module" src="./index.js"></script>
 </body>
 </html>

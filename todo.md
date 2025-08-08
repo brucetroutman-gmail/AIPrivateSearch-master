@@ -22,21 +22,23 @@ specs-3-scoring
 
 10. move Temp Cont to under Model drop down
 
-8. Store the results in the MySQL db aisearchscore searches 
+11. Store the results in the MySQL db aisearchscore searches
 
-8. Can We make an electron app for this that runs on a mac?
+12. Create Export2JSON routine to reproduce results 
 
-6. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
+12. Can We make an electron app for this that runs on a mac?
 
-7.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md
+13. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
 
-6. create a json file ??  load database
+14.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md
 
-7. multiple models selection ??
+15. create a json file ??  load database
 
-8. read prompts from tables ?? mutliple selections
+16. multiple models selection ??
 
-9. 
+17. read prompts from tables ?? mutliple selections
+
+18. 
 
 
 
