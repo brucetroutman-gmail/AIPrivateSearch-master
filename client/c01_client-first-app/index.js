@@ -2,12 +2,15 @@ import { search, getModels } from './services/api.js';
 
 const form       = document.getElementById('searchForm');
 const modelEl    = document.getElementById('model');
+const assistantTypeEl = document.getElementById('assistantType');
 const queryEl    = document.getElementById('query');
 const scoreTglEl = document.getElementById('scoreToggle');
 const temperatureEl = document.getElementById('temperature');
 const contextEl  = document.getElementById('context');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
+
+let systemPrompts = [];
 
 // Load models on page load
 async function loadModels() {
@@ -19,8 +22,11 @@ async function loadModels() {
       `<option value="${model}">${model}</option>`
     ).join('');
     
-    // Set default to qwen2:0.5b if available
-    if (models.includes('qwen2:0.5b')) {
+    // Restore last used model or set default
+    const lastUsedModel = localStorage.getItem('lastUsedModel');
+    if (lastUsedModel && models.includes(lastUsedModel)) {
+      modelEl.value = lastUsedModel;
+    } else if (models.includes('qwen2:0.5b')) {
       modelEl.value = 'qwen2:0.5b';
     }
     console.log('Models loaded successfully');
@@ -31,6 +37,65 @@ async function loadModels() {
 }
 
 loadModels();
+loadSystemPrompts();
+restoreModelOptions();
+
+// Load system prompts from JSON file
+async function loadSystemPrompts() {
+  try {
+    const response = await fetch('./system-prompts.json');
+    const data = await response.json();
+    systemPrompts = data.system_prompts;
+    
+    assistantTypeEl.innerHTML = systemPrompts.map(prompt => 
+      `<option value="${prompt.name}">${prompt.name}</option>`
+    ).join('');
+    
+    // Restore last used selection
+    const lastUsed = localStorage.getItem('lastAssistantType');
+    if (lastUsed && systemPrompts.find(p => p.name === lastUsed)) {
+      assistantTypeEl.value = lastUsed;
+    } else {
+      assistantTypeEl.value = systemPrompts[0]?.name || '';
+    }
+  } catch (error) {
+    assistantTypeEl.innerHTML = '<option value="">Error loading system prompts</option>';
+    console.error('Failed to load system prompts:', error);
+  }
+}
+
+// Save assistant type selection
+assistantTypeEl.addEventListener('change', () => {
+  localStorage.setItem('lastAssistantType', assistantTypeEl.value);
+});
+
+// Save model selection
+modelEl.addEventListener('change', () => {
+  localStorage.setItem('lastUsedModel', modelEl.value);
+});
+
+// Save temperature selection
+temperatureEl.addEventListener('change', () => {
+  localStorage.setItem('lastTemperature', temperatureEl.value);
+});
+
+// Save context selection
+contextEl.addEventListener('change', () => {
+  localStorage.setItem('lastContext', contextEl.value);
+});
+
+// Restore model options from localStorage
+function restoreModelOptions() {
+  const lastTemperature = localStorage.getItem('lastTemperature');
+  if (lastTemperature) {
+    temperatureEl.value = lastTemperature;
+  }
+  
+  const lastContext = localStorage.getItem('lastContext');
+  if (lastContext) {
+    contextEl.value = lastContext;
+  }
+}
 
 function formatMetrics(metrics) {
   if (!metrics) return 'N/A';
@@ -177,7 +242,12 @@ form.addEventListener('submit', async (e) => {
   outputEl.textContent = 'Loading…';
 
   try {
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value));
+    // Get selected system prompt
+    const selectedPrompt = systemPrompts.find(p => p.name === assistantTypeEl.value);
+    const systemPrompt = selectedPrompt ? selectedPrompt.prompt : null;
+    const systemPromptName = selectedPrompt ? selectedPrompt.name : null;
+    
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName);
     render(result);
     
     // Show export section
@@ -299,6 +369,7 @@ exportBtn.addEventListener('click', async () => {
       PcRAM: result.systemInfo?.ram || null,
       PcOS: result.systemInfo?.os || null,
       CreatedAt: result.createdAt || null,
+      SystemPrompt: result.systemPromptName || null,
       Prompt: result.query || null,
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,
@@ -342,6 +413,7 @@ exportBtn.addEventListener('click', async () => {
       PcRAM: result.systemInfo?.ram || null,
       PcOS: result.systemInfo?.os || null,
       CreatedAt: result.createdAt || null,
+      SystemPrompt: result.systemPromptName || null,
       Prompt: result.query || null,
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,

@@ -9,13 +9,15 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3) {
+  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null) {
     try {
       const searchModel = model || this.searchModel;
-      const searchResponse = await this.#search(query, searchModel, temperature, context);
+      const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt);
+      searchResponse.systemPromptName = systemPromptName;
       const result = {
         query,
         response: searchResponse.response,
+        systemPromptName: searchResponse.systemPromptName,
         createdAt: this.#formatCreatedAt(),
         pcCode: this.#generatePcCode(),
         systemInfo: this.#getSystemInfo(),
@@ -57,11 +59,13 @@ class CombinedSearchScorer {
   }
 
   /* private */
-  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3) {
+  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null) {
     try {
+      const finalPrompt = systemPrompt ? `${systemPrompt}\n\nUser: ${query}` : query;
+      
       const res = await this.ollama.generate({
         model: model,
-        prompt: query,
+        prompt: finalPrompt,
         stream: false,
         options: {
           temperature: temperature,
@@ -70,6 +74,7 @@ class CombinedSearchScorer {
       });
       return {
         response: res.response,
+        systemPromptName: null, // Will be set by caller
         metrics: {
           model: res.model,
           total_duration: res.total_duration,
