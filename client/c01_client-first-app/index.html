@@ -8,7 +8,7 @@
     h1   { margin-top: 0; }
     label { font-weight: 600; }
     select { width: 100%; padding: .5rem; margin: .5rem 0 1rem; }
-    select#temperature, select#context { width: auto; display: inline-block; margin: 0 .5rem; }
+    select#temperature, select#context, select#tokens { width: auto; display: inline-block; margin: 0 .5rem; }
     textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; }
     button { padding: .5rem 1rem; }
     #output { white-space: pre-wrap; margin-top: 2rem; background:#f6f6f6; padding:1rem; border-radius:6px; }
@@ -21,6 +21,11 @@
   <h1>AI Search + Score</h1>
 
   <form id="searchForm">
+    <label for="sourceType">Source Type:</label><br />
+    <select id="sourceType">
+      <option value="">Loading...</option>
+    </select><br />
+    
     <label for="model">Model:</label><br />
     <select id="model" required>
       <option value="">Loading models...</option>
@@ -34,21 +39,26 @@
     <label>Model Options:</label>
     <label for="temperature">Temperature:</label>
     <select id="temperature">
-      <option value="0.3" selected>Predictable</option>
-      <option value="0.6">Moderate</option>
-      <option value="0.9">Creative</option>
+      <option value="">Loading...</option>
     </select>
     
     <label for="context">Context:</label>
     <select id="context">
-      <option value="2048">2048</option>
-      <option value="4096" selected>4096</option>
-      <option value="8192">8192</option>
-      <option value="16384">16384</option>
+      <option value="">Loading...</option>
+    </select>
+    
+    <label for="tokens">Tokens:</label>
+    <select id="tokens">
+      <option value="">Loading...</option>
     </select><br /><br />
 
+    <label for="userPrompts">User Prompts:</label><br />
+    <select id="userPrompts">
+      <option value="">Loading...</option>
+    </select><br />
+    
     <label for="query">Enter your prompt:</label><br />
-    <textarea id="query" required placeholder="Ask me anything…"></textarea><br />
+    <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea><br />
 
     <label>
       <input type="checkbox" id="scoreToggle" />

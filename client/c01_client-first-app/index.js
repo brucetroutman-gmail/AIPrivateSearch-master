@@ -1,16 +1,42 @@
 import { search, getModels } from './services/api.js';
 
 const form       = document.getElementById('searchForm');
+const sourceTypeEl = document.getElementById('sourceType');
 const modelEl    = document.getElementById('model');
 const assistantTypeEl = document.getElementById('assistantType');
+const userPromptsEl = document.getElementById('userPrompts');
 const queryEl    = document.getElementById('query');
 const scoreTglEl = document.getElementById('scoreToggle');
 const temperatureEl = document.getElementById('temperature');
 const contextEl  = document.getElementById('context');
+const tokensEl   = document.getElementById('tokens');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
 
 let systemPrompts = [];
+
+// Load source types from JSON file
+async function loadSourceTypes() {
+  try {
+    const response = await fetch('./config/source-types.json');
+    const data = await response.json();
+    
+    sourceTypeEl.innerHTML = data.source_types.map(source => 
+      `<option value="${source.name}">${source.name}</option>`
+    ).join('');
+    
+    // Restore last used selection
+    const lastUsed = localStorage.getItem('lastSourceType');
+    if (lastUsed && data.source_types.find(s => s.name === lastUsed)) {
+      sourceTypeEl.value = lastUsed;
+    } else {
+      sourceTypeEl.value = data.source_types[0]?.name || '';
+    }
+  } catch (error) {
+    sourceTypeEl.innerHTML = '<option value="">Error loading source types</option>';
+    console.error('Failed to load source types:', error);
+  }
+}
 
 // Load models on page load
 async function loadModels() {
@@ -36,14 +62,19 @@ async function loadModels() {
   }
 }
 
+loadSourceTypes();
 loadModels();
 loadSystemPrompts();
+loadUserPrompts();
+loadTemperatureOptions();
+loadContextOptions();
+loadTokensOptions();
 restoreModelOptions();
 
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
   try {
-    const response = await fetch('./system-prompts.json');
+    const response = await fetch('./config/system-prompts.json');
     const data = await response.json();
     systemPrompts = data.system_prompts;
     
@@ -63,6 +94,29 @@ async function loadSystemPrompts() {
     console.error('Failed to load system prompts:', error);
   }
 }
+
+// Load user prompts from JSON file
+async function loadUserPrompts() {
+  try {
+    const response = await fetch('./config/users-prompts.json');
+    const data = await response.json();
+    
+    userPromptsEl.innerHTML = '<option value="">Select a prompt...</option>' + 
+      data.user_prompts.map(prompt => 
+        `<option value="${prompt.prompt}">${prompt.name}</option>`
+      ).join('');
+  } catch (error) {
+    userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
+    console.error('Failed to load user prompts:', error);
+  }
+}
+
+// Handle user prompt selection
+userPromptsEl.addEventListener('change', () => {
+  if (userPromptsEl.value) {
+    queryEl.value = userPromptsEl.value;
+  }
+});
 
 // Save assistant type selection
 assistantTypeEl.addEventListener('change', () => {
@@ -84,6 +138,67 @@ contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
 });
 
+// Save source type selection
+sourceTypeEl.addEventListener('change', () => {
+  localStorage.setItem('lastSourceType', sourceTypeEl.value);
+});
+
+// Save tokens selection
+tokensEl.addEventListener('change', () => {
+  localStorage.setItem('lastTokens', tokensEl.value);
+});
+
+// Load temperature options from JSON file
+async function loadTemperatureOptions() {
+  try {
+    const response = await fetch('./config/temperature.json');
+    const data = await response.json();
+    
+    temperatureEl.innerHTML = data.temperature.map(temp => 
+      `<option value="${temp.value}">${temp.name}</option>`
+    ).join('');
+  } catch (error) {
+    console.error('Failed to load temperature options:', error);
+  }
+}
+
+// Load context options from JSON file
+async function loadContextOptions() {
+  try {
+    const response = await fetch('./config/context.json');
+    const data = await response.json();
+    
+    contextEl.innerHTML = data.source_types.map(context => 
+      `<option value="${context.name}">${context.name}</option>`
+    ).join('');
+  } catch (error) {
+    console.error('Failed to load context options:', error);
+  }
+}
+
+// Load tokens options from JSON file
+async function loadTokensOptions() {
+  try {
+    const response = await fetch('./config/tokens.json');
+    const data = await response.json();
+    
+    tokensEl.innerHTML = data.tokens.map(token => 
+      `<option value="${token.name}">${token.name}</option>`
+    ).join('');
+    
+    // Restore last used selection
+    const lastUsed = localStorage.getItem('lastTokens');
+    if (lastUsed && data.tokens.find(t => t.name === lastUsed)) {
+      tokensEl.value = lastUsed;
+    } else {
+      tokensEl.value = data.tokens[0]?.name || '';
+    }
+  } catch (error) {
+    tokensEl.innerHTML = '<option value="">Error loading tokens</option>';
+    console.error('Failed to load tokens options:', error);
+  }
+}
+
 // Restore model options from localStorage
 function restoreModelOptions() {
   const lastTemperature = localStorage.getItem('lastTemperature');
@@ -94,6 +209,11 @@ function restoreModelOptions() {
   const lastContext = localStorage.getItem('lastContext');
   if (lastContext) {
     contextEl.value = lastContext;
+  }
+  
+  const lastTokens = localStorage.getItem('lastTokens');
+  if (lastTokens) {
+    tokensEl.value = lastTokens;
   }
 }
 
@@ -165,7 +285,7 @@ function render(result) {
     tbl.className = 'score-table';
     let tableHTML = `
       <thead>
-        <tr><th>Operation</th><th>Model</th><th>Duration</th><th>Load</th><th>Eval Rate</th><th>Context</th><th>Temperature</th></tr>
+        <tr><th>Operation</th><th>Model</th><th>Duration</th><th>Load</th><th>Tokens</th><th>Eval Rate</th><th>Context</th><th>Temperature</th></tr>
       </thead>
       <tbody>`;
 
@@ -174,7 +294,7 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Search</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      tableHTML += `<tr><td>Search</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
 
     if (result.metrics.scoring) {
@@ -182,7 +302,7 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Scoring</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      tableHTML += `<tr><td>Scoring</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
 
     if (result.metrics.scoringRetry) {
@@ -190,7 +310,7 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Scoring Retry</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      tableHTML += `<tr><td>Scoring Retry</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
     }
 
     tableHTML += '</tbody>';
@@ -247,7 +367,12 @@ form.addEventListener('submit', async (e) => {
     const systemPrompt = selectedPrompt ? selectedPrompt.prompt : null;
     const systemPromptName = selectedPrompt ? selectedPrompt.name : null;
     
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName);
+    // Get token limit
+    const tokenLimit = tokensEl.value === 'No Limit' ? null : 
+                      tokensEl.value === '250' ? 250 : 
+                      tokensEl.value === '500' ? 500 : null;
+    
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value);
     render(result);
     
     // Show export section
@@ -369,11 +494,13 @@ exportBtn.addEventListener('click', async () => {
       PcRAM: result.systemInfo?.ram || null,
       PcOS: result.systemInfo?.os || null,
       CreatedAt: result.createdAt || null,
+      SourceType: result.sourceType || null,
       SystemPrompt: result.systemPromptName || null,
       Prompt: result.query || null,
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,
       'ModelTemperature-search': result.metrics?.search?.temperature || null,
+      'ModelTokenLimit-search': result.tokenLimit || null,
       'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
       'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
       'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
@@ -413,11 +540,13 @@ exportBtn.addEventListener('click', async () => {
       PcRAM: result.systemInfo?.ram || null,
       PcOS: result.systemInfo?.os || null,
       CreatedAt: result.createdAt || null,
+      SourceType: result.sourceType || null,
       SystemPrompt: result.systemPromptName || null,
       Prompt: result.query || null,
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,
       'ModelTemperature-search': result.metrics?.search?.temperature || null,
+      'ModelTokenLimit-search': result.tokenLimit || null,
       'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
       'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
       'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,

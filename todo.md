@@ -28,6 +28,8 @@ specs-3-scoring
 
 13. add user prompts dropdown
 
+14. Terminal interface for multiple tests?
+
 12. Can We make an electron app for this that runs locally on a mac?
 
 13. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 

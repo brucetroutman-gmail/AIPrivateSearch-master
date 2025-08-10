@@ -19,13 +19,13 @@ router.post('/save', async (req, res) => {
     
     const insertQuery = `
       INSERT INTO searches (
-        TestCode, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SystemPrompt, Prompt,
-        \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`,
+        TestCode, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
+        \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
@@ -36,11 +36,13 @@ router.post('/save', async (req, res) => {
       data.PcRAM,
       data.PcOS,
       data.CreatedAt,
+      data.SourceType,
       data.SystemPrompt,
       data.Prompt,
       data['ModelName-search'],
       data['ModelContextSize-search'],
       data['ModelTemperature-search'],
+      data['ModelTokenLimit-search'],
       data['Duration-search-s'],
       data['Load-search-ms'],
       data['EvalTokensPerSecond-ssearch'],

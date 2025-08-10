@@ -9,15 +9,19 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null) {
+  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null) {
     try {
       const searchModel = model || this.searchModel;
-      const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt);
+      const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
       searchResponse.systemPromptName = systemPromptName;
+      searchResponse.sourceType = sourceType;
+      searchResponse.tokenLimit = tokenLimit;
       const result = {
         query,
         response: searchResponse.response,
         systemPromptName: searchResponse.systemPromptName,
+        sourceType: searchResponse.sourceType,
+        tokenLimit: searchResponse.tokenLimit,
         createdAt: this.#formatCreatedAt(),
         pcCode: this.#generatePcCode(),
         systemInfo: this.#getSystemInfo(),
@@ -59,18 +63,25 @@ class CombinedSearchScorer {
   }
 
   /* private */
-  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null) {
+  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null, tokenLimit = null) {
     try {
       const finalPrompt = systemPrompt ? `${systemPrompt}\n\nUser: ${query}` : query;
+      
+      const options = {
+        temperature: temperature,
+        num_ctx: context
+      };
+      
+      // Add token limit if specified
+      if (tokenLimit !== null) {
+        options.num_predict = tokenLimit;
+      }
       
       const res = await this.ollama.generate({
         model: model,
         prompt: finalPrompt,
         stream: false,
-        options: {
-          temperature: temperature,
-          num_ctx: context
-        }
+        options: options
       });
       return {
         response: res.response,
