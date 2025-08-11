@@ -98,7 +98,7 @@ async function loadSystemPrompts() {
 // Load user prompts from JSON file
 async function loadUserPrompts() {
   try {
-    const response = await fetch('./config/users-prompts.json');
+    const response = await fetch('./config/user-prompts.json');
     const data = await response.json();
     
     userPromptsEl.innerHTML = '<option value="">Select a prompt...</option>' + 
@@ -168,7 +168,7 @@ async function loadContextOptions() {
     const response = await fetch('./config/context.json');
     const data = await response.json();
     
-    contextEl.innerHTML = data.source_types.map(context => 
+    contextEl.innerHTML = data.context.map(context => 
       `<option value="${context.name}">${context.name}</option>`
     ).join('');
   } catch (error) {

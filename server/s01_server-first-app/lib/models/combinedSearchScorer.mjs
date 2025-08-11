@@ -1,11 +1,33 @@
 import { Ollama } from 'ollama';
 import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 class CombinedSearchScorer {
   constructor() {
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.searchModel = 'qwen2:0.5b';
-    this.scoreModel  = 'gemma2:2b-instruct-q4_0';
+    this.scoreSettings = this.#loadScoreSettings();
+  }
+
+  #loadScoreSettings() {
+    try {
+      const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const settings = {};
+      config['score-settings'].forEach(item => {
+        Object.assign(settings, item);
+      });
+      return settings;
+    } catch (error) {
+      console.error('Error loading score settings:', error);
+      return {
+        model: 'gemma2:2b-instruct-q4_0',
+        temperature: 0.3,
+        context: 4096,
+        maxtokens: 500
+      };
+    }
   }
 
   /* public */
@@ -165,12 +187,13 @@ Overall Comments: [Optional brief summary or additional notes]
 Please provide the evaluation in this exact format.`;
 
       const res = await this.ollama.generate({
-        model: this.scoreModel,
+        model: this.scoreSettings.model,
         prompt: scoringPrompt,
         stream: false,
         options: {
-          temperature: 0.3,
-          num_ctx: 4096
+          temperature: this.scoreSettings.temperature,
+          num_ctx: this.scoreSettings.context,
+          num_predict: this.scoreSettings.maxtokens
         }
       });
 
@@ -188,8 +211,9 @@ Please provide the evaluation in this exact format.`;
           prompt_eval_duration: res.prompt_eval_duration,
           eval_count: res.eval_count,
           eval_duration: res.eval_duration,
-          context_size: 4096,
-          temperature: 0.3
+          context_size: this.scoreSettings.context,
+          temperature: this.scoreSettings.temperature,
+          max_tokens: this.scoreSettings.maxtokens
         }
       };
     } catch (error) {

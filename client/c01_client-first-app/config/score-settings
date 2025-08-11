@@ -1,0 +1,16 @@
+{
+  "score-settings": [
+    {
+      "model": "gemma2:2b-instruct-q4_0"
+    },
+    {
+      "temperature": 0.3
+    },
+    {
+      "context": 2048
+    },
+    {
+      "maxtokens": 500
+    }
+  ]
+}
