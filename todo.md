@@ -26,21 +26,27 @@ specs-3-scoring
 
 12. add system propmts dropdown -done
 
-13. add user prompts dropdown
+13. add user prompts dropdown -done
 
-14. Terminal interface for multiple tests?
+14. Terminal interface for multiple tests? - no created test-executor  -done
 
-12. Can We make an electron app for this that runs locally on a mac?
+15. add copyright and licence and add aisearch-n-score.com  
 
-13. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
+15. Can We make an electron app for this that runs locally on a mac? -started
 
-14.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md
+16. create 50 tests - implement auto testing
 
-16. multiple models selection ??
+17. menu structure?  login, update config files. home, back ground from alan
 
-17. read prompts from tables ?? mutliple selections
+18. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
 
-18. 
+19.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md
+
+20. multiple models selection ??
+
+21. read prompts from tables ?? mutliple selections
+
+22. 
 
 
 

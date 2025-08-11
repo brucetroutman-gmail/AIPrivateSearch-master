@@ -19,17 +19,19 @@ router.post('/save', async (req, res) => {
     
     const insertQuery = `
       INSERT INTO searches (
-        TestCode, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
+        TestCode, TestCategory, TestDescription, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
       data.TestCode || '',
+      data.TestCategory,
+      data.TestDescription,
       data.PcCode,
       data.PcCPU,
       data.PcGraphics,

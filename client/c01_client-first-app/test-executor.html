@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Search Score - Test Executor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        .section-header { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        .subsection { margin: 10px 0 10px 20px; }
+        .subsection-header { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .test-item { margin: 5px 0; padding: 5px; }
+        .test-code { font-family: monospace; font-weight: bold; color: #0066cc; }
+        .controls { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .execute-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .execute-btn:hover { background: #0056b3; }
+        .execute-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .results { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; min-height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>AI Search Score - Test Executor</h1>
+    
+    <div class="model-selector" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <label for="model" style="font-weight: bold;">Model:</label><br>
+        <select id="model" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0 1rem;" required>
+            <option value="">Loading models...</option>
+        </select>
+    </div>
+    
+    <div class="controls">
+        <label><input type="checkbox" id="selectAll"> Select All Tests</label>
+        <button class="execute-btn" onclick="executeSelectedTests()">Execute Selected Tests</button>
+        <span id="selectedCount">0 tests selected</span>
+        <div id="executionStatus" style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px; display: none;">
+            <strong>🔄 Test Execution in Progress...</strong>
+            <div id="progressIndicator"></div>
+        </div>
+    </div>
+
+    <div id="testSections"></div>
+
+    <div class="results">
+        <h3>Test Results:</h3>
+        <div id="testResults">No tests executed yet.</div>
+    </div>
+
+    <script>
+        const modelTests = {
+            "baseline_tests": {
+                "title": "Baseline Tests",
+                "tests": [
+                    {"testcode": "t1111110", "description": "All minimum values, no scoring"},
+                    {"testcode": "t3554341", "description": "All maximum values, with scoring"},
+                    {"testcode": "t2323230", "description": "Mixed values, no scoring"},
+                    {"testcode": "t1452121", "description": "Mixed values, with scoring"},
+                    {"testcode": "t1234561", "description": "Sequential progression, with scoring"},
+                    {"testcode": "t3521430", "description": "Reverse progression, no scoring"},
+                    {"testcode": "t2143120", "description": "Random mix A, no scoring"},
+                    {"testcode": "t3415231", "description": "Random mix B, with scoring"}
+                ]
+            },
+            "parameter_specific_tests": {
+                "title": "Parameter-Specific Tests",
+                "source_type_variations": {
+                    "title": "Source Type Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "Local Model Only baseline"},
+                        {"testcode": "t2111110", "description": "Local Documents Only baseline"},
+                        {"testcode": "t3111110", "description": "Local Model and Documents baseline"}
+                    ]
+                },
+                "assistant_type_variations": {
+                    "title": "Assistant Type Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "Simple Assistant baseline"},
+                        {"testcode": "t1211110", "description": "Detailed Assistant baseline"},
+                        {"testcode": "t1311110", "description": "Reasoned Assistant baseline"},
+                        {"testcode": "t1411110", "description": "Creative Assistant baseline"},
+                        {"testcode": "t1511110", "description": "Coding Assistant baseline"}
+                    ]
+                },
+                "user_prompt_variations": {
+                    "title": "User Prompt Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "KNOWLEDGE-Quantum baseline"},
+                        {"testcode": "t1121110", "description": "REASON-AI-adopt baseline"},
+                        {"testcode": "t1131110", "description": "CREATE-AI-dialog baseline"},
+                        {"testcode": "t1141110", "description": "CODE-Pseudo baseline"},
+                        {"testcode": "t1151110", "description": "INSTRUCT-Fix wifi baseline"}
+                    ]
+                },
+                "temperature_variations": {
+                    "title": "Temperature Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "Predictable (0.3) baseline"},
+                        {"testcode": "t1111210", "description": "Moderate (0.6) baseline"},
+                        {"testcode": "t1111310", "description": "Creative (0.9) baseline"}
+                    ]
+                },
+                "context_variations": {
+                    "title": "Context Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "2048 context baseline"},
+                        {"testcode": "t1111120", "description": "4096 context baseline"},
+                        {"testcode": "t1111130", "description": "8192 context baseline"},
+                        {"testcode": "t1111140", "description": "16384 context baseline"}
+                    ]
+                },
+                "token_limit_variations": {
+                    "title": "Token Limit Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "No Limit baseline"},
+                        {"testcode": "t1111120", "description": "250 tokens baseline"},
+                        {"testcode": "t1111130", "description": "500 tokens baseline"}
+                    ]
+                },
+                "scoring_variations": {
+                    "title": "Scoring Variations",
+                    "tests": [
+                        {"testcode": "t1111110", "description": "No scoring baseline"},
+                        {"testcode": "t1111111", "description": "With scoring baseline"}
+                    ]
+                }
+            },
+            "edge_case_tests": {
+                "title": "Edge Case Tests",
+                "tests": [
+                    {"testcode": "t1111431", "description": "Maximum Context + Maximum Tokens + Scoring"},
+                    {"testcode": "t1413111", "description": "Creative Assistant + Creative Temperature + Scoring"},
+                    {"testcode": "t1544111", "description": "Coding Assistant + CODE-Pseudo + Scoring"},
+                    {"testcode": "t3254321", "description": "All Documents + Detailed + AI-adopt + Moderate + 8192 + 250 + Scoring"},
+                    {"testcode": "t2135140", "description": "Documents + Simple + CREATE + Creative + 16384 + No Limit + No Scoring"}
+                ]
+            },
+            "compatibility_tests": {
+                "title": "Compatibility Tests",
+                "tests": [
+                    {"testcode": "t1444331", "description": "Creative Assistant + Creative Temperature + Creative Tokens + Scoring"},
+                    {"testcode": "t5511111", "description": "Invalid (Assistant Type 5 max) - Error handling test"},
+                    {"testcode": "t1611111", "description": "Invalid (User Prompt 6 max) - Error handling test"}
+                ]
+            }
+        };
+
+        function renderTests() {
+            const container = document.getElementById('testSections');
+            
+            // Baseline Tests
+            container.appendChild(createSection('baseline', modelTests.baseline_tests));
+            
+            // Parameter Tests
+            const paramSection = document.createElement('div');
+            paramSection.className = 'section';
+            paramSection.innerHTML = `
+                <div class="section-header">
+                    <label><input type="checkbox" id="selectParameter"> Parameter-Specific Tests</label>
+                </div>
+            `;
+            
+            Object.entries(modelTests.parameter_specific_tests).forEach(([key, value]) => {
+                if (key !== 'title' && value.tests) {
+                    const subsection = document.createElement('div');
+                    subsection.className = 'subsection';
+                    subsection.innerHTML = `
+                        <div class="subsection-header">
+                            <label><input type="checkbox" class="subsection-select" data-group="${key}"> ${value.title}</label>
+                        </div>
+                    `;
+                    value.tests.forEach(test => {
+                        subsection.appendChild(createTestItem(test, 'parameter'));
+                    });
+                    paramSection.appendChild(subsection);
+                }
+            });
+            container.appendChild(paramSection);
+            
+            // Edge Case Tests
+            container.appendChild(createSection('edge', modelTests.edge_case_tests));
+            
+            // Compatibility Tests
+            container.appendChild(createSection('compatibility', modelTests.compatibility_tests));
+            
+            setupEventListeners();
+        }
+
+        function createSection(type, data) {
+            const section = document.createElement('div');
+            section.className = 'section';
+            section.innerHTML = `
+                <div class="section-header">
+                    <label><input type="checkbox" id="select${type.charAt(0).toUpperCase() + type.slice(1)}"> ${data.title}</label>
+                </div>
+            `;
+            
+            data.tests.forEach(test => {
+                section.appendChild(createTestItem(test, type));
+            });
+            
+            return section;
+        }
+
+        function createTestItem(test, group) {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.innerHTML = `
+                <label>
+                    <input type="checkbox" class="test-checkbox" data-testcode="${test.testcode}" data-group="${group}">
+                    <span class="test-code">${test.testcode}</span> - ${test.description}
+                </label>
+            `;
+            return item;
+        }
+
+        function setupEventListeners() {
+            // Select All
+            document.getElementById('selectAll').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.test-checkbox');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateSelectedCount();
+            });
+
+            // Section selectors
+            ['Baseline', 'Edge', 'Compatibility'].forEach(type => {
+                const selector = document.getElementById(`select${type}`);
+                if (selector) {
+                    selector.addEventListener('change', function() {
+                        const group = type.toLowerCase();
+                        const checkboxes = document.querySelectorAll(`[data-group="${group}"]`);
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                        updateSelectedCount();
+                    });
+                }
+            });
+
+            // Parameter section
+            document.getElementById('selectParameter').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('[data-group="parameter"]');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateSelectedCount();
+            });
+
+            // Subsection selectors
+            document.querySelectorAll('.subsection-select').forEach(selector => {
+                selector.addEventListener('change', function() {
+                    const group = this.dataset.group;
+                    const checkboxes = this.closest('.subsection').querySelectorAll('.test-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            });
+
+            // Individual test checkboxes
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('test-checkbox')) {
+                    updateSelectedCount();
+                }
+            });
+        }
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.test-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = `${selected} tests selected`;
+        }
+
+        async function executeSelectedTests() {
+            const selected = Array.from(document.querySelectorAll('.test-checkbox:checked'))
+                .map(cb => cb.dataset.testcode);
+            
+            const selectedModel = document.getElementById('model').value;
+            
+            if (selected.length === 0) {
+                alert('Please select at least one test to execute.');
+                return;
+            }
+            
+            if (!selectedModel) {
+                alert('Please select a model first.');
+                return;
+            }
+
+            // Show execution status at top
+            const statusDiv = document.getElementById('executionStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Executing ${selected.length} tests with model: ${selectedModel}...`;
+            
+            // Clear bottom results
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            // Load configuration data
+            const [sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions] = await Promise.all([
+                fetch('./config/source-types.json').then(r => r.json()),
+                fetch('./config/system-prompts.json').then(r => r.json()),
+                fetch('./config/user-prompts.json').then(r => r.json()),
+                fetch('./config/temperature.json').then(r => r.json()),
+                fetch('./config/context.json').then(r => r.json()),
+                fetch('./config/tokens.json').then(r => r.json())
+            ]);
+            
+            let completedTests = 0;
+            const results = [];
+            
+            for (const testCode of selected) {
+                try {
+                    const params = parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions);
+                    const result = await executeTest(params, selectedModel, testCode, params.testCategory, params.testDescription);
+                    results.push({ testCode, result, success: true });
+                } catch (error) {
+                    results.push({ testCode, error: error.message, success: false });
+                }
+                
+                completedTests++;
+                progressDiv.innerHTML = `Completed ${completedTests}/${selected.length} tests...`;
+            }
+            
+            // Hide execution status and display results
+            statusDiv.style.display = 'none';
+            displayTestResults(results);
+        }
+        
+        function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {
+            // Parse testcode pattern: t[1-3][1-5][1-5][1-3][1-4][1-3][0-1]
+            const sourceTypeMap = ['Local Model Only', 'Local Documents Only', 'Local Model and Documents'];
+            const assistantTypeMap = ['Simple Assistant', 'Detailed Assistant', 'Reasoned Assistant', 'Creative Assistant', 'Coding Assistant'];
+            const userPromptMap = ['KNOWLEDGE-Quantum', 'REASON-AI-adopt', 'CREATE-AI-dialog', 'CODE-Pseudo', 'INSTRUCT-Fix wifi'];
+            const temperatureMap = [0.3, 0.6, 0.9];
+            const contextMap = [2048, 4096, 8192, 16384];
+            const tokenMap = ['No Limit', '250', '500'];
+            
+            const sourceType = sourceTypeMap[parseInt(testCode[1]) - 1];
+            const assistantType = assistantTypeMap[parseInt(testCode[2]) - 1];
+            const userPromptType = userPromptMap[parseInt(testCode[3]) - 1];
+            const temperature = temperatureMap[parseInt(testCode[4]) - 1];
+            const context = contextMap[parseInt(testCode[5]) - 1];
+            const tokens = tokenMap[parseInt(testCode[6]) - 1];
+            const generateScores = testCode[7] === '1';
+            
+            // Determine test category and description
+            const { testCategory, testDescription } = getTestCategoryAndDescription(testCode);
+            
+            // Get system prompt
+            const systemPrompt = systemPrompts.system_prompts.find(p => p.name === assistantType);
+            
+            // Get user prompt
+            const userPrompt = userPrompts.user_prompts.find(p => p.name === userPromptType);
+            
+            return {
+                sourceType,
+                assistantType,
+                systemPrompt: systemPrompt?.prompt || '',
+                systemPromptName: assistantType,
+                userPrompt: userPrompt?.prompt || 'Default test prompt',
+                temperature,
+                context,
+                tokens: tokens === 'No Limit' ? null : parseInt(tokens),
+                generateScores,
+                testCategory,
+                testDescription
+            };
+        }
+        
+        function getTestCategoryAndDescription(testCode) {
+            // Define test categories based on the test patterns from AISearchScore-Testcodes.md
+            const baselineTests = ['t1111110', 't3554341', 't2323230', 't1452121', 't1234561', 't3521430', 't2143120', 't3415231'];
+            const sourceTypeTests = ['t1111110', 't2111110', 't3111110'];
+            const assistantTypeTests = ['t1111110', 't1211110', 't1311110', 't1411110', 't1511110'];
+            const userPromptTests = ['t1111110', 't1121110', 't1131110', 't1141110', 't1151110'];
+            const temperatureTests = ['t1111110', 't1111210', 't1111310'];
+            const contextTests = ['t1111110', 't1111120', 't1111130', 't1111140'];
+            const tokenTests = ['t1111110', 't1111120', 't1111130'];
+            const scoringTests = ['t1111110', 't1111111'];
+            const edgeCaseTests = ['t1111431', 't1413111', 't1544111', 't3254321', 't2135140'];
+            const compatibilityTests = ['t1444331', 't5511111', 't1611111'];
+            
+            if (baselineTests.includes(testCode)) {
+                return {
+                    testCategory: 'Baseline Tests',
+                    testDescription: getBaselineDescription(testCode)
+                };
+            } else if (edgeCaseTests.includes(testCode)) {
+                return {
+                    testCategory: 'Edge Case Tests',
+                    testDescription: getEdgeCaseDescription(testCode)
+                };
+            } else if (compatibilityTests.includes(testCode)) {
+                return {
+                    testCategory: 'Compatibility Tests',
+                    testDescription: getCompatibilityDescription(testCode)
+                };
+            } else if (sourceTypeTests.includes(testCode)) {
+                return {
+                    testCategory: 'Source Type Variations',
+                    testDescription: getSourceTypeDescription(testCode)
+                };
+            } else if (assistantTypeTests.includes(testCode)) {
+                return {
+                    testCategory: 'Assistant Type Variations',
+                    testDescription: getAssistantTypeDescription(testCode)
+                };
+            } else if (userPromptTests.includes(testCode)) {
+                return {
+                    testCategory: 'User Prompt Variations',
+                    testDescription: getUserPromptDescription(testCode)
+                };
+            } else if (temperatureTests.includes(testCode)) {
+                return {
+                    testCategory: 'Temperature Variations',
+                    testDescription: getTemperatureDescription(testCode)
+                };
+            } else if (contextTests.includes(testCode)) {
+                return {
+                    testCategory: 'Context Variations',
+                    testDescription: getContextDescription(testCode)
+                };
+            } else if (tokenTests.includes(testCode)) {
+                return {
+                    testCategory: 'Token Limit Variations',
+                    testDescription: getTokenDescription(testCode)
+                };
+            } else if (scoringTests.includes(testCode)) {
+                return {
+                    testCategory: 'Scoring Variations',
+                    testDescription: getScoringDescription(testCode)
+                };
+            } else {
+                return {
+                    testCategory: 'Custom Test',
+                    testDescription: 'Custom test configuration'
+                };
+            }
+        }
+        
+        function getBaselineDescription(testCode) {
+            const descriptions = {
+                't1111110': 'All minimum values, no scoring',
+                't3554341': 'All maximum values, with scoring',
+                't2323230': 'Mixed values, no scoring',
+                't1452121': 'Mixed values, with scoring',
+                't1234561': 'Sequential progression, with scoring',
+                't3521430': 'Reverse progression, no scoring',
+                't2143120': 'Random mix A, no scoring',
+                't3415231': 'Random mix B, with scoring'
+            };
+            return descriptions[testCode] || 'Baseline test';
+        }
+        
+        function getEdgeCaseDescription(testCode) {
+            const descriptions = {
+                't1111431': 'Maximum Context + Maximum Tokens + Scoring',
+                't1413111': 'Creative Assistant + Creative Temperature + Scoring',
+                't1544111': 'Coding Assistant + CODE-Pseudo + Scoring',
+                't3254321': 'All Documents + Detailed + AI-adopt + Moderate + 8192 + 250 + Scoring',
+                't2135140': 'Documents + Simple + CREATE + Creative + 16384 + No Limit + No Scoring'
+            };
+            return descriptions[testCode] || 'Edge case test';
+        }
+        
+        function getCompatibilityDescription(testCode) {
+            const descriptions = {
+                't1444331': 'Creative Assistant + Creative Temperature + Creative Tokens + Scoring',
+                't5511111': 'Invalid (Assistant Type 5 max) - Error handling test',
+                't1611111': 'Invalid (User Prompt 6 max) - Error handling test'
+            };
+            return descriptions[testCode] || 'Compatibility test';
+        }
+        
+        function getSourceTypeDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Local Model Only baseline',
+                't2111110': 'Local Documents Only baseline',
+                't3111110': 'Local Model and Documents baseline'
+            };
+            return descriptions[testCode] || 'Source type variation';
+        }
+        
+        function getAssistantTypeDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Simple Assistant baseline',
+                't1211110': 'Detailed Assistant baseline',
+                't1311110': 'Reasoned Assistant baseline',
+                't1411110': 'Creative Assistant baseline',
+                't1511110': 'Coding Assistant baseline'
+            };
+            return descriptions[testCode] || 'Assistant type variation';
+        }
+        
+        function getUserPromptDescription(testCode) {
+            const descriptions = {
+                't1111110': 'KNOWLEDGE-Quantum baseline',
+                't1121110': 'REASON-AI-adopt baseline',
+                't1131110': 'CREATE-AI-dialog baseline',
+                't1141110': 'CODE-Pseudo baseline',
+                't1151110': 'INSTRUCT-Fix wifi baseline'
+            };
+            return descriptions[testCode] || 'User prompt variation';
+        }
+        
+        function getTemperatureDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Predictable (0.3) baseline',
+                't1111210': 'Moderate (0.6) baseline',
+                't1111310': 'Creative (0.9) baseline'
+            };
+            return descriptions[testCode] || 'Temperature variation';
+        }
+        
+        function getContextDescription(testCode) {
+            const descriptions = {
+                't1111110': '2048 context baseline',
+                't1111120': '4096 context baseline',
+                't1111130': '8192 context baseline',
+                't1111140': '16384 context baseline'
+            };
+            return descriptions[testCode] || 'Context variation';
+        }
+        
+        function getTokenDescription(testCode) {
+            const descriptions = {
+                't1111110': 'No Limit baseline',
+                't1111120': '250 tokens baseline',
+                't1111130': '500 tokens baseline'
+            };
+            return descriptions[testCode] || 'Token limit variation';
+        }
+        
+        function getScoringDescription(testCode) {
+            const descriptions = {
+                't1111110': 'No scoring baseline',
+                't1111111': 'With scoring baseline'
+            };
+            return descriptions[testCode] || 'Scoring variation';
+        }
+        
+        async function executeTest(params, model, testCode, testCategory, testDescription) {
+            const response = await fetch('./services/api.js');
+            const apiModule = await import('./services/api.js');
+            
+            const result = await apiModule.search(
+                params.userPrompt,
+                params.generateScores,
+                model,
+                params.temperature,
+                params.context,
+                params.systemPrompt,
+                params.systemPromptName,
+                params.tokens,
+                params.sourceType,
+                testCode
+            );
+            
+            // Export to database with category and description
+            await exportToDatabase(result, testCategory, testDescription);
+            
+            return result;
+        }
+        
+        async function exportToDatabase(result, testCategory, testDescription) {
+            const dbData = {
+                TestCode: result.testCode || '',
+                TestCategory: testCategory || null,
+                TestDescription: testDescription || null,
+                PcCode: result.pcCode || null,
+                PcCPU: result.systemInfo?.chip || null,
+                PcGraphics: result.systemInfo?.graphics || null,
+                PcRAM: result.systemInfo?.ram || null,
+                PcOS: result.systemInfo?.os || null,
+                CreatedAt: result.createdAt || null,
+                SourceType: result.sourceType || null,
+                SystemPrompt: result.systemPromptName || null,
+                Prompt: result.query || null,
+                'ModelName-search': result.metrics?.search?.model || null,
+                'ModelContextSize-search': result.metrics?.search?.context_size || null,
+                'ModelTemperature-search': result.metrics?.search?.temperature || null,
+                'ModelTokenLimit-search': result.tokenLimit || null,
+                'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
+                'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
+                'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+                'Answer-search': result.response || null,
+                'ModelName-score': result.metrics?.scoring?.model || null,
+                'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
+                'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
+                'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
+                'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
+                'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
+                AccurateScore: result.scores?.accuracy || null,
+                RelevantScore: result.scores?.relevance || null,
+                OrganizedScore: result.scores?.organization || null,
+                'WeightedScore-pct': result.scores?.total || null
+            };
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/database/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dbData)
+                });
+                
+                const saveResult = await response.json();
+                if (!saveResult.success) {
+                    console.error('Database save failed:', saveResult.error);
+                }
+            } catch (error) {
+                console.error('Database save error:', error);
+            }
+        }
+        
+        function displayTestResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            let html = `<h4>Test Execution Complete (${results.length} tests)</h4>`;
+            
+            results.forEach(({ testCode, result, success, error }) => {
+                if (success) {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #28a745; border-radius: 5px; background: #d4edda;">
+                            <strong>${testCode}</strong> - ✅ Success
+                            <br><small>Response: ${result.response?.substring(0, 100)}...</small>
+                            <br><small>Saved to database</small>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #dc3545; border-radius: 5px; background: #f8d7da;">
+                            <strong>${testCode}</strong> - ❌ Failed
+                            <br><small>Error: ${error}</small>
+                        </div>
+                    `;
+                }
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Load models from Ollama
+        async function loadModels() {
+            try {
+                const response = await fetch('http://localhost:11434/api/tags');
+                const data = await response.json();
+                const modelSelect = document.getElementById('model');
+                modelSelect.innerHTML = '<option value="">Select a model...</option>';
+                
+                data.models
+                    .filter(model => !model.name.includes('nomic-embed-text'))
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.name;
+                        option.textContent = model.name;
+                        modelSelect.appendChild(option);
+                    });
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('model').innerHTML = '<option value="">Error loading Ollama models</option>';
+            }
+        }
+
+        // Initialize
+        loadModels();
+        renderTests();
+    </script>
+</body>
+</html>

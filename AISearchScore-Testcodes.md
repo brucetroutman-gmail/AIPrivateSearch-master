@@ -60,7 +60,7 @@ The TestCode system provides a systematic way to configure and track all paramet
 ## Recommended Test Strategy:
 
 ### **Baseline Tests** (8 tests):
-- **t1111111** = All minimum values, no scoring
+- **t1111110** = All minimum values, no scoring
 - **t3554341** = All maximum values, with scoring
 - **t2323230** = Mixed values, no scoring
 - **t1452121** = Mixed values, with scoring

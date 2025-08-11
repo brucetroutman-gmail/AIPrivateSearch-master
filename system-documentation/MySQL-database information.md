@@ -10,6 +10,8 @@ Password: FormR!1234
 CREATE TABLE `searches` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `TestCode` char(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `TestCategory` char(100) DEFAULT NULL,
+  `TestDescription` char(100) DEFAULT NULL,
   `PcCode` char(6) DEFAULT NULL,
   `PcCPU` char(100) DEFAULT NULL,
   `PcGraphics` char(100) DEFAULT NULL,
