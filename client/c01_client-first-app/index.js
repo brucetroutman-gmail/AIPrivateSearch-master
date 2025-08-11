@@ -199,6 +199,72 @@ async function loadTokensOptions() {
   }
 }
 
+// Generate TestCode based on current form selections
+function generateTestCode() {
+  // Position 1: 't' (fixed)
+  let testCode = 't';
+  
+  // Position 2: Source Type (1-3)
+  const sourceTypeMap = {
+    'Local Model Only': '1',
+    'Local Documents Only': '2', 
+    'Local Model and Documents': '3'
+  };
+  testCode += sourceTypeMap[sourceTypeEl.value] || '1';
+  
+  // Position 3: Assistant Type (1-5)
+  const assistantTypeMap = {
+    'Simple Assistant': '1',
+    'Detailed Assistant': '2',
+    'Reasoned Assistant': '3',
+    'Creative Assistant': '4',
+    'Coding Assistant': '5'
+  };
+  testCode += assistantTypeMap[assistantTypeEl.value] || '1';
+  
+  // Position 4: User Prompts (1-5)
+  const userPromptMap = {
+    'KNOWLEDGE-Quantum': '1',
+    'REASON-AI-adopt': '2',
+    'CREATE-AI-dialog': '3',
+    'CODE-Pseudo': '4',
+    'INSTRUCT-Fix wifi': '5'
+  };
+  // Check if query matches any template, default to 1
+  let userPromptCode = '1';
+  for (const [key, value] of Object.entries(userPromptMap)) {
+    const template = systemPrompts.find(p => p.name === key);
+    if (template && queryEl.value.includes(template.prompt.substring(0, 20))) {
+      userPromptCode = value;
+      break;
+    }
+  }
+  testCode += userPromptCode;
+  
+  // Position 5: Temperature (1-3)
+  const tempValue = parseFloat(temperatureEl.value);
+  const tempCode = tempValue === 0.3 ? '1' : tempValue === 0.6 ? '2' : '3';
+  testCode += tempCode;
+  
+  // Position 6: Context (1-4)
+  const contextValue = parseInt(contextEl.value);
+  const contextCode = contextValue === 2048 ? '1' : contextValue === 4096 ? '2' : contextValue === 8192 ? '3' : '4';
+  testCode += contextCode;
+  
+  // Position 7: Tokens (1-3)
+  const tokenMap = {
+    'No Limit': '1',
+    '250': '2',
+    '500': '3'
+  };
+  testCode += tokenMap[tokensEl.value] || '1';
+  
+  // Position 8: Generate Scores (0-1)
+  testCode += scoreTglEl.checked ? '1' : '0';
+  
+  return testCode;
+}
+
 // Restore model options from localStorage
 function restoreModelOptions() {
   const lastTemperature = localStorage.getItem('lastTemperature');
@@ -343,11 +409,11 @@ function render(result) {
     outputEl.append(sysTbl);
   }
 
-  // 5. created at
+  // 5. created at and test code
   const meta = document.createElement('p');
   meta.style.fontSize = '.8rem';
   meta.style.color = '#555';
-  meta.textContent = `CreatedAt: ${result.createdAt}`;
+  meta.textContent = `CreatedAt: ${result.createdAt} | Test Code: ${result.testCode || 'N/A'}`;
   outputEl.append(meta);
 }
 
@@ -372,7 +438,10 @@ form.addEventListener('submit', async (e) => {
                       tokensEl.value === '250' ? 250 : 
                       tokensEl.value === '500' ? 500 : null;
     
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value);
+    // Generate TestCode
+    const testCode = generateTestCode();
+    
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode);
     render(result);
     
     // Show export section
@@ -487,7 +556,7 @@ exportBtn.addEventListener('click', async () => {
     // Export as JSON with MySQL database field names
     const result = window.currentResult;
     const jsonData = {
-      TestCode: '',
+      TestCode: result.testCode || '',
       PcCode: result.pcCode || null,
       PcCPU: result.systemInfo?.chip || null,
       PcGraphics: result.systemInfo?.graphics || null,
@@ -533,7 +602,7 @@ exportBtn.addEventListener('click', async () => {
     // Export to database
     const result = window.currentResult;
     const dbData = {
-      TestCode: '',
+      TestCode: result.testCode || '',
       PcCode: result.pcCode || null,
       PcCPU: result.systemInfo?.chip || null,
       PcGraphics: result.systemInfo?.graphics || null,

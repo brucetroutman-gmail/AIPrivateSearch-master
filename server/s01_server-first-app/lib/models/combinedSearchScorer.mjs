@@ -9,7 +9,7 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null) {
+  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null) {
     try {
       const searchModel = model || this.searchModel;
       const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
@@ -22,6 +22,7 @@ class CombinedSearchScorer {
         systemPromptName: searchResponse.systemPromptName,
         sourceType: searchResponse.sourceType,
         tokenLimit: searchResponse.tokenLimit,
+        testCode: testCode,
         createdAt: this.#formatCreatedAt(),
         pcCode: this.#generatePcCode(),
         systemInfo: this.#getSystemInfo(),
