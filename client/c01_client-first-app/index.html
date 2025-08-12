@@ -1,89 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI-Search-Score – Demo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AISearch-n-Score - AI Model Evaluation Platform</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    h1   { margin-top: 0; }
-    label { font-weight: 600; }
-    select { width: 100%; padding: .5rem; margin: .5rem 0 1rem; }
-    select#temperature, select#context, select#tokens { width: auto; display: inline-block; margin: 0 .5rem; }
-    textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; }
-    button { padding: .5rem 1rem; }
-    #output { white-space: pre-wrap; margin-top: 2rem; background:#f6f6f6; padding:1rem; border-radius:6px; }
-    .score-table { border-collapse: collapse; margin-top: 1rem; }
-    .score-table th, .score-table td { border: 1px solid #ccc; padding: .4rem .6rem; text-align:center; }
-    .score-table th { background:#fafafa; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+    
+    /* Header */
+    .header {
+      background: #2c3e50;
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: gold;
+      text-decoration: none;
+    }
+    
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-menu a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    
+    .nav-menu a:hover {
+      background-color: #34495e;
+    }
+    
+    .login-icon {
+      background: #3498db;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      min-height: calc(100vh - 200px);
+    }
+    
+    .hero {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #3498db;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+    
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    
+    .feature {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .feature h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2c3e50;
+      color: white;
+      padding: 2rem 0;
+      margin-top: auto;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+    
+    .footer-links {
+      margin-bottom: 1rem;
+    }
+    
+    .footer-links a {
+      color: #bdc3c7;
+      text-decoration: none;
+      margin: 0 1rem;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+    }
+    
+    .copyright {
+      font-size: 0.9rem;
+      color: #bdc3c7;
+    }
   </style>
 </head>
 <body>
-  <h1>AI Search + Score</h1>
-  <nav style="margin-bottom: 1rem;">
-    <a href="./test-executor.html" style="padding: 0.5rem 1rem; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">Test Executor</a>
-  </nav>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="./index.html" class="logo">AISearch-n-Score</a>
+      <nav class="nav-menu">
+        <a href="./search.html">Search</a>
+        <a href="./test.html">Test</a>
+        <a href="#analyze">Analyze</a>
+        <div class="login-icon">👤</div>
+      </nav>
+    </div>
+  </header>
 
-  <form id="searchForm">
-    <label for="sourceType">Source Type:</label><br />
-    <select id="sourceType">
-      <option value="">Loading...</option>
-    </select><br />
-    
-    <label for="model">Model:</label><br />
-    <select id="model" required>
-      <option value="">Loading models...</option>
-    </select><br />
-    
-    <label for="assistantType">Assistant Type:</label><br />
-    <select id="assistantType">
-      <option value="">Loading system prompts...</option>
-    </select><br />
-    
-    <label>Model Options:</label>
-    <label for="temperature">Temperature:</label>
-    <select id="temperature">
-      <option value="">Loading...</option>
-    </select>
-    
-    <label for="context">Context:</label>
-    <select id="context">
-      <option value="">Loading...</option>
-    </select>
-    
-    <label for="tokens">Tokens:</label>
-    <select id="tokens">
-      <option value="">Loading...</option>
-    </select><br /><br />
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="hero">
+      <h1>AI Model Evaluation Platform</h1>
+      <p>Comprehensive testing and scoring system for AI models with systematic parameter evaluation, performance metrics, and detailed analytics.</p>
+      <div class="cta-buttons">
+        <a href="./search.html" class="btn btn-primary">Start Searching</a>
+        <a href="./test.html" class="btn btn-secondary">Run Tests</a>
+      </div>
+    </section>
 
-    <label for="userPrompts">User Prompts:</label><br />
-    <select id="userPrompts">
-      <option value="">Loading...</option>
-    </select><br />
-    
-    <label for="query">Enter your prompt:</label><br />
-    <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea><br />
+    <section class="features">
+      <div class="feature">
+        <h3>🔍 AI Search & Score</h3>
+        <p>Evaluate AI model responses with comprehensive scoring across accuracy, relevance, and organization metrics.</p>
+      </div>
+      <div class="feature">
+        <h3>🧪 Automated Testing</h3>
+        <p>Execute systematic test suites across 5,400 possible parameter combinations with automated result tracking.</p>
+      </div>
+      <div class="feature">
+        <h3>📊 Performance Analytics</h3>
+        <p>Detailed performance metrics including response times, token generation rates, and system resource usage.</p>
+      </div>
+      <div class="feature">
+        <h3>🎯 Parameter Control</h3>
+        <p>Fine-tune model behavior with temperature, context size, token limits, and assistant type configurations.</p>
+      </div>
+      <div class="feature">
+        <h3>💾 Data Export</h3>
+        <p>Export results in multiple formats including JSON, PDF, Markdown, and direct database storage.</p>
+      </div>
+      <div class="feature">
+        <h3>🔧 Model Integration</h3>
+        <p>Seamless integration with Ollama for local AI model execution and evaluation.</p>
+      </div>
+    </section>
+  </main>
 
-    <label>
-      <input type="checkbox" id="scoreToggle" />
-      Generate scores
-    </label><br /><br />
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <section id="output"></section>
-
-  <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 6px;">
-    <label for="exportFormat">Export Format:</label>
-    <select id="exportFormat">
-      <option value="pdf">Printer/PDF</option>
-      <option value="markdown">Markdown</option>
-      <option value="json">JSON</option>
-      <option value="database">Database</option>
-    </select>
-    <button type="button" id="exportBtn">Export</button>
-  </div>
-
-  <script type="module" src="./index.js"></script>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 AISearch-n-Score Group. All rights reserved.</p>
+        <p>Licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/" style="color: #bdc3c7;">Creative Commons Attribution-NonCommercial (CC BY-NC)</a>.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

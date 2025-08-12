@@ -3,9 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Search Score - Test Executor</title>
+    <title>Test-n-Save</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        /* Header and Footer Styles */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: gold;
+            text-decoration: none;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+        
+        .login-icon {
+            background: #3498db;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+        
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
         .section { margin: 20px 0; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
         .section-header { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
         .subsection { margin: 10px 0 10px 20px; }
@@ -20,7 +108,21 @@
     </style>
 </head>
 <body>
-    <h1>AI Search Score - Test Executor</h1>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="./index.html" class="logo">AISearch-n-Score</a>
+            <nav class="nav-menu">
+                <a href="./search.html">Search</a>
+                <a href="./test.html">Test</a>
+                <a href="./index.html#analyze">Analyze</a>
+                <div class="login-icon">👤</div>
+            </nav>
+        </div>
+    </header>
+
+    <div style="padding: 20px;">
+    <h1>Test-n-Save</h1>
     
     <div class="model-selector" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
         <label for="model" style="font-weight: bold;">Model:</label><br>
@@ -660,5 +762,21 @@
         loadModels();
         renderTests();
     </script>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AISearch-n-Score Group. All rights reserved.</p>
+                <p>Licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/" style="color: #bdc3c7;">Creative Commons Attribution-NonCommercial (CC BY-NC)</a>.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

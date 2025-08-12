@@ -30,11 +30,11 @@ specs-3-scoring
 
 14. Terminal interface for multiple tests? - no created test-executor  -done
 
-15. add copyright and licence and add aisearch-n-score.com  
+15. add copyright and licence and add aisearch-n-score.com  -done
 
 15. Can We make an electron app for this that runs locally on a mac? -started
 
-16. create 50 tests - implement auto testing
+16. create 35 tests - implement auto testing - done
 
 17. menu structure?  login, update config files. home, back ground from alan
 
