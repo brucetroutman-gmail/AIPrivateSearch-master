@@ -1,0 +1,142 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  
+  <!-- Background gradient -->
+  <rect width="1200" height="800" fill="url(#backgroundGradient)" />
+  
+  <!-- Floating database terms -->
+  <g opacity="0.15" font-family="Courier New, monospace" font-weight="bold">
+    <!-- Large terms -->
+    <text x="100" y="150" font-size="24" fill="rgba(173, 216, 230, 0.8)" transform="rotate(15 100 150)">PRIMARY KEY
+      <animateTransform attributeName="transform" type="translate" values="0,0; 50,-20; -30,40; 0,0" dur="15s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8; 0.4; 0.8" dur="8s" repeatCount="indefinite"/>
+    </text>
+    <text x="800" y="200" font-size="24" fill="rgba(144, 238, 144, 0.8)" transform="rotate(-20 800 200)">FOREIGN KEY
+      <animateTransform attributeName="transform" type="translate" values="0,0; -40,30; 20,-50; 0,0" dur="18s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8; 0.3; 0.8" dur="10s" repeatCount="indefinite"/>
+    </text>
+    <text x="300" y="600" font-size="24" fill="rgba(255, 255, 224, 0.8)" transform="rotate(25 300 600)">TRANSACTION
+      <animateTransform attributeName="transform" type="translate" values="0,0; 60,10; -20,-40; 0,0" dur="20s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8; 0.5; 0.8" dur="12s" repeatCount="indefinite"/>
+    </text>
+    <text x="900" y="650" font-size="24" fill="rgba(255, 182, 193, 0.8)" transform="rotate(-15 900 650)">NORMALIZATION
+      <animateTransform attributeName="transform" type="translate" values="0,0; -25,35; 45,-15; 0,0" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8; 0.4; 0.8" dur="9s" repeatCount="indefinite"/>
+    </text>
+    
+    <!-- Medium terms -->
+    <text x="50" y="350" font-size="20" fill="rgba(224, 255, 255, 0.7)" transform="rotate(45 50 350)">SELECT
+      <animateTransform attributeName="transform" type="translate" values="0,0; 30,-25; -40,35; 0,0" dur="14s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.3; 0.7" dur="7s" repeatCount="indefinite"/>
+    </text>
+    <text x="200" y="100" font-size="20" fill="rgba(173, 216, 230, 0.7)" transform="rotate(-30 200 100)">INSERT
+      <animateTransform attributeName="transform" type="translate" values="0,0; -20,45; 50,-10; 0,0" dur="17s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.4; 0.7" dur="11s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="120" font-size="20" fill="rgba(144, 238, 144, 0.7)" transform="rotate(10 600 120)">UPDATE
+      <animateTransform attributeName="transform" type="translate" values="0,0; 40,20; -30,-35; 0,0" dur="19s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.5; 0.7" dur="8.5s" repeatCount="indefinite"/>
+    </text>
+    <text x="950" y="350" font-size="20" fill="rgba(255, 255, 224, 0.7)" transform="rotate(-45 950 350)">DELETE
+      <animateTransform attributeName="transform" type="translate" values="0,0; -35,15; 25,-45; 0,0" dur="13s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.3; 0.7" dur="9.5s" repeatCount="indefinite"/>
+    </text>
+    <text x="150" y="750" font-size="20" fill="rgba(255, 182, 193, 0.7)" transform="rotate(30 150 750)">JOIN
+      <animateTransform attributeName="transform" type="translate" values="0,0; 55,-5; -15,40; 0,0" dur="21s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.4; 0.7" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="750" y="500" font-size="20" fill="rgba(224, 255, 255, 0.7)" transform="rotate(-25 750 500)">INDEX
+      <animateTransform attributeName="transform" type="translate" values="0,0; -45,25; 35,-20; 0,0" dur="15.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.5; 0.7" dur="10.5s" repeatCount="indefinite"/>
+    </text>
+    <text x="450" y="80" font-size="20" fill="rgba(173, 216, 230, 0.7)" transform="rotate(35 450 80)">TABLE
+      <animateTransform attributeName="transform" type="translate" values="0,0; 20,50; -55,-10; 0,0" dur="18.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.3; 0.7" dur="7.5s" repeatCount="indefinite"/>
+    </text>
+    <text x="1000" y="500" font-size="20" fill="rgba(144, 238, 144, 0.7)" transform="rotate(-40 1000 500)">SCHEMA
+      <animateTransform attributeName="transform" type="translate" values="0,0; -30,-40; 40,30; 0,0" dur="16.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7; 0.4; 0.7" dur="8s" repeatCount="indefinite"/>
+    </text>
+    
+    <!-- Regular terms -->
+    <text x="80" y="250" font-size="16" fill="rgba(255, 255, 255, 0.6)" transform="rotate(20 80 250)">ROW
+      <animateTransform attributeName="transform" type="translate" values="0,0; 25,30; -35,-20; 0,0" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.2; 0.6" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="350" y="200" font-size="16" fill="rgba(173, 216, 230, 0.6)" transform="rotate(-15 350 200)">COLUMN
+      <animateTransform attributeName="transform" type="translate" values="0,0; -40,15; 30,-40; 0,0" dur="22s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.3; 0.6" dur="9s" repeatCount="indefinite"/>
+    </text>
+    <text x="500" y="300" font-size="16" fill="rgba(144, 238, 144, 0.6)" transform="rotate(40 500 300)">QUERY
+      <animateTransform attributeName="transform" type="translate" values="0,0; 45,-15; -20,35; 0,0" dur="14.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.4; 0.6" dur="7s" repeatCount="indefinite"/>
+    </text>
+    <text x="700" y="350" font-size="16" fill="rgba(255, 255, 224, 0.6)" transform="rotate(-35 700 350)">RECORD
+      <animateTransform attributeName="transform" type="translate" values="0,0; -25,40; 50,-5; 0,0" dur="17.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.3; 0.6" dur="8s" repeatCount="indefinite"/>
+    </text>
+    <text x="250" y="450" font-size="16" fill="rgba(255, 182, 193, 0.6)" transform="rotate(25 250 450)">FIELD
+      <animateTransform attributeName="transform" type="translate" values="0,0; 35,25; -45,-30; 0,0" dur="13.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.5; 0.6" dur="5.5s" repeatCount="indefinite"/>
+    </text>
+    <text x="850" y="450" font-size="16" fill="rgba(224, 255, 255, 0.6)" transform="rotate(-20 850 450)">VIEW
+      <animateTransform attributeName="transform" type="translate" values="0,0; -30,-35; 40,20; 0,0" dur="20s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6; 0.2; 0.6" dur="10s" repeatCount="indefinite"/>
+    </text>
+    <text x="400" y="550" font-size="16" fill="rgba(173, 216, 230, 0.6)" transform="rotate(15 400 550)">TRIGGER</text>
+    <text x="650" y="650" font-size="16" fill="rgba(144, 238, 144, 0.6)" transform="rotate(-30 650 650)">PROCEDURE</text>
+    <text x="150" y="550" font-size="16" fill="rgba(255, 255, 224, 0.6)" transform="rotate(45 150 550)">FUNCTION</text>
+    <text x="950" y="150" font-size="16" fill="rgba(255, 182, 193, 0.6)" transform="rotate(-25 950 150)">CURSOR</text>
+    <text x="50" y="650" font-size="16" fill="rgba(224, 255, 255, 0.6)" transform="rotate(30 50 650)">BACKUP</text>
+    <text x="1100" y="300" font-size="16" fill="rgba(173, 216, 230, 0.6)" transform="rotate(-40 1100 300)">RESTORE</text>
+    
+    <!-- Small terms -->
+    <text x="180" y="320" font-size="12" fill="rgba(255, 255, 255, 0.5)" transform="rotate(60 180 320)">GROUP BY</text>
+    <text x="320" y="380" font-size="12" fill="rgba(173, 216, 230, 0.5)" transform="rotate(-50 320 380)">ORDER BY</text>
+    <text x="480" y="420" font-size="12" fill="rgba(144, 238, 144, 0.5)" transform="rotate(35 480 420)">WHERE</text>
+    <text x="620" y="280" font-size="12" fill="rgba(255, 255, 224, 0.5)" transform="rotate(-45 620 280)">HAVING</text>
+    <text x="780" y="380" font-size="12" fill="rgba(255, 182, 193, 0.5)" transform="rotate(50 780 380)">UNION</text>
+    <text x="220" y="680" font-size="12" fill="rgba(224, 255, 255, 0.5)" transform="rotate(-35 220 680)">DISTINCT</text>
+    <text x="420" y="720" font-size="12" fill="rgba(173, 216, 230, 0.5)" transform="rotate(25 420 720)">COUNT</text>
+    <text x="580" y="750" font-size="12" fill="rgba(144, 238, 144, 0.5)" transform="rotate(-55 580 750)">SUM</text>
+    <text x="820" y="720" font-size="12" fill="rgba(255, 255, 224, 0.5)" transform="rotate(40 820 720)">AVG</text>
+    <text x="1050" y="680" font-size="12" fill="rgba(255, 182, 193, 0.5)" transform="rotate(-30 1050 680)">MAX</text>
+    <text x="380" y="160" font-size="12" fill="rgba(224, 255, 255, 0.5)" transform="rotate(55 380 160)">MIN</text>
+    <text x="720" y="180" font-size="12" fill="rgba(173, 216, 230, 0.5)" transform="rotate(-40 720 180)">NULL</text>
+    <text x="550" y="480" font-size="12" fill="rgba(144, 238, 144, 0.5)" transform="rotate(20 550 480)">UNIQUE</text>
+    <text x="280" y="520" font-size="12" fill="rgba(255, 255, 224, 0.5)" transform="rotate(-60 280 520)">CASCADE</text>
+    <text x="880" y="580" font-size="12" fill="rgba(255, 182, 193, 0.5)" transform="rotate(45 880 580)">VARCHAR</text>
+    <text x="120" y="480" font-size="12" fill="rgba(224, 255, 255, 0.5)" transform="rotate(-25 120 480)">INTEGER</text>
+    <text x="1020" y="420" font-size="12" fill="rgba(173, 216, 230, 0.5)" transform="rotate(35 1020 420)">BOOLEAN</text>
+    <text x="680" y="550" font-size="12" fill="rgba(144, 238, 144, 0.5)" transform="rotate(-50 680 550)">DATETIME</text>
+    <text x="480" y="650" font-size="12" fill="rgba(255, 255, 224, 0.5)" transform="rotate(30 480 650)">ACID</text>
+    <text x="840" y="280" font-size="12" fill="rgba(255, 182, 193, 0.5)" transform="rotate(-35 840 280)">MYSQL</text>
+    <text x="1080" y="580" font-size="12" fill="rgba(224, 255, 255, 0.5)" transform="rotate(50 1080 580)">MONGODB</text>
+  </g>
+  
+  <!-- Glassmorphism background for title -->
+  <rect x="350" y="300" width="500" height="200" rx="20" ry="20" 
+        fill="rgba(255, 255, 255, 0.1)" 
+        stroke="rgba(255, 255, 255, 0.2)" 
+        stroke-width="1"
+        filter="url(#blur)"/>
+  
+  <!-- Main title -->
+  <text x="600" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">
+    <tspan x="600" dy="0">Institute Of Database</tspan>
+    <tspan x="600" dy="40">Developers</tspan>
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="rgba(255, 255, 255, 0.9)">
+    Powerful data management for modern applications
+  </text>
+</svg>

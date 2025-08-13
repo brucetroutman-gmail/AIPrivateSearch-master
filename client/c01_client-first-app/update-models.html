@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Models</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333;
+            --header-bg: #2c3e50;
+            --card-bg: #f8f9fa;
+            --border-color: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+            --input-bg: white;
+            --success-bg: #d4edda;
+            --success-border: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #dc3545;
+            --status-bg: #e3f2fd;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --header-bg: #1e1e1e;
+            --card-bg: #2d2d2d;
+            --border-color: #555;
+            --shadow: rgba(0,0,0,0.3);
+            --input-bg: #333;
+            --success-bg: #1e4d3a;
+            --success-border: #28a745;
+            --error-bg: #4d1e1e;
+            --error-border: #dc3545;
+            --status-bg: #1e3a4d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .header {
+            background: var(--header-bg);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: gold;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+        
+        .login-icon {
+            background: #3498db;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--header-bg);
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px var(--shadow);
+            z-index: 1;
+            border-radius: 4px;
+            top: 100%;
+            right: 0;
+        }
+        
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 4px;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #34495e;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--header-bg);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                transition: right 0.3s;
+                padding-top: 2rem;
+            }
+            
+            .nav-menu.active {
+                right: 0;
+            }
+            
+            .nav-menu a, .dropdown {
+                margin: 1rem 0;
+            }
+        }
+        
+        .footer {
+            background: var(--header-bg);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .section {
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            transition: background-color 0.3s;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .update-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .update-btn:hover {
+            background: #0056b3;
+        }
+        
+        .update-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 5px;
+            min-height: 100px;
+            transition: background-color 0.3s;
+        }
+        
+        .model-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 5px;
+            background: var(--input-bg);
+            transition: background-color 0.3s;
+        }
+        
+        .model-item {
+            margin: 5px 0;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="./index.html" class="logo">AISearch-n-Score</a>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav-menu" id="navMenu">
+                <a href="./search.html">Search</a>
+                <a href="./test.html">Test</a>
+                <a href="./index.html#analyze">Analyze</a>
+                <div class="dropdown">
+                    <a href="#options">Options</a>
+                    <div class="dropdown-content">
+                        <a href="#dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</a>
+                        <a href="#config">Modify Config Files</a>
+                        <a href="#collections">Manage Collections</a>
+                        <a href="./update-models.html">Update Models</a>
+                    </div>
+                </div>
+                <div class="login-icon">👤</div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1>Update Models</h1>
+        <p>Select models to update from Ollama registry. This will pull the latest versions of the selected models.</p>
+        
+        <div class="controls">
+            <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
+            <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
+            <span id="selectedCount">0 models selected</span>
+            <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                <strong>🔄 Model Update in Progress...</strong>
+                <div id="progressIndicator"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="font-weight: bold; margin-bottom: 10px;">Available Models:</div>
+            <div id="modelList" class="model-list">
+                Loading models...
+            </div>
+        </div>
+
+        <div class="results">
+            <h3>Update Results:</h3>
+            <div id="updateResults">No updates executed yet.</div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AISearch-n-Score Group. All rights reserved.</p>
+                <p>Licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/" style="color: #bdc3c7;">Creative Commons Attribution-NonCommercial (CC BY-NC)</a>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Load models from Ollama
+        async function loadModels() {
+            try {
+                const response = await fetch('http://localhost:11434/api/tags');
+                const data = await response.json();
+                const modelList = document.getElementById('modelList');
+                modelList.innerHTML = '';
+                
+                data.models
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(model => {
+                        const label = document.createElement('label');
+                        label.className = 'model-item';
+                        label.style.display = 'block';
+                        label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${model.name}"> ${model.name}`;
+                        modelList.appendChild(label);
+                    });
+                
+                // Setup select all functionality
+                document.getElementById('selectAllModels').addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.model-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+                
+                // Setup individual checkbox listeners
+                document.addEventListener('change', function(e) {
+                    if (e.target.classList.contains('model-checkbox')) {
+                        updateSelectedCount();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('modelList').innerHTML = 'Error loading Ollama models';
+            }
+        }
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.model-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = `${selected} models selected`;
+        }
+
+        async function updateSelectedModels() {
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedModels.length === 0) {
+                alert('Please select at least one model to update.');
+                return;
+            }
+
+            // Show update status
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Updating ${selectedModels.length} model(s)...`;
+            
+            // Clear results
+            const resultsDiv = document.getElementById('updateResults');
+            resultsDiv.innerHTML = '';
+            
+            const results = [];
+            let completedUpdates = 0;
+            
+            for (const model of selectedModels) {
+                const startTime = Date.now();
+                try {
+                    progressDiv.innerHTML = `Updating ${model}... (${completedUpdates + 1}/${selectedModels.length})`;
+                    
+                    const response = await fetch('http://localhost:11434/api/pull', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: model })
+                    });
+                    
+                    if (response.ok) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ model, success: true, elapsedTime });
+                    } else {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ model, success: false, error: `HTTP ${response.status}`, elapsedTime });
+                    }
+                } catch (error) {
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    results.push({ model, success: false, error: error.message, elapsedTime });
+                }
+                
+                completedUpdates++;
+                progressDiv.innerHTML = `Completed ${completedUpdates}/${selectedModels.length} updates...`;
+            }
+            
+            // Hide status and show results
+            statusDiv.style.display = 'none';
+            displayUpdateResults(results);
+        }
+
+        function displayUpdateResults(results) {
+            const resultsDiv = document.getElementById('updateResults');
+            let html = `<h4>Model Update Complete (${results.length} models)</h4>`;
+            
+            results.forEach(({ model, success, error, elapsedTime }) => {
+                if (success) {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${model}</strong> ${elapsedTime}s - ✅ Updated Successfully
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${model}</strong> ${elapsedTime}s - ❌ Update Failed
+                            <br><small>Error: ${error}</small>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Calculate and display total elapsed time
+            const totalElapsedTime = results.reduce((sum, result) => sum + parseFloat(result.elapsedTime), 0).toFixed(1);
+            html += `
+                <div style="margin: 20px 0; padding: 15px; border: 2px solid var(--border-color); border-radius: 5px; background: var(--card-bg); color: var(--text-color); text-align: left; font-weight: bold; transition: background-color 0.3s, color 0.3s;">
+                    Total Elapsed Time: ${totalElapsedTime}s
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        // Initialize
+        loadModels();
+    </script>
+</body>
+</html>

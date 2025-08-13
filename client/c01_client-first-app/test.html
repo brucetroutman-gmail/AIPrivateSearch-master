@@ -5,12 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test-n-Save</title>
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333;
+            --header-bg: #2c3e50;
+            --card-bg: #f8f9fa;
+            --border-color: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+            --input-bg: white;
+            --success-bg: #d4edda;
+            --success-border: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #dc3545;
+            --status-bg: #e3f2fd;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --header-bg: #1e1e1e;
+            --card-bg: #2d2d2d;
+            --border-color: #555;
+            --shadow: rgba(0,0,0,0.3);
+            --input-bg: #333;
+            --success-bg: #1e4d3a;
+            --success-border: #28a745;
+            --error-bg: #4d1e1e;
+            --error-border: #dc3545;
+            --status-bg: #1e3a4d;
+        }
+        
         /* Header and Footer Styles */
         .header {
-            background: #2c3e50;
+            background: var(--header-bg);
             color: white;
             padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--shadow);
         }
         
         .header-content {
@@ -60,8 +90,84 @@
             cursor: pointer;
         }
         
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--header-bg);
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px var(--shadow);
+            z-index: 1;
+            border-radius: 4px;
+            top: 100%;
+            right: 0;
+        }
+        
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 4px;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #34495e;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--header-bg);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                transition: right 0.3s;
+                padding-top: 2rem;
+            }
+            
+            .nav-menu.active {
+                right: 0;
+            }
+            
+            .nav-menu a, .dropdown {
+                margin: 1rem 0;
+            }
+        }
+        
         .footer {
-            background: #2c3e50;
+            background: var(--header-bg);
             color: white;
             padding: 2rem 0;
             margin-top: 2rem;
@@ -93,18 +199,18 @@
             color: #bdc3c7;
         }
         
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .section { margin: 20px 0; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+        .section { margin: 20px 0; border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; background: var(--card-bg); transition: background-color 0.3s; }
         .section-header { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
         .subsection { margin: 10px 0 10px 20px; }
         .subsection-header { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
         .test-item { margin: 5px 0; padding: 5px; }
         .test-code { font-family: monospace; font-weight: bold; color: #0066cc; }
-        .controls { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .controls { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s; }
         .execute-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
         .execute-btn:hover { background: #0056b3; }
         .execute-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .results { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; min-height: 100px; }
+        .results { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; min-height: 100px; transition: background-color 0.3s; }
     </style>
 </head>
 <body>
@@ -112,10 +218,24 @@
     <header class="header">
         <div class="header-content">
             <a href="./index.html" class="logo">AISearch-n-Score</a>
-            <nav class="nav-menu">
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav-menu" id="navMenu">
                 <a href="./search.html">Search</a>
                 <a href="./test.html">Test</a>
                 <a href="./index.html#analyze">Analyze</a>
+                <div class="dropdown">
+                    <a href="#options">Options</a>
+                    <div class="dropdown-content">
+                        <a href="#dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</a>
+                        <a href="#config">Modify Config Files</a>
+                        <a href="#collections">Manage Collections</a>
+                        <a href="./update-models.html">Update Models</a>
+                    </div>
+                </div>
                 <div class="login-icon">👤</div>
             </nav>
         </div>
@@ -124,10 +244,20 @@
     <div style="padding: 20px;">
     <h1>Test-n-Save</h1>
     
-    <div class="model-selector" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <label for="model" style="font-weight: bold;">Model:</label><br>
-        <select id="model" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0 1rem;" required>
-            <option value="">Loading models...</option>
+    <div class="model-selector" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
+        <div style="font-weight: bold; margin-bottom: 10px;">Models:</div>
+        <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
+        <div id="modelList" style="margin-top: 10px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); padding: 10px; border-radius: 5px; background: var(--input-bg);">
+            Loading models...
+        </div>
+    </div>
+    
+    <div class="token-override" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
+        <div style="font-weight: bold; margin-bottom: 10px;">Token Override:</div>
+        <select id="tokenOverride" style="width: 200px; padding: 0.5rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+            <option value="">No Override</option>
+            <option value="250" selected>250</option>
+            <option value="500">500</option>
         </select>
     </div>
     
@@ -135,7 +265,7 @@
         <label><input type="checkbox" id="selectAll"> Select All Tests</label>
         <button class="execute-btn" onclick="executeSelectedTests()">Execute Selected Tests</button>
         <span id="selectedCount">0 tests selected</span>
-        <div id="executionStatus" style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px; display: none;">
+        <div id="executionStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
             <strong>🔄 Test Execution in Progress...</strong>
             <div id="progressIndicator"></div>
         </div>
@@ -370,15 +500,16 @@
             const selected = Array.from(document.querySelectorAll('.test-checkbox:checked'))
                 .map(cb => cb.dataset.testcode);
             
-            const selectedModel = document.getElementById('model').value;
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
             
             if (selected.length === 0) {
                 alert('Please select at least one test to execute.');
                 return;
             }
             
-            if (!selectedModel) {
-                alert('Please select a model first.');
+            if (selectedModels.length === 0) {
+                alert('Please select at least one model first.');
                 return;
             }
 
@@ -386,7 +517,7 @@
             const statusDiv = document.getElementById('executionStatus');
             const progressDiv = document.getElementById('progressIndicator');
             statusDiv.style.display = 'block';
-            progressDiv.innerHTML = `Executing ${selected.length} tests with model: ${selectedModel}...`;
+            progressDiv.innerHTML = `Executing ${selected.length} tests with ${selectedModels.length} model(s)...`;
             
             // Clear bottom results
             const resultsDiv = document.getElementById('testResults');
@@ -406,16 +537,28 @@
             const results = [];
             
             for (const testCode of selected) {
-                try {
-                    const params = parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions);
-                    const result = await executeTest(params, selectedModel, testCode, params.testCategory, params.testDescription);
-                    results.push({ testCode, result, success: true });
-                } catch (error) {
-                    results.push({ testCode, error: error.message, success: false });
+                for (const model of selectedModels) {
+                    const startTime = Date.now();
+                    try {
+                        const params = parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions);
+                        
+                        // Apply token override if selected
+                        const tokenOverride = document.getElementById('tokenOverride').value;
+                        if (tokenOverride) {
+                            params.tokens = parseInt(tokenOverride);
+                        }
+                        
+                        const result = await executeTest(params, model, testCode, params.testCategory, params.testDescription);
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ testCode, model, result, success: true, elapsedTime });
+                    } catch (error) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ testCode, model, error: error.message, success: false, elapsedTime });
+                    }
+                    
+                    completedTests++;
+                    progressDiv.innerHTML = `Completed ${completedTests}/${selected.length * selectedModels.length} tests...`;
                 }
-                
-                completedTests++;
-                progressDiv.innerHTML = `Completed ${completedTests}/${selected.length} tests...`;
             }
             
             // Hide execution status and display results
@@ -713,24 +856,33 @@
             const resultsDiv = document.getElementById('testResults');
             let html = `<h4>Test Execution Complete (${results.length} tests)</h4>`;
             
-            results.forEach(({ testCode, result, success, error }) => {
+            results.forEach(({ testCode, model, result, success, error, elapsedTime }) => {
                 if (success) {
                     html += `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #28a745; border-radius: 5px; background: #d4edda;">
-                            <strong>${testCode}</strong> - ✅ Success
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ✅ Success
                             <br><small>Response: ${result.response?.substring(0, 100)}...</small>
                             <br><small>Saved to database</small>
                         </div>
                     `;
                 } else {
                     html += `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #dc3545; border-radius: 5px; background: #f8d7da;">
-                            <strong>${testCode}</strong> - ❌ Failed
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ❌ Failed
                             <br><small>Error: ${error}</small>
                         </div>
                     `;
                 }
             });
+            
+            // Calculate and display total elapsed time
+            const totalElapsedTime = results.reduce((sum, result) => sum + parseFloat(result.elapsedTime), 0);
+            const formattedTime = formatTime(totalElapsedTime);
+            html += `
+                <div style="margin: 20px 0; padding: 15px; border: 2px solid var(--border-color); border-radius: 5px; background: var(--card-bg); color: var(--text-color); text-align: left; font-weight: bold; transition: background-color 0.3s, color 0.3s;">
+                    Total Elapsed Time: ${formattedTime}
+                </div>
+            `;
             
             resultsDiv.innerHTML = html;
         }
@@ -740,27 +892,64 @@
             try {
                 const response = await fetch('http://localhost:11434/api/tags');
                 const data = await response.json();
-                const modelSelect = document.getElementById('model');
-                modelSelect.innerHTML = '<option value="">Select a model...</option>';
+                const modelList = document.getElementById('modelList');
+                modelList.innerHTML = '';
                 
                 data.models
                     .filter(model => !model.name.includes('nomic-embed-text'))
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.name;
-                        option.textContent = model.name;
-                        modelSelect.appendChild(option);
+                        const label = document.createElement('label');
+                        label.style.display = 'block';
+                        label.style.margin = '5px 0';
+                        label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${model.name}"> ${model.name}`;
+                        modelList.appendChild(label);
                     });
+                
+                // Setup select all models functionality
+                document.getElementById('selectAllModels').addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.model-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                });
+                
             } catch (error) {
                 console.error('Error loading models:', error);
-                document.getElementById('model').innerHTML = '<option value="">Error loading Ollama models</option>';
+                document.getElementById('modelList').innerHTML = 'Error loading Ollama models';
             }
         }
 
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = (totalSeconds % 60).toFixed(1);
+            
+            if (minutes > 0) {
+                return `${minutes}m ${seconds}s`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+        
         // Initialize
         loadModels();
         renderTests();
+    </script>
+    
+    <script>
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
     </script>
     </div>
 

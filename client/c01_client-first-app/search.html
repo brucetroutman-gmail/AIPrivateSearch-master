@@ -4,11 +4,30 @@
   <meta charset="UTF-8" />
   <title>Search-n-Score – Demo</title>
   <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333;
+      --header-bg: #2c3e50;
+      --card-bg: #f6f6f6;
+      --border-color: #ccc;
+      --shadow: rgba(0,0,0,0.1);
+      --input-bg: white;
+    }
+    
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #e0e0e0;
+      --header-bg: #1e1e1e;
+      --card-bg: #2d2d2d;
+      --border-color: #555;
+      --shadow: rgba(0,0,0,0.3);
+      --input-bg: #333;
+    }
     .header {
-      background: #2c3e50;
+      background: var(--header-bg);
       color: white;
       padding: 1rem 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px var(--shadow);
       margin: -2rem -2rem 2rem -2rem;
     }
     
@@ -59,8 +78,84 @@
       cursor: pointer;
     }
     
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: var(--header-bg);
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px var(--shadow);
+      z-index: 1;
+      border-radius: 4px;
+      top: 100%;
+      right: 0;
+    }
+    
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-radius: 4px;
+    }
+    
+    .dropdown-content a:hover {
+      background-color: #34495e;
+    }
+    
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+    
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      
+      .nav-menu {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: var(--header-bg);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        transition: right 0.3s;
+        padding-top: 2rem;
+      }
+      
+      .nav-menu.active {
+        right: 0;
+      }
+      
+      .nav-menu a, .dropdown {
+        margin: 1rem 0;
+      }
+    }
+    
     .footer {
-      background: #2c3e50;
+      background: var(--header-bg);
       color: white;
       padding: 2rem 0;
       margin: 2rem -2rem -2rem -2rem;
@@ -92,17 +187,17 @@
       color: #bdc3c7;
     }
     
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    body { font-family: system-ui, sans-serif; margin: 2rem; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
     h1   { margin-top: 0; }
     label { font-weight: 600; }
-    select { width: 100%; padding: .5rem; margin: .5rem 0 1rem; }
+    select { width: 100%; padding: .5rem; margin: .5rem 0 1rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
     select#temperature, select#context, select#tokens { width: auto; display: inline-block; margin: 0 .5rem; }
-    textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; }
+    textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
     button { padding: .5rem 1rem; }
-    #output { white-space: pre-wrap; margin-top: 2rem; background:#f6f6f6; padding:1rem; border-radius:6px; }
+    #output { white-space: pre-wrap; margin-top: 2rem; background: var(--card-bg); padding:1rem; border-radius:6px; transition: background-color 0.3s; }
     .score-table { border-collapse: collapse; margin-top: 1rem; }
-    .score-table th, .score-table td { border: 1px solid #ccc; padding: .4rem .6rem; text-align:center; }
-    .score-table th { background:#fafafa; }
+    .score-table th, .score-table td { border: 1px solid var(--border-color); padding: .4rem .6rem; text-align:center; }
+    .score-table th { background: var(--card-bg); }
   </style>
 </head>
 <body>
@@ -110,10 +205,24 @@
   <header class="header">
     <div class="header-content">
       <a href="./index.html" class="logo">AISearch-n-Score</a>
-      <nav class="nav-menu">
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav class="nav-menu" id="navMenu">
         <a href="./search.html">Search</a>
         <a href="./test.html">Test</a>
         <a href="./index.html#analyze">Analyze</a>
+        <div class="dropdown">
+          <a href="#options">Options</a>
+          <div class="dropdown-content">
+            <a href="#dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</a>
+            <a href="#config">Modify Config Files</a>
+            <a href="#collections">Manage Collections</a>
+            <a href="./update-models.html">Update Models</a>
+          </div>
+        </div>
         <div class="login-icon">👤</div>
       </nav>
     </div>
@@ -198,6 +307,23 @@
     </div>
   </footer>
 
+  <script>
+    function toggleDarkMode() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    function toggleMenu() {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.toggle('active');
+    }
+  </script>
   <script type="module" src="./search.js"></script>
 </body>
 </html>

@@ -34,7 +34,7 @@ specs-3-scoring
 
 15. Can We make an electron app for this that runs locally on a mac? -started
 
-16. create 35 tests - implement auto testing - done
+16. create 41 tests - implement auto testing - done
 
 17. menu structure?  login, update config files. home, back ground from alan
 
