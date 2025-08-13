@@ -38,6 +38,8 @@ specs-3-scoring
 
 17. menu structure?  login, update config files. home, back ground from alan
 
+18. Create Family documents
+
 18. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
 
 19.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md

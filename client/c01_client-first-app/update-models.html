@@ -425,6 +425,9 @@
                 return;
             }
             
+            // Clear previous results
+            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            
             for (const model of selectedModels) {
                 await pullModel(model, 'update');
             }
