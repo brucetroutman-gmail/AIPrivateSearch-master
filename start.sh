@@ -8,8 +8,10 @@ if ! pgrep -x "ollama" > /dev/null; then
 fi
 
 # Start backend server in background
-echo "Starting backend server..."
+echo "Installing backend dependencies..."
 cd server/s01_server-first-app
+npm install
+echo "Starting backend server..."
 npm start &
 BACKEND_PID=$!
 
