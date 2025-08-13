@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add/Update Models</title>
+    <title>Remove Models</title>
     <style>
         :root {
             --bg-color: #ffffff;
@@ -18,6 +18,8 @@
             --error-bg: #f8d7da;
             --error-border: #dc3545;
             --status-bg: #e3f2fd;
+            --warning-bg: #fff3cd;
+            --warning-border: #ffc107;
         }
         
         [data-theme="dark"] {
@@ -33,6 +35,8 @@
             --error-bg: #4d1e1e;
             --error-border: #dc3545;
             --status-bg: #1e3a4d;
+            --warning-bg: #4d3e1e;
+            --warning-border: #ffc107;
         }
         
         * {
@@ -234,8 +238,8 @@
             transition: background-color 0.3s;
         }
         
-        .update-btn {
-            background: #007bff;
+        .remove-btn {
+            background: #dc3545;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -244,11 +248,11 @@
             font-size: 16px;
         }
         
-        .update-btn:hover {
-            background: #0056b3;
+        .remove-btn:hover {
+            background: #c82333;
         }
         
-        .update-btn:disabled {
+        .remove-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
@@ -275,6 +279,15 @@
         .model-item {
             margin: 5px 0;
             padding: 5px;
+        }
+        
+        .warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: var(--text-color);
         }
     </style>
 </head>
@@ -309,35 +322,33 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <h1>Add/Update Models</h1>
-        <p>Add new models or update existing models from Ollama registry.</p>
+        <h1>Remove Models</h1>
+        <p>Select installed models to remove from Ollama. This will permanently delete the selected models.</p>
         
-        <div class="section">
-            <div style="font-weight: bold; margin-bottom: 10px;">Add New Model: <a href="http://ollama.com/library" target="_blank" style="font-weight: normal; color: #007bff;">Browse Ollama Library</a></div>
-            <input type="text" id="newModelName" placeholder="Enter model name (e.g., llama2, gemma:2b)" style="width: 300px; padding: 0.5rem; margin-right: 10px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
-            <button class="update-btn" onclick="addNewModel()">Add Model</button>
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> Removing models will permanently delete them from your system. You will need to re-download them if you want to use them again.
         </div>
         
         <div class="controls">
             <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
-            <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
+            <button class="remove-btn" onclick="removeSelectedModels()">Remove Selected Models</button>
             <span id="selectedCount">0 models selected</span>
-            <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
-                <strong>🔄 Model Update in Progress...</strong>
+            <div id="removeStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                <strong>🗑️ Model Removal in Progress...</strong>
                 <div id="progressIndicator"></div>
             </div>
         </div>
 
         <div class="section">
-            <div style="font-weight: bold; margin-bottom: 10px;">Installed Models (Update):</div>
+            <div style="font-weight: bold; margin-bottom: 10px;">Installed Models:</div>
             <div id="modelList" class="model-list">
                 Loading models...
             </div>
         </div>
 
         <div class="results">
-            <h3>Results:</h3>
-            <div id="updateResults">No operations executed yet.</div>
+            <h3>Removal Results:</h3>
+            <div id="removeResults">No removals executed yet.</div>
         </div>
     </main>
 
@@ -371,7 +382,7 @@
                         const label = document.createElement('label');
                         label.className = 'model-item';
                         label.style.display = 'block';
-                        label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${model.name}"> ${model.name}`;
+                        label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${model.name}"> ${model.name} <small>(${(model.size / 1024 / 1024 / 1024).toFixed(1)} GB)</small>`;
                         modelList.appendChild(label);
                     });
                 
@@ -400,134 +411,82 @@
             document.getElementById('selectedCount').textContent = `${selected} models selected`;
         }
 
-        async function addNewModel() {
-            const modelName = document.getElementById('newModelName').value.trim();
-            if (!modelName) {
-                alert('Please enter a model name.');
-                return;
-            }
-            
-            await pullModel(modelName, 'add');
-            document.getElementById('newModelName').value = '';
-            // Refresh the model list
-            setTimeout(loadModels, 1000);
-        }
-        
-        async function updateSelectedModels() {
+        async function removeSelectedModels() {
             const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
                 .map(cb => cb.value);
             
             if (selectedModels.length === 0) {
-                alert('Please select at least one model to update.');
+                alert('Please select at least one model to remove.');
                 return;
             }
+
+            if (!confirm(`Are you sure you want to remove ${selectedModels.length} model(s)? This action cannot be undone.`)) {
+                return;
+            }
+
+            // Show removal status
+            const statusDiv = document.getElementById('removeStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Removing ${selectedModels.length} model(s)...`;
+            
+            // Clear results
+            const resultsDiv = document.getElementById('removeResults');
+            resultsDiv.innerHTML = '';
+            
+            const results = [];
+            let completedRemovals = 0;
             
             for (const model of selectedModels) {
-                await pullModel(model, 'update');
-            }
-        }
-        
-        async function pullModel(modelName, action) {
-            const statusDiv = document.getElementById('updateStatus');
-            const progressDiv = document.getElementById('progressIndicator');
-            const resultsDiv = document.getElementById('updateResults');
-            
-            statusDiv.style.display = 'block';
-            progressDiv.innerHTML = `${action === 'add' ? 'Adding' : 'Updating'} ${modelName}...`;
-            
-            const startTime = Date.now();
-            try {
-                const response = await fetch('http://localhost:11434/api/pull', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: modelName })
-                });
+                const startTime = Date.now();
+                try {
+                    progressDiv.innerHTML = `Removing ${model}... (${completedRemovals + 1}/${selectedModels.length})`;
+                    
+                    const response = await fetch(`http://localhost:11434/api/delete`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: model })
+                    });
+                    
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    
+                    if (response.ok) {
+                        results.push({ model, success: true, elapsedTime });
+                    } else {
+                        results.push({ model, success: false, error: `HTTP ${response.status}`, elapsedTime });
+                    }
+                } catch (error) {
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    results.push({ model, success: false, error: error.message, elapsedTime });
+                }
                 
-                if (response.ok) {
-                    // Read the streaming response
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let done = false;
-                    
-                    while (!done) {
-                        const { value, done: readerDone } = await reader.read();
-                        done = readerDone;
-                        
-                        if (value) {
-                            const chunk = decoder.decode(value);
-                            const lines = chunk.split('\n').filter(line => line.trim());
-                            
-                            for (const line of lines) {
-                                try {
-                                    const data = JSON.parse(line);
-                                    if (data.status) {
-                                        progressDiv.innerHTML = `${modelName}: ${data.status}`;
-                                    }
-                                } catch (e) {
-                                    // Ignore JSON parse errors
-                                }
-                            }
-                        }
-                    }
-                    
-                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
-                    const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
-                            <strong>${modelName}</strong> ${elapsedTime}s - ✅ ${action === 'add' ? 'Added' : 'Updated'} Successfully
-                        </div>
-                    `;
-                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
-                        resultsDiv.innerHTML = resultHtml;
-                    } else {
-                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
-                    }
-                } else {
-                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
-                    const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
-                            <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
-                            <br><small>Error: HTTP ${response.status}</small>
-                        </div>
-                    `;
-                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
-                        resultsDiv.innerHTML = resultHtml;
-                    } else {
-                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
-                    }
-                }
-            } catch (error) {
-                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
-                const resultHtml = `
-                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
-                        <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
-                        <br><small>Error: ${error.message}</small>
-                    </div>
-                `;
-                if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
-                    resultsDiv.innerHTML = resultHtml;
-                } else {
-                    resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
-                }
+                completedRemovals++;
+                progressDiv.innerHTML = `Completed ${completedRemovals}/${selectedModels.length} removals...`;
             }
             
+            // Hide status and show results
             statusDiv.style.display = 'none';
+            displayRemovalResults(results);
+            
+            // Refresh the model list
+            setTimeout(loadModels, 1000);
         }
 
-        function displayUpdateResults(results) {
-            const resultsDiv = document.getElementById('updateResults');
-            let html = `<h4>Model Update Complete (${results.length} models)</h4>`;
+        function displayRemovalResults(results) {
+            const resultsDiv = document.getElementById('removeResults');
+            let html = `<h4>Model Removal Complete (${results.length} models)</h4>`;
             
             results.forEach(({ model, success, error, elapsedTime }) => {
                 if (success) {
                     html += `
                         <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
-                            <strong>${model}</strong> ${elapsedTime}s - ✅ Updated Successfully
+                            <strong>${model}</strong> ${elapsedTime}s - ✅ Removed Successfully
                         </div>
                     `;
                 } else {
                     html += `
                         <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
-                            <strong>${model}</strong> ${elapsedTime}s - ❌ Update Failed
+                            <strong>${model}</strong> ${elapsedTime}s - ❌ Removal Failed
                             <br><small>Error: ${error}</small>
                         </div>
                     `;
