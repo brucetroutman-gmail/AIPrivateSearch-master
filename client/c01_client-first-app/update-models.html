@@ -407,6 +407,9 @@
                 return;
             }
             
+            // Clear previous results
+            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            
             await pullModel(modelName, 'add');
             document.getElementById('newModelName').value = '';
             // Refresh the model list
@@ -448,6 +451,8 @@
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder();
                     let done = false;
+                    let lastMessage = '';
+                    let finalStatus = '';
                     
                     while (!done) {
                         const { value, done: readerDone } = await reader.read();
@@ -462,6 +467,10 @@
                                     const data = JSON.parse(line);
                                     if (data.status) {
                                         progressDiv.innerHTML = `${modelName}: ${data.status}`;
+                                        lastMessage = data.status;
+                                    }
+                                    if (data.error) {
+                                        finalStatus = `Error: ${data.error}`;
                                     }
                                 } catch (e) {
                                     // Ignore JSON parse errors
@@ -470,10 +479,20 @@
                         }
                     }
                     
+                    // Set final status if no error was captured
+                    if (!finalStatus) {
+                        finalStatus = lastMessage || 'Completed';
+                    }
+                    
                     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    
+                    // Check if there was actually an error despite HTTP 200
+                    const isActualError = finalStatus.toLowerCase().includes('error') || finalStatus.toLowerCase().includes('failed');
+                    
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
-                            <strong>${modelName}</strong> ${elapsedTime}s - ✅ ${action === 'add' ? 'Added' : 'Updated'} Successfully
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(${isActualError ? '--error-border' : '--success-border'}); border-radius: 5px; background: var(${isActualError ? '--error-bg' : '--success-bg'}); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ${isActualError ? '❌' : '✅'} ${action === 'add' ? 'Add' : 'Update'} ${isActualError ? 'Failed' : 'Successful'}
+                            <br><small>Ollama: ${finalStatus}</small>
                         </div>
                     `;
                     if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
@@ -483,10 +502,11 @@
                     }
                 } else {
                     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    const errorText = await response.text();
                     const resultHtml = `
                         <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
                             <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
-                            <br><small>Error: HTTP ${response.status}</small>
+                            <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
                         </div>
                     `;
                     if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
@@ -500,7 +520,7 @@
                 const resultHtml = `
                     <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
                         <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
-                        <br><small>Error: ${error.message}</small>
+                        <br><small>Network Error: ${error.message}</small>
                     </div>
                 `;
                 if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
