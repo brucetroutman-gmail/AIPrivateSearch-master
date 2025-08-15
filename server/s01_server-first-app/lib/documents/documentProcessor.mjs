@@ -27,9 +27,17 @@ export class DocumentProcessor {
   }
 
   async processPDF(filePath) {
-    // For now, return placeholder - PDF processing requires additional dependencies
     const filename = path.basename(filePath, '.pdf');
-    return `# ${filename}\n\n[PDF content - requires pdf-parse dependency for full processing]`;
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const { stdout } = await execAsync(`pdftotext "${filePath}" -`);
+      return `# ${filename}\n\n${stdout.trim()}`;
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting PDF content: ${error.message}]`;
+    }
   }
 
   async convertCollectionFiles(collection) {

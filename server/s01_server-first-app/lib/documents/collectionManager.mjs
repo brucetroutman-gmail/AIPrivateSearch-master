@@ -3,7 +3,6 @@ import path from 'path';
 
 export class CollectionManager {
   constructor() {
-    this.collections = ['Family-Documents', 'USA-History', 'My-Literature'];
     this.basePath = path.join(process.cwd(), '../../sources/local-documents');
   }
 
@@ -12,13 +11,42 @@ export class CollectionManager {
   }
 
   async listCollections() {
-    return this.collections;
+    try {
+      await fs.ensureDir(this.basePath);
+      const items = await fs.readdir(this.basePath);
+      const collections = [];
+      
+      for (const item of items) {
+        const itemPath = path.join(this.basePath, item);
+        const stat = await fs.stat(itemPath);
+        if (stat.isDirectory()) {
+          collections.push(item);
+        }
+      }
+      
+      return collections.sort();
+    } catch (error) {
+      console.error('Error listing collections:', error);
+      return [];
+    }
   }
 
   async getCollectionFiles(collection) {
     const collectionPath = this.getCollectionPath(collection);
     const files = await fs.readdir(collectionPath);
-    return files.filter(file => file.endsWith('.md'));
+    const filteredFiles = files.filter(file => !file.startsWith('.'));
+    
+    const filesWithSizes = [];
+    for (const file of filteredFiles) {
+      const filePath = path.join(collectionPath, file);
+      const stats = await fs.stat(filePath);
+      filesWithSizes.push({
+        name: file,
+        size: stats.size
+      });
+    }
+    
+    return filesWithSizes;
   }
 
   async createDocument(collection, filename, content) {

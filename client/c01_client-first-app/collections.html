@@ -9,12 +9,12 @@
   <script src="shared/common.js"></script>
   <style>
     .collections-container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 2rem auto;
       padding: 0 2rem;
     }
     
-    .collection-card {
+    .collections-section {
       background: var(--card-bg);
       border-radius: 8px;
       padding: 1.5rem;
@@ -22,95 +22,59 @@
       box-shadow: 0 2px 10px var(--shadow);
     }
     
-    .collection-header {
+    .collections-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
     }
     
-    .collection-name {
-      font-size: 1.5rem;
+    .collections-title {
+      font-size: 1.3rem;
       font-weight: bold;
       color: var(--text-color);
     }
     
-    .collection-stats {
-      display: flex;
+    .collections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1rem;
-      font-size: 0.9rem;
-      color: #666;
+      margin-top: 1rem;
     }
     
-    .action-buttons {
+    .collection-card {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      background: var(--bg-color);
+    }
+    
+    .collection-name {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+    
+    .collection-actions {
       display: flex;
       gap: 0.5rem;
-      flex-wrap: wrap;
+      margin-top: 0.5rem;
     }
     
     .btn {
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       transition: all 0.3s;
     }
     
     .btn-primary { background: #3498db; color: white; }
-    .btn-success { background: #27ae60; color: white; }
-    .btn-warning { background: #f39c12; color: white; }
-    .btn-info { background: #17a2b8; color: white; }
-    
     .btn:hover { opacity: 0.8; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .status-indicator {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 0.5rem;
-    }
-    
-    .status-ready { background: #27ae60; }
-    .status-processing { background: #f39c12; }
-    .status-error { background: #e74c3c; }
-    
-    .log-output {
-      background: #2c3e50;
-      color: #ecf0f1;
-      padding: 1rem;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.9rem;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 1rem;
-      display: none;
-    }
-    
-    .file-list {
-      margin-top: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    
-    .file-item {
-      display: flex;
-      justify-content: between;
-      align-items: center;
-      padding: 0.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-    
-    .file-name { flex: 1; }
-    .file-type { 
-      background: #95a5a6; 
-      color: white; 
-      padding: 0.2rem 0.5rem; 
-      border-radius: 3px; 
-      font-size: 0.8rem; 
+    [data-theme="dark"] h1 {
+      color: #87ceeb;
     }
   </style>
 </head>
@@ -119,18 +83,29 @@
 
   <div class="page-content">
     <main class="collections-container">
-    <h1>Manage Collections</h1>
-    <p>Convert documents and manage embeddings for local document collections.</p>
-    
-    <div id="collectionsContainer">
-      <div class="collection-card">
-        <div class="collection-header">
-          <div class="collection-name">Loading collections...</div>
+      <h1>Manage Collections</h1>
+      <p>Convert documents and manage embeddings for local document collections.</p>
+      
+      <div class="collections-section">
+        <div class="collections-header">
+          <div class="collections-title">Create New Collection</div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <input type="text" id="newCollectionName" placeholder="Enter collection name" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--card-bg); color: var(--text-color);">
+          <button class="btn btn-primary" onclick="createNewCollection()">Create Collection</button>
         </div>
       </div>
-    </div>
-    
-    <div id="logOutput" class="log-output"></div>
+      
+      <div class="collections-section">
+        <div class="collections-header">
+          <div class="collections-title">Available Collections</div>
+        </div>
+        <div class="collections-grid" id="collectionsGrid">
+          <div class="collection-card">
+            <div class="collection-name">Loading collections...</div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -138,194 +113,101 @@
     let collections = [];
     
     async function loadCollections() {
+      console.log('loadCollections called');
       try {
-        const response = await fetch('http://localhost:3001/api/documents/collections');
+        const response = await fetch('http://localhost:3001/api/documents/collections?t=' + Date.now());
         const data = await response.json();
         collections = data.collections;
+        console.log('Loaded collections:', collections);
         renderCollections();
       } catch (error) {
         console.error('Error loading collections:', error);
-        showError('Failed to load collections');
+        alert('Failed to load collections: ' + error.message);
       }
     }
     
     async function renderCollections() {
-      const container = document.getElementById('collectionsContainer');
+      console.log('renderCollections called with:', collections);
+      const container = document.getElementById('collectionsGrid');
       container.innerHTML = '';
       
+      if (!collections || collections.length === 0) {
+        container.innerHTML = '<div class="collection-card"><div class="collection-name">No collections found</div></div>';
+        return;
+      }
+      
       for (const collection of collections) {
-        const stats = await getCollectionStats(collection);
-        const card = createCollectionCard(collection, stats);
+        console.log('Creating card for:', collection);
+        const card = createCollectionCard(collection);
         container.appendChild(card);
       }
     }
     
-    async function getCollectionStats(collection) {
-      try {
-        const [filesResponse, indexedResponse] = await Promise.all([
-          fetch(`http://localhost:3001/api/documents/collections/${collection}/files`),
-          fetch(`http://localhost:3001/api/documents/collections/${collection}/indexed`)
-        ]);
-        
-        const filesData = await filesResponse.json();
-        const indexedData = await indexedResponse.json();
-        
-        return {
-          totalFiles: filesData.files?.length || 0,
-          indexedFiles: indexedData.documents?.length || 0,
-          status: 'ready'
-        };
-      } catch (error) {
-        return { totalFiles: 0, indexedFiles: 0, status: 'error' };
-      }
-    }
+
     
-    function createCollectionCard(collection, stats) {
+    function createCollectionCard(collection) {
+      console.log('Creating card for collection:', collection);
       const card = document.createElement('div');
       card.className = 'collection-card';
       
       card.innerHTML = `
-        <div class="collection-header">
-          <div class="collection-name">
-            <span class="status-indicator status-${stats.status}"></span>
-            ${collection}
-          </div>
-          <div class="collection-stats">
-            <span>Files: ${stats.totalFiles}</span>
-            <span>Indexed: ${stats.indexedFiles}</span>
-          </div>
+        <div class="collection-name">${collection}</div>
+        <div class="collection-actions">
+          <button class="btn btn-primary" onclick="openCollectionEditor('${collection}')">Edit</button>
         </div>
-        <div class="action-buttons">
-          <button class="btn btn-warning" onclick="convertDocuments('${collection}')">
-            Convert Documents
-          </button>
-          <button class="btn btn-primary" onclick="processDocuments('${collection}')">
-            Process & Index
-          </button>
-          <button class="btn btn-info" onclick="viewFiles('${collection}')">
-            View Files
-          </button>
-          <button class="btn btn-success" onclick="searchCollection('${collection}')">
-            Test Search
-          </button>
-        </div>
-        <div id="files-${collection}" class="file-list" style="display: none;"></div>
       `;
       
       return card;
     }
     
-    async function convertDocuments(collection) {
-      showLog(`Converting documents in ${collection}...`);
+    function openCollectionEditor(collection) {
+      // Store collection name in sessionStorage as fallback for servers that strip URL params
+      sessionStorage.setItem('currentCollection', collection);
+      window.location.href = `./collections-editor.html?collection=${encodeURIComponent(collection)}`;
+    }
+    
+    async function createNewCollection() {
+      const nameInput = document.getElementById('newCollectionName');
+      const collectionName = nameInput.value.trim();
+      
+      if (!collectionName) {
+        alert('Please enter a collection name');
+        return;
+      }
+      
+      if (!/^[a-zA-Z0-9-_]+$/.test(collectionName)) {
+        alert('Collection name can only contain letters, numbers, hyphens, and underscores');
+        return;
+      }
+      
+      showLog(`Creating new collection: ${collectionName}...`);
       
       try {
-        const response = await fetch('http://localhost:3001/api/documents/convert', {
+        const response = await fetch('http://localhost:3001/api/documents/collections/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ collection })
+          body: JSON.stringify({ name: collectionName })
         });
         
         const result = await response.json();
         
         if (result.success) {
-          showLog(`✓ Conversion complete: ${result.converted} files converted`);
-          renderCollections();
+          showLog(`✓ Collection '${collectionName}' created successfully`);
+          nameInput.value = '';
+          // Force refresh after a short delay
+          setTimeout(() => {
+            loadCollections();
+          }, 500);
         } else {
-          showLog(`✗ Conversion failed: ${result.error}`);
+          showLog(`✗ Failed to create collection: ${result.error}`);
         }
       } catch (error) {
-        showLog(`✗ Error: ${error.message}`);
+        showLog(`✗ Error creating collection: ${error.message}`);
       }
-    }
-    
-    async function processDocuments(collection) {
-      showLog(`Processing and indexing ${collection}...`);
-      
-      try {
-        const response = await fetch('http://localhost:3001/api/documents/process', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ collection })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          showLog(`✓ Processing complete: ${result.processed} documents indexed`);
-          renderCollections();
-        } else {
-          showLog(`✗ Processing failed: ${result.error}`);
-        }
-      } catch (error) {
-        showLog(`✗ Error: ${error.message}`);
-      }
-    }
-    
-    async function viewFiles(collection) {
-      const filesDiv = document.getElementById(`files-${collection}`);
-      
-      if (filesDiv.style.display === 'none') {
-        try {
-          const response = await fetch(`http://localhost:3001/api/documents/collections/${collection}/files`);
-          const data = await response.json();
-          
-          filesDiv.innerHTML = data.files.map(file => `
-            <div class="file-item">
-              <span class="file-name">${file}</span>
-              <span class="file-type">${file.split('.').pop().toUpperCase()}</span>
-            </div>
-          `).join('');
-          
-          filesDiv.style.display = 'block';
-        } catch (error) {
-          showLog(`✗ Error loading files: ${error.message}`);
-        }
-      } else {
-        filesDiv.style.display = 'none';
-      }
-    }
-    
-    async function searchCollection(collection) {
-      const query = prompt(`Enter search query for ${collection}:`);
-      if (!query) return;
-      
-      showLog(`Searching ${collection} for: "${query}"...`);
-      
-      try {
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${collection}/search`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, limit: 3 })
-        });
-        
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          showLog(`✓ Found ${data.results.length} results:`);
-          data.results.forEach((result, i) => {
-            showLog(`  ${i+1}. ${result.filename} (similarity: ${result.similarity.toFixed(3)})`);
-            showLog(`     "${result.content.substring(0, 100)}..."`);
-          });
-        } else {
-          showLog('✗ No results found');
-        }
-      } catch (error) {
-        showLog(`✗ Search error: ${error.message}`);
-      }
-    }
-    
-    function showLog(message) {
-      const logOutput = document.getElementById('logOutput');
-      logOutput.style.display = 'block';
-      logOutput.innerHTML += message + '\n';
-      logOutput.scrollTop = logOutput.scrollHeight;
-    }
-    
-    function showError(message) {
-      showLog(`✗ ERROR: ${message}`);
     }
     
     // Load collections on page load
+    console.log('Page loaded, calling loadCollections');
     loadCollections();
   </script>
 

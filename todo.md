@@ -36,9 +36,13 @@ specs-3-scoring
 
 16. create 41 tests - implement auto testing - done
 
-17. menu structure?  login, update config files. home, back ground from alan
+17. menu structure?  login, update config files. home, back ground from alan - done
 
-18. Create Family documents
+18. Create Family documents -done
+
+19. collect email address an store in searches table sign up for pro
+
+20. fix Collections !!!  --done
 
 18. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
 

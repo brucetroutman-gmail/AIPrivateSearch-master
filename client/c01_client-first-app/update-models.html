@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add/Update Models</title>
+    <title>Manage Models</title>
     <link rel="stylesheet" href="default.css">
     <link rel="stylesheet" href="shared/styles.css">
     <script src="shared/common.js"></script>
@@ -111,8 +111,8 @@
     <div class="page-content">
       <!-- Main Content -->
       <main class="main-content">
-        <h1>Add/Update Models</h1>
-        <p>Add new models or update existing models from Ollama registry.</p>
+        <h1>Manage Models</h1>
+        <p>Add, update, or remove models from Ollama registry.</p>
         
         <div class="section">
             <div style="font-weight: bold; margin-bottom: 10px;">Add New Model: <a href="http://ollama.com/library" target="_blank" style="font-weight: normal; color: #007bff;">Browse Ollama Library</a></div>
@@ -123,6 +123,7 @@
         <div class="controls">
             <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
             <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
+            <button class="update-btn" style="background: #dc3545;" onclick="removeSelectedModels()">Remove Selected Models</button>
             <span id="selectedCount">0 models selected</span>
             <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
                 <strong>🔄 Model Update in Progress...</strong>
@@ -223,6 +224,30 @@
             }
         }
         
+        async function removeSelectedModels() {
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedModels.length === 0) {
+                alert('Please select at least one model to remove.');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to remove ${selectedModels.length} selected models? This action cannot be undone.`)) {
+                return;
+            }
+            
+            // Clear previous results
+            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            
+            for (const model of selectedModels) {
+                await removeModel(model);
+            }
+            
+            // Refresh the model list
+            setTimeout(loadModels, 1000);
+        }
+        
         async function pullModel(modelName, action) {
             const statusDiv = document.getElementById('updateStatus');
             const progressDiv = document.getElementById('progressIndicator');
@@ -313,6 +338,67 @@
                 const resultHtml = `
                     <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
                         <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
+                        <br><small>Network Error: ${error.message}</small>
+                    </div>
+                `;
+                if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                    resultsDiv.innerHTML = resultHtml;
+                } else {
+                    resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                }
+            }
+            
+            statusDiv.style.display = 'none';
+        }
+        
+        async function removeModel(modelName) {
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            const resultsDiv = document.getElementById('updateResults');
+            
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Removing ${modelName}...`;
+            
+            const startTime = Date.now();
+            try {
+                const response = await fetch('http://localhost:11434/api/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: modelName })
+                });
+                
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                
+                if (response.ok) {
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ✓ Remove Successful
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
+                            <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                }
+            } catch (error) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                const resultHtml = `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
                         <br><small>Network Error: ${error.message}</small>
                     </div>
                 `;
