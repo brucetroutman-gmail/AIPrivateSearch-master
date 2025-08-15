@@ -12,8 +12,32 @@ const contextEl  = document.getElementById('context');
 const tokensEl   = document.getElementById('tokens');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
+const collectionEl = document.getElementById('collection');
+const collectionSection = document.getElementById('collectionSection');
 
 let systemPrompts = [];
+
+// Load collections from API
+async function loadCollections() {
+  try {
+    const response = await fetch('http://localhost:3001/api/documents/collections');
+    const data = await response.json();
+    
+    collectionEl.innerHTML = '<option value="">Select a collection...</option>' + 
+      data.collections.map(collection => 
+        `<option value="${collection}">${collection}</option>`
+      ).join('');
+    
+    // Restore last used collection
+    const lastUsed = localStorage.getItem('lastCollection');
+    if (lastUsed && data.collections.includes(lastUsed)) {
+      collectionEl.value = lastUsed;
+    }
+  } catch (error) {
+    collectionEl.innerHTML = '<option value="">Error loading collections</option>';
+    console.error('Failed to load collections:', error);
+  }
+}
 
 // Load source types from JSON file
 async function loadSourceTypes() {
@@ -63,6 +87,18 @@ async function loadModels() {
 }
 
 loadSourceTypes();
+
+// Check initial source type and show collection dropdown if needed
+setTimeout(() => {
+  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+    collectionSection.style.display = 'block';
+    loadCollections();
+    
+    // Also show the source chunks checkbox
+    const showChunksLabel = document.getElementById('showChunksLabel');
+    showChunksLabel.style.display = 'inline';
+  }
+}, 100);
 loadModels();
 loadSystemPrompts();
 loadUserPrompts();
@@ -78,20 +114,37 @@ async function loadSystemPrompts() {
     const data = await response.json();
     systemPrompts = data.system_prompts;
     
-    assistantTypeEl.innerHTML = systemPrompts.map(prompt => 
-      `<option value="${prompt.name}">${prompt.name}</option>`
-    ).join('');
-    
-    // Restore last used selection
-    const lastUsed = localStorage.getItem('lastAssistantType');
-    if (lastUsed && systemPrompts.find(p => p.name === lastUsed)) {
-      assistantTypeEl.value = lastUsed;
-    } else {
-      assistantTypeEl.value = systemPrompts[0]?.name || '';
-    }
+    filterAssistantTypes();
   } catch (error) {
     assistantTypeEl.innerHTML = '<option value="">Error loading system prompts</option>';
     console.error('Failed to load system prompts:', error);
+  }
+}
+
+// Filter assistant types based on source type
+function filterAssistantTypes() {
+  if (!systemPrompts || systemPrompts.length === 0) return;
+  
+  let filteredPrompts;
+  
+  if (sourceTypeEl.value === 'Local Documents Only') {
+    // Only show "Documents Only" assistant
+    filteredPrompts = systemPrompts.filter(prompt => prompt.name === 'Documents Only');
+  } else {
+    // Show all assistants except "Documents Only"
+    filteredPrompts = systemPrompts.filter(prompt => prompt.name !== 'Documents Only');
+  }
+  
+  assistantTypeEl.innerHTML = filteredPrompts.map(prompt => 
+    `<option value="${prompt.name}">${prompt.name}</option>`
+  ).join('');
+  
+  // Restore last used selection if still available
+  const lastUsed = localStorage.getItem('lastAssistantType');
+  if (lastUsed && filteredPrompts.find(p => p.name === lastUsed)) {
+    assistantTypeEl.value = lastUsed;
+  } else {
+    assistantTypeEl.value = filteredPrompts[0]?.name || '';
   }
 }
 
@@ -138,10 +191,37 @@ contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
 });
 
-// Save source type selection
+// Save source type selection and handle collection dropdown
 sourceTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSourceType', sourceTypeEl.value);
+  
+  // Show/hide collection dropdown based on source type
+  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+    collectionSection.style.display = 'block';
+    loadCollections();
+  } else {
+    collectionSection.style.display = 'none';
+  }
+  
+  // Show/hide source chunks checkbox for document source types
+  const showChunksLabel = document.getElementById('showChunksLabel');
+  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+    showChunksLabel.style.display = 'inline';
+  } else {
+    showChunksLabel.style.display = 'none';
+    document.getElementById('showChunksToggle').checked = false;
+  }
+  
+  // Filter assistant types based on source type
+  filterAssistantTypes();
 });
+
+// Save collection selection
+collectionEl.addEventListener('change', () => {
+  localStorage.setItem('lastCollection', collectionEl.value);
+});
+
+
 
 // Save tokens selection
 tokensEl.addEventListener('change', () => {
@@ -441,7 +521,17 @@ form.addEventListener('submit', async (e) => {
     // Generate TestCode
     const testCode = generateTestCode();
     
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode);
+    // Get collection if Local Documents source type is selected
+    const collection = (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') ? collectionEl.value : null;
+    const showChunks = document.getElementById('showChunksToggle').checked;
+    
+    // Validate collection selection for local documents
+    if ((sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') && !collection) {
+      outputEl.textContent = 'Please select a collection for local document search.';
+      return;
+    }
+    
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks);
     render(result);
     
     // Show export section

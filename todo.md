@@ -44,15 +44,19 @@ specs-3-scoring
 
 20. fix Collections !!!  --done
 
-18. create way to search internet for prompt and create a collection of 10  urls save in sources/internet title = web- + 25 chars of prompt.md 
+19.  create way to create document collections stored in sources/local documents 
+--done 
+20. multiple models selection --done
 
-19.  create way to create document collections stored in sources/local documents title = lcl- + 25 chars of prompt.md
+21. read prompts from tables ?? mutliple selections  --done
 
-20. multiple models selection ??
+22. Implement local documents only.
 
-21. read prompts from tables ?? mutliple selections
+23. Fix config manage Cancel with no changes
 
-22. 
+24. Add collections info to database
+
+25. User and system propmt by source type
 
 
 

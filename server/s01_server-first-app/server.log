@@ -1,1 +1,69 @@
 Server running on port 3001
+Received request: {
+  query: 'What is the us Constitution about?',
+  score: false,
+  model: 'qwen2:0.5b',
+  temperature: 0.3,
+  context: 2048,
+  systemPrompt: "You are an AI assistant tasked with answering queries based solely on the provided document collection. Do not search or reference any external sources, including the web or other models. If the requested information is not present in the document collection, explicitly state: The requested information is not found in the document collection. Provide accurate and concise responses derived only from the documents, and ensure your answers are relevant to the user's query.",
+  systemPromptName: 'Documents Only',
+  tokenLimit: 250,
+  sourceType: 'Local Documents Only',
+  testCode: 't2111120',
+  collection: 'USA-History'
+}
+Processing query: What is the us Constitution about?
+Scoring enabled: false
+Model: qwen2:0.5b
+Collection: USA-History
+Received request: {
+  query: 'What is the greenbook about?',
+  score: false,
+  model: 'qwen2:0.5b',
+  temperature: 0.3,
+  context: 2048,
+  systemPrompt: "You are an AI assistant tasked with answering queries based solely on the provided document collection. Do not search or reference any external sources, including the web or other models. If the requested information is not present in the document collection, explicitly state: The requested information is not found in the document collection. Provide accurate and concise responses derived only from the documents, and ensure your answers are relevant to the user's query.",
+  systemPromptName: 'Documents Only',
+  tokenLimit: 250,
+  sourceType: 'Local Documents Only',
+  testCode: 't2111120',
+  collection: 'USA-History'
+}
+Processing query: What is the greenbook about?
+Scoring enabled: false
+Model: qwen2:0.5b
+Collection: USA-History
+Received request: {
+  query: 'What is the greenbook about?',
+  score: false,
+  model: 'llama3.2:3b',
+  temperature: 0.3,
+  context: 2048,
+  systemPrompt: "You are an AI assistant tasked with answering queries based solely on the provided document collection. Do not search or reference any external sources, including the web or other models. If the requested information is not present in the document collection, explicitly state: The requested information is not found in the document collection. Provide accurate and concise responses derived only from the documents, and ensure your answers are relevant to the user's query.",
+  systemPromptName: 'Documents Only',
+  tokenLimit: 250,
+  sourceType: 'Local Documents Only',
+  testCode: 't2111120',
+  collection: 'USA-History'
+}
+Processing query: What is the greenbook about?
+Scoring enabled: false
+Model: llama3.2:3b
+Collection: USA-History
+Received request: {
+  query: 'Who was babe Ruth?',
+  score: false,
+  model: 'llama3.2:3b',
+  temperature: 0.3,
+  context: 2048,
+  systemPrompt: "You are an AI assistant tasked with answering queries based solely on the provided document collection. Do not search or reference any external sources, including the web or other models. If the requested information is not present in the document collection, explicitly state: The requested information is not found in the document collection. Provide accurate and concise responses derived only from the documents, and ensure your answers are relevant to the user's query.",
+  systemPromptName: 'Documents Only',
+  tokenLimit: 250,
+  sourceType: 'Local Documents Only',
+  testCode: 't2111120',
+  collection: 'USA-History'
+}
+Processing query: Who was babe Ruth?
+Scoring enabled: false
+Model: llama3.2:3b
+Collection: USA-History

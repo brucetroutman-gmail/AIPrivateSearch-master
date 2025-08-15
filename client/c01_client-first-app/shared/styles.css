@@ -205,3 +205,8 @@ body {
   flex: 1;
   padding: 2rem;
 }
+
+/* Light blue h1 in dark mode */
+[data-theme="dark"] h1 {
+  color: #87ceeb;
+}

@@ -17,6 +17,19 @@
     .score-table { border-collapse: collapse; margin-top: 1rem; }
     .score-table th, .score-table td { border: 1px solid var(--border-color); padding: .4rem .6rem; text-align:center; }
     .score-table th { background: var(--card-bg); }
+    
+    [data-theme="dark"] h3, [data-theme="dark"] h4 {
+      color: #87ceeb;
+    }
+    
+    [data-theme="dark"] .score-table th, [data-theme="dark"] .score-table td {
+      color: var(--text-color);
+      background: var(--card-bg);
+    }
+    
+    [data-theme="dark"] .score-table th {
+      color: #87ceeb;
+    }
   </style>
 </head>
 <body>
@@ -31,6 +44,13 @@
     <select id="sourceType">
       <option value="">Loading...</option>
     </select><br />
+    
+    <div id="collectionSection" style="display: none;">
+      <label for="collection">Collection:</label><br />
+      <select id="collection">
+        <option value="">Loading collections...</option>
+      </select><br />
+    </div>
     
     <label for="model">Model:</label><br />
     <select id="model" required>
@@ -66,25 +86,32 @@
     <label for="query">Enter your prompt:</label><br />
     <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea><br />
 
-    <label>
-      <input type="checkbox" id="scoreToggle" />
-      Generate scores
-    </label><br /><br />
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <label>
+        <input type="checkbox" id="scoreToggle" />
+        Generate scores
+      </label>
+      
+      <label id="showChunksLabel" style="display: none;">
+        <input type="checkbox" id="showChunksToggle" />
+        Show source chunks
+      </label>
+    </div><br />
 
     <button type="submit">Submit</button>
   </form>
 
   <section id="output"></section>
 
-  <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 6px;">
+  <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
     <label for="exportFormat">Export Format:</label>
-    <select id="exportFormat">
+    <select id="exportFormat" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
       <option value="pdf">Printer/PDF</option>
       <option value="markdown">Markdown</option>
       <option value="json">JSON</option>
       <option value="database">Database</option>
     </select>
-    <button type="button" id="exportBtn">Export</button>
+    <button type="button" id="exportBtn" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">Export</button>
   </div>
 
   </div>
