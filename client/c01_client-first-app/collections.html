@@ -76,6 +76,30 @@
     [data-theme="dark"] h1 {
       color: #87ceeb;
     }
+    
+    .message-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .message-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    [data-theme="dark"] .message-success {
+      background: #1e4d3a;
+      color: #28a745;
+      border: 1px solid #28a745;
+    }
+    
+    [data-theme="dark"] .message-error {
+      background: #4d1e1e;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+    }
   </style>
 </head>
 <body>
@@ -94,6 +118,7 @@
           <input type="text" id="newCollectionName" placeholder="Enter collection name" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--card-bg); color: var(--text-color);">
           <button class="btn btn-primary" onclick="createNewCollection()">Create Collection</button>
         </div>
+        <div id="createMessage" style="margin-top: 1rem; padding: 0.5rem; border-radius: 4px; display: none;"></div>
       </div>
       
       <div class="collections-section">
@@ -180,7 +205,7 @@
         return;
       }
       
-      showLog(`Creating new collection: ${collectionName}...`);
+      showMessage(`Creating collection '${collectionName}'...`, 'info');
       
       try {
         const response = await fetch('http://localhost:3001/api/documents/collections/create', {
@@ -192,17 +217,31 @@
         const result = await response.json();
         
         if (result.success) {
-          showLog(`✓ Collection '${collectionName}' created successfully`);
+          showMessage(`✓ Collection '${collectionName}' created successfully!`, 'success');
           nameInput.value = '';
           // Force refresh after a short delay
           setTimeout(() => {
             loadCollections();
           }, 500);
         } else {
-          showLog(`✗ Failed to create collection: ${result.error}`);
+          showMessage(`✗ Failed to create collection: ${result.error}`, 'error');
         }
       } catch (error) {
-        showLog(`✗ Error creating collection: ${error.message}`);
+        showMessage(`✗ Error creating collection: ${error.message}`, 'error');
+      }
+    }
+    
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('createMessage');
+      messageDiv.textContent = text;
+      messageDiv.className = type === 'success' ? 'message-success' : type === 'error' ? 'message-error' : '';
+      messageDiv.style.display = 'block';
+      
+      // Auto-hide after 3 seconds for success messages
+      if (type === 'success') {
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
       }
     }
     

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyze Tests - AISearch-n-Score</title>
+  <link rel="stylesheet" href="default.css">
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="shared/common.js"></script>
+  <style>
+    .analyze-container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .analyze-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+    
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    
+    .filter-group label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+    
+    .filter-group select {
+      padding: 0.4rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    
+    .report-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+    
+    .tab-button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab-button.active {
+      border-bottom-color: #3498db;
+      color: #3498db;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.5rem;
+      text-align: center;
+      color: var(--text-color);
+    }
+    
+    .comparison-table th {
+      background: var(--bg-color);
+      font-weight: bold;
+    }
+    
+    .best-score {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .worst-score {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    [data-theme="dark"] .best-score {
+      background: #1e4d3a;
+      color: #28a745;
+    }
+    
+    [data-theme="dark"] .worst-score {
+      background: #4d1e1e;
+      color: #dc3545;
+    }
+    
+    .chart-container {
+      height: 400px;
+      margin: 1rem 0;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .stat-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3498db;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-color);
+      margin-top: 0.5rem;
+    }
+    
+    [data-theme="dark"] h1 {
+      color: #87ceeb;
+    }
+    
+    [data-theme="dark"] h2, [data-theme="dark"] h3 {
+      color: #87ceeb;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="page-content">
+    <main class="analyze-container">
+      <h1>Test Analysis & Model Comparison</h1>
+      <p>Comprehensive analysis of AI model performance across 41 test scenarios.</p>
+      
+      <div class="analyze-section">
+        <h2>Filters</h2>
+        <div class="filters">
+          <div class="filter-group">
+            <label>PC Code:</label>
+            <select id="pcCodeFilter">
+              <option value="">All PC Codes</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Models:</label>
+            <select id="modelFilter" multiple size="3">
+              <option value="">Loading models...</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Source Type:</label>
+            <select id="sourceTypeFilter">
+              <option value="">All Source Types</option>
+              <option value="Local Model Only">Local Model Only</option>
+              <option value="Local Documents Only">Local Documents Only</option>
+              <option value="Local Model and Documents">Local Model and Documents</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Date Range:</label>
+            <select id="dateRangeFilter">
+              <option value="">All Dates</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="loadAnalysis()" style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Update Analysis</button>
+      </div>
+      
+      <div class="analyze-section">
+        <div class="report-tabs">
+          <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+          <button class="tab-button" onclick="showTab('performance')">Performance</button>
+          <button class="tab-button" onclick="showTab('scoring')">Scoring</button>
+          <button class="tab-button" onclick="showTab('detailed')">Detailed</button>
+        </div>
+        
+        <div id="overview" class="tab-content active">
+          <h3>Model Overview</h3>
+          <div class="stats-grid" id="overviewStats">
+            <div class="loading">Loading overview statistics...</div>
+          </div>
+          <div class="chart-container">
+            <div>Model Comparison Chart (Chart.js integration placeholder)</div>
+          </div>
+        </div>
+        
+        <div id="performance" class="tab-content">
+          <h3>Performance Metrics</h3>
+          <table class="comparison-table" id="performanceTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Avg Duration (s)</th>
+                <th>Avg Load Time (ms)</th>
+                <th>Avg Tokens/sec</th>
+                <th>Total Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="loading">Loading performance data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="scoring" class="tab-content">
+          <h3>Scoring Analysis</h3>
+          <table class="comparison-table" id="scoringTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Avg Accuracy</th>
+                <th>Avg Relevance</th>
+                <th>Avg Organization</th>
+                <th>Avg Weighted Score</th>
+                <th>Tests with Scores</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="loading">Loading scoring data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="detailed" class="tab-content">
+          <h3>Detailed Test Results</h3>
+          <div style="margin-bottom: 1rem;">
+            <label>Show: </label>
+            <select id="detailedFilter" onchange="updateDetailedView()">
+              <option value="all">All Tests</option>
+              <option value="scored">Only Scored Tests</option>
+              <option value="errors">Only Errors</option>
+            </select>
+          </div>
+          <table class="comparison-table" id="detailedTable">
+            <thead>
+              <tr>
+                <th>Test Code</th>
+                <th>Model</th>
+                <th>Source Type</th>
+                <th>Duration</th>
+                <th>Weighted Score</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="loading">Loading detailed data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script>
+    let testData = [];
+    let filteredData = [];
+    
+    // Load test data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTestData();
+    });
+    
+    async function loadTestData() {
+      try {
+        const response = await fetch('http://localhost:3001/api/database/tests');
+        const data = await response.json();
+        
+        if (data.success) {
+          testData = data.tests;
+          populateFilters();
+          loadAnalysis();
+        } else {
+          showError('Failed to load test data: ' + data.error);
+        }
+      } catch (error) {
+        showError('Error loading test data: ' + error.message);
+      }
+    }
+    
+    function populateFilters() {
+      // Populate PC Code filter
+      const pcCodes = [...new Set(testData.map(test => test.PcCode).filter(Boolean))];
+      const pcCodeFilter = document.getElementById('pcCodeFilter');
+      pcCodeFilter.innerHTML = '<option value="">All PC Codes</option>' + 
+        pcCodes.map(code => `<option value="${code}">${code}</option>`).join('');
+      
+      // Populate Model filter
+      const models = [...new Set(testData.map(test => test['ModelName-search']).filter(Boolean))];
+      const modelFilter = document.getElementById('modelFilter');
+      modelFilter.innerHTML = models.map(model => `<option value="${model}">${model}</option>`).join('');
+    }
+    
+    function loadAnalysis() {
+      applyFilters();
+      updateOverview();
+      updatePerformance();
+      updateScoring();
+      updateDetailed();
+    }
+    
+    function applyFilters() {
+      filteredData = testData.filter(test => {
+        const pcCode = document.getElementById('pcCodeFilter').value;
+        const selectedModels = Array.from(document.getElementById('modelFilter').selectedOptions).map(opt => opt.value);
+        const sourceType = document.getElementById('sourceTypeFilter').value;
+        const dateRange = document.getElementById('dateRangeFilter').value;
+        
+        if (pcCode && test.PcCode !== pcCode) return false;
+        if (selectedModels.length > 0 && !selectedModels.includes(test['ModelName-search'])) return false;
+        if (sourceType && test.SourceType !== sourceType) return false;
+        
+        if (dateRange) {
+          const testDate = new Date(test.CreatedAt);
+          const now = new Date();
+          const daysDiff = (now - testDate) / (1000 * 60 * 60 * 24);
+          
+          if (dateRange === 'today' && daysDiff > 1) return false;
+          if (dateRange === 'week' && daysDiff > 7) return false;
+          if (dateRange === 'month' && daysDiff > 30) return false;
+        }
+        
+        return true;
+      });
+    }
+    
+    function updateOverview() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const totalTests = filteredData.length;
+      const scoredTests = filteredData.filter(test => test['WeightedScore-pct']).length;
+      const avgScore = scoredTests > 0 ? 
+        (filteredData.reduce((sum, test) => sum + (test['WeightedScore-pct'] || 0), 0) / scoredTests).toFixed(1) : 'N/A';
+      
+      const statsHtml = `
+        <div class="stat-card">
+          <div class="stat-value">${models.length}</div>
+          <div class="stat-label">Models Tested</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${totalTests}</div>
+          <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${scoredTests}</div>
+          <div class="stat-label">Scored Tests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgScore}${avgScore !== 'N/A' ? '%' : ''}</div>
+          <div class="stat-label">Avg Score</div>
+        </div>
+      `;
+      
+      document.getElementById('overviewStats').innerHTML = statsHtml;
+    }
+    
+    function updatePerformance() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const tbody = document.querySelector('#performanceTable tbody');
+      
+      const rows = models.map(model => {
+        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
+        const avgDuration = (modelTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / modelTests.length).toFixed(1);
+        const avgLoad = (modelTests.reduce((sum, test) => sum + (test['Load-search-ms'] || 0), 0) / modelTests.length).toFixed(0);
+        const avgTokens = (modelTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / modelTests.length).toFixed(1);
+        
+        return `
+          <tr>
+            <td>${model}</td>
+            <td>${avgDuration}</td>
+            <td>${avgLoad}</td>
+            <td>${avgTokens}</td>
+            <td>${modelTests.length}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="5">No data available</td></tr>';
+    }
+    
+    function updateScoring() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const tbody = document.querySelector('#scoringTable tbody');
+      
+      const rows = models.map(model => {
+        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
+        const scoredTests = modelTests.filter(test => test['WeightedScore-pct']);
+        
+        if (scoredTests.length === 0) {
+          return `
+            <tr>
+              <td>${model}</td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td>0</td>
+            </tr>
+          `;
+        }
+        
+        const avgAccuracy = (scoredTests.reduce((sum, test) => sum + (test.AccurateScore || 0), 0) / scoredTests.length).toFixed(1);
+        const avgRelevance = (scoredTests.reduce((sum, test) => sum + (test.RelevantScore || 0), 0) / scoredTests.length).toFixed(1);
+        const avgOrganization = (scoredTests.reduce((sum, test) => sum + (test.OrganizedScore || 0), 0) / scoredTests.length).toFixed(1);
+        const avgWeighted = (scoredTests.reduce((sum, test) => sum + (test['WeightedScore-pct'] || 0), 0) / scoredTests.length).toFixed(1);
+        
+        return `
+          <tr>
+            <td>${model}</td>
+            <td>${avgAccuracy}</td>
+            <td>${avgRelevance}</td>
+            <td>${avgOrganization}</td>
+            <td>${avgWeighted}%</td>
+            <td>${scoredTests.length}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="6">No data available</td></tr>';
+    }
+    
+    function updateDetailed() {
+      updateDetailedView();
+    }
+    
+    function updateDetailedView() {
+      const filter = document.getElementById('detailedFilter').value;
+      const tbody = document.querySelector('#detailedTable tbody');
+      
+      let dataToShow = filteredData;
+      if (filter === 'scored') {
+        dataToShow = filteredData.filter(test => test['WeightedScore-pct']);
+      } else if (filter === 'errors') {
+        dataToShow = filteredData.filter(test => !test['Answer-search'] || test['Answer-search'].includes('Error'));
+      }
+      
+      const rows = dataToShow.slice(0, 100).map(test => {
+        const score = test['WeightedScore-pct'] ? `${test['WeightedScore-pct']}%` : 'N/A';
+        const duration = test['Duration-search-s'] ? `${test['Duration-search-s']}s` : 'N/A';
+        const createdAt = test.CreatedAt ? new Date(test.CreatedAt).toLocaleString() : 'N/A';
+        
+        return `
+          <tr>
+            <td>${test.TestCode || 'N/A'}</td>
+            <td>${test['ModelName-search'] || 'N/A'}</td>
+            <td>${test.SourceType || 'N/A'}</td>
+            <td>${duration}</td>
+            <td>${score}</td>
+            <td>${createdAt}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="6">No data available</td></tr>';
+      
+      if (dataToShow.length > 100) {
+        tbody.innerHTML += `<tr><td colspan="6" style="text-align: center; font-style: italic;">Showing first 100 of ${dataToShow.length} results</td></tr>`;
+      }
+    }
+    
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function showError(message) {
+      console.error(message);
+      // You could add a toast notification here
+    }
+  </script>
+</body>
+</html>

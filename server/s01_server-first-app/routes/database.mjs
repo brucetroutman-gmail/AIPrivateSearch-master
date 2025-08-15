@@ -71,4 +71,27 @@ router.post('/save', async (req, res) => {
   }
 });
 
+// Get all test data for analysis
+router.get('/tests', async (req, res) => {
+  try {
+    const query = `
+      SELECT * FROM searches 
+      ORDER BY CreatedAt DESC
+    `;
+    
+    const [rows] = await db.execute(query);
+    
+    res.json({
+      success: true,
+      tests: rows
+    });
+  } catch (error) {
+    console.error('Database query error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 export default router;

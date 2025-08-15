@@ -10,8 +10,11 @@ async function loadSharedComponents() {
     const footerResponse = await fetch('./shared/footer.html');
     const footerHTML = await footerResponse.text();
     document.getElementById('footer-placeholder').innerHTML = footerHTML;
+    
+    return Promise.resolve();
   } catch (error) {
     console.error('Error loading shared components:', error);
+    return Promise.reject(error);
   }
 }
 
@@ -35,8 +38,68 @@ function toggleMenu() {
   navMenu.classList.toggle('active');
 }
 
+// Email management
+function checkUserEmail() {
+  const email = localStorage.getItem('userEmail');
+  if (!email) {
+    promptForEmail();
+  }
+}
+
+function promptForEmail() {
+  const email = prompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address for export functionality:');
+  if (email && validateEmail(email)) {
+    localStorage.setItem('userEmail', email);
+  } else if (email) {
+    alert('Please enter a valid email address.');
+    promptForEmail();
+  }
+}
+
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+function getUserEmail() {
+  return localStorage.getItem('userEmail') || '';
+}
+
+function updateUserEmail() {
+  const currentEmail = getUserEmail();
+  const newEmail = prompt('Enter your email address:', currentEmail);
+  if (newEmail && validateEmail(newEmail)) {
+    localStorage.setItem('userEmail', newEmail);
+    alert('Email updated successfully!');
+  } else if (newEmail) {
+    alert('Please enter a valid email address.');
+  }
+}
+
+function showUserInfo() {
+  const email = getUserEmail();
+  if (email) {
+    const action = confirm(`Logged in as: ${email}\n\nClick OK to change email, Cancel to close.`);
+    if (action) {
+      updateUserEmail();
+    }
+  } else {
+    updateUserEmail();
+  }
+}
+
+function setupLoginIcon() {
+  const loginIcon = document.querySelector('.login-icon');
+  if (loginIcon) {
+    loginIcon.addEventListener('click', showUserInfo);
+  }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadTheme();
-  loadSharedComponents();
+  loadSharedComponents().then(() => {
+    setupLoginIcon();
+  });
+  checkUserEmail();
 });

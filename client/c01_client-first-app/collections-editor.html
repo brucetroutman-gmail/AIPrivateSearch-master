@@ -453,20 +453,20 @@
           
           if (result.success) {
             const chunkInfo = result.actualChunks ? ` (${result.actualChunks} chunks)` : '';
-            showLog(`${progress} ✓ Completed: ${filename}${chunkInfo} (${fileElapsed}s)`, 'success');
+            showLog(`${progress} ✓ Completed: ${filename}${chunkInfo} (${formatTime(fileElapsed)})`, 'success');
           } else {
-            showLog(`${progress} ✗ Failed: ${filename} - ${result.error} (${fileElapsed}s)`, 'error');
+            showLog(`${progress} ✗ Failed: ${filename} - ${result.error} (${formatTime(fileElapsed)})`, 'error');
           }
         } catch (error) {
           const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
-          showLog(`${progress} ✗ Error: ${filename} - ${error.message} (${fileElapsed}s)`, 'error');
+          showLog(`${progress} ✗ Error: ${filename} - ${error.message} (${formatTime(fileElapsed)})`, 'error');
         }
         showLog(''); // Add blank line after each file
       }
       
       const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
       showLog(`✓ Processing complete: ${selectedMD.length} files processed`, 'success');
-      showLog(`Total elapsed time: ${totalElapsed}s`, 'info');
+      showLog(`Total elapsed time: ${formatTime(totalElapsed)}`, 'info');
       
       // Force refresh of indexed documents status
       try {
@@ -535,6 +535,15 @@
     
     function showError(message) {
       showLog(`✗ ERROR: ${message}`, 'error');
+    }
+    
+    function formatTime(seconds) {
+      if (seconds < 60) {
+        return `${seconds}s`;
+      }
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = (seconds % 60).toFixed(1);
+      return `${minutes}m ${remainingSeconds}s`;
     }
     
     async function openFile(filename) {

@@ -694,6 +694,7 @@ exportBtn.addEventListener('click', async () => {
     const dbData = {
       TestCode: result.testCode || '',
       PcCode: result.pcCode || null,
+      UserEmail: getUserEmail() || null,
       PcCPU: result.systemInfo?.chip || null,
       PcGraphics: result.systemInfo?.graphics || null,
       PcRAM: result.systemInfo?.ram || null,

@@ -50,13 +50,17 @@ specs-3-scoring
 
 21. read prompts from tables ?? mutliple selections  --done
 
-22. Implement local documents only.
+22. Implement local documents only. -- started
+
+23. Collect email and use with export & messaging
 
 23. Fix config manage Cancel with no changes
 
-24. Add collections info to database
+24. Add collections info to database 
 
 25. User and system propmt by source type
+
+26. Privacy Policy Terms of Service , Contact --done
 
 
 
