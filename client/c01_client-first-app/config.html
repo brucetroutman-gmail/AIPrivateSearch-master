@@ -189,6 +189,12 @@
           </div>
         </div>
         <div class="file-card">
+          <div class="file-name">models-list.json</div>
+          <div class="file-actions">
+            <button class="btn btn-primary" onclick="openConfigEditor('models-list.json')">Edit</button>
+          </div>
+        </div>
+        <div class="file-card">
           <div class="file-name">source-types.json</div>
           <div class="file-actions">
             <button class="btn btn-primary" onclick="openConfigEditor('source-types.json')">Edit</button>
@@ -242,10 +248,7 @@
 
   <script>
     function openConfigEditor(filename) {
-      console.log('Opening config editor for:', filename);
-      const url = `config-editor?file=${filename}`;
-      console.log('Navigating to:', url);
-      window.location.href = url;
+      window.location.href = `config-editor?file=${filename}`;
     }
   </script>
 </body>

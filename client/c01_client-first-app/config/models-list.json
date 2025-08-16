@@ -1,0 +1,54 @@
+{
+  "models": [
+    {
+      "category": "search",
+      "modelName": "qwen3:0.6b",
+      "size": "522 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2:0.5b",
+      "size": "352 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2:1.5b",
+      "size": "934 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "phi4-mini:3.8b-q4_K_M",
+      "size": "2.5 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "granite3.3:2b",
+      "size": "1.5 GB"
+    },
+    {
+      "category": "embed",
+      "modelName": "nomic-embed-text",
+      "size": "274 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "llama3.2:3b",
+      "size": "2.0 GB"
+    },
+    {
+      "category": "score",
+      "modelName": "gemma2:2b-instruct-q4_0",
+      "size": "1.6 GB"
+    },
+    {
+      "category": "score",
+      "modelName": "gemma3:1b-it-q4_K_M",
+      "size": "815 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "gemma3:1b-it-q4_K_M",
+      "size": "815 MB"
+    }
+  ]
+}

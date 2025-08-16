@@ -4,6 +4,18 @@ import path from 'path';
 
 const router = express.Router();
 
+// List config files (must come before /:filename)
+router.get('/files', async (req, res) => {
+  try {
+    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const files = await fs.readdir(configDir);
+    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    res.json({ files: jsonFiles });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get config file
 router.get('/:filename', async (req, res) => {
   try {
@@ -21,18 +33,6 @@ router.put('/:filename', async (req, res) => {
     const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config', req.params.filename);
     await fs.writeFile(configPath, req.body.content, 'utf8');
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// List config files
-router.get('/', async (req, res) => {
-  try {
-    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
-    const files = await fs.readdir(configDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
-    res.json({ files: jsonFiles });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

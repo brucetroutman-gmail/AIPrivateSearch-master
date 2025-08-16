@@ -149,5 +149,48 @@
   </main>
 
   <div id="footer-placeholder"></div>
+
+  <script>
+    // Auto-refresh models on app startup
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        console.log('🔄 Ensuring all models are available in Ollama...');
+        
+        // Get current models-list.json
+        const configResponse = await fetch('http://localhost:3001/api/config/models-list.json');
+        const configData = await configResponse.json();
+        const modelsList = JSON.parse(configData.content);
+        
+        // Get unique model names from config
+        const uniqueModels = [...new Set(modelsList.models.map(m => m.modelName))];
+        
+        // Pull each model to ensure it's available
+        for (const modelName of uniqueModels) {
+          try {
+            console.log(`📥 Pulling ${modelName}...`);
+            const pullResponse = await fetch('http://localhost:11434/api/pull', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: modelName })
+            });
+            
+            if (pullResponse.ok) {
+              console.log(`✅ ${modelName} ready`);
+            } else {
+              console.log(`⚠️ ${modelName} pull failed`);
+            }
+          } catch (pullError) {
+            console.log(`❌ ${modelName} error:`, pullError.message);
+          }
+        }
+        
+        console.log('✅ Model sync complete');
+      } catch (error) {
+        console.log('⚠️ Model sync failed:', error.message);
+      }
+    });
+    
+
+  </script>
 </body>
 </html>
