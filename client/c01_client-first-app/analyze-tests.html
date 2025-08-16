@@ -83,12 +83,13 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
+      background: var(--card-bg);
     }
     
     .comparison-table th,
     .comparison-table td {
       border: 1px solid var(--border-color);
-      padding: 0.5rem;
+      padding: 0.75rem 0.5rem;
       text-align: center;
       color: var(--text-color);
     }
@@ -96,38 +97,69 @@
     .comparison-table th {
       background: var(--bg-color);
       font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    .comparison-table tbody tr:nth-child(even) {
+      background: var(--bg-color);
+    }
+    
+    .comparison-table tbody tr:hover {
+      background: var(--border-color);
     }
     
     .best-score {
-      background: #d4edda;
-      color: #155724;
+      background: #d4edda !important;
+      color: #155724 !important;
     }
     
     .worst-score {
-      background: #f8d7da;
-      color: #721c24;
+      background: #f8d7da !important;
+      color: #721c24 !important;
+    }
+    
+    [data-theme="dark"] .comparison-table th {
+      background: #2c3e50;
+      border-color: #34495e;
+    }
+    
+    [data-theme="dark"] .comparison-table tbody tr:nth-child(even) {
+      background: #34495e;
+    }
+    
+    [data-theme="dark"] .comparison-table tbody tr:hover {
+      background: #3c5a78;
     }
     
     [data-theme="dark"] .best-score {
-      background: #1e4d3a;
-      color: #28a745;
+      background: #1e4d3a !important;
+      color: #28a745 !important;
     }
     
     [data-theme="dark"] .worst-score {
-      background: #4d1e1e;
-      color: #dc3545;
+      background: #4d1e1e !important;
+      color: #dc3545 !important;
     }
     
     .chart-container {
-      height: 400px;
       margin: 1rem 0;
       background: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 1rem;
       color: var(--text-color);
+      overflow-x: auto;
+    }
+    
+    .chart-container .comparison-table {
+      margin: 0;
+    }
+    
+    .chart-container .comparison-table td small {
+      color: var(--text-color);
+      opacity: 0.7;
     }
     
     .stats-grid {
@@ -190,9 +222,9 @@
             </select>
           </div>
           <div class="filter-group">
-            <label>Models:</label>
-            <select id="modelFilter" multiple size="3">
-              <option value="">Loading models...</option>
+            <label>Model:</label>
+            <select id="modelFilter">
+              <option value="">All Models</option>
             </select>
           </div>
           <div class="filter-group">
@@ -397,7 +429,8 @@
       // Populate Model filter
       const models = [...new Set(testData.map(test => test['ModelName-search']).filter(Boolean))];
       const modelFilter = document.getElementById('modelFilter');
-      modelFilter.innerHTML = models.map(model => `<option value="${model}">${model}</option>`).join('');
+      modelFilter.innerHTML = '<option value="">All Models</option>' + 
+        models.map(model => `<option value="${model}">${model}</option>`).join('');
     }
     
     function loadAnalysis() {
@@ -412,12 +445,12 @@
     function applyFilters() {
       filteredData = testData.filter(test => {
         const pcCode = document.getElementById('pcCodeFilter').value;
-        const selectedModels = Array.from(document.getElementById('modelFilter').selectedOptions).map(opt => opt.value);
+        const selectedModel = document.getElementById('modelFilter').value;
         const sourceType = document.getElementById('sourceTypeFilter').value;
         const dateRange = document.getElementById('dateRangeFilter').value;
         
         if (pcCode && test.PcCode !== pcCode) return false;
-        if (selectedModels.length > 0 && !selectedModels.includes(test['ModelName-search'])) return false;
+        if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
         if (sourceType && test.SourceType !== sourceType) return false;
         
         if (dateRange) {
@@ -504,78 +537,13 @@
       tbody.innerHTML = rows || '<tr><td colspan="9">No data available</td></tr>';
     }
     
-    function updateHardware() {
-      const pcCodes = [...new Set(filteredData.map(test => test.PcCode).filter(Boolean))];
+    function updateScoring() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const tbody = document.querySelector('#scoringTable tbody');
       
-      // Hardware Stats
-      const avgDuration = filteredData.length > 0 ? 
-        (filteredData.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / filteredData.length).toFixed(1) : 'N/A';
-      const avgTokens = filteredData.length > 0 ? 
-        (filteredData.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / filteredData.length).toFixed(1) : 'N/A';
-      
-      const statsHtml = `
-        <div class="stat-card">
-          <div class="stat-value">${pcCodes.length}</div>
-          <div class="stat-label">PC Configurations</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${avgDuration}s</div>
-          <div class="stat-label">Avg Duration</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${avgTokens}</div>
-          <div class="stat-label">Avg Tokens/sec</div>
-        </div>
-      `;
-      
-      document.getElementById('hardwareStats').innerHTML = statsHtml;
-      
-      // Hardware Performance Table
-      const tbody = document.querySelector('#hardwareTable tbody');
-      const hardwareStats = pcCodes.map(pcCode => {
-        const pcTests = filteredData.filter(test => test.PcCode === pcCode);
-        const scoredTests = pcTests.filter(test => test['WeightedScore-pct']);
-        const sampleTest = pcTests[0];
-        
-        return {
-          pcCode,
-          cpu: sampleTest?.PcCPU || 'Unknown',
-          ram: sampleTest?.PcRAM || 'Unknown',
-          avgScore: scoredTests.length > 0 ? 
-            (scoredTests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / scoredTests.length).toFixed(1) : 'N/A',
-          avgDuration: (pcTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / pcTests.length).toFixed(1),
-          avgTokens: (pcTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / pcTests.length).toFixed(1),
-          testCount: pcTests.length
-        };
-      }).sort((a, b) => parseFloat(b.avgTokens) - parseFloat(a.avgTokens));
-      
-      const rows = hardwareStats.map(stats => `
-        <tr>
-          <td>${stats.pcCode}</td>
-          <td>${stats.cpu}</td>
-          <td>${stats.ram}</td>
-          <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
-          <td>${stats.avgDuration}s</td>
-          <td>${stats.avgTokens}</td>
-          <td>${stats.testCount}</td>
-        </tr>
-      `).join('');
-      
-      tbody.innerHTML = rows || '<tr><td colspan="7">No data available</td></tr>';
-      
-      // Hardware Matrix placeholder
-      document.getElementById('hardwareMatrix').innerHTML = '<div>Hardware vs Model performance matrix visualization would go here</div>';
-    }
-    
-    function updateParameters() {
-      // Temperature Analysis
-      const tempTbody = document.querySelector('#temperatureTable tbody');
-      const tempData = {};
-      
-      filteredData.forEach(test => {
-        const model = test['ModelName-search'];
-        const temp = test['ModelTemperature-search'];
-        const score = test['WeightedScore-pct'];
+      const rows = models.map(model => {
+        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
+        const scoredTests = modelTests.filter(test => test['WeightedScore-pct']);
         
         if (model && temp && score) {
           const key = `${model}_${temp}`;
