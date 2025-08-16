@@ -75,12 +75,15 @@ router.post('/save', async (req, res) => {
 // Get all test data for analysis
 router.get('/tests', async (req, res) => {
   try {
+    const connection = await mysql.createConnection(dbConfig);
+    
     const query = `
       SELECT * FROM searches 
       ORDER BY CreatedAt DESC
     `;
     
-    const [rows] = await db.execute(query);
+    const [rows] = await connection.execute(query);
+    await connection.end();
     
     res.json({
       success: true,
