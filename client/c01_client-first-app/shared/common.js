@@ -95,6 +95,62 @@ function setupLoginIcon() {
   }
 }
 
+// Common database export function
+async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null) {
+  const dbData = {
+    TestCode: result.testCode || '',
+    TestCategory: testCategory || null,
+    TestDescription: testDescription || null,
+    UserEmail: localStorage.getItem('userEmail') || null,
+    PcCode: result.pcCode || null,
+    PcCPU: result.systemInfo?.chip || null,
+    PcGraphics: result.systemInfo?.graphics || null,
+    PcRAM: result.systemInfo?.ram || null,
+    PcOS: result.systemInfo?.os || null,
+    CreatedAt: result.createdAt || null,
+    SourceType: result.sourceType || null,
+    SystemPrompt: result.systemPromptName || null,
+    Prompt: result.query || null,
+    'ModelName-search': result.metrics?.search?.model || null,
+    'ModelContextSize-search': result.metrics?.search?.context_size || testParams?.context || null,
+    'ModelTemperature-search': result.metrics?.search?.temperature || testParams?.temperature || null,
+    'ModelTokenLimit-search': result.tokenLimit || null,
+    'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
+    'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
+    'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+    'Answer-search': result.response || null,
+    'ModelName-score': result.metrics?.scoring?.model || null,
+    'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
+    'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
+    'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
+    'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
+    'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
+    AccurateScore: result.scores?.accuracy || null,
+    RelevantScore: result.scores?.relevance || null,
+    OrganizedScore: result.scores?.organization || null,
+    'WeightedScore-pct': result.scores?.total || null
+  };
+  
+  try {
+    const response = await fetch('http://localhost:3001/api/database/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dbData)
+    });
+    
+    const saveResult = await response.json();
+    
+    if (saveResult.success) {
+      return { success: true, insertId: saveResult.insertId };
+    } else {
+      throw new Error(saveResult.error);
+    }
+  } catch (error) {
+    console.error('Database export error:', error);
+    throw error;
+  }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadTheme();

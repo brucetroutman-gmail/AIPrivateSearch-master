@@ -19,46 +19,47 @@ router.post('/save', async (req, res) => {
     
     const insertQuery = `
       INSERT INTO searches (
-        TestCode, TestCategory, TestDescription, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
+        TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
       data.TestCode || '',
-      data.TestCategory,
-      data.TestDescription,
-      data.PcCode,
-      data.PcCPU,
-      data.PcGraphics,
-      data.PcRAM,
-      data.PcOS,
-      data.CreatedAt,
-      data.SourceType,
-      data.SystemPrompt,
-      data.Prompt,
-      data['ModelName-search'],
-      data['ModelContextSize-search'],
-      data['ModelTemperature-search'],
-      data['ModelTokenLimit-search'],
-      data['Duration-search-s'],
-      data['Load-search-ms'],
-      data['EvalTokensPerSecond-ssearch'],
-      data['Answer-search'],
-      data['ModelName-score'],
-      data['ModelContextSize-score'],
-      data['ModelTemperature-score'],
-      data['Duration-score-s'],
-      data['Load-score-ms'],
-      data['EvalTokensPerSecond-score'],
-      data.AccurateScore,
-      data.RelevantScore,
-      data.OrganizedScore,
-      data['WeightedScore-pct']
+      data.TestCategory || null,
+      data.TestDescription || null,
+      data.UserEmail || null,
+      data.PcCode || null,
+      data.PcCPU || null,
+      data.PcGraphics || null,
+      data.PcRAM || null,
+      data.PcOS || null,
+      data.CreatedAt || null,
+      data.SourceType || null,
+      data.SystemPrompt || null,
+      data.Prompt || null,
+      data['ModelName-search'] || null,
+      data['ModelContextSize-search'] || null,
+      data['ModelTemperature-search'] || null,
+      data['ModelTokenLimit-search'] || null,
+      data['Duration-search-s'] || null,
+      data['Load-search-ms'] || null,
+      data['EvalTokensPerSecond-ssearch'] || null,
+      data['Answer-search'] || null,
+      data['ModelName-score'] || null,
+      data['ModelContextSize-score'] || null,
+      data['ModelTemperature-score'] || null,
+      data['Duration-score-s'] || null,
+      data['Load-score-ms'] || null,
+      data['EvalTokensPerSecond-score'] || null,
+      data.AccurateScore || null,
+      data.RelevantScore || null,
+      data.OrganizedScore || null,
+      data['WeightedScore-pct'] || null
     ];
     
     const [result] = await connection.execute(insertQuery, values);

@@ -2,6 +2,12 @@
 
 echo "Starting AI Search & Score Application..."
 
+# Kill any existing server processes to free up ports
+echo "Stopping any existing servers..."
+pkill -f "node server.mjs" 2>/dev/null || true
+pkill -f "npx serve" 2>/dev/null || true
+sleep 1
+
 # Check if Ollama is running
 if ! pgrep -x "ollama" > /dev/null; then
     echo "Warning: Ollama service not detected. Please start with 'ollama serve'"

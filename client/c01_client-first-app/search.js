@@ -647,6 +647,9 @@ exportBtn.addEventListener('click', async () => {
     const result = window.currentResult;
     const jsonData = {
       TestCode: result.testCode || '',
+      TestCategory: null,
+      TestDescription: null,
+      UserEmail: localStorage.getItem('userEmail') || null,
       PcCode: result.pcCode || null,
       PcCPU: result.systemInfo?.chip || null,
       PcGraphics: result.systemInfo?.graphics || null,
@@ -689,54 +692,10 @@ exportBtn.addEventListener('click', async () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } else if (exportFormat === 'database') {
-    // Export to database
-    const result = window.currentResult;
-    const dbData = {
-      TestCode: result.testCode || '',
-      PcCode: result.pcCode || null,
-      UserEmail: getUserEmail() || null,
-      PcCPU: result.systemInfo?.chip || null,
-      PcGraphics: result.systemInfo?.graphics || null,
-      PcRAM: result.systemInfo?.ram || null,
-      PcOS: result.systemInfo?.os || null,
-      CreatedAt: result.createdAt || null,
-      SourceType: result.sourceType || null,
-      SystemPrompt: result.systemPromptName || null,
-      Prompt: result.query || null,
-      'ModelName-search': result.metrics?.search?.model || null,
-      'ModelContextSize-search': result.metrics?.search?.context_size || null,
-      'ModelTemperature-search': result.metrics?.search?.temperature || null,
-      'ModelTokenLimit-search': result.tokenLimit || null,
-      'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
-      'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
-      'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
-      'Answer-search': result.response || null,
-      'ModelName-score': result.metrics?.scoring?.model || null,
-      'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
-      'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
-      'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
-      'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
-      'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
-      AccurateScore: result.scores?.accuracy || null,
-      RelevantScore: result.scores?.relevance || null,
-      OrganizedScore: result.scores?.organization || null,
-      'WeightedScore-pct': result.scores?.total || null
-    };
-    
+    // Export to database using common function
     try {
-      const response = await fetch('http://localhost:3001/api/database/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dbData)
-      });
-      
-      const saveResult = await response.json();
-      
-      if (saveResult.success) {
-        alert(`Successfully saved to database with ID: ${saveResult.insertId}`);
-      } else {
-        alert(`Database save failed: ${saveResult.error}`);
-      }
+      const result = await exportToDatabase(window.currentResult);
+      alert(`Successfully saved to database with ID: ${result.insertId}`);
     } catch (error) {
       alert(`Database save error: ${error.message}`);
     }

@@ -52,9 +52,9 @@ specs-3-scoring
 
 22. Implement local documents only. -- started
 
-23. Collect email and use with export & messaging
+23. Collect email and use with export & messaging --done
 
-23. Fix config manage Cancel with no changes
+23. Fix config manage Cancel with no changes -- done
 
 24. Add collections info to database 
 
@@ -62,7 +62,11 @@ specs-3-scoring
 
 26. Privacy Policy Terms of Service , Contact --done
 
+27. get the best score model
 
+28. do best embeding technique
+
+29. best search models.
 
 
 
