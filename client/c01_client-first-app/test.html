@@ -45,11 +45,18 @@
     <h1>Test-n-Save</h1>
     
     <div class="model-selector" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
-        <div style="font-weight: bold; margin-bottom: 10px;">Models:</div>
+        <div style="font-weight: bold; margin-bottom: 10px;">Search Model:</div>
         <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
         <div id="modelList" style="margin-top: 10px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); padding: 10px; border-radius: 5px; background: var(--input-bg);">
             Loading models...
         </div>
+    </div>
+    
+    <div class="score-model-selector" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
+        <div style="font-weight: bold; margin-bottom: 10px;">Score Model:</div>
+        <select id="scoreModelSelect" style="width: 100%; padding: 0.5rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+            <option value="">Loading score models...</option>
+        </select>
     </div>
     
     <div class="token-override" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
@@ -583,6 +590,9 @@
             const response = await fetch('./services/api.js');
             const apiModule = await import('./services/api.js');
             
+            // Get selected score model
+            const scoreModel = document.getElementById('scoreModelSelect').value || model;
+            
             const result = await apiModule.search(
                 params.userPrompt,
                 params.generateScores,
@@ -640,24 +650,51 @@
             resultsDiv.innerHTML = html;
         }
 
-        // Load models from Ollama
+        // Load models from models-list.json (search category only)
         async function loadModels() {
             try {
-                const response = await fetch('http://localhost:11434/api/tags');
+                const response = await fetch('config/models-list.json');
                 const data = await response.json();
                 const modelList = document.getElementById('modelList');
                 modelList.innerHTML = '';
                 
-                data.models
-                    .filter(model => !model.name.includes('nomic-embed-text'))
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .forEach(model => {
-                        const label = document.createElement('label');
-                        label.style.display = 'block';
-                        label.style.margin = '5px 0';
-                        label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${model.name}"> ${model.name}`;
-                        modelList.appendChild(label);
+                // Get unique search models
+                const searchModels = [...new Set(
+                    data.models
+                        .filter(model => model.category === 'search')
+                        .map(model => model.modelName)
+                )].sort();
+                
+                searchModels.forEach(modelName => {
+                    const label = document.createElement('label');
+                    label.style.display = 'block';
+                    label.style.margin = '5px 0';
+                    label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${modelName}"> ${modelName}`;
+                    modelList.appendChild(label);
+                });
+                
+                // Load score models
+                const scoreModels = [...new Set(
+                    data.models
+                        .filter(model => model.category === 'score')
+                        .map(model => model.modelName)
+                )].sort();
+                
+                const scoreSelect = document.getElementById('scoreModelSelect');
+                if (scoreModels.length > 0) {
+                    const savedScoreModel = localStorage.getItem('selectedScoreModel');
+                    scoreSelect.innerHTML = scoreModels.map((modelName, index) => {
+                        const isSelected = savedScoreModel ? modelName === savedScoreModel : index === 0;
+                        return `<option value="${modelName}" ${isSelected ? 'selected' : ''}>${modelName}</option>`;
+                    }).join('');
+                    
+                    // Save selection on change
+                    scoreSelect.addEventListener('change', function() {
+                        localStorage.setItem('selectedScoreModel', this.value);
                     });
+                } else {
+                    scoreSelect.innerHTML = '<option value="">No score models available</option>';
+                }
                 
                 // Setup select all models functionality
                 document.getElementById('selectAllModels').addEventListener('change', function() {

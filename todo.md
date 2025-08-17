@@ -60,7 +60,9 @@ specs-3-scoring
 
 25. User and system propmt by source type
 
-26. Privacy Policy Terms of Service , Contact --done
+26. Privacy Policy Terms of Service , Contact --doneand search --started
+
+27. add score model to db test 
 
 27. get the best score model
 

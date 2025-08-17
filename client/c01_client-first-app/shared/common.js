@@ -107,7 +107,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     PcGraphics: result.systemInfo?.graphics || null,
     PcRAM: result.systemInfo?.ram || null,
     PcOS: result.systemInfo?.os || null,
-    CreatedAt: result.createdAt || null,
+    CreatedAt: result.createdAt ? new Date(result.createdAt).toISOString().slice(0, 19).replace('T', ' ') : null,
     SourceType: result.sourceType || null,
     SystemPrompt: result.systemPromptName || null,
     Prompt: result.query || null,
