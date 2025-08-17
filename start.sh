@@ -8,10 +8,15 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
-# Check if Ollama is running
-if ! pgrep -x "ollama" > /dev/null; then
-    echo "Warning: Ollama service not detected. Please start with 'ollama serve'"
+# Check if Ollama is available
+echo "Checking Ollama availability..."
+if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+    echo "❌ Ollama not available at http://localhost:11434"
+    echo "📥 Please install Ollama from: https://ollama.com/download"
+    echo "🚀 Then run: ollama serve"
+    exit 1
 fi
+echo "✅ Ollama is running"
 
 # Start backend server in background
 echo "Installing backend dependencies..."

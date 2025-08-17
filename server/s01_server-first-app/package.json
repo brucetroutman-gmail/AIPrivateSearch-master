@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "process-docs": "node scripts/processAllCollections.mjs",
-    "convert-docs": "node scripts/convertDocuments.mjs"
+    "process-docs": "node scripts/processAllCollections.mjs"
   },
   "dependencies": {
     "busboy": "^1.6.0",
