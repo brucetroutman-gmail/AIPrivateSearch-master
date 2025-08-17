@@ -62,22 +62,33 @@ async function loadSourceTypes() {
   }
 }
 
-// Load models on page load
+// Load models from models-list.json (search category only)
 async function loadModels() {
   try {
     console.log('Loading models...');
-    const { models } = await getModels();
-    console.log('Models received:', models);
-    modelEl.innerHTML = models.map(model => 
+    const response = await fetch('config/models-list.json');
+    const data = await response.json();
+    
+    // Get unique search models
+    const searchModels = [...new Set(
+      data.models
+        .filter(model => model.category === 'search')
+        .map(model => model.modelName)
+    )].sort();
+    
+    console.log('Models received:', searchModels);
+    modelEl.innerHTML = searchModels.map(model => 
       `<option value="${model}">${model}</option>`
     ).join('');
     
     // Restore last used model or set default
     const lastUsedModel = localStorage.getItem('lastUsedModel');
-    if (lastUsedModel && models.includes(lastUsedModel)) {
+    if (lastUsedModel && searchModels.includes(lastUsedModel)) {
       modelEl.value = lastUsedModel;
-    } else if (models.includes('qwen2:0.5b')) {
+    } else if (searchModels.includes('qwen2:0.5b')) {
       modelEl.value = 'qwen2:0.5b';
+    } else if (searchModels.length > 0) {
+      modelEl.value = searchModels[0];
     }
     console.log('Models loaded successfully');
   } catch (error) {
