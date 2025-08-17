@@ -31,7 +31,7 @@ class CombinedSearchScorer {
   }
 
   /* public */
-  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null) {
+  async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, scoreModel = null) {
     try {
       const searchModel = model || this.searchModel;
       const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
@@ -55,14 +55,14 @@ class CombinedSearchScorer {
       };
 
       if (enableScoring) {
-        const scoreResult = await this.#score(query, searchResponse.response, temperature, context);
+        const scoreResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
         result.scores = scoreResult.scores;
         result.metrics.scoring = scoreResult.metrics;
         
         // Retry once if no scores were obtained
         if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
           console.log('No scores obtained, retrying once...');
-          const retryResult = await this.#score(query, searchResponse.response, temperature, context);
+          const retryResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
           result.scores = retryResult.scores;
           result.metrics.scoringRetry = retryResult.metrics;
           
@@ -127,7 +127,7 @@ class CombinedSearchScorer {
     }
   }
 
-  async #score(query, answer, temperature = 0.3, context = 0.3) {
+  async #score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
     try {
       console.log('Starting scoring process...');
       
@@ -186,7 +186,7 @@ Overall Comments: [Optional brief summary or additional notes]
 
 Please provide the evaluation in this exact format.`;
 
-      const modelToUse = this.scoreSettings.model;
+      const modelToUse = scoreModel || this.scoreSettings.model;
       
       const res = await this.ollama.generate({
         model: modelToUse,
@@ -278,8 +278,8 @@ Please provide the evaluation in this exact format.`;
         }
       }
 
-      if (scoreObj.total === null &&
-          scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
+      // Always calculate weighted score from individual scores (ignore AI model's total)
+      if (scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
         const rawScore = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
         scoreObj.total = Math.round((rawScore / 30) * 100);
       }

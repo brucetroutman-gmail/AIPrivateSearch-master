@@ -11,7 +11,7 @@ const scorer = new CombinedSearchScorer();
 router.post('/', async (req, res) => {
   try {
     console.log('Received request:', req.body);
-    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks } = req.body;
+    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
@@ -70,7 +70,7 @@ router.post('/', async (req, res) => {
       const enhancedQuery = `Based on the following documents, please answer this question: ${query}\n\nRelevant documents:\n${documentContext}`;
       
       // Process through AI model using existing scorer
-      const result = await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode);
+      const result = await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
       
       // Add collection info to result
       result.collection = collection;
@@ -80,7 +80,7 @@ router.post('/', async (req, res) => {
     }
     
     // Use existing internet search for non-collection queries
-    const result = await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode);
+    const result = await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
     
     console.log('Sending response:', result);
     res.json(result);

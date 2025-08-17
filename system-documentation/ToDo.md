@@ -10,37 +10,37 @@ to do AISearchScore
 
 specs-3-scoring
 
-5. show ollama times etc at end of response - done
+5. show ollama times etc at end of response  --done
 
-6. create PcCode - done
+6. create PcCode --done
 
-7. gather pc mmetics, ram cpu etc - done
+7. gather pc mmetics, ram cpu etc --done
 
-8. Use CreatedAt format not TimeStamp - done
+8. Use CreatedAt format not TimeStamp --done
 
-9. add model options Temperature and Context Size - done
+9. add model options Temperature and Context Size --done
 
-10. move Temp Cont to under Model drop down
+10. move Temp Cont to under Model drop down --done
 
-11. Store the results in the MySQL db aisearchscore searches - done
+11. Store the results in the MySQL db aisearchscore searches --done
 
-12. add system propmts dropdown -done
+12. add system propmts dropdown --done
 
-13. add user prompts dropdown -done
+13. add user prompts dropdown --done
 
-14. Terminal interface for multiple tests? - no created test-executor  -done
+14. Terminal interface for multiple tests? - no created test-executor  --done
 
-15. add copyright and licence and add aisearch-n-score.com  -done
+15. add copyright and licence and add aisearch-n-score.com  --done
 
-15. Can We make an electron app for this that runs locally on a mac? -started
+15. Can We make an electron app for this that runs locally on a mac? --started
 
-16. create 41 tests - implement auto testing - done
+16. create 41 tests - implement auto testing --done
 
-17. menu structure?  login, update config files. home, back ground from alan - done
+17. menu structure?  login, update config files. home, back ground from alan --done
 
-18. Create Family documents -done
+18. Create Family documents --done
 
-19. collect email address an store in searches table sign up for pro
+19. collect email address and store in searches table --done
 
 20. fix Collections !!!  --done
 
@@ -54,21 +54,23 @@ specs-3-scoring
 
 23. Collect email and use with export & messaging --done
 
-23. Fix config manage Cancel with no changes -- done
+24. Fix config manage Cancel with no changes -- done
 
-24. Add collections info to database 
+25. Add collections info to database 
 
-25. User and system propmt by source type
+26. User and system propmt by source type
 
-26. Privacy Policy Terms of Service , Contact --done
+27. Privacy Policy Terms of Service , Contact --done
 
-27. add score model to db test
+28. add score model to db test --done
 
-27. get the best score model
+29. get the good enough score models
 
-28. do best embeding technique
+30. get best embeding technique
 
-29. best search models.
+31. embed with lanceDB ??
+
+32. get the good enough search models.
 
 
 

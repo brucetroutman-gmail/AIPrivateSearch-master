@@ -106,6 +106,7 @@ loadTemperatureOptions();
 loadContextOptions();
 loadTokensOptions();
 restoreModelOptions();
+loadScoreModels('scoreModel');
 
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
@@ -219,6 +220,12 @@ sourceTypeEl.addEventListener('change', () => {
 // Save collection selection
 collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
+});
+
+// Show/hide score model dropdown based on score toggle
+scoreTglEl.addEventListener('change', () => {
+  const scoreModelSection = document.getElementById('scoreModelSection');
+  scoreModelSection.style.display = scoreTglEl.checked ? 'block' : 'none';
 });
 
 
@@ -524,6 +531,7 @@ form.addEventListener('submit', async (e) => {
     // Get collection if Local Documents source type is selected
     const collection = (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') ? collectionEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
+    const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
     
     // Validate collection selection for local documents
     if ((sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') && !collection) {
@@ -531,7 +539,7 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel);
     render(result);
     
     // Show export section
@@ -551,7 +559,7 @@ exportBtn.addEventListener('click', async () => {
     return;
   }
   
-  const filename = `AISearch-${window.currentResult.createdAt}`;
+  const filename = `AISearch-${new Date(window.currentResult.createdAt).toLocaleString('sv-SE').replace(/[: ]/g, '-')}`;
   
   if (exportFormat === 'pdf') {
     // Create a new window for printing

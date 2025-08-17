@@ -95,6 +95,39 @@ function setupLoginIcon() {
   }
 }
 
+// Common score model loading function
+async function loadScoreModels(selectElementId) {
+  try {
+    const response = await fetch('config/models-list.json');
+    const data = await response.json();
+    const scoreSelect = document.getElementById(selectElementId);
+    
+    const scoreModels = [...new Set(
+      data.models
+        .filter(model => model.category === 'score')
+        .map(model => model.modelName)
+    )].sort();
+    
+    if (scoreModels.length > 0) {
+      const savedScoreModel = localStorage.getItem('selectedScoreModel');
+      scoreSelect.innerHTML = scoreModels.map((modelName, index) => {
+        const isSelected = savedScoreModel ? modelName === savedScoreModel : index === 0;
+        return `<option value="${modelName}" ${isSelected ? 'selected' : ''}>${modelName}</option>`;
+      }).join('');
+      
+      // Save selection on change
+      scoreSelect.addEventListener('change', function() {
+        localStorage.setItem('selectedScoreModel', this.value);
+      });
+    } else {
+      scoreSelect.innerHTML = '<option value="">No score models available</option>';
+    }
+  } catch (error) {
+    console.error('Error loading score models:', error);
+    document.getElementById(selectElementId).innerHTML = '<option value="">Error loading score models</option>';
+  }
+}
+
 // Common database export function
 async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null) {
   const dbData = {
@@ -107,7 +140,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     PcGraphics: result.systemInfo?.graphics || null,
     PcRAM: result.systemInfo?.ram || null,
     PcOS: result.systemInfo?.os || null,
-    CreatedAt: result.createdAt ? new Date(result.createdAt).toISOString().slice(0, 19).replace('T', ' ') : null,
+    CreatedAt: result.createdAt ? new Date(result.createdAt).toLocaleString('sv-SE').replace('T', ' ') : null,
     SourceType: result.sourceType || null,
     SystemPrompt: result.systemPromptName || null,
     Prompt: result.query || null,

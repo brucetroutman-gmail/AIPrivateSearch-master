@@ -603,7 +603,10 @@
                 params.systemPromptName,
                 params.tokens,
                 params.sourceType,
-                testCode
+                testCode,
+                null, // collection
+                false, // showChunks
+                scoreModel
             );
             
             // Export to database with category and description
@@ -673,28 +676,8 @@
                     modelList.appendChild(label);
                 });
                 
-                // Load score models
-                const scoreModels = [...new Set(
-                    data.models
-                        .filter(model => model.category === 'score')
-                        .map(model => model.modelName)
-                )].sort();
-                
-                const scoreSelect = document.getElementById('scoreModelSelect');
-                if (scoreModels.length > 0) {
-                    const savedScoreModel = localStorage.getItem('selectedScoreModel');
-                    scoreSelect.innerHTML = scoreModels.map((modelName, index) => {
-                        const isSelected = savedScoreModel ? modelName === savedScoreModel : index === 0;
-                        return `<option value="${modelName}" ${isSelected ? 'selected' : ''}>${modelName}</option>`;
-                    }).join('');
-                    
-                    // Save selection on change
-                    scoreSelect.addEventListener('change', function() {
-                        localStorage.setItem('selectedScoreModel', this.value);
-                    });
-                } else {
-                    scoreSelect.innerHTML = '<option value="">No score models available</option>';
-                }
+                // Load score models using common function
+                loadScoreModels('scoreModelSelect');
                 
                 // Setup select all models functionality
                 document.getElementById('selectAllModels').addEventListener('change', function() {
