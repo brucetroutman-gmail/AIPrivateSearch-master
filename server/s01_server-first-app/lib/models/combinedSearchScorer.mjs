@@ -11,23 +11,13 @@ class CombinedSearchScorer {
   }
 
   #loadScoreSettings() {
-    try {
-      const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      const settings = {};
-      config['score-settings'].forEach(item => {
-        Object.assign(settings, item);
-      });
-      return settings;
-    } catch (error) {
-      console.error('Error loading score settings:', error);
-      return {
-        model: 'gemma2:2b-instruct-q4_0',
-        temperature: 0.3,
-        context: 4096,
-        maxtokens: 500
-      };
-    }
+    const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const settings = {};
+    config['score-settings'].forEach(item => {
+      Object.assign(settings, item);
+    });
+    return settings;
   }
 
   /* public */

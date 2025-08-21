@@ -6,6 +6,7 @@ import modelsRouter from './routes/models.mjs';
 import databaseRouter from './routes/database.mjs';
 import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
+import { errorHandler } from './middleware/errorHandler.mjs';
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,9 @@ app.use('/api/models', modelsRouter);
 app.use('/api/database', databaseRouter);
 app.use('/api/documents', documentsRouter);
 app.use('/api/config', configRouter);
+
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

@@ -354,25 +354,20 @@
         showLog(`${progress} Adding: ${file.name}`);
         
         try {
-          // Check file size - if > 10MB, use chunked upload
-          if (file.size > 10 * 1024 * 1024) {
-            await uploadLargeFile(file, progress);
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showLog(`${progress} ✓ Added: ${file.name}`, 'success');
           } else {
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload`, {
-              method: 'POST',
-              body: formData
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-              showLog(`${progress} ✓ Added: ${file.name}`, 'success');
-            } else {
-              showLog(`${progress} ✗ Failed to add: ${file.name} - ${result.error}`, 'error');
-            }
+            showLog(`${progress} ✗ Failed to add: ${file.name} - ${result.error}`, 'error');
           }
         } catch (error) {
           showLog(`${progress} ✗ Error adding: ${file.name} - ${error.message}`, 'error');
@@ -560,41 +555,7 @@
       }
     }
     
-    async function uploadLargeFile(file, progress) {
-      const chunkSize = 1024 * 1024; // 1MB chunks
-      const totalChunks = Math.ceil(file.size / chunkSize);
-      
-      showLog(`${progress} Uploading large file in ${totalChunks} chunks...`);
-      
-      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        const start = chunkIndex * chunkSize;
-        const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
-        
-        const formData = new FormData();
-        formData.append('chunk', chunk);
-        formData.append('filename', file.name);
-        formData.append('chunkIndex', chunkIndex);
-        formData.append('totalChunks', totalChunks);
-        
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload-chunk`, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-          throw new Error(`Chunk ${chunkIndex + 1}/${totalChunks} failed: ${result.error}`);
-        }
-        
-        if (chunkIndex % 5 === 0 || chunkIndex === totalChunks - 1) {
-          showLog(`${progress} Uploaded chunk ${chunkIndex + 1}/${totalChunks}`);
-        }
-      }
-      
-      showLog(`${progress} ✓ Added: ${file.name}`);
-    }
+
     
     async function deleteDocuments() {
       const selected = getSelectedDocuments();
