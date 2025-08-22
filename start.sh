@@ -23,9 +23,9 @@ echo "Pulling required models..."
 MODELS=$(cat client/c01_client-first-app/config/models-list.json | grep '"modelName"' | cut -d'"' -f4 | sort -u)
 for model in $MODELS; do
     echo "📥 Pulling $model..."
-    ollama pull "$model" >/dev/null 2>&1 &
+    ollama pull "$model"
+    echo "✅ $model ready"
 done
-wait
 echo "✅ All models ready"
 
 # Start backend server in background
