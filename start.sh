@@ -18,6 +18,16 @@ if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
 fi
 echo "✅ Ollama is running"
 
+# Pull required models
+echo "Pulling required models..."
+MODELS=$(cat client/c01_client-first-app/config/models-list.json | grep '"modelName"' | cut -d'"' -f4 | sort -u)
+for model in $MODELS; do
+    echo "📥 Pulling $model..."
+    ollama pull "$model" >/dev/null 2>&1 &
+done
+wait
+echo "✅ All models ready"
+
 # Start backend server in background
 echo "Installing backend dependencies..."
 cd server/s01_server-first-app
