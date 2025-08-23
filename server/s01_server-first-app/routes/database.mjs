@@ -14,23 +14,25 @@ const dbConfig = {
 router.post('/save', async (req, res) => {
   try {
     const data = req.body;
+    console.log('Database save request data:', JSON.stringify(data, null, 2));
+    console.log('CreatedAt value:', data.CreatedAt, 'Length:', data.CreatedAt?.length);
     
     const connection = await mysql.createConnection(dbConfig);
     
     const insertQuery = `
       INSERT INTO searches (
-        TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, SystemPrompt, Prompt,
+        TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, Prompt,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
       data.TestCode || '',
-      data.TestCategory || null,
+      data.TestCategory || 'User Selected Test',
       data.TestDescription || null,
       data.UserEmail || null,
       data.PcCode || null,
@@ -38,8 +40,9 @@ router.post('/save', async (req, res) => {
       data.PcGraphics || null,
       data.PcRAM || null,
       data.PcOS || null,
-      data.CreatedAt || null,
+      data.CreatedAt ? data.CreatedAt.substring(0, 19).replace('T', ' ') : null,
       data.SourceType || null,
+      data.CollectionName || null,
       data.SystemPrompt || null,
       data.Prompt || null,
       data['ModelName-search'] || null,
@@ -62,9 +65,11 @@ router.post('/save', async (req, res) => {
       data['WeightedScore-pct'] || null
     ];
     
+    console.log('Executing query with', values.length, 'parameters');
     const [result] = await connection.execute(insertQuery, values);
     await connection.end();
     
+    console.log('Database save successful, insertId:', result.insertId);
     res.json({ success: true, insertId: result.insertId });
   } catch (error) {
     console.error('Database save error:', error);

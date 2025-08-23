@@ -12,6 +12,8 @@ const contextEl  = document.getElementById('context');
 const tokensEl   = document.getElementById('tokens');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
+const autoExportToggle = document.getElementById('autoExportToggle');
+const manualExportSection = document.getElementById('manualExportSection');
 const collectionEl = document.getElementById('collection');
 const collectionSection = document.getElementById('collectionSection');
 
@@ -238,6 +240,19 @@ scoreTglEl.addEventListener('change', () => {
   const scoreModelSection = document.getElementById('scoreModelSection');
   scoreModelSection.style.display = scoreTglEl.checked ? 'block' : 'none';
 });
+
+// Handle auto export toggle
+autoExportToggle.addEventListener('change', () => {
+  manualExportSection.style.display = autoExportToggle.checked ? 'none' : 'block';
+  localStorage.setItem('autoExportToDatabase', autoExportToggle.checked);
+});
+
+// Restore auto export setting
+const autoExportSetting = localStorage.getItem('autoExportToDatabase');
+if (autoExportSetting === 'true') {
+  autoExportToggle.checked = true;
+  manualExportSection.style.display = 'none';
+}
 
 
 
@@ -553,6 +568,16 @@ form.addEventListener('submit', async (e) => {
     const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel);
     render(result);
     
+    // Auto export to database if enabled
+    if (autoExportToggle.checked) {
+      try {
+        const exportResult = await exportToDatabase(window.currentResult);
+        console.log('Auto-exported to database with ID:', exportResult.insertId);
+      } catch (error) {
+        console.error('Auto-export failed:', error);
+      }
+    }
+    
     // Show export section
     document.getElementById('exportSection').style.display = 'block';
   } catch (err) {
@@ -560,6 +585,56 @@ form.addEventListener('submit', async (e) => {
     console.error(err);
   }
 });
+
+// Export to database function
+async function exportToDatabase(result) {
+  const jsonData = {
+    TestCode: result.testCode || '',
+    TestCategory: null,
+    TestDescription: null,
+    UserEmail: localStorage.getItem('userEmail') || null,
+    PcCode: result.pcCode || null,
+    PcCPU: result.systemInfo?.chip || null,
+    PcGraphics: result.systemInfo?.graphics || null,
+    PcRAM: result.systemInfo?.ram || null,
+    PcOS: result.systemInfo?.os || null,
+    CreatedAt: result.createdAt || null,
+    SourceType: result.sourceType || null,
+    CollectionName: (result.sourceType === 'Local Documents Only' || result.sourceType === 'Local Model and Documents') ? result.collection : null,
+    SystemPrompt: result.systemPromptName || null,
+    Prompt: result.query || null,
+    'ModelName-search': result.metrics?.search?.model || null,
+    'ModelContextSize-search': result.metrics?.search?.context_size || null,
+    'ModelTemperature-search': result.metrics?.search?.temperature || null,
+    'ModelTokenLimit-search': result.tokenLimit || null,
+    'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
+    'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
+    'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+    'Answer-search': result.response || null,
+    'ModelName-score': result.metrics?.scoring?.model || null,
+    'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
+    'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
+    'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
+    'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
+    'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
+    AccurateScore: result.scores?.accuracy || null,
+    RelevantScore: result.scores?.relevance || null,
+    OrganizedScore: result.scores?.organization || null,
+    'WeightedScore-pct': result.scores?.total || null
+  };
+  
+  const response = await fetch('http://localhost:3001/api/database/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(jsonData)
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Database save failed: ${response.statusText}`);
+  }
+  
+  return await response.json();
+}
 
 // Add event listener for export button
 exportBtn.addEventListener('click', async () => {
@@ -676,6 +751,7 @@ exportBtn.addEventListener('click', async () => {
       PcOS: result.systemInfo?.os || null,
       CreatedAt: result.createdAt || null,
       SourceType: result.sourceType || null,
+      CollectionName: (result.sourceType === 'Local Documents Only' || result.sourceType === 'Local Model and Documents') ? result.collection : null,
       SystemPrompt: result.systemPromptName || null,
       Prompt: result.query || null,
       'ModelName-search': result.metrics?.search?.model || null,

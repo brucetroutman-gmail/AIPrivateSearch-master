@@ -56,7 +56,7 @@ specs-3-scoring
 
 24. Fix config manage Cancel with no changes -- done
 
-25. Add collections info to database 
+25. Add collections info to database -- done
 
 26. User and system propmt by source type
 
