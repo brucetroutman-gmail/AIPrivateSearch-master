@@ -335,21 +335,23 @@ function generateTestCode() {
   };
   testCode += assistantTypeMap[assistantTypeEl.value] || '1';
   
-  // Position 4: User Prompts (1-5)
-  const userPromptMap = {
-    'KNOWLEDGE-Quantum': '1',
-    'REASON-AI-adopt': '2',
-    'CREATE-AI-dialog': '3',
-    'CODE-Pseudo': '4',
-    'INSTRUCT-Fix wifi': '5'
-  };
-  // Check if query matches any template, default to 1
+  // Position 4: User Prompts (1-5) - default to 1
   let userPromptCode = '1';
-  for (const [key, value] of Object.entries(userPromptMap)) {
-    const template = systemPrompts.find(p => p.name === key);
-    if (template && queryEl.value.includes(template.prompt.substring(0, 20))) {
-      userPromptCode = value;
-      break;
+  if (systemPrompts && systemPrompts.length > 0) {
+    const userPromptMap = {
+      'KNOWLEDGE-Quantum': '1',
+      'REASON-AI-adopt': '2',
+      'CREATE-AI-dialog': '3',
+      'CODE-Pseudo': '4',
+      'INSTRUCT-Fix wifi': '5'
+    };
+    // Check if query matches any template
+    for (const [key, value] of Object.entries(userPromptMap)) {
+      const template = systemPrompts.find(p => p.name === key);
+      if (template && queryEl.value && queryEl.value.includes(template.prompt.substring(0, 20))) {
+        userPromptCode = value;
+        break;
+      }
     }
   }
   testCode += userPromptCode;
@@ -434,7 +436,7 @@ function render(result) {
     tbl.className = 'score-table';
     tbl.innerHTML = `
       <thead>
-        <tr><th>Criterion</th><th>Score (1-5)</th><th>Justification</th></tr>
+        <tr><th>Criterion</th><th>Score (1-3)</th><th>Justification</th></tr>
       </thead>
       <tbody>
         <tr><td>Accuracy</td><td>${s.accuracy ?? '-'}</td><td>${s.justifications.accuracy}</td></tr>
@@ -538,7 +540,20 @@ form.addEventListener('submit', async (e) => {
     return;
   }
   
-  outputEl.textContent = 'Loading…';
+  // Disable submit button to prevent multiple runs
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Processing...';
+  
+  let progressMessages = [];
+  
+  function updateProgress(message) {
+    progressMessages.push(message);
+    outputEl.textContent = progressMessages.join(' → ') + '...';
+  }
+  
+  updateProgress('Loading');
 
   try {
     // Get selected system prompt
@@ -565,7 +580,14 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel);
+    updateProgress('Searching');
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, updateProgress);
+    
+    // Show scoring phase if scores were generated
+    if (result.scores) {
+      updateProgress('Scoring');
+    }
+    
     render(result);
     
     // Auto export to database if enabled
@@ -583,6 +605,10 @@ form.addEventListener('submit', async (e) => {
   } catch (err) {
     outputEl.textContent = err.message;
     console.error(err);
+  } finally {
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 });
 
@@ -687,7 +713,7 @@ exportBtn.addEventListener('click', async () => {
     if (result.scores) {
       const s = result.scores;
       markdown += `## Scores\n\n`;
-      markdown += `| Criterion | Score (1-5) | Justification |\n`;
+      markdown += `| Criterion | Score (1-3) | Justification |\n`;
       markdown += `|-----------|-------------|---------------|\n`;
       markdown += `| Accuracy | ${s.accuracy ?? '-'} | ${s.justifications.accuracy} |\n`;
       markdown += `| Relevance | ${s.relevance ?? '-'} | ${s.justifications.relevance} |\n`;

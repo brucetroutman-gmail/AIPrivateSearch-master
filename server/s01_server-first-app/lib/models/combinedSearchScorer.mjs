@@ -121,60 +121,28 @@ class CombinedSearchScorer {
     try {
       console.log('Starting scoring process...');
       
-      const scoringPrompt = `### Scoring Criteria Definitions
--##Accurate (1-5)
-The degree to which the response contains correct, verifiable information supported by evidence or widely accepted knowledge.
+      const scoringPrompt = `Score this response on 3 criteria (1-3 scale):
 
-Score 5: Entirely accurate with no errors. All information is verifiable and precisely addresses requirements.
-Score 4: Highly accurate with minimal errors that don't impact overall value.
-Score 3: Generally accurate with a few minor errors or slightly unsupported assertions.
-Score 2: Mixed accuracy with noticeable errors or unverifiable claims alongside correct information.
-Score 1: Predominantly inaccurate with major factual errors or fabrications.
+Query: "${query}"
+Response: "${answer}"
 
--##Relevant (1-5)
-The extent to which the response directly addresses the prompt and includes necessary information.
+Criteria:
+- Accurate: Factually correct (1=Poor, 2=Good, 3=Excellent)
+- Relevant: Addresses query (1=Poor, 2=Good, 3=Excellent)
+- Organized: Clear structure (1=Poor, 2=Good, 3=Excellent)
 
-Score 5: Answer fully addresses the prompt, is concise, with minimal unnecessary information.
-Score 4: Response addresses the core of the prompt with little tangential information.
-Score 3: Response mostly addresses the prompt but includes some unnecessary information.
-Score 2: Response partially addresses the prompt with significant omissions or irrelevant content.
-Score 1: Response barely addresses or misses the prompt entirely.
+Format:
+**Accurate**: [1-3]
+Justification: [Brief reason]
 
--##Organized (1-5)
-The logical structure, organization, and flow of the response.
+**Relevant**: [1-3]
+Justification: [Brief reason]
 
-Score 5: Exceptionally clear, logically organized, with perfect flow between ideas.
-Score 4: Very clear structure with strong logical flow throughout.
-Score 3: Generally clear organization with a few awkward transitions or minor issues.
-Score 2: Somewhat organized but with noticeable logical gaps or confusing structure.
-Score 1: Disorganized, incoherent, or lacks any clear structure.
+**Organized**: [1-3]
+Justification: [Brief reason]
 
-### Instructions
-1. Evaluate the response based on the three criteria.
-2. Assign a score from 1 to 5 for each criterion.
-3. Provide a brief justification for each score.
-4. If a criterion is not applicable, state this and assign 0.
-5. Use EXACTLY the following format (single line **Accurate** etc.).
-
-### Evaluation for Response
-
-Original Query: "${query}"
-
-Response to Evaluate: "${answer}"
-
-**Accurate**: [Score]
-Justification: [Your reasoning]
-
-**Relevant**: [Score]
-Justification: [Your reasoning]
-
-**Organized**: [Score]
-Justification: [Your reasoning]
-
-**Total Score**: [Total Score]
-Overall Comments: [Optional brief summary or additional notes]
-
-Please provide the evaluation in this exact format.`;
+**Total Score**: [Total]
+Overall Comments: [Optional summary]`;
 
       const modelToUse = scoreModel || this.scoreSettings.model;
       
@@ -269,9 +237,10 @@ Please provide the evaluation in this exact format.`;
       }
 
       // Always calculate weighted score from individual scores (ignore AI model's total)
+      // For 1-3 scale: max possible = (3*3) + (2*3) + (1*3) = 18
       if (scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
         const rawScore = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
-        scoreObj.total = Math.round((rawScore / 30) * 100);
+        scoreObj.total = Math.round((rawScore / 18) * 100);
       }
       
       return scoreObj;
@@ -292,7 +261,7 @@ Please provide the evaluation in this exact format.`;
   }
 
   #extract(line) {
-    const m = line.match(/\b([0-5])\b/);
+    const m = line.match(/\b([0-3])\b/);
     return m ? Number(m[1]) : null;
   }
 

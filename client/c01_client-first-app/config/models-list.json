@@ -16,6 +16,11 @@
       "size": "934 MB"
     },
     {
+      "category": "score",
+      "modelName": "qwen2:1.5b",
+      "size": "934 MB"
+    },
+    {
       "category": "search",
       "modelName": "phi4-mini:3.8b-q4_K_M",
       "size": "2.5 GB"
@@ -41,14 +46,19 @@
       "size": "1.6 GB"
     },
     {
-      "category": "score",
+      "category": "search",
       "modelName": "gemma3:1b-it-q4_K_M",
       "size": "815 MB"
     },
     {
       "category": "search",
-      "modelName": "gemma3:1b-it-q4_K_M",
-      "size": "815 MB"
+      "modelName": "phi3:3.8b",
+      "size": "unknown"
+    },
+    {
+      "category": "score",
+      "modelName": "phi3:3.8b",
+      "size": "unknown"
     }
   ]
 }

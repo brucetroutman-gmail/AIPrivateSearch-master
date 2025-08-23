@@ -1,6 +1,9 @@
 const API_ROOT = 'http://localhost:3001';
 
-export async function search(query, score = false, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, collection = null, showChunks = false, scoreModel = null) {
+export async function search(query, score = false, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, collection = null, showChunks = false, scoreModel = null, progressCallback = null) {
+  // Show scoring progress if scoring is enabled - will be called when scoring actually starts
+  // (Remove the artificial delay)
+  
   const res = await fetch(`${API_ROOT}/api/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
