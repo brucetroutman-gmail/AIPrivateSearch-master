@@ -58,19 +58,31 @@ specs-3-scoring
 
 25. Add collections info to database -- done
 
-26. User and system propmt by source type
+26. Privacy Policy Terms of Service , Contact --done
 
-27. Privacy Policy Terms of Service , Contact --done
+27. add score model to db test --done
 
-28. add score model to db test --done
+28. Toggle Developer mode -- done
 
-29. get the good enough score models
+29. Require email onevery page -- done
 
-30. get best embeding technique
+30. Move Auto export next to Geneerate Scores -- done
 
-31. embed with lanceDB ??
+--------------------------------
 
-32. get the good enough search models.
+28. User and system propmt by source type
+
+32. Re-Visit the Test Codes - focus on speed
+
+33. get the good enough score models
+
+34. get best embeding technique
+
+35. embed with lanceDB ??
+
+36. get the good enough search models.
+
+37. Create Doctors and lawyers document set
 
 
 

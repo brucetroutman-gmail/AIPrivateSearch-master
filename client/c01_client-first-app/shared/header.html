@@ -8,8 +8,8 @@
     </div>
     <nav class="nav-menu" id="navMenu">
       <a href="./search.html">Search</a>
-      <a href="./test.html">Test</a>
-      <a href="./analyze-tests.html">Analyze</a>
+      <a href="./test.html" class="dev-only">Test</a>
+      <a href="./analyze-tests.html" class="dev-only">Analyze</a>
       <div class="dropdown">
         <a href="#manage">Manage</a>
         <div class="dropdown-content">
@@ -21,7 +21,8 @@
         <a href="#options">Options</a>
         <div class="dropdown-content">
           <a href="#dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</a>
-          <a href="./config.html">Modify Config Files</a>
+          <a href="#dev-mode" onclick="toggleDeveloperMode()">Toggle Developer Mode</a>
+          <a href="./config.html" class="dev-only">Modify Config Files</a>
         </div>
       </div>
       <div class="login-icon" title="User Info">👤</div>

@@ -86,10 +86,15 @@
     <label for="query">Enter your prompt:</label><br />
     <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea><br />
 
-    <div style="display: flex; gap: 2rem; align-items: center;">
+    <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
       <label>
         <input type="checkbox" id="scoreToggle" />
         Generate scores
+      </label>
+      
+      <label>
+        <input type="checkbox" id="autoExportToggle" />
+        Auto Export to Database
       </label>
       
       <label id="showChunksLabel" style="display: none;">
@@ -111,13 +116,6 @@
   <section id="output"></section>
 
   <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
-    <div style="margin-bottom: 1rem;">
-      <label>
-        <input type="checkbox" id="autoExportToggle" />
-        Auto Export to Database
-      </label>
-    </div>
-    
     <div id="manualExportSection">
       <label for="exportFormat">Export Format:</label>
       <select id="exportFormat" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">

@@ -38,22 +38,62 @@ function toggleMenu() {
   navMenu.classList.toggle('active');
 }
 
+// Developer mode toggle
+function toggleDeveloperMode() {
+  const isDeveloperMode = localStorage.getItem('developerMode') === 'true';
+  const newMode = !isDeveloperMode;
+  localStorage.setItem('developerMode', newMode);
+  applyDeveloperMode(newMode);
+  alert(`Developer Mode ${newMode ? 'enabled' : 'disabled'}`);
+}
+
+function applyDeveloperMode(isDeveloperMode = null) {
+  if (isDeveloperMode === null) {
+    isDeveloperMode = localStorage.getItem('developerMode') === 'true';
+  }
+  
+  const devOnlyElements = document.querySelectorAll('.dev-only');
+  devOnlyElements.forEach(element => {
+    element.style.display = isDeveloperMode ? '' : 'none';
+  });
+}
+
+function loadDeveloperMode() {
+  // Default to developer mode enabled if not set
+  const isDeveloperMode = localStorage.getItem('developerMode');
+  if (isDeveloperMode === null) {
+    localStorage.setItem('developerMode', 'true');
+  }
+  applyDeveloperMode();
+}
+
 // Email management
 function checkUserEmail() {
   const email = localStorage.getItem('userEmail');
   if (!email) {
     promptForEmail();
+    return false;
   }
+  return true;
 }
 
 function promptForEmail() {
-  const email = prompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address for export functionality:');
-  if (email && validateEmail(email)) {
-    localStorage.setItem('userEmail', email);
-  } else if (email) {
-    alert('Please enter a valid email address.');
-    promptForEmail();
-  }
+  let email;
+  do {
+    email = prompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address to continue:');
+    if (email === null) {
+      // User clicked cancel
+      alert('Email is required to use this application.');
+      continue;
+    }
+    if (email && validateEmail(email)) {
+      localStorage.setItem('userEmail', email);
+      return true;
+    } else if (email) {
+      alert('Please enter a valid email address.');
+    }
+  } while (!email || !validateEmail(email));
+  return false;
 }
 
 function validateEmail(email) {
@@ -187,8 +227,16 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadTheme();
+  
+  // Check email first - block page loading if no email
+  if (!checkUserEmail()) {
+    // Hide page content until email is provided
+    document.body.style.display = 'none';
+    return;
+  }
+  
   loadSharedComponents().then(() => {
     setupLoginIcon();
+    loadDeveloperMode();
   });
-  checkUserEmail();
 });
