@@ -49,16 +49,6 @@
       "category": "search",
       "modelName": "gemma3:1b-it-q4_K_M",
       "size": "815 MB"
-    },
-    {
-      "category": "search",
-      "modelName": "phi3:3.8b",
-      "size": "unknown"
-    },
-    {
-      "category": "score",
-      "modelName": "phi3:3.8b",
-      "size": "unknown"
     }
   ]
 }
