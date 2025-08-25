@@ -69,7 +69,7 @@ specs-3-scoring
 30. Move Auto export next to Geneerate Scores -- done
 
 --------------------------------
-
+28. Only pull ollama if over 24 hrs old
 
 28. in dev mode show all. hide if not in dev mode
 

@@ -7,18 +7,181 @@
   <link rel="stylesheet" href="shared/styles.css">
   <script src="shared/common.js"></script>
   <style>
-    h1   { margin-top: 0; }
-    label { font-weight: 600; }
-    select { width: 100%; padding: .5rem; margin: .5rem 0 1rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
-    select#temperature, select#context, select#tokens { width: auto; display: inline-block; margin: 0 .5rem; }
-    textarea { width: 100%; height: 6rem; margin: .5rem 0 1rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
-    button { padding: .5rem 1rem; }
-    #output { white-space: pre-wrap; margin-top: 2rem; background: var(--card-bg); padding:1rem; border-radius:6px; transition: background-color 0.3s; }
-    .score-table { border-collapse: collapse; margin-top: 1rem; }
-    .score-table th, .score-table td { border: 1px solid var(--border-color); padding: .4rem .6rem; text-align:center; }
-    .score-table th { background: var(--card-bg); }
+    h1 { margin-top: 0; }
     
+    /* Layout Structure */
+    .layout-container {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .form-column {
+      min-width: 0;
+    }
+    
+    .results-column {
+      min-width: 0;
+    }
+    
+    /* Form Groups */
+    .form-group {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: background-color 0.3s;
+    }
+    
+    .form-group legend {
+      font-weight: 600;
+      color: var(--text-color);
+      padding: 0 0.5rem;
+      font-size: 1rem;
+    }
+    
+    /* Form Fields */
+    .field {
+      margin-bottom: 1rem;
+    }
+    
+    .field:last-child {
+      margin-bottom: 0;
+    }
+    
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+    
+    select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    textarea {
+      height: 8rem;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    /* Model Options Grid */
+    .model-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .option-group label {
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .option-group select {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+    
+    /* Checkbox Group */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .checkbox-label input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .submit-btn:hover {
+      background: #2980b9;
+    }
+    
+    .submit-btn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    
+    /* Results */
+    #output {
+      white-space: pre-wrap;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      transition: background-color 0.3s;
+      min-height: 200px;
+    }
+    
+    #output:empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    #output:empty::before {
+      content: "Results will appear here...";
+    }
+    
+    /* Tables */
+    .score-table {
+      border-collapse: collapse;
+      margin-top: 1rem;
+      width: 100%;
+    }
+    
+    .score-table th, .score-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 0.75rem;
+      text-align: center;
+    }
+    
+    .score-table th {
+      background: var(--card-bg);
+      font-weight: 600;
+    }
+    
+    /* Dark Theme */
     [data-theme="dark"] h3, [data-theme="dark"] h4 {
+      color: #87ceeb;
+    }
+    
+    [data-theme="dark"] .form-group legend {
       color: #87ceeb;
     }
     
@@ -30,6 +193,37 @@
     [data-theme="dark"] .score-table th {
       color: #87ceeb;
     }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .layout-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .model-options {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .form-group {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .model-options {
+        grid-template-columns: 1fr;
+      }
+      
+      .checkbox-group {
+        gap: 0.5rem;
+      }
+      
+      textarea {
+        height: 6rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -38,95 +232,149 @@
   <div class="page-content">
     <h1>Search-n-Score</h1>
 
+    <div class="layout-container">
+      <div class="form-column">
+        <form id="searchForm">
+          <!-- Source & Model Section -->
+          <fieldset class="form-group">
+            <legend>🔍 Source & Model</legend>
+            <div class="field">
+              <label for="sourceType">Source Type</label>
+              <select id="sourceType">
+                <option value="">Loading...</option>
+              </select>
+            </div>
+            
+            <div id="collectionSection" class="field" style="display: none;">
+              <label for="collection">Collection</label>
+              <select id="collection">
+                <option value="">Loading collections...</option>
+              </select>
+            </div>
+            
+            <div class="field">
+              <label for="model">Search Model</label>
+              <select id="model" required>
+                <option value="">Loading models...</option>
+              </select>
+            </div>
+            
+            <div class="model-options">
+              <div class="option-group">
+                <label for="temperature">Temperature</label>
+                <select id="temperature">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+              
+              <div class="option-group">
+                <label for="context">Context</label>
+                <select id="context">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+              
+              <div class="option-group">
+                <label for="tokens">Tokens</label>
+                <select id="tokens">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
 
-  <form id="searchForm">
-    <label for="sourceType">Source Type:</label><br />
-    <select id="sourceType">
-      <option value="">Loading...</option>
-    </select><br />
-    
-    <div id="collectionSection" style="display: none;">
-      <label for="collection">Collection:</label><br />
-      <select id="collection">
-        <option value="">Loading collections...</option>
-      </select><br />
+          <!-- Prompt Section -->
+          <fieldset class="form-group">
+            <legend>💬 Prompt</legend>
+            <div class="field">
+              <label for="assistantType">Assistant Type</label>
+              <select id="assistantType">
+                <option value="">Loading system prompts...</option>
+              </select>
+            </div>
+            
+            <div class="field">
+              <label for="userPrompts">User Prompts</label>
+              <select id="userPrompts">
+                <option value="">Loading...</option>
+              </select>
+            </div>
+            
+            <div class="field">
+              <label for="query">Enter your prompt</label>
+              <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea>
+            </div>
+          </fieldset>
+
+          <!-- Options & Actions Section -->
+          <fieldset class="form-group">
+            <legend>🎯 Options & Actions</legend>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="scoreToggle" />
+                Generate scores
+              </label>
+              
+              <label class="checkbox-label">
+                <input type="checkbox" id="autoExportToggle" />
+                Auto Export to Database
+              </label>
+              
+              <label id="showChunksLabel" class="checkbox-label" style="display: none;">
+                <input type="checkbox" id="showChunksToggle" />
+                Show source chunks
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Scoring Section -->
+          <fieldset id="scoringSection" class="form-group" style="display: none;">
+            <legend>📊 Scoring</legend>
+            <div class="field">
+              <label for="scoreModel">Score Model</label>
+              <select id="scoreModel">
+                <option value="">Loading score models...</option>
+              </select>
+            </div>
+            
+            <div class="model-options">
+              <div class="option-group">
+                <label for="scoreTemperature">Temperature</label>
+                <select id="scoreTemperature">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+              
+              <div class="option-group">
+                <label for="scoreContext">Context</label>
+                <select id="scoreContext">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+              
+              <div class="option-group">
+                <label for="scoreTokens">Tokens</label>
+                <select id="scoreTokens">
+                  <option value="">Loading...</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Submit Section -->
+          <fieldset class="form-group">
+            <legend>🚀 Execute</legend>
+            <button type="submit" class="submit-btn">Submit</button>
+          </fieldset>
+        </form>
+      </div>
+
+      <div class="results-column">
+        <section id="output"></section>
+      </div>
     </div>
-    
-    <label for="model">Model:</label><br />
-    <select id="model" required>
-      <option value="">Loading models...</option>
-    </select><br />
-    
-    <label for="assistantType">Assistant Type:</label><br />
-    <select id="assistantType">
-      <option value="">Loading system prompts...</option>
-    </select><br />
-    
-    <label>Model Options:</label>
-    <label for="temperature">Temperature:</label>
-    <select id="temperature">
-      <option value="">Loading...</option>
-    </select>
-    
-    <label for="context">Context:</label>
-    <select id="context">
-      <option value="">Loading...</option>
-    </select>
-    
-    <label for="tokens">Tokens:</label>
-    <select id="tokens">
-      <option value="">Loading...</option>
-    </select><br /><br />
 
-    <label for="userPrompts">User Prompts:</label><br />
-    <select id="userPrompts">
-      <option value="">Loading...</option>
-    </select><br />
-    
-    <label for="query">Enter your prompt:</label><br />
-    <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea><br />
 
-    <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
-      <label>
-        <input type="checkbox" id="scoreToggle" />
-        Generate scores
-      </label>
-      
-      <label>
-        <input type="checkbox" id="autoExportToggle" />
-        Auto Export to Database
-      </label>
-      
-      <label id="showChunksLabel" style="display: none;">
-        <input type="checkbox" id="showChunksToggle" />
-        Show source chunks
-      </label>
-    </div>
-    
-    <div id="scoreModelSection" style="display: none; margin: 1rem 0;">
-      <label for="scoreModel">Score Model:</label><br />
-      <select id="scoreModel" style="width: 300px;">
-        <option value="">Loading score models...</option>
-      </select><br />
-    </div>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <section id="output"></section>
-
-  <div id="exportSection" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
-    <div id="manualExportSection">
-      <label for="exportFormat">Export Format:</label>
-      <select id="exportFormat" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
-        <option value="pdf">Printer/PDF</option>
-        <option value="markdown">Markdown</option>
-        <option value="json">JSON</option>
-        <option value="database">Database</option>
-      </select>
-      <button type="button" id="exportBtn" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">Export</button>
-    </div>
-  </div>
 
   </div>
   

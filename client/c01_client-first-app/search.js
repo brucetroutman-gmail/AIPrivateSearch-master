@@ -19,6 +19,11 @@ const collectionSection = document.getElementById('collectionSection');
 
 let systemPrompts = [];
 
+// Utility function to format CreatedAt timestamps
+function formatCreatedAt(timestamp) {
+  return timestamp ? new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ') : null;
+}
+
 // Load collections from API
 async function loadCollections() {
   try {
@@ -120,6 +125,7 @@ loadContextOptions();
 loadTokensOptions();
 restoreModelOptions();
 loadScoreModels('scoreModel');
+loadScoringOptions();
 
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
@@ -235,10 +241,10 @@ collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
 });
 
-// Show/hide score model dropdown based on score toggle
+// Show/hide scoring section based on score toggle
 scoreTglEl.addEventListener('change', () => {
-  const scoreModelSection = document.getElementById('scoreModelSection');
-  scoreModelSection.style.display = scoreTglEl.checked ? 'block' : 'none';
+  const scoringSection = document.getElementById('scoringSection');
+  scoringSection.style.display = scoreTglEl.checked ? 'block' : 'none';
   localStorage.setItem('generateScores', scoreTglEl.checked);
 });
 
@@ -259,13 +265,68 @@ if (autoExportSetting === 'true') {
 const generateScoresSetting = localStorage.getItem('generateScores');
 if (generateScoresSetting === 'true') {
   scoreTglEl.checked = true;
-  document.getElementById('scoreModelSection').style.display = 'block';
+  document.getElementById('scoringSection').style.display = 'block';
 }
 
 // Restore prompt text
 const lastPrompt = localStorage.getItem('lastPrompt');
 if (lastPrompt) {
   queryEl.value = lastPrompt;
+}
+
+// Load and populate scoring options
+async function loadScoringOptions() {
+  try {
+    // Load temperature options
+    const tempResponse = await fetch('./config/temperature.json');
+    const tempData = await tempResponse.json();
+    const scoreTemperatureEl = document.getElementById('scoreTemperature');
+    scoreTemperatureEl.innerHTML = tempData.temperature.map(temp => 
+      `<option value="${temp.value}">${temp.name}</option>`
+    ).join('');
+    
+    // Load context options
+    const contextResponse = await fetch('./config/context.json');
+    const contextData = await contextResponse.json();
+    const scoreContextEl = document.getElementById('scoreContext');
+    scoreContextEl.innerHTML = contextData.context.map(context => 
+      `<option value="${context.name}">${context.name}</option>`
+    ).join('');
+    
+    // Load tokens options
+    const tokensResponse = await fetch('./config/tokens.json');
+    const tokensData = await tokensResponse.json();
+    const scoreTokensEl = document.getElementById('scoreTokens');
+    scoreTokensEl.innerHTML = tokensData.tokens.map(token => 
+      `<option value="${token.name}">${token.name}</option>`
+    ).join('');
+    
+    // Restore saved values
+    const lastScoreTemp = localStorage.getItem('lastScoreTemperature');
+    if (lastScoreTemp) scoreTemperatureEl.value = lastScoreTemp;
+    
+    const lastScoreContext = localStorage.getItem('lastScoreContext');
+    if (lastScoreContext) scoreContextEl.value = lastScoreContext;
+    
+    const lastScoreTokens = localStorage.getItem('lastScoreTokens');
+    if (lastScoreTokens) scoreTokensEl.value = lastScoreTokens;
+    
+    // Add event listeners for persistence
+    scoreTemperatureEl.addEventListener('change', () => {
+      localStorage.setItem('lastScoreTemperature', scoreTemperatureEl.value);
+    });
+    
+    scoreContextEl.addEventListener('change', () => {
+      localStorage.setItem('lastScoreContext', scoreContextEl.value);
+    });
+    
+    scoreTokensEl.addEventListener('change', () => {
+      localStorage.setItem('lastScoreTokens', scoreTokensEl.value);
+    });
+    
+  } catch (error) {
+    console.error('Failed to load scoring options:', error);
+  }
 }
 
 
@@ -549,6 +610,27 @@ function render(result) {
   meta.style.color = '#555';
   meta.textContent = `CreatedAt: ${result.createdAt} | Test Code: ${result.testCode || 'N/A'}`;
   outputEl.append(meta);
+
+  // 6. Add export section at the end
+  const exportDiv = document.createElement('div');
+  exportDiv.style.cssText = 'margin-top: 1.5rem; padding: 1rem; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--border-color);';
+  exportDiv.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <label for="exportFormat" style="margin: 0; font-weight: 600;">Export to:</label>
+      <select id="exportFormat" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;">
+        <option value="pdf">Printer/PDF</option>
+        <option value="markdown">Markdown</option>
+        <option value="json">JSON</option>
+        <option value="database">Database</option>
+      </select>
+      <button type="button" id="exportBtn" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Export</button>
+    </div>
+  `;
+  outputEl.append(exportDiv);
+  
+  // Add event listener to the new export button
+  const newExportBtn = exportDiv.querySelector('#exportBtn');
+  newExportBtn.addEventListener('click', handleExport);
 }
 
 form.addEventListener('submit', async (e) => {
@@ -621,8 +703,7 @@ form.addEventListener('submit', async (e) => {
       }
     }
     
-    // Show export section
-    document.getElementById('exportSection').style.display = 'block';
+    // Export section is now part of the answer
   } catch (err) {
     outputEl.textContent = err.message;
     console.error(err);
@@ -647,7 +728,7 @@ async function exportToDatabase(result) {
     PcGraphics: result.systemInfo?.graphics || null,
     PcRAM: result.systemInfo?.ram || null,
     PcOS: result.systemInfo?.os || null,
-    CreatedAt: result.createdAt || null,
+    CreatedAt: formatCreatedAt(result.createdAt),
     SourceType: result.sourceType || null,
     CollectionName: (result.sourceType === 'Local Documents Only' || result.sourceType === 'Local Model and Documents') ? result.collection : null,
     SystemPrompt: result.systemPromptName || null,
@@ -686,7 +767,8 @@ async function exportToDatabase(result) {
 }
 
 // Add event listener for export button
-exportBtn.addEventListener('click', async () => {
+// Export handler function
+async function handleExport() {
   const exportFormat = document.getElementById('exportFormat').value;
   
   if (!window.currentResult) {
@@ -694,7 +776,8 @@ exportBtn.addEventListener('click', async () => {
     return;
   }
   
-  const filename = `AISearch-${new Date(window.currentResult.createdAt).toLocaleString('sv-SE').replace(/[: ]/g, '-')}`;
+  const createdAt = new Date(window.currentResult.createdAt);
+  const filename = `AISearch-${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}-${String(createdAt.getDate()).padStart(2, '0')}-${String(createdAt.getHours()).padStart(2, '0')}-${String(createdAt.getMinutes()).padStart(2, '0')}-${String(createdAt.getSeconds()).padStart(2, '0')}`;
   
   if (exportFormat === 'pdf') {
     // Create a new window for printing
@@ -773,7 +856,7 @@ exportBtn.addEventListener('click', async () => {
     markdown += `|--------|-----|----------|-----|----| \n`;
     markdown += `| ${result.pcCode || 'Unknown'} | ${result.systemInfo?.chip || 'Unknown'} | ${result.systemInfo?.graphics || 'Unknown'} | ${result.systemInfo?.ram || 'Unknown'} | ${result.systemInfo?.os || 'Unknown'} |\n\n`;
     
-    markdown += `**CreatedAt:** ${result.createdAt}\n`;
+    markdown += `**CreatedAt:** ${formatCreatedAt(result.createdAt)}\n`;
     
     // Download markdown file
     const blob = new Blob([markdown], { type: 'text/markdown' });
@@ -798,7 +881,7 @@ exportBtn.addEventListener('click', async () => {
       PcGraphics: result.systemInfo?.graphics || null,
       PcRAM: result.systemInfo?.ram || null,
       PcOS: result.systemInfo?.os || null,
-      CreatedAt: result.createdAt || null,
+      CreatedAt: formatCreatedAt(result.createdAt),
       SourceType: result.sourceType || null,
       CollectionName: (result.sourceType === 'Local Documents Only' || result.sourceType === 'Local Model and Documents') ? result.collection : null,
       SystemPrompt: result.systemPromptName || null,
@@ -844,4 +927,9 @@ exportBtn.addEventListener('click', async () => {
       alert(`Database save error: ${error.message}`);
     }
   }
-});
+}
+
+// Add event listener for export button (if it exists in DOM)
+if (exportBtn) {
+  exportBtn.addEventListener('click', handleExport);
+}
