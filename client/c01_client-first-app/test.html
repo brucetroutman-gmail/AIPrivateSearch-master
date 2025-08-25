@@ -62,8 +62,8 @@
     <div class="token-override" style="margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s;">
         <div style="font-weight: bold; margin-bottom: 10px;">Token Override:</div>
         <select id="tokenOverride" style="width: 200px; padding: 0.5rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
-            <option value="">No Override</option>
-            <option value="250" selected>250</option>
+            <option value="" selected>No Override</option>
+            <option value="250">250</option>
             <option value="500">500</option>
         </select>
     </div>
@@ -86,140 +86,76 @@
     </div>
 
     <script>
-        const modelTests = {
-            "baseline_tests": {
-                "title": "Baseline Tests",
-                "tests": [
-                    {"testcode": "t1111110", "description": "All minimum values, no scoring"},
-                    {"testcode": "t3554341", "description": "All maximum values, with scoring"},
-                    {"testcode": "t2323230", "description": "Mixed values, no scoring"},
-                    {"testcode": "t1452121", "description": "Mixed values, with scoring"},
-                    {"testcode": "t1234561", "description": "Sequential progression, with scoring"},
-                    {"testcode": "t3521430", "description": "Reverse progression, no scoring"},
-                    {"testcode": "t2143120", "description": "Random mix A, no scoring"},
-                    {"testcode": "t3415231", "description": "Random mix B, with scoring"}
-                ]
-            },
-            "parameter_specific_tests": {
-                "title": "Parameter-Specific Tests",
-                "source_type_variations": {
-                    "title": "Source Type Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "Local Model Only baseline"},
-                        {"testcode": "t2111110", "description": "Local Documents Only baseline"},
-                        {"testcode": "t3111110", "description": "Local Model and Documents baseline"}
-                    ]
-                },
-                "assistant_type_variations": {
-                    "title": "Assistant Type Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "Simple Assistant baseline"},
-                        {"testcode": "t1211110", "description": "Detailed Assistant baseline"},
-                        {"testcode": "t1311110", "description": "Reasoned Assistant baseline"},
-                        {"testcode": "t1411110", "description": "Creative Assistant baseline"},
-                        {"testcode": "t1511110", "description": "Coding Assistant baseline"}
-                    ]
-                },
-                "user_prompt_variations": {
-                    "title": "User Prompt Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "KNOWLEDGE-Quantum baseline"},
-                        {"testcode": "t1121110", "description": "REASON-AI-adopt baseline"},
-                        {"testcode": "t1131110", "description": "CREATE-AI-dialog baseline"},
-                        {"testcode": "t1141110", "description": "CODE-Pseudo baseline"},
-                        {"testcode": "t1151110", "description": "INSTRUCT-Fix wifi baseline"}
-                    ]
-                },
-                "temperature_variations": {
-                    "title": "Temperature Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "Predictable (0.3) baseline"},
-                        {"testcode": "t1111210", "description": "Moderate (0.6) baseline"},
-                        {"testcode": "t1111310", "description": "Creative (0.9) baseline"}
-                    ]
-                },
-                "context_variations": {
-                    "title": "Context Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "2048 context baseline"},
-                        {"testcode": "t1111120", "description": "4096 context baseline"},
-                        {"testcode": "t1111130", "description": "8192 context baseline"},
-                        {"testcode": "t1111140", "description": "16384 context baseline"}
-                    ]
-                },
-                "token_limit_variations": {
-                    "title": "Token Limit Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "No Limit baseline"},
-                        {"testcode": "t1111120", "description": "250 tokens baseline"},
-                        {"testcode": "t1111130", "description": "500 tokens baseline"}
-                    ]
-                },
-                "scoring_variations": {
-                    "title": "Scoring Variations",
-                    "tests": [
-                        {"testcode": "t1111110", "description": "No scoring baseline"},
-                        {"testcode": "t1111111", "description": "With scoring baseline"}
-                    ]
-                }
-            },
-            "edge_case_tests": {
-                "title": "Edge Case Tests",
-                "tests": [
-                    {"testcode": "t1111431", "description": "Maximum Context + Maximum Tokens + Scoring"},
-                    {"testcode": "t1413111", "description": "Creative Assistant + Creative Temperature + Scoring"},
-                    {"testcode": "t1544111", "description": "Coding Assistant + CODE-Pseudo + Scoring"},
-                    {"testcode": "t3254321", "description": "All Documents + Detailed + AI-adopt + Moderate + 8192 + 250 + Scoring"},
-                    {"testcode": "t2135140", "description": "Documents + Simple + CREATE + Creative + 16384 + No Limit + No Scoring"}
-                ]
-            },
-            "compatibility_tests": {
-                "title": "Compatibility Tests",
-                "tests": [
-                    {"testcode": "t1444331", "description": "Creative Assistant + Creative Temperature + Creative Tokens + Scoring"},
-                    {"testcode": "t5511111", "description": "Invalid (Assistant Type 5 max) - Error handling test"},
-                    {"testcode": "t1611111", "description": "Invalid (User Prompt 6 max) - Error handling test"}
-                ]
+        let modelTests = {};
+
+        async function loadModelTests() {
+            try {
+                const response = await fetch('./config/model-tests.json');
+                const data = await response.json();
+                modelTests = data['model-tests'];
+                renderTests();
+            } catch (error) {
+                console.error('Error loading model tests:', error);
+                document.getElementById('testSections').innerHTML = '<div class="section">Error loading test configuration</div>';
             }
-        };
+        }
 
         function renderTests() {
+            if (!modelTests || Object.keys(modelTests).length === 0) {
+                document.getElementById('testSections').innerHTML = '<div class="section">No tests available</div>';
+                return;
+            }
+            
             const container = document.getElementById('testSections');
+            container.innerHTML = ''; // Clear existing content
+            
+            // Performance Tests
+            if (modelTests.performance_tests) {
+                container.appendChild(createSection('performance', modelTests.performance_tests));
+            }
             
             // Baseline Tests
-            container.appendChild(createSection('baseline', modelTests.baseline_tests));
+            if (modelTests.baseline_tests) {
+                container.appendChild(createSection('baseline', modelTests.baseline_tests));
+            }
             
             // Parameter Tests
-            const paramSection = document.createElement('div');
-            paramSection.className = 'section';
-            paramSection.innerHTML = `
-                <div class="section-header">
-                    <label><input type="checkbox" id="selectParameter"> Parameter-Specific Tests</label>
-                </div>
-            `;
-            
-            Object.entries(modelTests.parameter_specific_tests).forEach(([key, value]) => {
-                if (key !== 'title' && value.tests) {
-                    const subsection = document.createElement('div');
-                    subsection.className = 'subsection';
-                    subsection.innerHTML = `
-                        <div class="subsection-header">
-                            <label><input type="checkbox" class="subsection-select" data-group="${key}"> ${value.title}</label>
-                        </div>
-                    `;
-                    value.tests.forEach(test => {
-                        subsection.appendChild(createTestItem(test, 'parameter'));
-                    });
-                    paramSection.appendChild(subsection);
-                }
-            });
-            container.appendChild(paramSection);
+            if (modelTests.parameter_specific_tests) {
+                const paramSection = document.createElement('div');
+                paramSection.className = 'section';
+                paramSection.innerHTML = `
+                    <div class="section-header">
+                        <label><input type="checkbox" id="selectParameter"> Parameter-Specific Tests</label>
+                    </div>
+                `;
+                
+                Object.entries(modelTests.parameter_specific_tests).forEach(([key, value]) => {
+                    if (key !== 'title' && value.tests) {
+                        const subsection = document.createElement('div');
+                        subsection.className = 'subsection';
+                        subsection.innerHTML = `
+                            <div class="subsection-header">
+                                <label><input type="checkbox" class="subsection-select" data-group="${key}"> ${value.title}</label>
+                            </div>
+                        `;
+                        value.tests.forEach(test => {
+                            subsection.appendChild(createTestItem(test, 'parameter'));
+                        });
+                        paramSection.appendChild(subsection);
+                    }
+                });
+                container.appendChild(paramSection);
+            }
             
             // Edge Case Tests
-            container.appendChild(createSection('edge', modelTests.edge_case_tests));
+            if (modelTests.edge_case_tests) {
+                container.appendChild(createSection('edge', modelTests.edge_case_tests));
+            }
             
             // Compatibility Tests
-            container.appendChild(createSection('compatibility', modelTests.compatibility_tests));
+            if (modelTests.compatibility_tests) {
+                container.appendChild(createSection('compatibility', modelTests.compatibility_tests));
+            }
             
             setupEventListeners();
         }
@@ -254,14 +190,17 @@
 
         function setupEventListeners() {
             // Select All
-            document.getElementById('selectAll').addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.test-checkbox');
-                checkboxes.forEach(cb => cb.checked = this.checked);
-                updateSelectedCount();
-            });
+            const selectAllEl = document.getElementById('selectAll');
+            if (selectAllEl) {
+                selectAllEl.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.test-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            }
 
             // Section selectors
-            ['Baseline', 'Edge', 'Compatibility'].forEach(type => {
+            ['Performance', 'Baseline', 'Edge', 'Compatibility'].forEach(type => {
                 const selector = document.getElementById(`select${type}`);
                 if (selector) {
                     selector.addEventListener('change', function() {
@@ -274,11 +213,14 @@
             });
 
             // Parameter section
-            document.getElementById('selectParameter').addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('[data-group="parameter"]');
-                checkboxes.forEach(cb => cb.checked = this.checked);
-                updateSelectedCount();
-            });
+            const selectParameterEl = document.getElementById('selectParameter');
+            if (selectParameterEl) {
+                selectParameterEl.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('[data-group="parameter"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            }
 
             // Subsection selectors
             document.querySelectorAll('.subsection-select').forEach(selector => {
@@ -319,6 +261,13 @@
                 alert('Please select at least one model first.');
                 return;
             }
+
+            // Disable button and change appearance
+            const executeBtn = document.querySelector('.execute-btn');
+            executeBtn.disabled = true;
+            executeBtn.textContent = 'Processing';
+            executeBtn.style.backgroundColor = '#1e3a8a';
+            executeBtn.style.cursor = 'not-allowed';
 
             // Show execution status at top
             const statusDiv = document.getElementById('executionStatus');
@@ -371,6 +320,12 @@
             // Hide execution status and display results
             statusDiv.style.display = 'none';
             displayTestResults(results);
+            
+            // Re-enable button and restore appearance
+            executeBtn.disabled = false;
+            executeBtn.textContent = 'Execute Selected Tests';
+            executeBtn.style.backgroundColor = '#007bff';
+            executeBtn.style.cursor = 'pointer';
         }
         
         function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {
@@ -704,7 +659,7 @@
         
         // Initialize
         loadModels();
-        renderTests();
+        loadModelTests();
     </script>
     
     </div>
