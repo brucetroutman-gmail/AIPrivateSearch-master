@@ -239,6 +239,7 @@ collectionEl.addEventListener('change', () => {
 scoreTglEl.addEventListener('change', () => {
   const scoreModelSection = document.getElementById('scoreModelSection');
   scoreModelSection.style.display = scoreTglEl.checked ? 'block' : 'none';
+  localStorage.setItem('generateScores', scoreTglEl.checked);
 });
 
 // Handle auto export toggle
@@ -254,11 +255,29 @@ if (autoExportSetting === 'true') {
   manualExportSection.style.display = 'none';
 }
 
+// Restore generate scores setting
+const generateScoresSetting = localStorage.getItem('generateScores');
+if (generateScoresSetting === 'true') {
+  scoreTglEl.checked = true;
+  document.getElementById('scoreModelSection').style.display = 'block';
+}
+
+// Restore prompt text
+const lastPrompt = localStorage.getItem('lastPrompt');
+if (lastPrompt) {
+  queryEl.value = lastPrompt;
+}
+
 
 
 // Save tokens selection
 tokensEl.addEventListener('change', () => {
   localStorage.setItem('lastTokens', tokensEl.value);
+});
+
+// Save prompt text
+queryEl.addEventListener('input', () => {
+  localStorage.setItem('lastPrompt', queryEl.value);
 });
 
 // Load temperature options from JSON file
@@ -429,14 +448,14 @@ function render(result) {
     const s = result.scores;
 
     const scoresH = document.createElement('h3');
-    scoresH.textContent = 'Scores';
+    scoresH.innerHTML = 'Scores <small>(3-Better 2-Good 1-Poor)</small>';
     outputEl.append(scoresH);
 
     const tbl = document.createElement('table');
     tbl.className = 'score-table';
     tbl.innerHTML = `
       <thead>
-        <tr><th>Criterion</th><th>Score (1-3)</th><th>Justification</th></tr>
+        <tr><th>Criterion</th><th>Score</th><th>Justification</th></tr>
       </thead>
       <tbody>
         <tr><td>Accuracy</td><td>${s.accuracy ?? '-'}</td><td>${s.justifications.accuracy}</td></tr>
@@ -545,6 +564,8 @@ form.addEventListener('submit', async (e) => {
   const originalText = submitBtn.textContent;
   submitBtn.disabled = true;
   submitBtn.textContent = 'Processing...';
+  submitBtn.style.color = '#1e3a8a';
+  submitBtn.style.fontWeight = 'bold';
   
   let progressMessages = [];
   
@@ -609,6 +630,8 @@ form.addEventListener('submit', async (e) => {
     // Re-enable submit button
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
+    submitBtn.style.color = '';
+    submitBtn.style.fontWeight = '';
   }
 });
 
@@ -713,7 +736,7 @@ exportBtn.addEventListener('click', async () => {
     if (result.scores) {
       const s = result.scores;
       markdown += `## Scores\n\n`;
-      markdown += `| Criterion | Score (1-3) | Justification |\n`;
+      markdown += `| Criterion | Score | Justification |\n`;
       markdown += `|-----------|-------------|---------------|\n`;
       markdown += `| Accuracy | ${s.accuracy ?? '-'} | ${s.justifications.accuracy} |\n`;
       markdown += `| Relevance | ${s.relevance ?? '-'} | ${s.justifications.relevance} |\n`;

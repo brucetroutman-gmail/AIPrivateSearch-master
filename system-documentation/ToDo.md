@@ -70,6 +70,11 @@ specs-3-scoring
 
 --------------------------------
 
+
+28. in dev mode show all. hide if not in dev mode
+
+28. Add context and tokens and temperature to scores  
+
 28. User and system propmt by source type
 
 32. Re-Visit the Test Codes - focus on speed
@@ -83,6 +88,8 @@ specs-3-scoring
 36. get the good enough search models.
 
 37. Create Doctors and lawyers document set
+
+38. simple assistant has screwy scores
 
 
 
