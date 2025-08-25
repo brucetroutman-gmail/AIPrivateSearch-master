@@ -44,7 +44,7 @@ function toggleDeveloperMode() {
   const newMode = !isDeveloperMode;
   localStorage.setItem('developerMode', newMode);
   applyDeveloperMode(newMode);
-  alert(`Developer Mode ${newMode ? 'enabled' : 'disabled'}`);
+  alert(`Advanced Mode ${newMode ? 'enabled' : 'disabled'}`);
 }
 
 function applyDeveloperMode(isDeveloperMode = null) {
@@ -54,6 +54,11 @@ function applyDeveloperMode(isDeveloperMode = null) {
   
   const devOnlyElements = document.querySelectorAll('.dev-only');
   devOnlyElements.forEach(element => {
+    element.style.display = isDeveloperMode ? '' : 'none';
+  });
+  
+  const advOnlyElements = document.querySelectorAll('.adv-only');
+  advOnlyElements.forEach(element => {
     element.style.display = isDeveloperMode ? '' : 'none';
   });
 }

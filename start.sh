@@ -18,15 +18,40 @@ if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
 fi
 echo "✅ Ollama is running"
 
-# Pull required models
-echo "Pulling required models..."
-MODELS=$(cat client/c01_client-first-app/config/models-list.json | grep '"modelName"' | cut -d'"' -f4 | sort -u)
-for model in $MODELS; do
-    echo "📥 Pulling $model..."
-    ollama pull "$model"
-    echo "✅ $model ready"
-done
-echo "✅ All models ready"
+# Pull required models (only if not pulled in last 24 hours)
+echo "Checking model status..."
+LAST_PULL_FILE=".last_model_pull"
+CURRENT_TIME=$(date +%s)
+SHOULD_PULL=false
+
+if [ -f "$LAST_PULL_FILE" ]; then
+    LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
+    TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
+    # 86400 seconds = 24 hours
+    if [ $TIME_DIFF -gt 86400 ]; then
+        SHOULD_PULL=true
+        echo "⏰ Last model pull was over 24 hours ago, updating models..."
+    else
+        echo "✅ Models were pulled recently (within 24 hours), skipping pull"
+    fi
+else
+    SHOULD_PULL=true
+    echo "📥 First time setup, pulling models..."
+fi
+
+if [ "$SHOULD_PULL" = true ]; then
+    MODELS=$(cat client/c01_client-first-app/config/models-list.json | grep '"modelName"' | cut -d'"' -f4 | sort -u)
+    for model in $MODELS; do
+        echo "📥 Pulling $model..."
+        ollama pull "$model"
+        echo "✅ $model ready"
+    done
+    # Record the current time
+    echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
+    echo "✅ All models updated"
+else
+    echo "✅ All models ready (using cached versions)"
+fi
 
 # Start backend server in background
 echo "Installing backend dependencies..."

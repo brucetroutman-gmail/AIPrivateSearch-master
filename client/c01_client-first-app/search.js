@@ -604,11 +604,11 @@ function render(result) {
     outputEl.append(sysTbl);
   }
 
-  // 5. created at and test code
+  // 5. created at, test code, and execution time
   const meta = document.createElement('p');
   meta.style.fontSize = '.8rem';
-  meta.style.color = '#555';
-  meta.textContent = `CreatedAt: ${result.createdAt} | Test Code: ${result.testCode || 'N/A'}`;
+  meta.style.color = 'var(--text-color)';
+  meta.textContent = `CreatedAt: ${result.createdAt} | Test Code: ${result.testCode || 'N/A'}${result.executionTime ? ` | Time: ${result.executionTime}` : ''}`;
   outputEl.append(meta);
 
   // 6. Add export section at the end
@@ -640,6 +640,9 @@ form.addEventListener('submit', async (e) => {
     outputEl.textContent = 'Please select a model first.';
     return;
   }
+  
+  // Start timing
+  const startTime = Date.now();
   
   // Disable submit button to prevent multiple runs
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -690,6 +693,16 @@ form.addEventListener('submit', async (e) => {
     if (result.scores) {
       updateProgress('Scoring');
     }
+    
+    // Calculate execution time
+    const endTime = Date.now();
+    const executionTime = endTime - startTime;
+    const minutes = Math.floor(executionTime / 60000);
+    const seconds = Math.floor((executionTime % 60000) / 1000);
+    const formattedTime = `${minutes.toString().padStart(2, '0')}.${seconds.toString().padStart(2, '0')}`;
+    
+    // Add execution time to result
+    result.executionTime = formattedTime;
     
     render(result);
     
