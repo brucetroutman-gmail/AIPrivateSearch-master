@@ -608,7 +608,7 @@ function render(result) {
   const meta = document.createElement('p');
   meta.style.fontSize = '.8rem';
   meta.style.color = 'var(--text-color)';
-  meta.textContent = `CreatedAt: ${result.createdAt} | Test Code: ${result.testCode || 'N/A'}${result.executionTime ? ` | Time: ${result.executionTime}` : ''}`;
+  meta.textContent = `CreatedAt: ${formatCreatedAt(result.createdAt)} | Test Code: ${result.testCode || 'N/A'}${result.executionTime ? ` | Time: ${result.executionTime}` : ''}`;
   outputEl.append(meta);
 
   // 6. Add export section at the end
