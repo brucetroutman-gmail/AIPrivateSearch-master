@@ -108,7 +108,8 @@ class CombinedSearchScorer {
           eval_count: res.eval_count,
           eval_duration: res.eval_duration,
           context_size: context,
-          temperature: temperature
+          temperature: temperature,
+          token_limit: tokenLimit
         }
       };
     } catch (error) {

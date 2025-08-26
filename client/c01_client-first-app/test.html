@@ -109,53 +109,12 @@
             const container = document.getElementById('testSections');
             container.innerHTML = ''; // Clear existing content
             
-            // Performance Tests
-            if (modelTests.performance_tests) {
-                container.appendChild(createSection('performance', modelTests.performance_tests));
-            }
-            
-            // Baseline Tests
-            if (modelTests.baseline_tests) {
-                container.appendChild(createSection('baseline', modelTests.baseline_tests));
-            }
-            
-            // Parameter Tests
-            if (modelTests.parameter_specific_tests) {
-                const paramSection = document.createElement('div');
-                paramSection.className = 'section';
-                paramSection.innerHTML = `
-                    <div class="section-header">
-                        <label><input type="checkbox" id="selectParameter"> Parameter-Specific Tests</label>
-                    </div>
-                `;
-                
-                Object.entries(modelTests.parameter_specific_tests).forEach(([key, value]) => {
-                    if (key !== 'title' && value.tests) {
-                        const subsection = document.createElement('div');
-                        subsection.className = 'subsection';
-                        subsection.innerHTML = `
-                            <div class="subsection-header">
-                                <label><input type="checkbox" class="subsection-select" data-group="${key}"> ${value.title}</label>
-                            </div>
-                        `;
-                        value.tests.forEach(test => {
-                            subsection.appendChild(createTestItem(test, 'parameter'));
-                        });
-                        paramSection.appendChild(subsection);
-                    }
-                });
-                container.appendChild(paramSection);
-            }
-            
-            // Edge Case Tests
-            if (modelTests.edge_case_tests) {
-                container.appendChild(createSection('edge', modelTests.edge_case_tests));
-            }
-            
-            // Compatibility Tests
-            if (modelTests.compatibility_tests) {
-                container.appendChild(createSection('compatibility', modelTests.compatibility_tests));
-            }
+            // Render all test sections dynamically
+            Object.entries(modelTests).forEach(([key, section]) => {
+                if (section.tests) {
+                    container.appendChild(createSection(key, section));
+                }
+            });
             
             setupEventListeners();
         }

@@ -709,7 +709,7 @@ form.addEventListener('submit', async (e) => {
     // Auto export to database if enabled
     if (autoExportToggle.checked) {
       try {
-        const exportResult = await exportToDatabase(window.currentResult);
+        const exportResult = await exportToDatabase(window.currentResult, null, null, null);
         console.log('Auto-exported to database with ID:', exportResult.insertId);
       } catch (error) {
         console.error('Auto-export failed:', error);
@@ -729,56 +729,8 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// Export to database function
-async function exportToDatabase(result) {
-  const jsonData = {
-    TestCode: result.testCode || '',
-    TestCategory: null,
-    TestDescription: null,
-    UserEmail: localStorage.getItem('userEmail') || null,
-    PcCode: result.pcCode || null,
-    PcCPU: result.systemInfo?.chip || null,
-    PcGraphics: result.systemInfo?.graphics || null,
-    PcRAM: result.systemInfo?.ram || null,
-    PcOS: result.systemInfo?.os || null,
-    CreatedAt: formatCreatedAt(result.createdAt),
-    SourceType: result.sourceType || null,
-    CollectionName: (result.sourceType === 'Local Documents Only' || result.sourceType === 'Local Model and Documents') ? result.collection : null,
-    SystemPrompt: result.systemPromptName || null,
-    Prompt: result.query || null,
-    'ModelName-search': result.metrics?.search?.model || null,
-    'ModelContextSize-search': result.metrics?.search?.context_size || null,
-    'ModelTemperature-search': result.metrics?.search?.temperature || null,
-    'ModelTokenLimit-search': result.tokenLimit || null,
-    'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
-    'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
-    'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
-    'Answer-search': result.response || null,
-    'ModelName-score': result.metrics?.scoring?.model || null,
-    'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
-    'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
-    'ModelTokenLimit-score': result.metrics?.scoring?.max_tokens || null,
-    'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
-    'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
-    'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
-    AccurateScore: result.scores?.accuracy || null,
-    RelevantScore: result.scores?.relevance || null,
-    OrganizedScore: result.scores?.organization || null,
-    'WeightedScore-pct': result.scores?.total || null
-  };
-  
-  const response = await fetch('http://localhost:3001/api/database/save', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(jsonData)
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Database save failed: ${response.statusText}`);
-  }
-  
-  return await response.json();
-}
+// Use the shared exportToDatabase function from common.js
+// (function is already available globally)
 
 // Add event listener for export button
 // Export handler function
@@ -903,7 +855,9 @@ async function handleExport() {
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,
       'ModelTemperature-search': result.metrics?.search?.temperature || null,
-      'ModelTokenLimit-search': result.tokenLimit || null,
+      'ModelTokenLimit-search': result.metrics?.search?.token_limit !== undefined ? 
+        (result.metrics?.search?.token_limit === null ? 'No Limit' : result.metrics.search.token_limit) : 
+        (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
       'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
       'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
       'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
@@ -936,7 +890,7 @@ async function handleExport() {
   } else if (exportFormat === 'database') {
     // Export to database using common function
     try {
-      const result = await exportToDatabase(window.currentResult);
+      const result = await exportToDatabase(window.currentResult, null, null, null);
       alert(`Successfully saved to database with ID: ${result.insertId}`);
     } catch (error) {
       alert(`Database save error: ${error.message}`);

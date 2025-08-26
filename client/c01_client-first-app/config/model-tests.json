@@ -1,7 +1,7 @@
 {
   "model-tests": {
-    "performance_tests": {
-      "title": "Performance Tests",
+    "performance_tests_model": {
+      "title": "Performance Tests Local Model Only",
       "test_count": 4,
       "tests": [
         {
@@ -18,7 +18,29 @@
         },
         {
           "testcode": "t1553411",
-          "description": "Edge: NSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
+          "description": "Edge: INSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
+        }
+      ]
+    },
+    "performance_tests_docs": {
+      "title": "Performance Tests - Local Docs Only",
+      "test_count": 4,
+      "tests": [
+        {
+          "testcode": "t2112310",
+          "description": "KNOWLEDGE-Quantum, No Scoring"
+        },
+        {
+          "testcode": "t2112311",
+          "description": "KNOWLEDGE-Quantum, Scoring"
+        },
+        {
+          "testcode": "t2543311",
+          "description": "Edge: CODE-Pseudo, Temp=0.9, Max Context=16384, 250 Tokens, Scoring"
+        },
+        {
+          "testcode": "t2553411",
+          "description": "Edge: INSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
         }
       ]
     }

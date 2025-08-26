@@ -192,7 +192,9 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelName-search': result.metrics?.search?.model || null,
     'ModelContextSize-search': result.metrics?.search?.context_size || testParams?.context || null,
     'ModelTemperature-search': result.metrics?.search?.temperature || testParams?.temperature || null,
-    'ModelTokenLimit-search': result.tokenLimit || null,
+    'ModelTokenLimit-search': result.metrics?.search?.token_limit !== undefined ? 
+      (result.metrics?.search?.token_limit === null ? 'No Limit' : result.metrics.search.token_limit) : 
+      (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
     'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
     'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
     'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
