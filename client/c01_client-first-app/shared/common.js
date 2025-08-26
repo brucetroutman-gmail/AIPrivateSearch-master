@@ -200,6 +200,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelName-score': result.metrics?.scoring?.model || null,
     'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
     'ModelTemperature-score': result.metrics?.scoring?.temperature || null,
+    'ModelTokenLimit-score': result.metrics?.scoring?.max_tokens || null,
     'Duration-score-s': result.metrics?.scoring ? (result.metrics.scoring.total_duration / 1000000000) : null,
     'Load-score-ms': result.metrics?.scoring ? Math.round(result.metrics.scoring.load_duration / 1000000) : null,
     'EvalTokensPerSecond-score': result.metrics?.scoring ? (result.metrics.scoring.eval_count / (result.metrics.scoring.eval_duration / 1000000000)) : null,
