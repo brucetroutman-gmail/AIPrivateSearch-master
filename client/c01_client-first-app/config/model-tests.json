@@ -13,12 +13,12 @@
           "description": "KNOWLEDGE-Quantum, Scoring"
         },
         {
-          "testcode": "t1144311",
-          "description": "Edge: Creative Temp=0.9, Max Context=16384, 250 Tokens, Scoring"
+          "testcode": "t1543311",
+          "description": "Edge: CODE-Pseudo, Temp=0.9, Max Context=16384, 250 Tokens, Scoring"
         },
         {
-          "testcode": "t1153411",
-          "description": "Edge: CODE-Pseudo, Creative Temp=0.9, Max Context=16384, Scoring"
+          "testcode": "t1553411",
+          "description": "Edge: NSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
         }
       ]
     }

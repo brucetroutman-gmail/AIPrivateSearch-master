@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestCode Checker</title>
+    <link rel="stylesheet" href="default.css">
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="shared/common.js"></script>
+    <style>
+        .checker-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .testcode-input {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+            font-family: monospace;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .check-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .check-btn:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+        .digit-breakdown {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .digit {
+            font-family: monospace;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+        <div class="checker-container">
+            <h1>TestCode Checker</h1>
+            
+            <div class="input-section">
+                <label for="testcodeInput">Enter TestCode:</label>
+                <input type="text" id="testcodeInput" class="testcode-input" placeholder="e.g., t1112310" maxlength="8">
+                <button class="check-btn" onclick="checkTestCode()">Check</button>
+            </div>
+
+            <div id="results" class="results">
+                <h3>TestCode Breakdown</h3>
+                <div id="breakdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkTestCode() {
+            const testCode = document.getElementById('testcodeInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const breakdownDiv = document.getElementById('breakdown');
+            
+            if (!testCode) {
+                breakdownDiv.innerHTML = '<div class="error">Please enter a testcode</div>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            if (testCode.length !== 8 || !testCode.startsWith('t')) {
+                breakdownDiv.innerHTML = '<div class="error">TestCode must be 8 characters starting with "t" (e.g., t1112310)</div>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            const breakdown = parseTestCode(testCode);
+            displayBreakdown(breakdown, testCode);
+            resultsDiv.style.display = 'block';
+        }
+        
+        function parseTestCode(testCode) {
+            const sourceTypeMap = {
+                '1': 'Local Model Only',
+                '2': 'Local Documents Only', 
+                '3': 'Local Model and Documents'
+            };
+            
+            const assistantTypeMap = {
+                '1': 'Detailed Assistant',
+                '2': 'Reasoned Assistant',
+                '3': 'Creative Assistant',
+                '4': 'Documents Only',
+                '5': 'Coding Assistant'
+            };
+            
+            const userPromptMap = {
+                '1': 'KNOWLEDGE-Quantum',
+                '2': 'REASON-AI-adopt',
+                '3': 'CREATE-AI-dialog',
+                '4': 'CODE-Pseudo',
+                '5': 'INSTRUCT-Fix wifi'
+            };
+            
+            const temperatureMap = {
+                '1': '0.3 (Predictable)',
+                '2': '0.6 (Moderate)',
+                '3': '0.9 (Creative)'
+            };
+            
+            const contextMap = {
+                '1': '2048',
+                '2': '4096',
+                '3': '8192',
+                '4': '16384'
+            };
+            
+            const tokenMap = {
+                '1': 'No Limit',
+                '2': '250',
+                '3': '500'
+            };
+            
+            const scoringMap = {
+                '0': 'No Scoring',
+                '1': 'With Scoring'
+            };
+            
+            return {
+                prefix: { digit: testCode[0], meaning: 'Test Prefix' },
+                sourceType: { digit: testCode[1], meaning: sourceTypeMap[testCode[1]] || 'Invalid' },
+                assistantType: { digit: testCode[2], meaning: assistantTypeMap[testCode[2]] || 'Invalid' },
+                userPrompt: { digit: testCode[3], meaning: userPromptMap[testCode[3]] || 'Invalid' },
+                temperature: { digit: testCode[4], meaning: temperatureMap[testCode[4]] || 'Invalid' },
+                context: { digit: testCode[5], meaning: contextMap[testCode[5]] || 'Invalid' },
+                tokens: { digit: testCode[6], meaning: tokenMap[testCode[6]] || 'Invalid' },
+                scoring: { digit: testCode[7], meaning: scoringMap[testCode[7]] || 'Invalid' }
+            };
+        }
+        
+        function displayBreakdown(breakdown, testCode) {
+            const breakdownDiv = document.getElementById('breakdown');
+            
+            let html = `<div style="font-family: monospace; font-size: 18px; margin-bottom: 20px; color: #007bff;">${testCode}</div>`;
+            html += '<div class="digit-breakdown">';
+            
+            const positions = [
+                { key: 'prefix', label: 'Position 1 - Prefix' },
+                { key: 'sourceType', label: 'Position 2 - Source Type' },
+                { key: 'assistantType', label: 'Position 3 - Assistant Type' },
+                { key: 'userPrompt', label: 'Position 4 - User Prompt' },
+                { key: 'temperature', label: 'Position 5 - Temperature' },
+                { key: 'context', label: 'Position 6 - Context' },
+                { key: 'tokens', label: 'Position 7 - Tokens' },
+                { key: 'scoring', label: 'Position 8 - Scoring' }
+            ];
+            
+            positions.forEach(pos => {
+                const item = breakdown[pos.key];
+                const isInvalid = item.meaning === 'Invalid';
+                html += `
+                    <div class="digit ${isInvalid ? 'error' : ''}">${item.digit}</div>
+                    <div style="${isInvalid ? 'color: #dc3545;' : ''}">${item.digit} - ${pos.label}: ${item.meaning}</div>
+                `;
+            });
+            
+            html += '</div>';
+            breakdownDiv.innerHTML = html;
+        }
+        
+        // Allow Enter key to trigger check
+        document.getElementById('testcodeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkTestCode();
+            }
+        });
+    </script>
+
+    <div id="footer-placeholder"></div>
+</body>
+</html>

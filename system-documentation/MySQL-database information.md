@@ -34,6 +34,7 @@ CREATE TABLE `searches` (
   `ModelName-score` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `ModelContextSize-score` int DEFAULT NULL,
   `ModelTemperature-score` float DEFAULT NULL,
+  `ModelTokenLimit-score` char(25) DEFAULT NULL,
   `Duration-score-s` float DEFAULT NULL,
   `Load-score-ms` int DEFAULT NULL,
   `EvalTokensPerSecond-score` float DEFAULT NULL,

@@ -24,10 +24,10 @@ router.post('/save', async (req, res) => {
         TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, Prompt,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
-        \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`,
+        \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`, \`ModelTokenLimit-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
@@ -56,6 +56,7 @@ router.post('/save', async (req, res) => {
       data['ModelName-score'] || null,
       data['ModelContextSize-score'] || null,
       data['ModelTemperature-score'] || null,
+      data['ModelTokenLimit-score'] || null,
       data['Duration-score-s'] || null,
       data['Load-score-ms'] || null,
       data['EvalTokensPerSecond-score'] || null,

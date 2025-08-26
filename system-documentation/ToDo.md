@@ -69,15 +69,15 @@ specs-3-scoring
 30. Move Auto export next to Geneerate Scores -- done
 
 --------------------------------
-28. Only pull ollama if over 24 hrs old
+28. Only pull ollama if over 24 hrs old --Done
 
-28. in dev mode show all. hide if not in dev mode
+28. in dev mode show all. hide if not in dev mode --started
 
 28. Add context and tokens and temperature to scores  
 
 28. User and system propmt by source type
 
-32. Re-Visit the Test Codes - focus on speed
+32. Re-Visit the Test Codes - focus on speed  --started
 
 33. get the good enough score models
 
@@ -89,7 +89,7 @@ specs-3-scoring
 
 37. Create Doctors and lawyers document set
 
-38. simple assistant has screwy scores
+38. 
 
 
 
