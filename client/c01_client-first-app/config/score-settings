@@ -1,7 +1,7 @@
 {
   "score-settings": [
     {
-      "model": "qwen2:0.5b"
+      "model": "qwen2:1.5b"
     },
     {
       "temperature": 0.3

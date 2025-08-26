@@ -304,7 +304,10 @@
                             params.tokens = parseInt(tokenOverride);
                         }
                         
-                        const result = await executeTest(params, model, testCode, params.testCategory, params.testDescription);
+                        // Get category and description from JSON based on testCode
+                        const { testCategory, testDescription } = getTestCategoryAndDescriptionFromJSON(testCode);
+                        
+                        const result = await executeTest(params, model, testCode, testCategory, testDescription);
                         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                         results.push({ testCode, model, result, success: true, elapsedTime });
                     } catch (error) {
@@ -348,8 +351,9 @@
             // Determine test category and description
             const { testCategory, testDescription } = getTestCategoryAndDescription(testCode);
             
-            // Get system prompt
-            const systemPrompt = systemPrompts.system_prompts.find(p => p.name === assistantType);
+            // Get system prompt by id from testcode (position 2)
+            const assistantId = testCode[2];
+            const systemPrompt = systemPrompts.system_prompts.find(p => p.id === assistantId);
             
             // Get user prompt
             const userPrompt = userPrompts.user_prompts.find(p => p.name === userPromptType);
@@ -358,7 +362,7 @@
                 sourceType,
                 assistantType,
                 systemPrompt: systemPrompt?.prompt || '',
-                systemPromptName: assistantType,
+                systemPromptName: systemPrompt?.name || 'Unknown Assistant',
                 userPrompt: userPrompt?.prompt || 'Default test prompt',
                 temperature,
                 context,
@@ -655,6 +659,25 @@
             } else {
                 return `${seconds}s`;
             }
+        }
+        
+        function getTestCategoryAndDescriptionFromJSON(testCode) {
+            // Search through all test categories in modelTests
+            for (const [key, category] of Object.entries(modelTests)) {
+                if (category.tests) {
+                    const test = category.tests.find(t => t.testcode === testCode);
+                    if (test) {
+                        return {
+                            testCategory: category.title,
+                            testDescription: test.description
+                        };
+                    }
+                }
+            }
+            return {
+                testCategory: 'Unknown Category',
+                testDescription: 'Unknown test'
+            };
         }
         
         // Initialize
