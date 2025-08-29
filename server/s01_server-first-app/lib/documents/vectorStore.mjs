@@ -22,11 +22,12 @@ export class VectorStore {
   }
 
   async addDocument(filename, chunks, embeddings, metadata) {
+    // Remove existing document first
+    await this.removeDocument(filename);
+    
+    // Read fresh data after removal
     const index = await fs.readJson(this.indexPath);
     const vectors = await fs.readJson(this.vectorsPath);
-
-    // Remove existing document if it exists
-    await this.removeDocument(filename);
 
     const docId = `${this.collection}_${filename}`;
     const docRecord = {

@@ -11,7 +11,7 @@ const scorer = new CombinedSearchScorer();
 router.post('/', async (req, res) => {
   try {
     console.log('Received request:', req.body);
-    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel } = req.body;
+    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel, vectorDB } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
@@ -25,8 +25,10 @@ router.post('/', async (req, res) => {
     
     // Route to DocumentSearch if collection is provided
     if (collection) {
-      const documentSearch = new DocumentSearch(collection);
-      await documentSearch.initialize();
+      const documentSearch = new DocumentSearch(collection, vectorDB || 'local');
+      if (vectorDB !== 'lanceDB') {
+        await documentSearch.initialize();
+      }
       
       const searchResults = await documentSearch.searchDocuments(query, 5);
       

@@ -73,7 +73,7 @@ specs-3-scoring
 
 28. in dev mode show all. hide if not in dev mode --started
 
-28. Add context and tokens and temperature to scores  
+28. Add context and tokens and temperature to scores  --done
 
 28. User and system propmt by source type
 
@@ -81,9 +81,7 @@ specs-3-scoring
 
 33. get the good enough score models
 
-34. get best embeding technique
-
-35. embed with lanceDB ??
+34. get best embeding technique - embed with lanceDB ??
 
 36. get the good enough search models.
 

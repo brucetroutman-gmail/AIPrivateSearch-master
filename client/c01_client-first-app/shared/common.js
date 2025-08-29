@@ -4,17 +4,18 @@ async function loadSharedComponents() {
     // Load header
     const headerResponse = await fetch('./shared/header.html');
     const headerHTML = await headerResponse.text();
-    document.getElementById('header-placeholder').innerHTML = headerHTML;
+    const headerEl = document.getElementById('header-placeholder');
+    if (headerEl) headerEl.innerHTML = headerHTML;
     
     // Load footer
     const footerResponse = await fetch('./shared/footer.html');
     const footerHTML = await footerResponse.text();
-    document.getElementById('footer-placeholder').innerHTML = footerHTML;
+    const footerEl = document.getElementById('footer-placeholder');
+    if (footerEl) footerEl.innerHTML = footerHTML;
     
-    return Promise.resolve();
   } catch (error) {
     console.error('Error loading shared components:', error);
-    return Promise.reject(error);
+    throw error;
   }
 }
 
@@ -35,7 +36,9 @@ function loadTheme() {
 // Toggle mobile menu
 function toggleMenu() {
   const navMenu = document.getElementById('navMenu');
-  navMenu.classList.toggle('active');
+  if (navMenu) {
+    navMenu.classList.toggle('active');
+  }
 }
 
 // Developer mode toggle
@@ -47,20 +50,20 @@ function toggleDeveloperMode() {
   alert(`Advanced Mode ${newMode ? 'enabled' : 'disabled'}`);
 }
 
+function toggleElementsByClass(className, isDeveloperMode) {
+  const elements = document.querySelectorAll(className);
+  elements.forEach(element => {
+    element.style.display = isDeveloperMode ? '' : 'none';
+  });
+}
+
 function applyDeveloperMode(isDeveloperMode = null) {
   if (isDeveloperMode === null) {
     isDeveloperMode = localStorage.getItem('developerMode') === 'true';
   }
   
-  const devOnlyElements = document.querySelectorAll('.dev-only');
-  devOnlyElements.forEach(element => {
-    element.style.display = isDeveloperMode ? '' : 'none';
-  });
-  
-  const advOnlyElements = document.querySelectorAll('.adv-only');
-  advOnlyElements.forEach(element => {
-    element.style.display = isDeveloperMode ? '' : 'none';
-  });
+  toggleElementsByClass('.dev-only', isDeveloperMode);
+  toggleElementsByClass('.adv-only', isDeveloperMode);
 }
 
 function loadDeveloperMode() {
@@ -98,7 +101,6 @@ function promptForEmail() {
       alert('Please enter a valid email address.');
     }
   } while (!email || !validateEmail(email));
-  return false;
 }
 
 function validateEmail(email) {
@@ -113,7 +115,7 @@ function getUserEmail() {
 function updateUserEmail() {
   const currentEmail = getUserEmail();
   const newEmail = prompt('Enter your email address:', currentEmail);
-  if (newEmail && validateEmail(newEmail)) {
+  if (newEmail !== null && newEmail && validateEmail(newEmail)) {
     localStorage.setItem('userEmail', newEmail);
     alert('Email updated successfully!');
   } else if (newEmail) {
@@ -147,6 +149,11 @@ async function loadScoreModels(selectElementId) {
     const data = await response.json();
     const scoreSelect = document.getElementById(selectElementId);
     
+    if (!scoreSelect) {
+      console.error('Score select element not found:', selectElementId);
+      return;
+    }
+    
     const scoreModels = [...new Set(
       data.models
         .filter(model => model.category === 'score')
@@ -160,8 +167,12 @@ async function loadScoreModels(selectElementId) {
         return `<option value="${modelName}" ${isSelected ? 'selected' : ''}>${modelName}</option>`;
       }).join('');
       
-      // Save selection on change
-      scoreSelect.addEventListener('change', function() {
+      // Remove existing event listeners to prevent duplicates
+      const newSelect = scoreSelect.cloneNode(true);
+      scoreSelect.parentNode.replaceChild(newSelect, scoreSelect);
+      
+      // Add single event listener
+      newSelect.addEventListener('change', function() {
         localStorage.setItem('selectedScoreModel', this.value);
       });
     } else {
@@ -169,7 +180,10 @@ async function loadScoreModels(selectElementId) {
     }
   } catch (error) {
     console.error('Error loading score models:', error);
-    document.getElementById(selectElementId).innerHTML = '<option value="">Error loading score models</option>';
+    const selectEl = document.getElementById(selectElementId);
+    if (selectEl) {
+      selectEl.innerHTML = '<option value="">Error loading score models</option>';
+    }
   }
 }
 
@@ -197,7 +211,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
     'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
     'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
-    'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+    'EvalTokensPerSecond-search': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
     'Answer-search': result.response || null,
     'ModelName-score': result.metrics?.scoring?.model || null,
     'ModelContextSize-score': result.metrics?.scoring?.context_size || null,

@@ -161,7 +161,10 @@
           <h1 id="collectionTitle">Edit Collection</h1>
           <p>Manage documents and perform operations on this collection.</p>
         </div>
-        <button class="btn btn-secondary" onclick="goBack()">Back to Collections</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-danger" onclick="removeCollection()">Remove Collection</button>
+          <button class="btn btn-secondary" onclick="goBack()">Back to Collections</button>
+        </div>
       </div>
       
       <div class="editor-section">
@@ -196,8 +199,16 @@
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
           <button class="btn btn-warning" onclick="convertDocuments()">Convert to MD</button>
-          <button class="btn btn-primary" onclick="processDocuments()">Process MD Files</button>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <select id="vectorDBSelect" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--card-bg); color: var(--text-color);">
+              <option value="local">Local</option>
+              <option value="lanceDB">LanceDB</option>
+            </select>
+            <button class="btn btn-primary" onclick="processDocuments()">Process MD Files</button>
+            <button class="btn btn-danger" onclick="removeEmbeddings()">Remove MD Embed</button>
+          </div>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
+          <button class="btn btn-info" onclick="viewEmbeddings()">View Embeddings</button>
         </div>
       </div>
       
@@ -278,8 +289,7 @@
         const fileSize = typeof doc === 'string' ? 0 : doc.size;
         const ext = fileName.split('.').pop().toLowerCase();
         const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
-        const indexedFilenames = indexedDocuments.map(item => item.filename);
-        const isIndexed = indexedFilenames.includes(fileName);
+        const indexedDoc = indexedDocuments.find(item => item.filename === fileName);
         
         const formatFileSize = (bytes) => {
           if (bytes === 0) return '';
@@ -295,9 +305,25 @@
         } else if (ext === 'txt') {
           fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #3498db; text-decoration: none; margin-left: 10px;">TXT</a>`;
         } else if (ext === 'md') {
-          const statusIcon = isIndexed ? '✓' : '○';
-          const statusColor = isIndexed ? '#27ae60' : '#95a5a6';
-          fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #27ae60; text-decoration: none; margin-left: 10px;">MD</a> <span style="color: ${statusColor}; margin-left: 5px;" title="${isIndexed ? 'Processed' : 'Not processed'}">${statusIcon}</span>`;
+          let statusIcons = '';
+          let tooltipText = 'Not processed';
+          
+          if (indexedDoc) {
+            if (indexedDoc.inLocal && indexedDoc.inLanceDB) {
+              statusIcons = '<span style="color: #27ae60; margin-left: 5px;">✓</span><span style="color: #ffd700; margin-left: 2px;">✓</span>';
+              tooltipText = 'Processed in Local and LanceDB';
+            } else if (indexedDoc.inLocal) {
+              statusIcons = '<span style="color: #27ae60; margin-left: 5px;">✓</span>';
+              tooltipText = 'Processed in Local only';
+            } else if (indexedDoc.inLanceDB) {
+              statusIcons = '<span style="color: #ffd700; margin-left: 5px;">✓</span>';
+              tooltipText = 'Processed in LanceDB only';
+            }
+          } else {
+            statusIcons = '<span style="color: #95a5a6; margin-left: 5px;">○</span>';
+          }
+          
+          fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #27ae60; text-decoration: none; margin-left: 10px;">MD</a> <span title="${tooltipText}">${statusIcons}</span>`;
         }
         
         item.innerHTML = `
@@ -419,9 +445,10 @@
         return;
       }
       
+      const vectorDB = document.getElementById('vectorDBSelect').value;
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Processing ${selectedMD.length} selected MD files...`);
+      showLog(`Processing ${selectedMD.length} selected MD files to ${vectorDB}...`);
       
       // Show progress for each file
       for (let i = 0; i < selectedMD.length; i++) {
@@ -440,7 +467,9 @@
           showLog(`${progress} Processing: ${filename}${chunkInfo}`, 'info');
           
           const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vectorDB })
           });
           
           const result = await response.json();
@@ -476,18 +505,53 @@
     }
     
     
+    async function viewEmbeddings() {
+      clearLog();
+      showLog(`Checking embeddings for collection: ${currentCollection}`);
+      
+      try {
+        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/embeddings-info`);
+        const data = await response.json();
+        
+        showLog(`\n=== LOCAL STORAGE ===`);
+        if (data.local.documents.length > 0) {
+          showLog(`✓ ${data.local.documents.length} documents, ${data.local.totalChunks} total chunks`);
+          data.local.documents.forEach(doc => {
+            showLog(`  • ${doc.filename}: ${doc.chunks} chunks`);
+          });
+        } else {
+          showLog(`✗ No documents in local storage`);
+        }
+        
+        showLog(`\n=== LANCEDB STORAGE ===`);
+        if (data.lanceDB.documents.length > 0) {
+          showLog(`✓ ${data.lanceDB.documents.length} documents, ${data.lanceDB.totalChunks} total chunks`);
+          data.lanceDB.documents.forEach(doc => {
+            showLog(`  • ${doc.filename}: ${doc.chunks} chunks`);
+          });
+        } else {
+          showLog(`✗ No documents in LanceDB storage`);
+        }
+        
+      } catch (error) {
+        showLog(`✗ Error checking embeddings: ${error.message}`, 'error');
+      }
+    }
+    
     async function testSearch() {
       const query = prompt(`Enter search query for ${currentCollection}:`);
       if (!query) return;
       
+      const vectorDB = document.getElementById('vectorDBSelect').value;
+      
       clearLog();
-      showLog(`Searching ${currentCollection} for: "${query}"...`);
+      showLog(`Searching ${currentCollection} in ${vectorDB} for: "${query}"...`);
       
       try {
         const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, limit: 3 })
+          body: JSON.stringify({ query, limit: 3, vectorDB })
         });
         
         const data = await response.json();
@@ -503,6 +567,34 @@
         }
       } catch (error) {
         showLog(`✗ Search error: ${error.message}`);
+      }
+    }
+    
+    async function removeCollection() {
+      if (!confirm(`Are you sure you want to PERMANENTLY DELETE the entire '${currentCollection}' collection?\n\nThis will:\n- Remove all embeddings from both Local and LanceDB\n- Delete all files in the collection\n- Remove the collection folder\n\nThis action CANNOT be undone!`)) {
+        return;
+      }
+      
+      clearLog();
+      showLog(`Removing collection '${currentCollection}'...`, 'info');
+      
+      try {
+        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showLog(`✓ Collection '${currentCollection}' removed successfully!`, 'success');
+          setTimeout(() => {
+            window.location.href = 'collections.html';
+          }, 2000);
+        } else {
+          showLog(`✗ Failed to remove collection: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showLog(`✗ Error removing collection: ${error.message}`, 'error');
       }
     }
     
@@ -556,6 +648,51 @@
     }
     
 
+    
+    async function removeEmbeddings() {
+      const selected = getSelectedDocuments();
+      const selectedMD = selected.filter(file => file.endsWith('.md'));
+      
+      if (selectedMD.length === 0) {
+        alert('Please select at least one MD file to remove embeddings from');
+        return;
+      }
+      
+      const vectorDB = document.getElementById('vectorDBSelect').value;
+      
+      if (!confirm(`Remove embeddings from ${selectedMD.length} MD files in ${vectorDB}?`)) {
+        return;
+      }
+      
+      clearLog();
+      showLog(`Removing embeddings from ${selectedMD.length} MD files in ${vectorDB}...`);
+      
+      for (let i = 0; i < selectedMD.length; i++) {
+        const filename = selectedMD[i];
+        const progress = `${i + 1}/${selectedMD.length}`;
+        
+        try {
+          const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vectorDB })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showLog(`${progress} ✓ Removed embeddings: ${filename}`, 'success');
+          } else {
+            showLog(`${progress} ✗ Failed: ${filename} - ${result.error}`, 'error');
+          }
+        } catch (error) {
+          showLog(`${progress} ✗ Error: ${filename} - ${error.message}`, 'error');
+        }
+      }
+      
+      showLog(`✓ Embedding removal complete: ${selectedMD.length} files processed`, 'success');
+      loadDocuments();
+    }
     
     async function deleteDocuments() {
       const selected = getSelectedDocuments();

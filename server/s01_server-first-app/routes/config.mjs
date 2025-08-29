@@ -9,8 +9,8 @@ router.get('/files', async (req, res) => {
   try {
     const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
     const files = await fs.readdir(configDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
-    res.json({ files: jsonFiles });
+    const jsonFiles = files.filter(file => file.endsWith('.json')).sort();
+    res.json(jsonFiles);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

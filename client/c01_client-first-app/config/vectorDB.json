@@ -1,0 +1,12 @@
+{
+  "vectorDB": [
+    {
+      "name": "Local",
+      "value": "local"
+    },
+    {
+      "name": "LanceDB",
+      "value": "lanceDB"
+    }
+  ]
+}

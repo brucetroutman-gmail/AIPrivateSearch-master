@@ -16,6 +16,8 @@ const autoExportToggle = document.getElementById('autoExportToggle');
 const manualExportSection = document.getElementById('manualExportSection');
 const collectionEl = document.getElementById('collection');
 const collectionSection = document.getElementById('collectionSection');
+const vectorDBEl = document.getElementById('vectorDB');
+const vectorDBSection = document.getElementById('vectorDBSection');
 
 let systemPrompts = [];
 
@@ -28,6 +30,7 @@ function formatCreatedAt(timestamp) {
 async function loadCollections() {
   try {
     const response = await fetch('http://localhost:3001/api/documents/collections');
+    if (!response.ok) throw new Error('Failed to fetch collections');
     const data = await response.json();
     
     collectionEl.innerHTML = '<option value="">Select a collection...</option>' + 
@@ -106,26 +109,83 @@ async function loadModels() {
 
 loadSourceTypes();
 
-// Check initial source type and show collection dropdown if needed
+// Check initial source type and show collection/vectorDB dropdowns if needed
 setTimeout(() => {
-  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+  if (sourceTypeEl.value.includes('Docu')) {
     collectionSection.style.display = 'block';
+    if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
     
     // Also show the source chunks checkbox
     const showChunksLabel = document.getElementById('showChunksLabel');
-    showChunksLabel.style.display = 'inline';
+    if (showChunksLabel) showChunksLabel.style.display = 'inline';
   }
 }, 100);
 loadModels();
 loadSystemPrompts();
 loadUserPrompts();
+
+loadTokensOptions();
 loadTemperatureOptions();
 loadContextOptions();
-loadTokensOptions();
 restoreModelOptions();
 loadScoreModels('scoreModel');
 loadScoringOptions();
+
+// Load temperature options from JSON file
+async function loadTemperatureOptions() {
+  try {
+    const response = await fetch('./config/temperature.json');
+    const data = await response.json();
+    
+    temperatureEl.innerHTML = data.temperature.map(temp => 
+      `<option value="${temp.value}">${temp.name}</option>`
+    ).join('');
+  } catch (error) {
+    console.error('Failed to load temperature options:', error);
+  }
+}
+
+// Load context options from JSON file
+async function loadContextOptions() {
+  try {
+    const response = await fetch('./config/context.json');
+    const data = await response.json();
+    
+    contextEl.innerHTML = data.context.map(context => 
+      `<option value="${context.name}">${context.name}</option>`
+    ).join('');
+  } catch (error) {
+    console.error('Failed to load context options:', error);
+  }
+}
+
+// Load vectorDB options from JSON file
+async function loadVectorDBOptions() {
+  if (!vectorDBEl) return;
+  
+  try {
+    const response = await fetch('./config/vectorDB.json');
+    if (!response.ok) throw new Error('Failed to fetch vectorDB options');
+    const data = await response.json();
+    
+    vectorDBEl.innerHTML = data.vectorDB.map(db => 
+      `<option value="${db.value}">${db.name}</option>`
+    ).join('');
+    
+    // Restore last used selection
+    const lastUsed = localStorage.getItem('lastVectorDB');
+    if (lastUsed && data.vectorDB.find(db => db.value === lastUsed)) {
+      vectorDBEl.value = lastUsed;
+    } else {
+      vectorDBEl.value = data.vectorDB[0]?.value || 'local';
+    }
+  } catch (error) {
+    vectorDBEl.innerHTML = '<option value="local">Local</option>';
+    console.error('Failed to load vectorDB options:', error);
+  }
+}
+loadVectorDBOptions();
 
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
@@ -215,21 +275,24 @@ contextEl.addEventListener('change', () => {
 sourceTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSourceType', sourceTypeEl.value);
   
-  // Show/hide collection dropdown based on source type
-  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+  // Show/hide collection and vectorDB dropdowns based on source type
+  if (sourceTypeEl.value.includes('Docu')) {
     collectionSection.style.display = 'block';
+    if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
   } else {
     collectionSection.style.display = 'none';
+    if (vectorDBSection) vectorDBSection.style.display = 'none';
   }
   
   // Show/hide source chunks checkbox for document source types
   const showChunksLabel = document.getElementById('showChunksLabel');
-  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
-    showChunksLabel.style.display = 'inline';
+  const showChunksToggle = document.getElementById('showChunksToggle');
+  if (sourceTypeEl.value.includes('Docu')) {
+    if (showChunksLabel) showChunksLabel.style.display = 'inline';
   } else {
-    showChunksLabel.style.display = 'none';
-    document.getElementById('showChunksToggle').checked = false;
+    if (showChunksLabel) showChunksLabel.style.display = 'none';
+    if (showChunksToggle) showChunksToggle.checked = false;
   }
   
   // Filter assistant types based on source type
@@ -240,6 +303,13 @@ sourceTypeEl.addEventListener('change', () => {
 collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
 });
+
+// Save vectorDB selection
+if (vectorDBEl) {
+  vectorDBEl.addEventListener('change', () => {
+    localStorage.setItem('lastVectorDB', vectorDBEl.value);
+  });
+}
 
 // Show/hide scoring section based on score toggle
 scoreTglEl.addEventListener('change', () => {
@@ -341,38 +411,13 @@ queryEl.addEventListener('input', () => {
   localStorage.setItem('lastPrompt', queryEl.value);
 });
 
-// Load temperature options from JSON file
-async function loadTemperatureOptions() {
-  try {
-    const response = await fetch('./config/temperature.json');
-    const data = await response.json();
-    
-    temperatureEl.innerHTML = data.temperature.map(temp => 
-      `<option value="${temp.value}">${temp.name}</option>`
-    ).join('');
-  } catch (error) {
-    console.error('Failed to load temperature options:', error);
-  }
-}
 
-// Load context options from JSON file
-async function loadContextOptions() {
-  try {
-    const response = await fetch('./config/context.json');
-    const data = await response.json();
-    
-    contextEl.innerHTML = data.context.map(context => 
-      `<option value="${context.name}">${context.name}</option>`
-    ).join('');
-  } catch (error) {
-    console.error('Failed to load context options:', error);
-  }
-}
 
 // Load tokens options from JSON file
 async function loadTokensOptions() {
   try {
     const response = await fetch('./config/tokens.json');
+    if (!response.ok) throw new Error('Failed to fetch tokens');
     const data = await response.json();
     
     tokensEl.innerHTML = data.tokens.map(token => 
@@ -676,18 +721,19 @@ form.addEventListener('submit', async (e) => {
     const testCode = generateTestCode();
     
     // Get collection if Local Documents source type is selected
-    const collection = (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') ? collectionEl.value : null;
+    const collection = (sourceTypeEl.value.includes('Docu')) ? collectionEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
+    const vectorDB = (sourceTypeEl.value.includes('Docu') && vectorDBEl) ? vectorDBEl.value : 'local';
     
     // Validate collection selection for local documents
-    if ((sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') && !collection) {
+    if (sourceTypeEl.value.includes('Docu') && !collection) {
       outputEl.textContent = 'Please select a collection for local document search.';
       return;
     }
     
     updateProgress('Searching');
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, updateProgress);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, vectorDB);
     
     // Show scoring phase if scores were generated
     if (result.scores) {
