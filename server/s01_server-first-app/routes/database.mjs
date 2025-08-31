@@ -1,14 +1,17 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
 const dbConfig = {
-  host: '92.112.184.206',
-  port: 3306,
-  user: 'nimdas',
-  password: 'FormR!1234',
-  database: 'aisearchscore'
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 };
 
 router.post('/save', async (req, res) => {
