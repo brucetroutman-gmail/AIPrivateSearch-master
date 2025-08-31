@@ -1,4 +1,6 @@
 // CSRF Token Management
+const TOKEN_EXPIRY_MINUTES = 58;
+
 class CSRFManager {
   constructor() {
     this.token = null;
@@ -28,7 +30,7 @@ class CSRFManager {
       
       const data = await response.json();
       this.token = data.csrfToken;
-      this.tokenExpiry = Date.now() + 3500000; // 58 minutes (slightly less than server expiry)
+      this.tokenExpiry = Date.now() + (TOKEN_EXPIRY_MINUTES * 60 * 1000);
       
       return this.token;
     } catch (error) {
@@ -44,12 +46,14 @@ class CSRFManager {
 
   // Add CSRF token to request headers
   async addTokenToHeaders(headers = {}) {
-    const token = await this.getToken();
-    if (token) {
-      return {
-        ...headers,
-        'X-CSRF-Token': token
-      };
+    // Check if we have a valid cached token first
+    if (this.token && this.tokenExpiry && Date.now() < this.tokenExpiry) {
+      headers['X-CSRF-Token'] = this.token;
+    } else {
+      const token = await this.getToken();
+      if (token) {
+        headers['X-CSRF-Token'] = token;
+      }
     }
     return headers;
   }

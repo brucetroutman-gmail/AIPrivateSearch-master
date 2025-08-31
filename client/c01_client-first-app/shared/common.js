@@ -1,3 +1,111 @@
+// User message system
+function showUserMessage(message, type = 'info') {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  let messageEl = document.getElementById('user-message');
+  if (!messageEl) {
+    messageEl = document.createElement('div');
+    messageEl.id = 'user-message';
+    messageEl.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 10px; border-radius: 4px; z-index: 1000;';
+    document.body.appendChild(messageEl);
+  }
+  
+  messageEl.textContent = message;
+  if (isDark) {
+    messageEl.style.background = type === 'error' ? '#5f2c2c' : type === 'success' ? '#2d5a2d' : '#333';
+    messageEl.style.borderColor = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#666';
+    messageEl.style.color = '#fff';
+  } else {
+    messageEl.style.background = type === 'error' ? '#ffebee' : type === 'success' ? '#e8f5e8' : '#f0f0f0';
+    messageEl.style.borderColor = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#ccc';
+    messageEl.style.color = '#333';
+  }
+  messageEl.style.border = '1px solid';
+  
+  setTimeout(() => messageEl.remove(), 3000);
+}
+
+// Secure prompt replacement
+function securePrompt(message, defaultValue = '') {
+  return new Promise((resolve) => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
+    
+    const messageEl = document.createElement('p');
+    messageEl.textContent = message;
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = defaultValue;
+    input.style.cssText = `width: 100%; padding: 8px; margin: 10px 0; border: 1px solid ${isDark ? '#555' : '#ccc'}; border-radius: 4px; background: ${isDark ? '#333' : 'white'}; color: ${isDark ? '#fff' : '#333'};`;
+    
+    const buttons = document.createElement('div');
+    buttons.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `padding: 8px 16px; border: 1px solid ${isDark ? '#555' : '#ccc'}; background: ${isDark ? '#444' : '#f5f5f5'}; color: ${isDark ? '#fff' : '#333'}; border-radius: 4px; cursor: pointer;`;
+    
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'OK';
+    okBtn.style.cssText = 'padding: 8px 16px; border: none; background: #007cba; color: white; border-radius: 4px; cursor: pointer;';
+    
+    cancelBtn.onclick = () => { document.body.removeChild(modal); resolve(null); };
+    okBtn.onclick = () => { document.body.removeChild(modal); resolve(input.value); };
+    
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(okBtn);
+    dialog.appendChild(messageEl);
+    dialog.appendChild(input);
+    dialog.appendChild(buttons);
+    modal.appendChild(dialog);
+    document.body.appendChild(modal);
+    
+    input.focus();
+    input.select();
+  });
+}
+
+// Secure confirm replacement
+function secureConfirm(message) {
+  return new Promise((resolve) => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
+    
+    const messageEl = document.createElement('p');
+    messageEl.textContent = message;
+    messageEl.style.whiteSpace = 'pre-line';
+    
+    const buttons = document.createElement('div');
+    buttons.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `padding: 8px 16px; border: 1px solid ${isDark ? '#555' : '#ccc'}; background: ${isDark ? '#444' : '#f5f5f5'}; color: ${isDark ? '#fff' : '#333'}; border-radius: 4px; cursor: pointer;`;
+    
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'OK';
+    okBtn.style.cssText = 'padding: 8px 16px; border: none; background: #007cba; color: white; border-radius: 4px; cursor: pointer;';
+    
+    cancelBtn.onclick = () => { document.body.removeChild(modal); resolve(false); };
+    okBtn.onclick = () => { document.body.removeChild(modal); resolve(true); };
+    
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(okBtn);
+    dialog.appendChild(messageEl);
+    dialog.appendChild(buttons);
+    modal.appendChild(dialog);
+    document.body.appendChild(modal);
+  });
+}
+
 // Load shared header and footer
 async function loadSharedComponents() {
   try {
@@ -47,7 +155,7 @@ function toggleDeveloperMode() {
   const newMode = !isDeveloperMode;
   localStorage.setItem('developerMode', newMode);
   applyDeveloperMode(newMode);
-  alert(`Advanced Mode ${newMode ? 'enabled' : 'disabled'}`);
+  showUserMessage(`Advanced Mode ${newMode ? 'enabled' : 'disabled'}`, 'info');
 }
 
 function toggleElementsByClass(className, isDeveloperMode) {
@@ -85,20 +193,20 @@ function checkUserEmail() {
   return true;
 }
 
-function promptForEmail() {
+async function promptForEmail() {
   let email;
   do {
-    email = prompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address to continue:');
+    email = await securePrompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address to continue:');
     if (email === null) {
       // User clicked cancel
-      alert('Email is required to use this application.');
+      showUserMessage('Email is required to use this application.', 'error');
       continue;
     }
     if (email && validateEmail(email)) {
       localStorage.setItem('userEmail', email);
       return true;
     } else if (email) {
-      alert('Please enter a valid email address.');
+      showUserMessage('Please enter a valid email address.', 'error');
     }
   } while (!email || !validateEmail(email));
 }
@@ -112,26 +220,26 @@ function getUserEmail() {
   return localStorage.getItem('userEmail') || '';
 }
 
-function updateUserEmail() {
+async function updateUserEmail() {
   const currentEmail = getUserEmail();
-  const newEmail = prompt('Enter your email address:', currentEmail);
+  const newEmail = await securePrompt('Enter your email address:', currentEmail);
   if (newEmail !== null && newEmail && validateEmail(newEmail)) {
     localStorage.setItem('userEmail', newEmail);
-    alert('Email updated successfully!');
+    showUserMessage('Email updated successfully!', 'success');
   } else if (newEmail) {
-    alert('Please enter a valid email address.');
+    showUserMessage('Please enter a valid email address.', 'error');
   }
 }
 
-function showUserInfo() {
+async function showUserInfo() {
   const email = getUserEmail();
   if (email) {
-    const action = confirm(`Logged in as: ${email}\n\nClick OK to change email, Cancel to close.`);
+    const action = await secureConfirm(`Logged in as: ${email}\n\nClick OK to change email, Cancel to close.`);
     if (action) {
-      updateUserEmail();
+      await updateUserEmail();
     }
   } else {
-    updateUserEmail();
+    await updateUserEmail();
   }
 }
 

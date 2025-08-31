@@ -4,7 +4,7 @@ const API_ROOT = 'http://localhost:3001';
 async function handleApiResponse(res) {
   if (!res.ok) {
     const errorText = await res.text();
-    console.error(`Server returned ${res.status}:`, errorText);
+    console.error(`Server returned ${res.status}:`, errorText.replace(/[\r\n]/g, ' '));
     throw new Error(`Server error: ${res.status} - ${errorText}`);
   }
   return res.json();

@@ -33,10 +33,18 @@ async function loadCollections() {
     if (!response.ok) throw new Error('Failed to fetch collections');
     const data = await response.json();
     
-    collectionEl.innerHTML = '<option value="">Select a collection...</option>' + 
-      data.collections.map(collection => 
-        `<option value="${collection}">${collection}</option>`
-      ).join('');
+    collectionEl.innerHTML = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a collection...';
+    collectionEl.appendChild(defaultOption);
+    
+    data.collections.forEach(collection => {
+      const option = document.createElement('option');
+      option.value = collection;
+      option.textContent = collection;
+      collectionEl.appendChild(option);
+    });
     
     // Restore last used collection
     const lastUsed = localStorage.getItem('lastCollection');
@@ -55,9 +63,13 @@ async function loadSourceTypes() {
     const response = await fetch('./config/source-types.json');
     const data = await response.json();
     
-    sourceTypeEl.innerHTML = data.source_types.map(source => 
-      `<option value="${source.name}">${source.name}</option>`
-    ).join('');
+    sourceTypeEl.innerHTML = '';
+    data.source_types.forEach(source => {
+      const option = document.createElement('option');
+      option.value = source.name;
+      option.textContent = source.name;
+      sourceTypeEl.appendChild(option);
+    });
     
     // Restore last used selection
     const lastUsed = localStorage.getItem('lastSourceType');
@@ -87,9 +99,13 @@ async function loadModels() {
     )].sort();
     
     console.log('Models received:', searchModels);
-    modelEl.innerHTML = searchModels.map(model => 
-      `<option value="${model}">${model}</option>`
-    ).join('');
+    modelEl.innerHTML = '';
+    searchModels.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model;
+      option.textContent = model;
+      modelEl.appendChild(option);
+    });
     
     // Restore last used model or set default
     const lastUsedModel = localStorage.getItem('lastUsedModel');
@@ -138,9 +154,13 @@ async function loadTemperatureOptions() {
     const response = await fetch('./config/temperature.json');
     const data = await response.json();
     
-    temperatureEl.innerHTML = data.temperature.map(temp => 
-      `<option value="${temp.value}">${temp.name}</option>`
-    ).join('');
+    temperatureEl.innerHTML = '';
+    data.temperature.forEach(temp => {
+      const option = document.createElement('option');
+      option.value = temp.value;
+      option.textContent = temp.name;
+      temperatureEl.appendChild(option);
+    });
   } catch (error) {
     console.error('Failed to load temperature options:', error);
   }
@@ -152,9 +172,13 @@ async function loadContextOptions() {
     const response = await fetch('./config/context.json');
     const data = await response.json();
     
-    contextEl.innerHTML = data.context.map(context => 
-      `<option value="${context.name}">${context.name}</option>`
-    ).join('');
+    contextEl.innerHTML = '';
+    data.context.forEach(context => {
+      const option = document.createElement('option');
+      option.value = context.name;
+      option.textContent = context.name;
+      contextEl.appendChild(option);
+    });
   } catch (error) {
     console.error('Failed to load context options:', error);
   }
@@ -169,9 +193,13 @@ async function loadVectorDBOptions() {
     if (!response.ok) throw new Error('Failed to fetch vectorDB options');
     const data = await response.json();
     
-    vectorDBEl.innerHTML = data.vectorDB.map(db => 
-      `<option value="${db.value}">${db.name}</option>`
-    ).join('');
+    vectorDBEl.innerHTML = '';
+    data.vectorDB.forEach(db => {
+      const option = document.createElement('option');
+      option.value = db.value;
+      option.textContent = db.name;
+      vectorDBEl.appendChild(option);
+    });
     
     // Restore last used selection
     const lastUsed = localStorage.getItem('lastVectorDB');
@@ -215,9 +243,13 @@ function filterAssistantTypes() {
     filteredPrompts = systemPrompts.filter(prompt => prompt.name !== 'Documents Only');
   }
   
-  assistantTypeEl.innerHTML = filteredPrompts.map(prompt => 
-    `<option value="${prompt.name}">${prompt.name}</option>`
-  ).join('');
+  assistantTypeEl.innerHTML = '';
+  filteredPrompts.forEach(prompt => {
+    const option = document.createElement('option');
+    option.value = prompt.name;
+    option.textContent = prompt.name;
+    assistantTypeEl.appendChild(option);
+  });
   
   // Restore last used selection if still available
   const lastUsed = localStorage.getItem('lastAssistantType');
@@ -234,10 +266,18 @@ async function loadUserPrompts() {
     const response = await fetch('./config/user-prompts.json');
     const data = await response.json();
     
-    userPromptsEl.innerHTML = '<option value="">Select a prompt...</option>' + 
-      data.user_prompts.map(prompt => 
-        `<option value="${prompt.prompt}">${prompt.name}</option>`
-      ).join('');
+    userPromptsEl.innerHTML = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a prompt...';
+    userPromptsEl.appendChild(defaultOption);
+    
+    data.user_prompts.forEach(prompt => {
+      const option = document.createElement('option');
+      option.value = prompt.prompt;
+      option.textContent = prompt.name;
+      userPromptsEl.appendChild(option);
+    });
   } catch (error) {
     userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
     console.error('Failed to load user prompts:', error);
@@ -351,25 +391,37 @@ async function loadScoringOptions() {
     const tempResponse = await fetch('./config/temperature.json');
     const tempData = await tempResponse.json();
     const scoreTemperatureEl = document.getElementById('scoreTemperature');
-    scoreTemperatureEl.innerHTML = tempData.temperature.map(temp => 
-      `<option value="${temp.value}">${temp.name}</option>`
-    ).join('');
+    scoreTemperatureEl.innerHTML = '';
+    tempData.temperature.forEach(temp => {
+      const option = document.createElement('option');
+      option.value = temp.value;
+      option.textContent = temp.name;
+      scoreTemperatureEl.appendChild(option);
+    });
     
     // Load context options
     const contextResponse = await fetch('./config/context.json');
     const contextData = await contextResponse.json();
     const scoreContextEl = document.getElementById('scoreContext');
-    scoreContextEl.innerHTML = contextData.context.map(context => 
-      `<option value="${context.name}">${context.name}</option>`
-    ).join('');
+    scoreContextEl.innerHTML = '';
+    contextData.context.forEach(context => {
+      const option = document.createElement('option');
+      option.value = context.name;
+      option.textContent = context.name;
+      scoreContextEl.appendChild(option);
+    });
     
     // Load tokens options
     const tokensResponse = await fetch('./config/tokens.json');
     const tokensData = await tokensResponse.json();
     const scoreTokensEl = document.getElementById('scoreTokens');
-    scoreTokensEl.innerHTML = tokensData.tokens.map(token => 
-      `<option value="${token.name}">${token.name}</option>`
-    ).join('');
+    scoreTokensEl.innerHTML = '';
+    tokensData.tokens.forEach(token => {
+      const option = document.createElement('option');
+      option.value = token.name;
+      option.textContent = token.name;
+      scoreTokensEl.appendChild(option);
+    });
     
     // Restore saved values
     const lastScoreTemp = localStorage.getItem('lastScoreTemperature');
@@ -391,7 +443,9 @@ async function loadScoringOptions() {
     });
     
     scoreTokensEl.addEventListener('change', () => {
-      localStorage.setItem('lastScoreTokens', scoreTokensEl.value);
+      // Sanitize value before storing to prevent XSS
+      const sanitizedValue = scoreTokensEl.value.replace(/[<>"'&]/g, '');
+      localStorage.setItem('lastScoreTokens', sanitizedValue);
     });
     
   } catch (error) {
@@ -420,9 +474,13 @@ async function loadTokensOptions() {
     if (!response.ok) throw new Error('Failed to fetch tokens');
     const data = await response.json();
     
-    tokensEl.innerHTML = data.tokens.map(token => 
-      `<option value="${token.name}">${token.name}</option>`
-    ).join('');
+    tokensEl.innerHTML = '';
+    data.tokens.forEach(token => {
+      const option = document.createElement('option');
+      option.value = token.name;
+      option.textContent = token.name;
+      tokensEl.appendChild(option);
+    });
     
     // Restore last used selection
     const lastUsed = localStorage.getItem('lastTokens');
@@ -554,22 +612,37 @@ function render(result) {
     const s = result.scores;
 
     const scoresH = document.createElement('h3');
-    scoresH.innerHTML = 'Scores <small>(3-Better 2-Good 1-Poor)</small>';
+    scoresH.textContent = 'Scores (3-Better 2-Good 1-Poor)';
     outputEl.append(scoresH);
 
     const tbl = document.createElement('table');
     tbl.className = 'score-table';
-    tbl.innerHTML = `
-      <thead>
-        <tr><th>Criterion</th><th>Score</th><th>Justification</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Accuracy</td><td>${s.accuracy ?? '-'}</td><td>${s.justifications.accuracy}</td></tr>
-        <tr><td>Relevance</td><td>${s.relevance ?? '-'}</td><td>${s.justifications.relevance}</td></tr>
-        <tr><td>Organization</td><td>${s.organization ?? '-'}</td><td>${s.justifications.organization}</td></tr>
-        <tr><td><strong>Weighted Score</strong></td><td><strong>${s.total ? s.total + '%' : '-'}</strong></td><td></td></tr>
-      </tbody>
-    `;
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['Criterion', 'Score', 'Justification'].forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    [['Accuracy', s.accuracy ?? '-', s.justifications.accuracy],
+     ['Relevance', s.relevance ?? '-', s.justifications.relevance],
+     ['Organization', s.organization ?? '-', s.justifications.organization],
+     ['Weighted Score', s.total ? s.total + '%' : '-', '']].forEach(([criterion, score, justification]) => {
+      const row = document.createElement('tr');
+      [criterion, score, justification].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    });
+    
+    tbl.appendChild(thead);
+    tbl.appendChild(tbody);
     outputEl.append(tbl);
 
     if (s.overallComments) {
@@ -589,18 +662,30 @@ function render(result) {
 
     const tbl = document.createElement('table');
     tbl.className = 'score-table';
-    let tableHTML = `
-      <thead>
-        <tr><th>Operation</th><th>Model</th><th>Duration</th><th>Load</th><th>Tokens</th><th>Eval Rate</th><th>Context</th><th>Temperature</th></tr>
-      </thead>
-      <tbody>`;
-
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['Operation', 'Model', 'Duration', 'Load', 'Tokens', 'Eval Rate', 'Context', 'Temperature'].forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    
     if (result.metrics.search) {
       const m = result.metrics.search;
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Search</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      const row = document.createElement('tr');
+      ['Search', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
     }
 
     if (result.metrics.scoring) {
@@ -608,7 +693,13 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Scoring</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      const row = document.createElement('tr');
+      ['Scoring', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
     }
 
     if (result.metrics.scoringRetry) {
@@ -616,11 +707,17 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      tableHTML += `<tr><td>Scoring Retry</td><td>${m.model}</td><td>${totalSecs}s</td><td>${loadMs}ms</td><td>${m.eval_count || 0}</td><td>${tokensPerSec} t/s</td><td>${m.context_size}</td><td>${m.temperature}</td></tr>`;
+      const row = document.createElement('tr');
+      ['Scoring Retry', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
     }
-
-    tableHTML += '</tbody>';
-    tbl.innerHTML = tableHTML;
+    
+    tbl.appendChild(thead);
+    tbl.appendChild(tbody);
     outputEl.append(tbl);
   }
 
@@ -632,20 +729,27 @@ function render(result) {
 
     const sysTbl = document.createElement('table');
     sysTbl.className = 'score-table';
-    let sysTableHTML = `
-      <thead>
-        <tr><th>PcCode</th><th>CPU</th><th>Graphics</th><th>RAM</th><th>OS</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>${result.pcCode || 'Unknown'}</td>
-          <td>${result.systemInfo?.chip || 'Unknown'}</td>
-          <td>${result.systemInfo?.graphics || 'Unknown'}</td>
-          <td>${result.systemInfo?.ram || 'Unknown'}</td>
-          <td>${result.systemInfo?.os || 'Unknown'}</td>
-        </tr>
-      </tbody>`;
-    sysTbl.innerHTML = sysTableHTML;
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['PcCode', 'CPU', 'Graphics', 'RAM', 'OS'].forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    const dataRow = document.createElement('tr');
+    [result.pcCode || 'Unknown', result.systemInfo?.chip || 'Unknown', result.systemInfo?.graphics || 'Unknown', result.systemInfo?.ram || 'Unknown', result.systemInfo?.os || 'Unknown'].forEach(text => {
+      const td = document.createElement('td');
+      td.textContent = text;
+      dataRow.appendChild(td);
+    });
+    tbody.appendChild(dataRow);
+    
+    sysTbl.appendChild(thead);
+    sysTbl.appendChild(tbody);
     outputEl.append(sysTbl);
   }
 
@@ -659,18 +763,35 @@ function render(result) {
   // 6. Add export section at the end
   const exportDiv = document.createElement('div');
   exportDiv.style.cssText = 'margin-top: 1.5rem; padding: 1rem; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--border-color);';
-  exportDiv.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <label for="exportFormat" style="margin: 0; font-weight: 600;">Export to:</label>
-      <select id="exportFormat" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;">
-        <option value="pdf">Printer/PDF</option>
-        <option value="markdown">Markdown</option>
-        <option value="json">JSON</option>
-        <option value="database">Database</option>
-      </select>
-      <button type="button" id="exportBtn" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Export</button>
-    </div>
-  `;
+  
+  const innerDiv = document.createElement('div');
+  innerDiv.style.cssText = 'display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;';
+  
+  const label = document.createElement('label');
+  label.setAttribute('for', 'exportFormat');
+  label.style.cssText = 'margin: 0; font-weight: 600;';
+  label.textContent = 'Export to:';
+  
+  const select = document.createElement('select');
+  select.id = 'exportFormat';
+  select.style.cssText = 'background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;';
+  ['pdf', 'markdown', 'json', 'database'].forEach(value => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value === 'pdf' ? 'Printer/PDF' : value.charAt(0).toUpperCase() + value.slice(1);
+    select.appendChild(option);
+  });
+  
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.id = 'exportBtn';
+  button.style.cssText = 'background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;';
+  button.textContent = 'Export';
+  
+  innerDiv.appendChild(label);
+  innerDiv.appendChild(select);
+  innerDiv.appendChild(button);
+  exportDiv.appendChild(innerDiv);
   outputEl.append(exportDiv);
   
   // Add event listener to the new export button
@@ -680,6 +801,13 @@ function render(result) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  // Check authorization - require email for access
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail || userEmail.trim() === '') {
+    outputEl.textContent = 'Please provide your email address to use this service.';
+    return;
+  }
   
   if (!modelEl.value) {
     outputEl.textContent = 'Please select a model first.';
@@ -781,10 +909,19 @@ form.addEventListener('submit', async (e) => {
 // Add event listener for export button
 // Export handler function
 async function handleExport() {
+  // Check authorization - require email for export access
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail || userEmail.trim() === '') {
+    console.warn('Export blocked: No email provided');
+    outputEl.textContent = 'Please provide your email address to export results.';
+    return;
+  }
+  
   const exportFormat = document.getElementById('exportFormat').value;
   
   if (!window.currentResult) {
-    alert('No results available to export.');
+    console.warn('Export blocked: No results available');
+    outputEl.textContent = 'No results available to export.';
     return;
   }
   
@@ -794,22 +931,23 @@ async function handleExport() {
   if (exportFormat === 'pdf') {
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
+    // Sanitize content by creating a temporary element and using textContent
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = outputEl.innerHTML;
+    const sanitizedContent = tempDiv.textContent || tempDiv.innerText || '';
+    
     printWindow.document.write(`
       <html>
         <head>
           <title>AI Search Results</title>
           <style>
-            body { font-family: system-ui, sans-serif; margin: 2rem; }
-            h1, h3 { margin-top: 1rem; }
-            table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
-            th, td { border: 1px solid #ccc; padding: .4rem .6rem; text-align: left; }
-            th { background: #fafafa; }
-            .meta { font-size: 0.8rem; color: #555; margin-top: 1rem; }
+            body { font-family: system-ui, sans-serif; margin: 2rem; white-space: pre-wrap; }
+            h1 { margin-top: 1rem; }
           </style>
         </head>
         <body>
           <h1>AI Search Results</h1>
-          ${outputEl.innerHTML}
+          <pre>${sanitizedContent}</pre>
         </body>
       </html>
     `);
@@ -937,9 +1075,15 @@ async function handleExport() {
     // Export to database using common function
     try {
       const result = await exportToDatabase(window.currentResult, null, null, null);
-      alert(`Successfully saved to database with ID: ${result.insertId}`);
+      console.log(`Successfully saved to database with ID: ${result.insertId}`);
+      // Show success feedback in UI instead of alert
+      outputEl.style.border = '2px solid green';
+      setTimeout(() => outputEl.style.border = '', 3000);
     } catch (error) {
-      alert(`Database save error: ${error.message}`);
+      console.error('Database save error:', error.message);
+      // Show error feedback in UI instead of alert
+      outputEl.style.border = '2px solid red';
+      setTimeout(() => outputEl.style.border = '', 3000);
     }
   }
 }
