@@ -6,6 +6,7 @@
   <title>Config Editor - AISearch-n-Score</title>
   <link rel="stylesheet" href="default.css">
   <link rel="stylesheet" href="shared/styles.css">
+  <script src="csrf.js"></script>
   <script src="shared/common.js"></script>
   <style>
     
@@ -186,7 +187,7 @@
       }
       
       try {
-        const response = await fetch(`http://localhost:3001/api/config/${currentFileName}`, {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/config/${currentFileName}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content })

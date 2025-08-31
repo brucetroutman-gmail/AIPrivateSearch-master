@@ -6,6 +6,7 @@
     <title>Manage Models</title>
     <link rel="stylesheet" href="default.css">
     <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
     <script src="shared/common.js"></script>
     <style>
         :root {
@@ -274,7 +275,7 @@
                         });
                         
                         // Save updated config
-                        const saveResponse = await fetch('http://localhost:3001/api/config/models-list.json', {
+                        const saveResponse = await window.csrfManager.fetch('http://localhost:3001/api/config/models-list.json', {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
@@ -399,7 +400,7 @@
                         models.models = models.models.filter(model => model.modelName !== modelName);
                         
                         // Save updated config
-                        await fetch('http://localhost:3001/api/config/models-list.json', {
+                        await window.csrfManager.fetch('http://localhost:3001/api/config/models-list.json', {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })

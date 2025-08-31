@@ -6,6 +6,7 @@
   <title>Edit Collection - AISearch-n-Score</title>
   <link rel="stylesheet" href="default.css">
   <link rel="stylesheet" href="shared/styles.css">
+  <script src="csrf.js"></script>
   <script src="shared/common.js"></script>
   <style>
     .editor-container {
@@ -383,7 +384,7 @@
           const formData = new FormData();
           formData.append('file', file);
           
-          const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload`, {
+          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload`, {
             method: 'POST',
             body: formData
           });
@@ -417,7 +418,7 @@
       showLog(`Converting ${selected.length} selected documents...`);
       
       try {
-        const response = await fetch('http://localhost:3001/api/documents/convert-selected', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/documents/convert-selected', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection, files: selected })
@@ -466,7 +467,7 @@
           const chunkInfo = estimatedChunks > 5 ? ` (~${estimatedChunks} chunks estimated)` : '';
           showLog(`${progress} Processing: ${filename}${chunkInfo}`, 'info');
           
-          const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ vectorDB })
@@ -548,7 +549,7 @@
       showLog(`Searching ${currentCollection} in ${vectorDB} for: "${query}"...`);
       
       try {
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/search`, {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, limit: 3, vectorDB })
@@ -579,7 +580,7 @@
       showLog(`Removing collection '${currentCollection}'...`, 'info');
       
       try {
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}`, {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}`, {
           method: 'DELETE'
         });
         
@@ -635,7 +636,7 @@
     
     async function openFile(filename) {
       try {
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}/open`, {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}/open`, {
           method: 'POST'
         });
         const result = await response.json();
@@ -672,7 +673,7 @@
         const progress = `${i + 1}/${selectedMD.length}`;
         
         try {
-          const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ vectorDB })
@@ -716,7 +717,7 @@
         try {
           // Remove from vector DB if it's an MD file
           if (filename.endsWith('.md')) {
-            const removeResponse = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+            const removeResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
               method: 'DELETE'
             });
             if (removeResponse.ok) {
@@ -725,7 +726,7 @@
           }
           
           // Delete the file
-          const deleteResponse = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}`, {
+          const deleteResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}`, {
             method: 'DELETE'
           });
           

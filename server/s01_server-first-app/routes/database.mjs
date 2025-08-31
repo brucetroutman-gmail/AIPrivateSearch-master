@@ -1,6 +1,8 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
+import { requireAuth } from '../middleware/auth.mjs';
 
 dotenv.config();
 
@@ -11,16 +13,22 @@ const dbConfig = {
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  connectionLimit: 10,
+  acquireTimeout: 60000,
+  timeout: 60000
 };
 
-router.post('/save', async (req, res) => {
+const pool = mysql.createPool(dbConfig);
+
+router.post('/save', requireAuth, async (req, res) => {
+  let connection;
   try {
     const data = req.body;
-    console.log('Database save request data:', JSON.stringify(data, null, 2));
-    console.log('CreatedAt value:', data.CreatedAt, 'Length:', data.CreatedAt?.length);
+    safeLog('Database save request received');
+    safeLog('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
     
-    const connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
     
     const insertQuery = `
       INSERT INTO searches (
@@ -69,22 +77,24 @@ router.post('/save', async (req, res) => {
       data['WeightedScore-pct'] || null
     ];
     
-    console.log('Executing query with', values.length, 'parameters');
+    safeLog('Executing query with', values.length, 'parameters');
     const [result] = await connection.execute(insertQuery, values);
-    await connection.end();
     
-    console.log('Database save successful, insertId:', result.insertId);
+    safeLog('Database save successful, insertId:', String(result.insertId));
     res.json({ success: true, insertId: result.insertId });
   } catch (error) {
-    console.error('Database save error:', error);
+    safeError('Database save error:', error.message);
     res.status(500).json({ success: false, error: error.message });
+  } finally {
+    if (connection) connection.release();
   }
 });
 
 // Get all test data for analysis
-router.get('/tests', async (req, res) => {
+router.get('/tests', requireAuth, async (req, res) => {
+  let connection;
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
     
     const query = `
       SELECT * FROM searches 
@@ -92,18 +102,19 @@ router.get('/tests', async (req, res) => {
     `;
     
     const [rows] = await connection.execute(query);
-    await connection.end();
     
     res.json({
       success: true,
       tests: rows
     });
   } catch (error) {
-    console.error('Database query error:', error);
+    safeError('Database query error:', error.message);
     res.status(500).json({
       success: false,
       error: error.message
     });
+  } finally {
+    if (connection) connection.release();
   }
 });
 

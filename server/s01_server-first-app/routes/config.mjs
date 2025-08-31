@@ -1,11 +1,13 @@
 import express from 'express';
 import fs from 'fs-extra';
 import path from 'path';
+import { requireAuth } from '../middleware/auth.mjs';
+import { validateFilename } from '../lib/utils/pathValidator.mjs';
 
 const router = express.Router();
 
 // List config files (must come before /:filename)
-router.get('/files', async (req, res) => {
+router.get('/files', requireAuth, async (req, res) => {
   try {
     const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
     const files = await fs.readdir(configDir);
@@ -17,9 +19,10 @@ router.get('/files', async (req, res) => {
 });
 
 // Get config file
-router.get('/:filename', async (req, res) => {
+router.get('/:filename', requireAuth, async (req, res) => {
   try {
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config', req.params.filename);
+    const filename = validateFilename(req.params.filename);
+    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config', filename);
     const content = await fs.readFile(configPath, 'utf8');
     res.json({ content });
   } catch (error) {
@@ -28,9 +31,10 @@ router.get('/:filename', async (req, res) => {
 });
 
 // Update config file
-router.put('/:filename', async (req, res) => {
+router.put('/:filename', requireAuth, async (req, res) => {
   try {
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config', req.params.filename);
+    const filename = validateFilename(req.params.filename);
+    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config', filename);
     await fs.writeFile(configPath, req.body.content, 'utf8');
     res.json({ success: true });
   } catch (error) {

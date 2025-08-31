@@ -6,6 +6,7 @@
   <title>Manage Collections - AISearch-n-Score</title>
   <link rel="stylesheet" href="default.css">
   <link rel="stylesheet" href="shared/styles.css">
+  <script src="csrf.js"></script>
   <script src="shared/common.js"></script>
   <style>
     .collections-container {
@@ -208,7 +209,7 @@
       showMessage(`Creating collection '${collectionName}'...`, 'info');
       
       try {
-        const response = await fetch('http://localhost:3001/api/documents/collections/create', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/documents/collections/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: collectionName })

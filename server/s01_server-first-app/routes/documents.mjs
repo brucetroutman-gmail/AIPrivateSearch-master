@@ -3,7 +3,10 @@ import { CollectionManager } from '../lib/documents/collectionManager.mjs';
 import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { asyncHandler } from '../middleware/errorHandler.mjs';
+import { requireAuth, requireAdminAuth } from '../middleware/auth.mjs';
 import lanceDBService from '../lib/documents/lanceDBService.mjs';
+import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
+import { validatePath, validateFilename } from '../lib/utils/pathValidator.mjs';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -17,7 +20,7 @@ router.get('/collections', asyncHandler(async (req, res) => {
   res.json({ collections });
 }));
 
-router.post('/collections/create', asyncHandler(async (req, res) => {
+router.post('/collections/create', requireAuth, asyncHandler(async (req, res) => {
   const { name } = req.body;
   
   if (!name || typeof name !== 'string') {
@@ -28,7 +31,8 @@ router.post('/collections/create', asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Collection name can only contain letters, numbers, hyphens, and underscores' });
   }
   
-  const collectionPath = path.join(process.cwd(), '../../sources/local-documents', name);
+  const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+  const collectionPath = validatePath(name, baseDir);
   
   if (await fs.pathExists(collectionPath)) {
     return res.status(409).json({ error: 'Collection already exists' });
@@ -42,7 +46,7 @@ router.post('/collections/create', asyncHandler(async (req, res) => {
   res.json({ success: true, message: `Collection '${name}' created successfully` });
 }));
 
-router.delete('/collections/:collection', asyncHandler(async (req, res) => {
+router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (req, res) => {
   const collection = req.params.collection;
   
   try {
@@ -60,7 +64,8 @@ router.delete('/collections/:collection', asyncHandler(async (req, res) => {
     }
     
     // Remove collection folder and all files
-    const collectionPath = path.join(process.cwd(), '../../sources/local-documents', collection);
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(collection, baseDir);
     if (await fs.pathExists(collectionPath)) {
       await fs.remove(collectionPath);
     }
@@ -91,7 +96,10 @@ router.get('/collections/:collection/files/:filename', async (req, res) => {
 
 router.post('/collections/:collection/files/:filename/open', async (req, res) => {
   try {
-    const filePath = path.join(process.cwd(), '../../sources/local-documents', req.params.collection, req.params.filename);
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionDir = validatePath(req.params.collection, baseDir);
+    const filename = validateFilename(req.params.filename);
+    const filePath = path.join(collectionDir, filename);
     const { exec } = await import('child_process');
     exec(`open "${filePath}"`, (error) => {
       if (error) {
@@ -105,14 +113,16 @@ router.post('/collections/:collection/files/:filename/open', async (req, res) =>
   }
 });
 
-router.post('/collections/:collection/upload', asyncHandler(async (req, res) => {
+router.post('/collections/:collection/upload', requireAuth, asyncHandler(async (req, res) => {
   const busboy = (await import('busboy')).default;
   const bb = busboy({ headers: req.headers });
   
   bb.on('file', (name, file, info) => {
     const { filename } = info;
-    const collectionPath = path.join(process.cwd(), '../../sources/local-documents', req.params.collection);
-    const saveTo = path.join(collectionPath, filename);
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(req.params.collection, baseDir);
+    const safeFilename = validateFilename(filename);
+    const saveTo = path.join(collectionPath, safeFilename);
     
     file.pipe(fs.createWriteStream(saveTo));
     
@@ -199,7 +209,7 @@ async function convertFiles(collection, files = null) {
         converted++;
         results.push({ file, success: true });
       } catch (error) {
-        console.error(`Error converting ${file}:`, error.message);
+        safeError('Error converting file:', encodeURIComponent(file), error.message);
         results.push({ file, success: false, error: error.message });
       }
     }
@@ -243,7 +253,7 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
       await documentSearch.indexDocument(filename, document.content, vectorDB);
       processed++;
     } catch (error) {
-      console.error(`Error processing ${filename}:`, error.message);
+      safeError('Error processing file:', encodeURIComponent(filename), error.message);
     }
   }
   
@@ -264,7 +274,7 @@ router.post('/process-selected', asyncHandler(async (req, res) => {
 }));
 
 // Embedding Operations
-router.post('/collections/:collection/index/:filename', async (req, res) => {
+router.post('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
     const { vectorDB = 'local' } = req.body;
     const documentSearch = new DocumentSearch(req.params.collection);
@@ -287,7 +297,7 @@ router.post('/collections/:collection/index/:filename', async (req, res) => {
   }
 });
 
-router.delete('/collections/:collection/index/:filename', async (req, res) => {
+router.delete('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
     const { vectorDB = 'local' } = req.body;
     
@@ -327,7 +337,7 @@ router.get('/collections/:collection/indexed', async (req, res) => {
     const localDocs = await localSearch.listIndexedDocuments();
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     
-    console.log(`Collection ${req.params.collection} - Local docs:`, localDocs.length, 'LanceDB docs:', lanceDocs.length);
+    safeLog('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
     
     // Combine and mark which storage each document is in
     const allFilenames = new Set([...localDocs.map(d => d.filename), ...lanceDocs.map(d => d.filename)]);

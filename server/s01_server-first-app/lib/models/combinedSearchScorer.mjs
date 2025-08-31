@@ -122,28 +122,16 @@ class CombinedSearchScorer {
     try {
       console.log('Starting scoring process...');
       
-      const scoringPrompt = `Score this response on 3 criteria (1-3 scale):
+      const scoringPrompt = `Rate this answer on a scale of 1-3 for each criterion:
 
-Query: "${query}"
-Response: "${answer}"
+Query: ${query}
+Answer: ${answer}
 
-Criteria:
-- Accurate: Factually correct (1=Poor, 2=Good, 3=Excellent)
-- Relevant: Addresses query (1=Poor, 2=Good, 3=Excellent)
-- Organized: Clear structure (1=Poor, 2=Good, 3=Excellent)
+Accurate: [1-3]
+Relevant: [1-3] 
+Organized: [1-3]
 
-Format:
-**Accurate**: [1-3]
-Justification: [Brief reason]
-
-**Relevant**: [1-3]
-Justification: [Brief reason]
-
-**Organized**: [1-3]
-Justification: [Brief reason]
-
-**Total Score**: [Total]
-Overall Comments: [Optional summary]`;
+Provide ONLY the three numbers, one per line.`;
 
       const modelToUse = scoreModel || this.scoreSettings.model;
       
@@ -204,50 +192,35 @@ Overall Comments: [Optional summary]`;
 
   #parseScores(text) {
     try {
+      console.log('Raw scoring text:', text);
+      
       const scoreObj = {
         accuracy: null,
         relevance: null,
         organization: null,
         total: null,
-        justifications: { accuracy: '', relevance: '', organization: '' },
-        overallComments: ''
+        justifications: { accuracy: 'Auto-generated', relevance: 'Auto-generated', organization: 'Auto-generated' },
+        overallComments: 'Scores extracted from model response'
       };
 
-      const lines = text.split('\n').map(l => l.trim());
-
-      let current = null;
-      for (const line of lines) {
-        if (line.startsWith('**Accurate**')) {
-          scoreObj.accuracy = this.#extract(line);
-          current = 'accuracy';
-        } else if (line.startsWith('**Relevant**')) {
-          scoreObj.relevance = this.#extract(line);
-          current = 'relevance';
-        } else if (line.startsWith('**Organized**')) {
-          scoreObj.organization = this.#extract(line);
-          current = 'organization';
-        } else if (line.startsWith('**Total Score**')) {
-          scoreObj.total = this.#extract(line);
-          current = null;
-        } else if (line.startsWith('Overall Comments:')) {
-          scoreObj.overallComments = line.replace('Overall Comments:', '').trim();
-          current = null;
-        } else if (line.startsWith('Justification:') && current) {
-          scoreObj.justifications[current] = line.replace('Justification:', '').trim();
-        }
-      }
-
-      // Always calculate weighted score from individual scores (ignore AI model's total)
-      // For 1-3 scale: max possible = (3*3) + (2*3) + (1*3) = 18
-      if (scoreObj.accuracy && scoreObj.relevance && scoreObj.organization) {
+      // Extract all numbers 1-3 from the response
+      const numbers = text.match(/[1-3]/g);
+      console.log('Found numbers:', numbers);
+      
+      if (numbers && numbers.length >= 3) {
+        scoreObj.accuracy = Number(numbers[0]);
+        scoreObj.relevance = Number(numbers[1]);
+        scoreObj.organization = Number(numbers[2]);
+        
+        // Calculate weighted score
         const rawScore = (3 * scoreObj.accuracy) + (2 * scoreObj.relevance) + (1 * scoreObj.organization);
         scoreObj.total = Math.round((rawScore / 18) * 100);
       }
       
+      console.log('Parsed scores:', scoreObj);
       return scoreObj;
     } catch (error) {
       console.error('Error parsing scores:', error);
-      console.error('Raw text to parse:', text);
       
       return {
         accuracy: null,
@@ -255,7 +228,7 @@ Overall Comments: [Optional summary]`;
         organization: null,
         total: null,
         justifications: { accuracy: '', relevance: '', organization: '' },
-        overallComments: `Parse error: ${error.message}`,
+        overallComments: 'Parsing failed',
         error: error.message
       };
     }
@@ -268,7 +241,7 @@ Overall Comments: [Optional summary]`;
 
   #generatePcCode() {
     try {
-      const serial = execSync('system_profiler SPHardwareDataType | grep "Serial Number" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      const serial = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Serial Number" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
       if (serial && serial.length >= 6) {
         return serial.substring(0, 3) + serial.substring(serial.length - 3);
       }
@@ -281,12 +254,12 @@ Overall Comments: [Optional summary]`;
 
   #getSystemInfo() {
     try {
-      let chip = execSync('system_profiler SPHardwareDataType | grep "Chip" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      let chip = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Chip" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
       if (!chip) {
-        chip = execSync('system_profiler SPHardwareDataType | grep "Processor" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+        chip = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Processor" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
       }
-      const graphics = execSync('system_profiler SPDisplaysDataType | grep "Chipset Model" | head -1 | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      const ram = execSync('system_profiler SPHardwareDataType | grep "Memory" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      const graphics = execSync('system_profiler SPDisplaysDataType 2>/dev/null | grep "Chipset Model" | head -1 | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      const ram = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Memory" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
       const os = execSync('sw_vers -productName && sw_vers -productVersion', { encoding: 'utf8' }).replace('\n', ' ').trim();
       
       return {

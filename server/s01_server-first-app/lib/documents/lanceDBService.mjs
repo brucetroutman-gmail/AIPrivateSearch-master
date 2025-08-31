@@ -1,6 +1,7 @@
 import { connect } from '@lancedb/lancedb';
 import path from 'path';
 import fs from 'fs-extra';
+import { safeLog, safeError } from '../utils/safeLogger.mjs';
 
 class LanceDBService {
   constructor() {
@@ -30,10 +31,10 @@ class LanceDBService {
     
     try {
       const table = await this.db.createTable(collectionName, documents);
-      console.log(`Created LanceDB collection: ${collectionName}`);
+      safeLog('Created LanceDB collection:', collectionName);
       return table;
     } catch (error) {
-      console.error(`Failed to create collection ${collectionName}:`, error);
+      safeError('Failed to create collection:', error.message);
       throw error;
     }
   }
@@ -44,7 +45,7 @@ class LanceDBService {
     try {
       return await this.db.openTable(collectionName);
     } catch (error) {
-      console.error(`Collection ${collectionName} not found in LanceDB`);
+      safeLog('Collection not found in LanceDB');
       return null;
     }
   }
@@ -65,10 +66,10 @@ class LanceDBService {
         .limit(limit)
         .toArray();
       
-      console.log(`LanceDB search in ${collectionName} found ${results.length} results`);
+      safeLog('LanceDB search found results:', results.length);
       return results;
     } catch (error) {
-      console.error(`Search failed in collection ${collectionName}:`, error);
+      safeError('LanceDB search failed:', error.message);
       return [];
     }
   }
@@ -79,7 +80,7 @@ class LanceDBService {
     try {
       return await this.db.tableNames();
     } catch (error) {
-      console.error('Failed to list LanceDB collections:', error);
+      safeError('Failed to list LanceDB collections:', error.message);
       return [];
     }
   }
@@ -108,7 +109,7 @@ class LanceDBService {
       
       return Array.from(uniqueFiles.values());
     } catch (error) {
-      console.error(`Failed to list documents in ${collectionName}:`, error);
+      safeError('Failed to list documents:', error.message);
       return [];
     }
   }
@@ -134,9 +135,9 @@ class LanceDBService {
       }
       
       this.collections.add(collectionName);
-      console.log(`Added ${chunks.length} chunks for ${filename} to LanceDB collection ${collectionName}`);
+      safeLog('Added chunks to LanceDB:', chunks.length);
     } catch (error) {
-      console.error(`Failed to add document ${filename} to LanceDB:`, error);
+      safeError('Failed to add document to LanceDB:', error.message);
       throw error;
     }
   }
@@ -153,10 +154,10 @@ class LanceDBService {
       
       const table = await this.db.openTable(collectionName);
       await table.delete(`source = "${filename}"`);
-      console.log(`Removed document ${filename} from LanceDB collection ${collectionName}`);
+      safeLog('Removed document from LanceDB');
       return { success: true };
     } catch (error) {
-      console.error(`Failed to remove document ${filename} from LanceDB:`, error);
+      safeError('Failed to remove document from LanceDB:', error.message);
       throw error;
     }
   }
@@ -166,10 +167,10 @@ class LanceDBService {
     
     try {
       await this.db.dropTable(collectionName);
-      console.log(`Removed LanceDB collection: ${collectionName}`);
+      safeLog('Removed LanceDB collection');
       return { success: true };
     } catch (error) {
-      console.error(`Failed to remove LanceDB collection ${collectionName}:`, error);
+      safeError('Failed to remove LanceDB collection:', error.message);
       return { success: true }; // Don't throw error if collection doesn't exist
     }
   }
@@ -193,7 +194,7 @@ class LanceDBService {
       
       return chunkCounts;
     } catch (error) {
-      console.error(`Failed to get chunk counts for ${collectionName}:`, error);
+      safeError('Failed to get chunk counts:', error.message);
       return {};
     }
   }

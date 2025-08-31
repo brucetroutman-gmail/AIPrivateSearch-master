@@ -227,7 +227,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
   };
   
   try {
-    const response = await fetch('http://localhost:3001/api/database/save', {
+    const response = await window.csrfManager.fetch('http://localhost:3001/api/database/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dbData)

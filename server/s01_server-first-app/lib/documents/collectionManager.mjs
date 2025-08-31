@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 
 export class CollectionManager {
   constructor() {
@@ -7,7 +8,7 @@ export class CollectionManager {
   }
 
   getCollectionPath(collection) {
-    return path.join(this.basePath, collection);
+    return validatePath(collection, this.basePath);
   }
 
   async listCollections() {
@@ -50,25 +51,29 @@ export class CollectionManager {
   }
 
   async createDocument(collection, filename, content) {
-    const filePath = path.join(this.getCollectionPath(collection), filename);
+    const safeFilename = validateFilename(filename);
+    const filePath = path.join(this.getCollectionPath(collection), safeFilename);
     await fs.writeFile(filePath, content, 'utf8');
     return { success: true, path: filePath };
   }
 
   async readDocument(collection, filename) {
-    const filePath = path.join(this.getCollectionPath(collection), filename);
+    const safeFilename = validateFilename(filename);
+    const filePath = path.join(this.getCollectionPath(collection), safeFilename);
     const content = await fs.readFile(filePath, 'utf8');
     return { content, path: filePath };
   }
 
   async updateDocument(collection, filename, content) {
-    const filePath = path.join(this.getCollectionPath(collection), filename);
+    const safeFilename = validateFilename(filename);
+    const filePath = path.join(this.getCollectionPath(collection), safeFilename);
     await fs.writeFile(filePath, content, 'utf8');
     return { success: true, path: filePath };
   }
 
   async deleteDocument(collection, filename) {
-    const filePath = path.join(this.getCollectionPath(collection), filename);
+    const safeFilename = validateFilename(filename);
+    const filePath = path.join(this.getCollectionPath(collection), safeFilename);
     await fs.remove(filePath);
     return { success: true };
   }
