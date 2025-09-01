@@ -1,5 +1,6 @@
 import { Ollama } from 'ollama';
 import { execSync } from 'child_process';
+import { safeLog, safeError } from '../utils/safeLogger.mjs';
 import fs from 'fs';
 import path from 'path';
 
@@ -51,7 +52,7 @@ class CombinedSearchScorer {
         
         // Retry once if no scores were obtained
         if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
-          console.log('No scores obtained, retrying once...');
+          safeLog('No scores obtained, retrying once');
           const retryResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
           result.scores = retryResult.scores;
           result.metrics.scoringRetry = retryResult.metrics;
@@ -64,7 +65,7 @@ class CombinedSearchScorer {
       }
       return result;
     } catch (error) {
-      console.error('Error in process method:', error);
+      safeError('Error in process method:', error.message);
       return {
         query,
         response: 'Error occurred while processing the query',
@@ -113,14 +114,14 @@ class CombinedSearchScorer {
         }
       };
     } catch (error) {
-      console.error('Error in search method:', error);
+      safeError('Error in search method:', error.message);
       throw new Error(`Search failed: ${error.message}`);
     }
   }
 
   async #score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
     try {
-      console.log('Starting scoring process...');
+      safeLog('Starting scoring process');
       
       const scoringPrompt = `Rate this answer on a scale of 1-3 for each criterion:
 
@@ -146,9 +147,9 @@ Provide ONLY the three numbers, one per line.`;
         }
       });
 
-      console.log('Scoring model response received, parsing...');
+      safeLog('Scoring model response received, parsing');
       const scores = this.#parseScores(res.response);
-      console.log('Scoring completed successfully:', scores);
+      safeLog('Scoring completed successfully');
       
       return {
         scores,
@@ -166,9 +167,9 @@ Provide ONLY the three numbers, one per line.`;
         }
       };
     } catch (error) {
-      console.error('Error in scoring method:', error);
-      console.error('Query:', query);
-      console.error('Answer length:', answer?.length || 'undefined');
+      safeError('Error in scoring method:', error.message);
+      safeError('Query length:', query?.length || 0);
+      safeError('Answer length:', answer?.length || 0);
       
       // Return a default score structure instead of null
       return {
@@ -192,7 +193,7 @@ Provide ONLY the three numbers, one per line.`;
 
   #parseScores(text) {
     try {
-      console.log('Raw scoring text:', text);
+      safeLog('Raw scoring text length:', text?.length || 0);
       
       const scoreObj = {
         accuracy: null,
@@ -205,7 +206,7 @@ Provide ONLY the three numbers, one per line.`;
 
       // Extract all numbers 1-3 from the response
       const numbers = text.match(/[1-3]/g);
-      console.log('Found numbers:', numbers);
+      safeLog('Found numbers:', numbers);
       
       if (numbers && numbers.length >= 3) {
         scoreObj.accuracy = Number(numbers[0]);
@@ -217,10 +218,10 @@ Provide ONLY the three numbers, one per line.`;
         scoreObj.total = Math.round((rawScore / 18) * 100);
       }
       
-      console.log('Parsed scores:', scoreObj);
+      safeLog('Parsed scores successfully');
       return scoreObj;
     } catch (error) {
-      console.error('Error parsing scores:', error);
+      safeError('Error parsing scores:', error.message);
       
       return {
         accuracy: null,
@@ -247,7 +248,7 @@ Provide ONLY the three numbers, one per line.`;
       }
       return 'UNKNOWN';
     } catch (error) {
-      console.error('Error generating PcCode:', error.message);
+      safeError('Error generating PcCode:', error.message);
       return 'ERROR';
     }
   }
@@ -269,7 +270,7 @@ Provide ONLY the three numbers, one per line.`;
         os: os || 'Unknown'
       };
     } catch (error) {
-      console.error('Error getting system info:', error.message);
+      safeError('Error getting system info:', error.message);
       return {
         chip: 'Error',
         graphics: 'Error',

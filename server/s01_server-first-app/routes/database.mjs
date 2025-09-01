@@ -9,21 +9,30 @@ dotenv.config();
 const router = express.Router();
 
 const dbConfig = {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USERNAME || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_DATABASE || 'aisearchscore',
   connectionLimit: 10,
   acquireTimeout: 60000,
   timeout: 60000
 };
 
-const pool = mysql.createPool(dbConfig);
+let pool;
+try {
+  pool = mysql.createPool(dbConfig);
+} catch (error) {
+  safeError('Database pool creation failed:', error.message);
+}
 
 router.post('/save', requireAuth, async (req, res) => {
   let connection;
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not configured' });
+    }
+    
     const data = req.body;
     safeLog('Database save request received');
     safeLog('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
@@ -94,6 +103,10 @@ router.post('/save', requireAuth, async (req, res) => {
 router.get('/tests', requireAuth, async (req, res) => {
   let connection;
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not configured' });
+    }
+    
     connection = await pool.getConnection();
     
     const query = `

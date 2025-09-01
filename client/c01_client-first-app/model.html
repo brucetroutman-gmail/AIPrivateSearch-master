@@ -228,12 +228,12 @@
             if (document.getElementById('categoryEmbed').checked) selectedCategories.push('embed');
             
             if (!modelName) {
-                alert('Please enter a model name.');
+                showUserMessage('Please enter a model name.', 'error');
                 return;
             }
             
             if (selectedCategories.length === 0) {
-                alert('Please select at least one category.');
+                showUserMessage('Please select at least one category.', 'error');
                 return;
             }
             
@@ -346,7 +346,7 @@
                 .map(cb => cb.value);
             
             if (selectedModels.length === 0) {
-                alert('Please select at least one model to update.');
+                showUserMessage('Please select at least one model to update.', 'error');
                 return;
             }
             
@@ -363,11 +363,11 @@
                 .map(cb => cb.value);
             
             if (selectedModels.length === 0) {
-                alert('Please select at least one model to remove.');
+                showUserMessage('Please select at least one model to remove.', 'error');
                 return;
             }
             
-            if (!confirm(`Are you sure you want to remove ${selectedModels.length} selected models? This action cannot be undone.`)) {
+            if (!await secureConfirm(`Are you sure you want to remove ${selectedModels.length} selected models? This action cannot be undone.`)) {
                 return;
             }
             

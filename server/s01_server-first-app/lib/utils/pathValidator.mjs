@@ -2,13 +2,20 @@ import path from 'path';
 
 // Safe path validation to prevent path traversal
 export function validatePath(userPath, allowedDir) {
-  // Remove null bytes and normalize
-  const cleanPath = userPath.replace(/\0/g, '');
+  if (!userPath || typeof userPath !== 'string') {
+    throw new Error('Invalid path input');
+  }
+  
+  // Remove null bytes and other dangerous characters
+  const cleanPath = userPath.replace(/[\0\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   const normalizedPath = path.normalize(cleanPath);
   
   // Prevent path traversal attempts
-  if (normalizedPath.includes('..') || normalizedPath.startsWith('/')) {
-    throw new Error('Invalid path');
+  if (normalizedPath.includes('..') || 
+      normalizedPath.startsWith('/') || 
+      normalizedPath.includes('\\..\\') ||
+      normalizedPath.match(/^[a-zA-Z]:\\/)) {
+    throw new Error('Path traversal attempt detected');
   }
   
   // Build safe path within allowed directory
@@ -17,7 +24,8 @@ export function validatePath(userPath, allowedDir) {
   const resolvedAllowedDir = path.resolve(allowedDir);
   
   // Ensure resolved path is within allowed directory
-  if (!resolvedPath.startsWith(resolvedAllowedDir)) {
+  if (!resolvedPath.startsWith(resolvedAllowedDir + path.sep) && 
+      resolvedPath !== resolvedAllowedDir) {
     throw new Error('Path outside allowed directory');
   }
   
@@ -25,9 +33,19 @@ export function validatePath(userPath, allowedDir) {
 }
 
 export function validateFilename(filename) {
-  // Allow only alphanumeric, dots, hyphens, underscores
-  if (!/^[a-zA-Z0-9._-]+$/.test(filename)) {
+  if (!filename || typeof filename !== 'string') {
+    throw new Error('Invalid filename input');
+  }
+  
+  // Remove dangerous characters
+  const cleanFilename = filename.replace(/[\0\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  
+  // Allow alphanumeric, dots, hyphens, underscores, spaces
+  if (!/^[a-zA-Z0-9._\s-]+$/.test(cleanFilename) || 
+      cleanFilename.includes('..') ||
+      cleanFilename.startsWith('.')) {
     throw new Error('Invalid filename');
   }
-  return filename;
+  
+  return cleanFilename;
 }

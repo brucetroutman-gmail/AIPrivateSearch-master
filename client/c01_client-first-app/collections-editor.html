@@ -410,7 +410,7 @@
     async function convertDocuments() {
       const selected = getSelectedDocuments();
       if (selected.length === 0) {
-        alert('Please select documents to convert');
+        showUserMessage('Please select documents to convert', 'error');
         return;
       }
       
@@ -442,7 +442,7 @@
       const selectedMD = selected.filter(file => file.endsWith('.md'));
       
       if (selectedMD.length === 0) {
-        alert('Please select at least one MD file to process');
+        showUserMessage('Please select at least one MD file to process', 'error');
         return;
       }
       
@@ -540,7 +540,7 @@
     }
     
     async function testSearch() {
-      const query = prompt(`Enter search query for ${currentCollection}:`);
+      const query = await securePrompt(`Enter search query for ${currentCollection}:`);
       if (!query) return;
       
       const vectorDB = document.getElementById('vectorDBSelect').value;
@@ -572,7 +572,7 @@
     }
     
     async function removeCollection() {
-      if (!confirm(`Are you sure you want to PERMANENTLY DELETE the entire '${currentCollection}' collection?\n\nThis will:\n- Remove all embeddings from both Local and LanceDB\n- Delete all files in the collection\n- Remove the collection folder\n\nThis action CANNOT be undone!`)) {
+      if (!await secureConfirm(`Are you sure you want to PERMANENTLY DELETE the entire '${currentCollection}' collection?\n\nThis will:\n- Remove all embeddings from both Local and LanceDB\n- Delete all files in the collection\n- Remove the collection folder\n\nThis action CANNOT be undone!`)) {
         return;
       }
       
@@ -655,13 +655,13 @@
       const selectedMD = selected.filter(file => file.endsWith('.md'));
       
       if (selectedMD.length === 0) {
-        alert('Please select at least one MD file to remove embeddings from');
+        showUserMessage('Please select at least one MD file to remove embeddings from', 'error');
         return;
       }
       
       const vectorDB = document.getElementById('vectorDBSelect').value;
       
-      if (!confirm(`Remove embeddings from ${selectedMD.length} MD files in ${vectorDB}?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} MD files in ${vectorDB}?`)) {
         return;
       }
       
@@ -698,11 +698,11 @@
     async function deleteDocuments() {
       const selected = getSelectedDocuments();
       if (selected.length === 0) {
-        alert('Please select documents to delete');
+        showUserMessage('Please select documents to delete', 'error');
         return;
       }
       
-      if (!confirm(`Are you sure you want to delete ${selected.length} selected documents? This action cannot be undone.`)) {
+      if (!await secureConfirm(`Are you sure you want to delete ${selected.length} selected documents? This action cannot be undone.`)) {
         return;
       }
       

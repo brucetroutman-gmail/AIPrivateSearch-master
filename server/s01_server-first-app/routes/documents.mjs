@@ -15,7 +15,7 @@ const collectionManager = new CollectionManager();
 const documentProcessor = new DocumentProcessor();
 
 // CRUD Operations
-router.get('/collections', asyncHandler(async (req, res) => {
+router.get('/collections', requireAuth, asyncHandler(async (req, res) => {
   const collections = await collectionManager.listCollections();
   res.json({ collections });
 }));
@@ -76,7 +76,7 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
   }
 }));
 
-router.get('/collections/:collection/files', async (req, res) => {
+router.get('/collections/:collection/files', requireAuth, async (req, res) => {
   try {
     const files = await collectionManager.getCollectionFiles(req.params.collection);
     res.json({ files });
@@ -85,7 +85,7 @@ router.get('/collections/:collection/files', async (req, res) => {
   }
 });
 
-router.get('/collections/:collection/files/:filename', async (req, res) => {
+router.get('/collections/:collection/files/:filename', requireAuth, async (req, res) => {
   try {
     const document = await collectionManager.readDocument(req.params.collection, req.params.filename);
     res.json(document);
@@ -94,7 +94,7 @@ router.get('/collections/:collection/files/:filename', async (req, res) => {
   }
 });
 
-router.post('/collections/:collection/files/:filename/open', async (req, res) => {
+router.post('/collections/:collection/files/:filename/open', requireAuth, async (req, res) => {
   try {
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionDir = validatePath(req.params.collection, baseDir);
@@ -142,7 +142,7 @@ router.post('/collections/:collection/upload', requireAuth, asyncHandler(async (
 
 
 
-router.post('/collections/:collection/files/:filename', async (req, res) => {
+router.post('/collections/:collection/files/:filename', requireAuth, async (req, res) => {
   try {
     let content = req.body.content;
     
@@ -162,7 +162,7 @@ router.post('/collections/:collection/files/:filename', async (req, res) => {
   }
 });
 
-router.put('/collections/:collection/files/:filename', async (req, res) => {
+router.put('/collections/:collection/files/:filename', requireAuth, async (req, res) => {
   try {
     const result = await collectionManager.updateDocument(req.params.collection, req.params.filename, req.body.content);
     res.json(result);
@@ -171,7 +171,7 @@ router.put('/collections/:collection/files/:filename', async (req, res) => {
   }
 });
 
-router.delete('/collections/:collection/files/:filename', async (req, res) => {
+router.delete('/collections/:collection/files/:filename', requireAuth, async (req, res) => {
   try {
     const result = await collectionManager.deleteDocument(req.params.collection, req.params.filename);
     res.json(result);
@@ -219,13 +219,13 @@ async function convertFiles(collection, files = null) {
 }
 
 // Document Conversion
-router.post('/convert', asyncHandler(async (req, res) => {
+router.post('/convert', requireAuth, asyncHandler(async (req, res) => {
   const { collection } = req.body;
   const result = await convertFiles(collection);
   res.json({ success: true, ...result });
 }));
 
-router.post('/convert-selected', asyncHandler(async (req, res) => {
+router.post('/convert-selected', requireAuth, asyncHandler(async (req, res) => {
   const { collection, files } = req.body;
   const result = await convertFiles(collection, files);
   res.json({ success: true, ...result });
@@ -261,13 +261,13 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
 }
 
 // Document Processing
-router.post('/process', asyncHandler(async (req, res) => {
+router.post('/process', requireAuth, asyncHandler(async (req, res) => {
   const { collection, vectorDB } = req.body;
   const result = await processFiles(collection, null, vectorDB);
   res.json({ success: true, ...result });
 }));
 
-router.post('/process-selected', asyncHandler(async (req, res) => {
+router.post('/process-selected', requireAuth, asyncHandler(async (req, res) => {
   const { collection, files, vectorDB } = req.body;
   const result = await processFiles(collection, files, vectorDB);
   res.json({ success: true, ...result });
@@ -316,7 +316,7 @@ router.delete('/collections/:collection/index/:filename', requireAuth, async (re
 });
 
 // Search Operations
-router.post('/collections/:collection/search', async (req, res) => {
+router.post('/collections/:collection/search', requireAuth, async (req, res) => {
   try {
     const { vectorDB = 'local' } = req.body;
     const documentSearch = new DocumentSearch(req.params.collection, vectorDB);
@@ -329,7 +329,7 @@ router.post('/collections/:collection/search', async (req, res) => {
   }
 });
 
-router.get('/collections/:collection/indexed', async (req, res) => {
+router.get('/collections/:collection/indexed', requireAuth, async (req, res) => {
   try {
     const localSearch = new DocumentSearch(req.params.collection, 'local');
     await localSearch.initialize();
@@ -359,7 +359,7 @@ router.get('/collections/:collection/indexed', async (req, res) => {
   }
 });
 
-router.get('/collections/:collection/embeddings-info', async (req, res) => {
+router.get('/collections/:collection/embeddings-info', requireAuth, async (req, res) => {
   try {
     const localSearch = new DocumentSearch(req.params.collection, 'local');
     await localSearch.initialize();

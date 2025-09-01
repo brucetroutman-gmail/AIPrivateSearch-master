@@ -1,38 +1,62 @@
-re is a node js script, extract.js to convert word docx to text. 
+// Node.js script to convert Word docx to text
 const fs = require('fs');
+const path = require('path');
 const unzipper = require('unzipper');
 
-const inputFile = process.argv[2]  './sources/fr40325_AIDocs_Project.docx';
-const outputFile = inputFile.replace('.docx', '.md');
+// Path validation function
+function validatePath(userPath, allowedDir) {
+  const cleanPath = userPath.replace(/\0/g, '');
+  const normalizedPath = path.normalize(cleanPath);
+  
+  if (normalizedPath.includes('..') || normalizedPath.startsWith('/')) {
+    throw new Error('Invalid path');
+  }
+  
+  const safePath = path.join(allowedDir, normalizedPath);
+  const resolvedPath = path.resolve(safePath);
+  const resolvedAllowedDir = path.resolve(allowedDir);
+  
+  if (!resolvedPath.startsWith(resolvedAllowedDir)) {
+    throw new Error('Path outside allowed directory');
+  }
+  
+  return resolvedPath;
+}
 
-fs.createReadStream(inputFile)
-  .pipe(unzipper.Parse())
-  .on('entry', entry => {
-    if (entry.path === 'word/document.xml') {
-      let content = '';
-      entry.on('data', data => content += data.toString());
-      entry.on('end', () => {
-        // Extract text between <w:t> tags
-        const textMatches = content.match(/<w:t[^>]>([^<])</w:t>/g)  [];
-        let markdown = '';
+const allowedDir = path.join(__dirname, '../../sources');
+const inputArg = process.argv[2] || './sources/fr40325_AIDocs_Project.docx';
 
-        // Process text matches
-        textMatches.forEach(match => {
-          const text = match.replace(/<[^>]+>/g, '');
-          if (text.trim()) {
-            markdown += text;
-          }
+try {
+  const inputFile = validatePath(inputArg, allowedDir);
+  const outputFile = inputFile.replace('.docx', '.md');
+
+  fs.createReadStream(inputFile)
+    .pipe(unzipper.Parse())
+    .on('entry', entry => {
+      if (entry.path === 'word/document.xml') {
+        let content = '';
+        entry.on('data', data => content += data.toString());
+        entry.on('end', () => {
+          const textMatches = content.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+          let markdown = '';
+
+          textMatches.forEach(match => {
+            const text = match.replace(/<[^>]+>/g, '');
+            if (text.trim()) {
+              markdown += text;
+            }
+          });
+
+          markdown = markdown.replace(/[\r\n]+/g, '\n\n');
+          fs.writeFileSync(outputFile, markdown);
+          console.log(`Converted to ${path.basename(outputFile)}`);
         });
-
-        // Add paragraph breaks
-        markdown = markdown.replace(/[\r\n]+/g, '\n\n');
-
-        // Write to output file
-        fs.writeFileSync(outputFile, markdown);
-        console.log(Converted to ${outputFile});
-      });
-    } else {
-      entry.autodrain();
-    }
-  })
-  .on('error', err => console.error('Error:', err));
+      } else {
+        entry.autodrain();
+      }
+    })
+    .on('error', err => console.error('Error:', err));
+} catch (error) {
+  console.error('Path validation error:', error.message);
+  process.exit(1);
+}

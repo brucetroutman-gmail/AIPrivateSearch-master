@@ -213,12 +213,12 @@
                 .map(cb => cb.value);
             
             if (selected.length === 0) {
-                alert('Please select at least one test to execute.');
+                showUserMessage('Please select at least one test to execute.', 'error');
                 return;
             }
             
             if (selectedModels.length === 0) {
-                alert('Please select at least one model first.');
+                showUserMessage('Please select at least one model first.', 'error');
                 return;
             }
 

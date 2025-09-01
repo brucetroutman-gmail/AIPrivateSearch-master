@@ -1,5 +1,15 @@
 import { search, getModels } from './services/api.js';
 
+// Import showUserMessage from global scope - wait for it to be available
+let showUserMessage = function(msg, type) { console.log(`${type}: ${msg}`); };
+
+// Wait for showUserMessage to be available
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.showUserMessage) {
+    showUserMessage = window.showUserMessage;
+  }
+});
+
 const form       = document.getElementById('searchForm');
 const sourceTypeEl = document.getElementById('sourceType');
 const modelEl    = document.getElementById('model');
@@ -885,8 +895,10 @@ form.addEventListener('submit', async (e) => {
       try {
         const exportResult = await exportToDatabase(window.currentResult, null, null, null);
         console.log('Auto-exported to database with ID:', exportResult.insertId);
+        showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
       } catch (error) {
         console.error('Auto-export failed:', error);
+        showUserMessage(`Auto-save failed: ${error.message}`, 'error');
       }
     }
     
@@ -1076,14 +1088,10 @@ async function handleExport() {
     try {
       const result = await exportToDatabase(window.currentResult, null, null, null);
       console.log(`Successfully saved to database with ID: ${result.insertId}`);
-      // Show success feedback in UI instead of alert
-      outputEl.style.border = '2px solid green';
-      setTimeout(() => outputEl.style.border = '', 3000);
+      showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
     } catch (error) {
       console.error('Database save error:', error.message);
-      // Show error feedback in UI instead of alert
-      outputEl.style.border = '2px solid red';
-      setTimeout(() => outputEl.style.border = '', 3000);
+      showUserMessage(`Database save failed: ${error.message}`, 'error');
     }
   }
 }

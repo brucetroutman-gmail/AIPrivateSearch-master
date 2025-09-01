@@ -1,16 +1,26 @@
 // Simple test script to verify CSRF protection
 const fetch = require('node-fetch');
 
+function safeLog(message, ...args) {
+  const sanitized = args.map(arg => {
+    if (typeof arg === 'string') {
+      return arg.replace(/[\r\n\t\x00-\x1f\x7f-\x9f]/g, '_').substring(0, 500);
+    }
+    return String(arg).substring(0, 500);
+  });
+  console.log(message, ...sanitized);
+}
+
 async function testCSRF() {
   const baseURL = 'http://localhost:3001';
   
-  console.log('Testing CSRF Protection...\n');
+  safeLog('Testing CSRF Protection...');
   
   // Test 1: GET request should work without CSRF token
   try {
     const response = await fetch(`${baseURL}/api/csrf-token`);
     const data = await response.json();
-    console.log('✓ GET /api/csrf-token works:', data.csrfToken ? 'Token received' : 'No token');
+    safeLog('GET /api/csrf-token works:', data.csrfToken ? 'Token received' : 'No token');
     
     const csrfToken = data.csrfToken;
     
@@ -23,12 +33,12 @@ async function testCSRF() {
       });
       
       if (response2.status === 403) {
-        console.log('✓ POST without CSRF token correctly rejected (403)');
+        safeLog('POST without CSRF token correctly rejected (403)');
       } else {
-        console.log('✗ POST without CSRF token should be rejected but got:', response2.status);
+        safeLog('POST without CSRF token should be rejected but got:', response2.status);
       }
     } catch (error) {
-      console.log('✗ Error testing POST without token:', error.message);
+      safeLog('Error testing POST without token:', error.message);
     }
     
     // Test 3: POST request with CSRF token should work
@@ -49,16 +59,16 @@ async function testCSRF() {
       });
       
       if (response3.ok) {
-        console.log('✓ POST with CSRF token works');
+        safeLog('POST with CSRF token works');
       } else {
-        console.log('✗ POST with CSRF token failed:', response3.status, await response3.text());
+        safeLog('POST with CSRF token failed:', response3.status);
       }
     } catch (error) {
-      console.log('✗ Error testing POST with token:', error.message);
+      safeLog('Error testing POST with token:', error.message);
     }
     
   } catch (error) {
-    console.log('✗ Error getting CSRF token:', error.message);
+    safeLog('Error getting CSRF token:', error.message);
   }
 }
 

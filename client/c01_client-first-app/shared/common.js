@@ -1,27 +1,43 @@
-// User message system
+// Secure user message system
 function showUserMessage(message, type = 'info') {
+  // Sanitize input
+  if (typeof message !== 'string') {
+    message = String(message);
+  }
+  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
+    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
+    return entities[char];
+  }).substring(0, 200);
+  
+  const validTypes = ['info', 'success', 'error'];
+  const safeType = validTypes.includes(type) ? type : 'info';
+  
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   let messageEl = document.getElementById('user-message');
   if (!messageEl) {
     messageEl = document.createElement('div');
     messageEl.id = 'user-message';
-    messageEl.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 10px; border-radius: 4px; z-index: 1000;';
+    messageEl.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 10px; border-radius: 4px; z-index: 1000; max-width: 300px; word-wrap: break-word;';
     document.body.appendChild(messageEl);
   }
   
-  messageEl.textContent = message;
+  messageEl.textContent = sanitizedMessage;
   if (isDark) {
-    messageEl.style.background = type === 'error' ? '#5f2c2c' : type === 'success' ? '#2d5a2d' : '#333';
-    messageEl.style.borderColor = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#666';
+    messageEl.style.background = safeType === 'error' ? '#5f2c2c' : safeType === 'success' ? '#2d5a2d' : '#333';
+    messageEl.style.borderColor = safeType === 'error' ? '#f44336' : safeType === 'success' ? '#4caf50' : '#666';
     messageEl.style.color = '#fff';
   } else {
-    messageEl.style.background = type === 'error' ? '#ffebee' : type === 'success' ? '#e8f5e8' : '#f0f0f0';
-    messageEl.style.borderColor = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#ccc';
+    messageEl.style.background = safeType === 'error' ? '#ffebee' : safeType === 'success' ? '#e8f5e8' : '#f0f0f0';
+    messageEl.style.borderColor = safeType === 'error' ? '#f44336' : safeType === 'success' ? '#4caf50' : '#ccc';
     messageEl.style.color = '#333';
   }
   messageEl.style.border = '1px solid';
   
-  setTimeout(() => messageEl.remove(), 3000);
+  setTimeout(() => {
+    if (messageEl && messageEl.parentNode) {
+      messageEl.parentNode.removeChild(messageEl);
+    }
+  }, 3000);
 }
 
 // Secure prompt replacement
@@ -352,6 +368,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     console.error('Database export error:', error);
     throw error;
   }
+}
+
+// Make showUserMessage globally available
+if (typeof window !== 'undefined') {
+  window.showUserMessage = showUserMessage;
 }
 
 // Initialize on page load

@@ -148,7 +148,7 @@
         renderCollections();
       } catch (error) {
         console.error('Error loading collections:', error);
-        alert('Failed to load collections: ' + error.message);
+        showUserMessage('Failed to load collections: ' + error.message, 'error');
       }
     }
     
@@ -197,12 +197,12 @@
       const collectionName = nameInput.value.trim();
       
       if (!collectionName) {
-        alert('Please enter a collection name');
+        showUserMessage('Please enter a collection name', 'error');
         return;
       }
       
       if (!/^[a-zA-Z0-9-_]+$/.test(collectionName)) {
-        alert('Collection name can only contain letters, numbers, hyphens, and underscores');
+        showUserMessage('Collection name can only contain letters, numbers, hyphens, and underscores', 'error');
         return;
       }
       

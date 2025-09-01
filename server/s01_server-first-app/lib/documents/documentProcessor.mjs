@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 
 export class DocumentProcessor {
   constructor() {
@@ -41,7 +42,8 @@ export class DocumentProcessor {
   }
 
   async convertCollectionFiles(collection) {
-    const collectionPath = path.join(process.cwd(), '../../sources/local-documents', collection);
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(collection, baseDir);
     const files = await fs.readdir(collectionPath);
     const results = [];
 
@@ -49,9 +51,10 @@ export class DocumentProcessor {
       const ext = path.extname(file).toLowerCase();
       if (this.supportedFormats.includes(ext)) {
         try {
-          const filePath = path.join(collectionPath, file);
+          const safeFilename = validateFilename(file);
+          const filePath = path.join(collectionPath, safeFilename);
           const markdown = await this.convertToMarkdown(filePath);
-          const outputFile = file.replace(ext, '.md');
+          const outputFile = safeFilename.replace(ext, '.md');
           const outputPath = path.join(collectionPath, outputFile);
           
           await fs.writeFile(outputPath, markdown, 'utf8');

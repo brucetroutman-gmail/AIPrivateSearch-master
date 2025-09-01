@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
 
 // Store CSRF tokens in memory (in production, use Redis or database)
 const csrfTokens = new Map();
@@ -35,7 +36,7 @@ export function validateCSRFToken(req, res, next) {
   
   // In development, allow requests without CSRF token with warning
   if (!submittedToken) {
-    console.warn('CSRF token missing for', req.method, req.path);
+    safeError('CSRF token missing for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -45,7 +46,7 @@ export function validateCSRFToken(req, res, next) {
   const storedTokenData = csrfTokens.get(sessionId);
   
   if (!storedTokenData) {
-    console.warn('CSRF token invalid for', req.method, req.path);
+    safeError('CSRF token invalid for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -55,7 +56,7 @@ export function validateCSRFToken(req, res, next) {
   // Check if token expired
   if (Date.now() > storedTokenData.expires) {
     csrfTokens.delete(sessionId);
-    console.warn('CSRF token expired for', req.method, req.path);
+    safeError('CSRF token expired for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -64,7 +65,7 @@ export function validateCSRFToken(req, res, next) {
   
   // Validate token
   if (storedTokenData.token !== submittedToken) {
-    console.warn('CSRF token mismatch for', req.method, req.path);
+    safeError('CSRF token mismatch for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }

@@ -19,9 +19,9 @@ class LanceDBService {
       const tableNames = await this.db.tableNames();
       tableNames.forEach(name => this.collections.add(name));
       
-      console.log('LanceDB initialized at:', this.dbPath);
+      safeLog('LanceDB initialized at path');
     } catch (error) {
-      console.error('Failed to initialize LanceDB:', error);
+      safeError('Failed to initialize LanceDB:', error.message);
       throw error;
     }
   }
@@ -56,7 +56,7 @@ class LanceDBService {
     try {
       const tableNames = await this.db.tableNames();
       if (!tableNames.includes(collectionName)) {
-        console.log(`Collection ${collectionName} not found in LanceDB`);
+        safeLog('Collection not found in LanceDB:', collectionName);
         return [];
       }
       
@@ -148,7 +148,7 @@ class LanceDBService {
     try {
       const tableNames = await this.db.tableNames();
       if (!tableNames.includes(collectionName)) {
-        console.log(`Collection ${collectionName} not found in LanceDB`);
+        safeLog('Collection not found in LanceDB:', collectionName);
         return { success: true };
       }
       

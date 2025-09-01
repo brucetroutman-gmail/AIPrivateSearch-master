@@ -13,7 +13,10 @@ async function handleApiResponse(res) {
 export async function search(query, score = false, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, collection = null, showChunks = false, scoreModel = null, vectorDB = 'local') {
   const res = await window.csrfManager.fetch(`${API_ROOT}/api/search`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-API-Key': 'dev-key'
+    },
     body: JSON.stringify({ query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel, vectorDB })
   });
   
@@ -21,6 +24,8 @@ export async function search(query, score = false, model = null, temperature = 0
 }
 
 export async function getModels() {
-  const res = await fetch(`${API_ROOT}/api/models`);
+  const res = await window.csrfManager.fetch(`${API_ROOT}/api/models`, {
+    headers: { 'X-API-Key': 'dev-key' }
+  });
   return handleApiResponse(res);
 }

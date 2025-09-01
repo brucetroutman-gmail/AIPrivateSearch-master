@@ -204,9 +204,9 @@
       }
     }
     
-    function reloadFile() {
+    async function reloadFile() {
       if (hasUnsavedChanges()) {
-        if (!confirm('You have unsaved changes. Reload anyway?')) {
+        if (!await secureConfirm('You have unsaved changes. Reload anyway?')) {
           return;
         }
       }
@@ -238,9 +238,9 @@
       return document.getElementById('jsonEditor').value !== originalContent;
     }
     
-    function goBack() {
+    async function goBack() {
       if (hasUnsavedChanges()) {
-        if (!confirm('You have unsaved changes. Leave anyway?')) {
+        if (!await secureConfirm('You have unsaved changes. Leave anyway?')) {
           return;
         }
       }

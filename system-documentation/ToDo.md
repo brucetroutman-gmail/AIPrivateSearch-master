@@ -87,7 +87,11 @@ specs-3-scoring
 
 37. Create Doctors and lawyers document set
 
-38. 
+38. processing consistent color scheme
+
+39. secureUser  set dark mode
+
+40. EvalTokensperSecond-search not showing in DB
 
 
 
