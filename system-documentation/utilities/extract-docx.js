@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const unzipper = require('unzipper');
+const { logger } = require('../../shared/utils/logger.js');
 
 // Path validation function
 function validatePath(userPath, allowedDir) {
@@ -49,14 +50,16 @@ try {
 
           markdown = markdown.replace(/[\r\n]+/g, '\n\n');
           fs.writeFileSync(outputFile, markdown);
-          console.log(`Converted to ${path.basename(outputFile)}`);
+          logger.log(`Converted to ${path.basename(outputFile)}`);
         });
       } else {
         entry.autodrain();
       }
     })
-    .on('error', err => console.error('Error:', err));
+    .on('error', err => {
+      logger.error('Error:', err);
+    });
 } catch (error) {
-  console.error('Path validation error:', error.message);
+  logger.error('Path validation error:', error.message);
   process.exit(1);
 }

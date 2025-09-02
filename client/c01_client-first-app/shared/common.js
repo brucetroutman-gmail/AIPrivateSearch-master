@@ -138,7 +138,11 @@ async function loadSharedComponents() {
     if (footerEl) footerEl.innerHTML = footerHTML;
     
   } catch (error) {
-    console.error('Error loading shared components:', error);
+    if (typeof logger !== 'undefined') {
+      logger.error('Error loading shared components:', error);
+    } else {
+      console.error('Error loading shared components:', error);
+    }
     throw error;
   }
 }
@@ -303,7 +307,11 @@ async function loadScoreModels(selectElementId) {
       scoreSelect.innerHTML = '<option value="">No score models available</option>';
     }
   } catch (error) {
-    console.error('Error loading score models:', error);
+    if (typeof logger !== 'undefined') {
+      logger.error('Error loading score models:', error);
+    } else {
+      console.error('Error loading score models:', error);
+    }
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {
       selectEl.innerHTML = '<option value="">Error loading score models</option>';
@@ -365,7 +373,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       throw new Error(saveResult.error);
     }
   } catch (error) {
-    console.error('Database export error:', error);
+    if (typeof logger !== 'undefined') {
+      logger.error('Database export error:', error);
+    } else {
+      console.error('Database export error:', error);
+    }
     throw error;
   }
 }

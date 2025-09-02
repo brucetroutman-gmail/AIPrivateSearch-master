@@ -9,6 +9,7 @@ import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
+import { logger } from '../../shared/utils/logger.js';
 
 const app = express();
 app.use(cors({
@@ -41,8 +42,8 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, (err) => {
   if (err) {
-    console.error('Failed to start server:', err);
+    logger.error('Failed to start server:', err);
     process.exit(1);
   }
-  console.log(`Server running on port ${PORT}`);
+  logger.log(`Server running on port ${PORT}`);
 });
