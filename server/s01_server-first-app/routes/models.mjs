@@ -1,11 +1,13 @@
 import express from 'express';
 import { Ollama } from 'ollama';
-import { requireAuth } from '../middleware/auth.mjs';
+import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
+import loggerPkg from '../../../shared/utils/logger.mjs';
+const { logger } = loggerPkg;
 
 const router = express.Router();
 const ollama = new Ollama({ host: 'http://localhost:11434' });
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuthWithRateLimit(10, 60000), async (req, res) => {
   try {
     const response = await ollama.list();
     const models = response.models
@@ -14,7 +16,7 @@ router.get('/', requireAuth, async (req, res) => {
       .sort();
     res.json({ models });
   } catch (error) {
-    console.error('Error fetching models:', error);
+    logger.error('Error fetching models:', error);
     res.status(500).json({ error: 'Failed to fetch models' });
   }
 });

@@ -1,7 +1,7 @@
 import { logger } from '../shared/logger.js';
 
 const API_ROOT = 'http://localhost:3001';
-const API_KEY = window.config?.apiKey || process.env.API_KEY || '';
+const API_KEY = window.config?.apiKey || '';
 
 // Helper function for API response handling
 async function handleApiResponse(res) {

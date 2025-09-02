@@ -1,6 +1,6 @@
 // Simple test script to verify CSRF protection
 const fetch = require('node-fetch');
-const { logger } = require('./shared/utils/logger.js');
+const { logger } = require('./shared/utils/logger.mjs');
 
 async function testCSRF() {
   const baseURL = 'http://localhost:3001';

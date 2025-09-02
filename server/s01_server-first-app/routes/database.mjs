@@ -1,8 +1,9 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
-import { requireAuth } from '../middleware/auth.mjs';
+import loggerPkg from '../../../shared/utils/logger.mjs';
+const { logger } = loggerPkg;
+import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 
 dotenv.config();
 
@@ -23,10 +24,10 @@ let pool;
 try {
   pool = mysql.createPool(dbConfig);
 } catch (error) {
-  safeError('Database pool creation failed:', error.message);
+  logger.error('Database pool creation failed:', error.message);
 }
 
-router.post('/save', requireAuth, async (req, res) => {
+router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
   let connection;
   try {
     if (!pool) {
@@ -34,8 +35,8 @@ router.post('/save', requireAuth, async (req, res) => {
     }
     
     const data = req.body;
-    safeLog('Database save request received');
-    safeLog('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
+    logger.log('Database save request received');
+    logger.log('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
     
     connection = await pool.getConnection();
     
@@ -86,13 +87,13 @@ router.post('/save', requireAuth, async (req, res) => {
       data['WeightedScore-pct'] || null
     ];
     
-    safeLog('Executing query with', values.length, 'parameters');
+    logger.log('Executing query with', values.length, 'parameters');
     const [result] = await connection.execute(insertQuery, values);
     
-    safeLog('Database save successful, insertId:', String(result.insertId));
+    logger.log('Database save successful, insertId:', String(result.insertId));
     res.json({ success: true, insertId: result.insertId });
   } catch (error) {
-    safeError('Database save error:', error.message);
+    logger.error('Database save error:', error.message);
     res.status(500).json({ success: false, error: error.message });
   } finally {
     if (connection) connection.release();
@@ -100,7 +101,7 @@ router.post('/save', requireAuth, async (req, res) => {
 });
 
 // Get all test data for analysis
-router.get('/tests', requireAuth, async (req, res) => {
+router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
   let connection;
   try {
     if (!pool) {
@@ -121,7 +122,7 @@ router.get('/tests', requireAuth, async (req, res) => {
       tests: rows
     });
   } catch (error) {
-    safeError('Database query error:', error.message);
+    logger.error('Database query error:', error.message);
     res.status(500).json({
       success: false,
       error: error.message

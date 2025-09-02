@@ -1,3 +1,3 @@
 // Browser-compatible logger import
-import { logger, sanitizeLogInput } from '../../../shared/utils/logger.js';
+import { logger, sanitizeLogInput } from './utils/logger.js';
 export { logger, sanitizeLogInput };

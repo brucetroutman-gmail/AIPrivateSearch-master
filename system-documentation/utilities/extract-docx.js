@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const unzipper = require('unzipper');
-const { logger } = require('../../shared/utils/logger.js');
+const { logger } = require('../../shared/utils/logger.mjs');
 
 // Path validation function
 function validatePath(userPath, allowedDir) {

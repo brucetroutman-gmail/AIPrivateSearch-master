@@ -1,33 +1,103 @@
-import { safeError } from '../lib/utils/safeLogger.mjs';
+import loggerPkg from '../../../shared/utils/logger.mjs';
+const { logger } = loggerPkg;
+
+// Rate limiting store
+const rateLimitStore = new Map();
+
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, data] of rateLimitStore.entries()) {
+    if (now - data.resetTime > 300000) { // 5 minutes
+      rateLimitStore.delete(key);
+    }
+  }
+}, 300000);
+
+// Rate limiting middleware
+function rateLimit(maxRequests = 100, windowMs = 60000) {
+  return (req, res, next) => {
+    const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
+    const now = Date.now();
+    const key = `${clientIP}:${req.route?.path || req.path}`;
+    
+    let rateLimitData = rateLimitStore.get(key);
+    
+    if (!rateLimitData || now - rateLimitData.resetTime > windowMs) {
+      rateLimitData = { count: 0, resetTime: now };
+    }
+    
+    rateLimitData.count++;
+    rateLimitStore.set(key, rateLimitData);
+    
+    if (rateLimitData.count > maxRequests) {
+      logger.error('Rate limit exceeded for IP:', clientIP);
+      return res.status(429).json({ error: 'Too many requests' });
+    }
+    
+    next();
+  };
+}
 
 // Authorization middleware
 export function requireAuth(req, res, next) {
   const apiKey = req.headers['x-api-key'];
+  const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   
   // Check for valid API key
   if (process.env.API_KEY && apiKey === process.env.API_KEY) {
+    logger.log('Authorized request from IP:', clientIP);
     return next();
   }
   
   // Allow localhost in development only
   if (process.env.NODE_ENV === 'development') {
-    const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress;
     if (clientIP === '127.0.0.1' || clientIP === '::1' || clientIP === '::ffff:127.0.0.1') {
+      logger.log('Development localhost access from IP:', clientIP);
       return next();
     }
   }
   
-  safeError('Unauthorized access attempt from IP:', req.ip);
+  logger.error('Unauthorized access attempt from IP:', clientIP, 'API Key provided:', !!apiKey);
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
 export function requireAdminAuth(req, res, next) {
   const adminKey = req.headers['x-admin-key'];
+  const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   
   if (process.env.ADMIN_KEY && adminKey === process.env.ADMIN_KEY) {
+    logger.log('Admin authorized from IP:', clientIP);
     return next();
   }
   
-  safeError('Admin access denied for IP:', req.ip);
+  logger.error('Admin access denied for IP:', clientIP);
   return res.status(403).json({ error: 'Admin access required' });
+}
+
+// Combined auth with rate limiting
+export function requireAuthWithRateLimit(maxRequests = 100, windowMs = 60000) {
+  return [rateLimit(maxRequests, windowMs), requireAuth];
+}
+
+export function requireAdminAuthWithRateLimit(maxRequests = 50, windowMs = 60000) {
+  return [rateLimit(maxRequests, windowMs), requireAdminAuth];
+}
+
+// Middleware to validate request origin
+export function validateOrigin(req, res, next) {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001'
+  ];
+  
+  if (process.env.NODE_ENV === 'production' && origin && !allowedOrigins.includes(origin)) {
+    logger.error('Invalid origin:', origin);
+    return res.status(403).json({ error: 'Forbidden origin' });
+  }
+  
+  next();
 }

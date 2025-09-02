@@ -9,7 +9,8 @@ import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
-import loggerPkg from '../../shared/utils/logger.js';
+import { validateOrigin } from './middleware/auth.mjs';
+import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
 const app = express();
@@ -27,7 +28,8 @@ app.get('/api/csrf-token', generateCSRFToken, (req, res) => {
   res.json({ csrfToken: req.csrfToken });
 });
 
-// Apply CSRF protection to all API routes
+// Apply origin validation and CSRF protection to all API routes
+app.use('/api', validateOrigin);
 app.use('/api', validateCSRFToken);
 
 // Use the routers

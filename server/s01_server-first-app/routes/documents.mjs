@@ -5,7 +5,8 @@ import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { asyncHandler } from '../middleware/errorHandler.mjs';
 import { requireAuth, requireAdminAuth } from '../middleware/auth.mjs';
 import lanceDBService from '../lib/documents/lanceDBService.mjs';
-import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
+import loggerPkg from '../../../shared/utils/logger.mjs';
+const { logger } = loggerPkg;
 import { validatePath, validateFilename } from '../lib/utils/pathValidator.mjs';
 import fs from 'fs-extra';
 import path from 'path';
@@ -60,7 +61,7 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
     try {
       await lanceDBService.removeCollection(collection);
     } catch (error) {
-      console.log(`LanceDB collection ${collection} not found or already removed`);
+      logger.log(`LanceDB collection ${collection} not found or already removed`);
     }
     
     // Remove collection folder and all files
@@ -209,7 +210,7 @@ async function convertFiles(collection, files = null) {
         converted++;
         results.push({ file, success: true });
       } catch (error) {
-        safeError('Error converting file:', encodeURIComponent(file), error.message);
+        logger.error('Error converting file:', file, error.message);
         results.push({ file, success: false, error: error.message });
       }
     }
@@ -253,7 +254,7 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
       await documentSearch.indexDocument(filename, document.content, vectorDB);
       processed++;
     } catch (error) {
-      safeError('Error processing file:', encodeURIComponent(filename), error.message);
+      logger.error('Error processing file:', filename, error.message);
     }
   }
   
@@ -337,7 +338,7 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
     const localDocs = await localSearch.listIndexedDocuments();
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     
-    safeLog('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
+    logger.log('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
     
     // Combine and mark which storage each document is in
     const allFilenames = new Set([...localDocs.map(d => d.filename), ...lanceDocs.map(d => d.filename)]);
