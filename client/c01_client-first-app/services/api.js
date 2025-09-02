@@ -1,6 +1,7 @@
 import { logger } from '../shared/logger.js';
 
 const API_ROOT = 'http://localhost:3001';
+const API_KEY = window.config?.apiKey || process.env.API_KEY || '';
 
 // Helper function for API response handling
 async function handleApiResponse(res) {
@@ -17,7 +18,7 @@ export async function search(query, score = false, model = null, temperature = 0
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      'X-API-Key': 'dev-key'
+      'X-API-Key': API_KEY
     },
     body: JSON.stringify({ query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel, vectorDB })
   });
@@ -27,7 +28,7 @@ export async function search(query, score = false, model = null, temperature = 0
 
 export async function getModels() {
   const res = await window.csrfManager.fetch(`${API_ROOT}/api/models`, {
-    headers: { 'X-API-Key': 'dev-key' }
+    headers: { 'X-API-Key': API_KEY }
   });
   return handleApiResponse(res);
 }

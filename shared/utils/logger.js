@@ -50,12 +50,8 @@ const logger = {
   }
 };
 
-// Export for both CommonJS and ES modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { logger, sanitizeLogInput };
-} else if (typeof window !== 'undefined') {
-  window.logger = logger;
-  window.sanitizeLogInput = sanitizeLogInput;
-}
-
+// Export for ES modules
 export { logger, sanitizeLogInput };
+
+// Export for CommonJS
+export default { logger, sanitizeLogInput };
