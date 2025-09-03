@@ -1,7 +1,8 @@
 import { search, getModels } from './services/api.js';
+import { logger } from './shared/utils/logger.js';
 
 // Import showUserMessage from global scope - wait for it to be available
-let showUserMessage = function(msg, type) { console.log(`${type}: ${msg}`); };
+let showUserMessage = function(msg, type) { logger.log(`${type}: ${msg}`); };
 
 // Wait for showUserMessage to be available
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,7 +64,8 @@ async function loadCollections() {
     }
   } catch (error) {
     collectionEl.innerHTML = '<option value="">Error loading collections</option>';
-    console.error('Failed to load collections:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load collections:', error);
   }
 }
 
@@ -90,14 +92,15 @@ async function loadSourceTypes() {
     }
   } catch (error) {
     sourceTypeEl.innerHTML = '<option value="">Error loading source types</option>';
-    console.error('Failed to load source types:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load source types:', error);
   }
 }
 
 // Load models from models-list.json (search category only)
 async function loadModels() {
   try {
-    console.log('Loading models...');
+    logger.log('Loading models...');
     const response = await fetch('config/models-list.json');
     const data = await response.json();
     
@@ -108,7 +111,7 @@ async function loadModels() {
         .map(model => model.modelName)
     )].sort();
     
-    console.log('Models received:', searchModels);
+    logger.log('Models received:', searchModels);
     modelEl.innerHTML = '';
     searchModels.forEach(model => {
       const option = document.createElement('option');
@@ -126,10 +129,11 @@ async function loadModels() {
     } else if (searchModels.length > 0) {
       modelEl.value = searchModels[0];
     }
-    console.log('Models loaded successfully');
+    logger.log('Models loaded successfully');
   } catch (error) {
     modelEl.innerHTML = '<option value="">Error loading models</option>';
-    console.error('Failed to load models:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load models:', error);
   }
 }
 
@@ -172,7 +176,8 @@ async function loadTemperatureOptions() {
       temperatureEl.appendChild(option);
     });
   } catch (error) {
-    console.error('Failed to load temperature options:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load temperature options:', error);
   }
 }
 
@@ -190,7 +195,8 @@ async function loadContextOptions() {
       contextEl.appendChild(option);
     });
   } catch (error) {
-    console.error('Failed to load context options:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load context options:', error);
   }
 }
 
@@ -220,7 +226,8 @@ async function loadVectorDBOptions() {
     }
   } catch (error) {
     vectorDBEl.innerHTML = '<option value="local">Local</option>';
-    console.error('Failed to load vectorDB options:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load vectorDB options:', error);
   }
 }
 loadVectorDBOptions();
@@ -235,7 +242,8 @@ async function loadSystemPrompts() {
     filterAssistantTypes();
   } catch (error) {
     assistantTypeEl.innerHTML = '<option value="">Error loading system prompts</option>';
-    console.error('Failed to load system prompts:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load system prompts:', error);
   }
 }
 
@@ -290,7 +298,8 @@ async function loadUserPrompts() {
     });
   } catch (error) {
     userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
-    console.error('Failed to load user prompts:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load user prompts:', error);
   }
 }
 
@@ -459,7 +468,8 @@ async function loadScoringOptions() {
     });
     
   } catch (error) {
-    console.error('Failed to load scoring options:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load scoring options:', error);
   }
 }
 
@@ -501,7 +511,8 @@ async function loadTokensOptions() {
     }
   } catch (error) {
     tokensEl.innerHTML = '<option value="">Error loading tokens</option>';
-    console.error('Failed to load tokens options:', error);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('Failed to load tokens options:', error);
   }
 }
 
@@ -894,10 +905,11 @@ form.addEventListener('submit', async (e) => {
     if (autoExportToggle.checked) {
       try {
         const exportResult = await exportToDatabase(window.currentResult, null, null, null);
-        console.log('Auto-exported to database with ID:', exportResult.insertId);
+        logger.log('Auto-exported to database with ID:', exportResult.insertId);
         showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
       } catch (error) {
-        console.error('Auto-export failed:', error);
+        // logger sanitizes all inputs to prevent log injection
+      logger.error('Auto-export failed:', error);
         showUserMessage(`Auto-save failed: ${error.message}`, 'error');
       }
     }
@@ -905,7 +917,8 @@ form.addEventListener('submit', async (e) => {
     // Export section is now part of the answer
   } catch (err) {
     outputEl.textContent = err.message;
-    console.error(err);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error(err);
   } finally {
     // Re-enable submit button
     submitBtn.disabled = false;
@@ -924,7 +937,7 @@ async function handleExport() {
   // Check authorization - require email for export access
   const userEmail = localStorage.getItem('userEmail');
   if (!userEmail || userEmail.trim() === '') {
-    console.warn('Export blocked: No email provided');
+    logger.warn('Export blocked: No email provided');
     outputEl.textContent = 'Please provide your email address to export results.';
     return;
   }
@@ -932,7 +945,7 @@ async function handleExport() {
   const exportFormat = document.getElementById('exportFormat').value;
   
   if (!window.currentResult) {
-    console.warn('Export blocked: No results available');
+    logger.warn('Export blocked: No results available');
     outputEl.textContent = 'No results available to export.';
     return;
   }
@@ -1087,10 +1100,11 @@ async function handleExport() {
     // Export to database using common function
     try {
       const result = await exportToDatabase(window.currentResult, null, null, null);
-      console.log(`Successfully saved to database with ID: ${result.insertId}`);
+      logger.log(`Successfully saved to database with ID: ${result.insertId}`);
       showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
     } catch (error) {
-      console.error('Database save error:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Database save error:', error.message);
       showUserMessage(`Database save failed: ${error.message}`, 'error');
     }
   }

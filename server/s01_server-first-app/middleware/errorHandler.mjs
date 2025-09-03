@@ -1,4 +1,4 @@
-import { safeError } from '../lib/utils/safeLogger.mjs';
+import { logger } from '../../../shared/utils/logger.mjs';
 
 // Common error handler middleware
 export const asyncHandler = (fn) => (req, res, next) => {
@@ -6,7 +6,8 @@ export const asyncHandler = (fn) => (req, res, next) => {
 };
 
 export const errorHandler = (err, req, res, next) => {
-  safeError('Route error:', err.message);
+  // logger sanitizes all inputs to prevent log injection
+  logger.error('Route error:', err.message);
   
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal server error';

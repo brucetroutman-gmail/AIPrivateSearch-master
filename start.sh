@@ -40,7 +40,7 @@ else
 fi
 
 if [ "$SHOULD_PULL" = true ]; then
-    MODELS=$(cat client/c01_client-first-app/config/models-list.json | grep '"modelName"' | cut -d'"' -f4 | sort -u)
+    MODELS=$(grep '"modelName"' client/c01_client-first-app/config/models-list.json | cut -d'"' -f4 | sort -u)
     for model in $MODELS; do
         echo "📥 Pulling $model..."
         ollama pull "$model"
@@ -61,8 +61,12 @@ echo "Starting backend server..."
 npm start &
 BACKEND_PID=$!
 
-# Wait for backend to start
+# Wait for backend to start and verify it's running
 sleep 3
+if ! kill -0 $BACKEND_PID 2>/dev/null; then
+    echo "❌ Backend server failed to start"
+    exit 1
+fi
 
 # Start frontend client
 echo "Starting frontend client..."

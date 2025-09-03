@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
+import { logger } from '../../../shared/utils/logger.mjs';
 
 // Store CSRF tokens in memory (in production, use Redis or database)
 const csrfTokens = new Map();
@@ -36,7 +36,8 @@ export function validateCSRFToken(req, res, next) {
   
   // In development, allow requests without CSRF token with warning
   if (!submittedToken) {
-    safeError('CSRF token missing for method:', req.method);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('CSRF token missing for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -46,7 +47,8 @@ export function validateCSRFToken(req, res, next) {
   const storedTokenData = csrfTokens.get(sessionId);
   
   if (!storedTokenData) {
-    safeError('CSRF token invalid for method:', req.method);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('CSRF token invalid for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -56,7 +58,8 @@ export function validateCSRFToken(req, res, next) {
   // Check if token expired
   if (Date.now() > storedTokenData.expires) {
     csrfTokens.delete(sessionId);
-    safeError('CSRF token expired for method:', req.method);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('CSRF token expired for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -65,7 +68,8 @@ export function validateCSRFToken(req, res, next) {
   
   // Validate token
   if (storedTokenData.token !== submittedToken) {
-    safeError('CSRF token mismatch for method:', req.method);
+    // logger sanitizes all inputs to prevent log injection
+    logger.error('CSRF token mismatch for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }

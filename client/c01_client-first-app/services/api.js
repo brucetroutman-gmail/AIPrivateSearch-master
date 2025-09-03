@@ -7,6 +7,7 @@ const API_KEY = window.config?.apiKey || '';
 async function handleApiResponse(res) {
   if (!res.ok) {
     const errorText = await res.text();
+    // logger sanitizes all inputs to prevent log injection
     logger.error(`Server returned ${res.status}:`, errorText);
     throw new Error(`Server error: ${res.status} - ${errorText}`);
   }

@@ -1,7 +1,7 @@
 import { connect } from '@lancedb/lancedb';
 import path from 'path';
 import fs from 'fs-extra';
-import { safeLog, safeError } from '../utils/safeLogger.mjs';
+import { logger } from '../../../../shared/utils/logger.mjs';
 
 class LanceDBService {
   constructor() {
@@ -19,9 +19,10 @@ class LanceDBService {
       const tableNames = await this.db.tableNames();
       tableNames.forEach(name => this.collections.add(name));
       
-      safeLog('LanceDB initialized at path');
+      logger.log('LanceDB initialized at path');
     } catch (error) {
-      safeError('Failed to initialize LanceDB:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to initialize LanceDB:', error.message);
       throw error;
     }
   }
@@ -31,10 +32,11 @@ class LanceDBService {
     
     try {
       const table = await this.db.createTable(collectionName, documents);
-      safeLog('Created LanceDB collection:', collectionName);
+      logger.log('Created LanceDB collection:', collectionName);
       return table;
     } catch (error) {
-      safeError('Failed to create collection:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to create collection:', error.message);
       throw error;
     }
   }
@@ -45,7 +47,7 @@ class LanceDBService {
     try {
       return await this.db.openTable(collectionName);
     } catch (error) {
-      safeLog('Collection not found in LanceDB');
+      logger.log('Collection not found in LanceDB');
       return null;
     }
   }
@@ -56,7 +58,7 @@ class LanceDBService {
     try {
       const tableNames = await this.db.tableNames();
       if (!tableNames.includes(collectionName)) {
-        safeLog('Collection not found in LanceDB:', collectionName);
+        logger.log('Collection not found in LanceDB:', collectionName);
         return [];
       }
       
@@ -66,10 +68,11 @@ class LanceDBService {
         .limit(limit)
         .toArray();
       
-      safeLog('LanceDB search found results:', results.length);
+      logger.log('LanceDB search found results:', results.length);
       return results;
     } catch (error) {
-      safeError('LanceDB search failed:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('LanceDB search failed:', error.message);
       return [];
     }
   }
@@ -80,7 +83,8 @@ class LanceDBService {
     try {
       return await this.db.tableNames();
     } catch (error) {
-      safeError('Failed to list LanceDB collections:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to list LanceDB collections:', error.message);
       return [];
     }
   }
@@ -109,7 +113,8 @@ class LanceDBService {
       
       return Array.from(uniqueFiles.values());
     } catch (error) {
-      safeError('Failed to list documents:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to list documents:', error.message);
       return [];
     }
   }
@@ -135,9 +140,10 @@ class LanceDBService {
       }
       
       this.collections.add(collectionName);
-      safeLog('Added chunks to LanceDB:', chunks.length);
+      logger.log('Added chunks to LanceDB:', chunks.length);
     } catch (error) {
-      safeError('Failed to add document to LanceDB:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to add document to LanceDB:', error.message);
       throw error;
     }
   }
@@ -148,16 +154,17 @@ class LanceDBService {
     try {
       const tableNames = await this.db.tableNames();
       if (!tableNames.includes(collectionName)) {
-        safeLog('Collection not found in LanceDB:', collectionName);
+        logger.log('Collection not found in LanceDB:', collectionName);
         return { success: true };
       }
       
       const table = await this.db.openTable(collectionName);
       await table.delete(`source = "${filename}"`);
-      safeLog('Removed document from LanceDB');
+      logger.log('Removed document from LanceDB');
       return { success: true };
     } catch (error) {
-      safeError('Failed to remove document from LanceDB:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to remove document from LanceDB:', error.message);
       throw error;
     }
   }
@@ -167,10 +174,11 @@ class LanceDBService {
     
     try {
       await this.db.dropTable(collectionName);
-      safeLog('Removed LanceDB collection');
+      logger.log('Removed LanceDB collection');
       return { success: true };
     } catch (error) {
-      safeError('Failed to remove LanceDB collection:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to remove LanceDB collection:', error.message);
       return { success: true }; // Don't throw error if collection doesn't exist
     }
   }
@@ -194,7 +202,8 @@ class LanceDBService {
       
       return chunkCounts;
     } catch (error) {
-      safeError('Failed to get chunk counts:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Failed to get chunk counts:', error.message);
       return {};
     }
   }

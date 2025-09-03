@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { safeLog, safeError } from '../utils/safeLogger.mjs';
+import { logger } from '../../../../shared/utils/logger.mjs';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 
 class EpubConverter {
@@ -13,7 +13,8 @@ class EpubConverter {
     try {
       execSync('which pandoc', { stdio: 'ignore' });
     } catch (error) {
-      safeError('Pandoc not found. Install with: brew install pandoc');
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Pandoc not found. Install with: brew install pandoc');
     }
   }
 
@@ -33,7 +34,7 @@ class EpubConverter {
       const safeBaseName = validateFilename(baseName + '.md');
       const outputFile = path.join(targetDir, safeBaseName);
 
-      safeLog('Converting EPUB file to markdown');
+      logger.log('Converting EPUB file to markdown');
 
       // Use pandoc to convert EPUB to Markdown
       const command = `pandoc "${safeEpubPath}" -t markdown -o "${outputFile}"`;
@@ -43,14 +44,15 @@ class EpubConverter {
       // Verify output file was created
       if (fs.existsSync(outputFile)) {
         const stats = fs.statSync(outputFile);
-        safeLog('Conversion successful, size KB:', Math.round(stats.size / 1024));
+        logger.log('Conversion successful, size KB:', Math.round(stats.size / 1024));
         return outputFile;
       } else {
         throw new Error('Output file was not created');
       }
 
     } catch (error) {
-      safeError('EPUB conversion failed:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('EPUB conversion failed:', error.message);
       throw error;
     }
   }
@@ -63,11 +65,11 @@ class EpubConverter {
       const epubFiles = files.filter(file => file.toLowerCase().endsWith('.epub'));
       
       if (epubFiles.length === 0) {
-        safeLog('No EPUB files found in directory');
+        logger.log('No EPUB files found in directory');
         return [];
       }
 
-      safeLog('Found EPUB files to convert:', epubFiles.length);
+      logger.log('Found EPUB files to convert:', epubFiles.length);
       const results = [];
 
       for (const epubFile of epubFiles) {
@@ -83,7 +85,8 @@ class EpubConverter {
 
       return results;
     } catch (error) {
-      safeError('Directory processing failed:', error.message);
+      // logger sanitizes all inputs to prevent log injection
+      logger.error('Directory processing failed:', error.message);
       throw error;
     }
   }

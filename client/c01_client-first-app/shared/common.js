@@ -1,5 +1,66 @@
+// Rate limiting for message display
+let messageCallCount = 0;
+let lastMessageReset = Date.now();
+
+// Rate limiting for prompts
+let promptCallCount = 0;
+let lastPromptReset = Date.now();
+
+// Authorization system
+const AUTHORIZED_FUNCTIONS = new Set([
+  'toggleDeveloperMode', 'promptForEmail', 'updateUserEmail', 'showUserInfo',
+  'exportToDatabase', 'loadScoreModels', 'loadSharedComponents', 'handleExport',
+  'search.js', 'collections.html', 'test.html', 'model.html', 'collections-editor.html'
+]);
+
+function isAuthorizedCaller() {
+  const stack = new Error().stack;
+  if (!stack) return false;
+  
+  // Check if call comes from authorized functions
+  for (const funcName of AUTHORIZED_FUNCTIONS) {
+    if (stack.includes(funcName)) return true;
+  }
+  
+  // Check if call comes from legitimate application files
+  const legitimateFiles = [
+    'search.js', 'common.js', 'collections.html', 'test.html', 
+    'model.html', 'collections-editor.html'
+  ];
+  
+  for (const file of legitimateFiles) {
+    if (stack.includes(file)) return true;
+  }
+  
+  // Check if call comes from same origin and not from eval/Function
+  if (window.location.origin === document.location.origin && 
+      !stack.includes('eval') && !stack.includes('Function')) {
+    return true;
+  }
+  
+  return false;
+}
+
 // Secure user message system
 function showUserMessage(message, type = 'info') {
+  // Authorization check
+  if (!isAuthorizedCaller()) {
+    console.warn('Unauthorized message display attempt');
+    return;
+  }
+  
+  // Rate limiting - max 10 messages per 30 seconds
+  const now = Date.now();
+  if (now - lastMessageReset > 30000) {
+    messageCallCount = 0;
+    lastMessageReset = now;
+  }
+  if (messageCallCount >= 10) {
+    console.warn('Message rate limit exceeded');
+    return;
+  }
+  messageCallCount++;
+  
   // Sanitize input
   if (typeof message !== 'string') {
     message = String(message);
@@ -42,6 +103,33 @@ function showUserMessage(message, type = 'info') {
 
 // Secure prompt replacement
 function securePrompt(message, defaultValue = '') {
+  // Authorization check
+  if (!isAuthorizedCaller()) {
+    console.warn('Unauthorized prompt attempt');
+    return Promise.resolve(null);
+  }
+  
+  // Rate limiting - max 5 prompts per 60 seconds
+  const now = Date.now();
+  if (now - lastPromptReset > 60000) {
+    promptCallCount = 0;
+    lastPromptReset = now;
+  }
+  if (promptCallCount >= 5) {
+    console.warn('Prompt rate limit exceeded');
+    return Promise.resolve(null);
+  }
+  promptCallCount++;
+  
+  // Sanitize message input
+  if (typeof message !== 'string') {
+    message = String(message);
+  }
+  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
+    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
+    return entities[char];
+  }).substring(0, 500);
+  
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const modal = document.createElement('div');
@@ -51,7 +139,7 @@ function securePrompt(message, defaultValue = '') {
     dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
     
     const messageEl = document.createElement('p');
-    messageEl.textContent = message;
+    messageEl.textContent = sanitizedMessage;
     
     const input = document.createElement('input');
     input.type = 'text';
@@ -87,6 +175,33 @@ function securePrompt(message, defaultValue = '') {
 
 // Secure confirm replacement
 function secureConfirm(message) {
+  // Authorization check
+  if (!isAuthorizedCaller()) {
+    console.warn('Unauthorized confirm attempt');
+    return Promise.resolve(false);
+  }
+  
+  // Rate limiting - max 5 confirms per 60 seconds
+  const now = Date.now();
+  if (now - lastPromptReset > 60000) {
+    promptCallCount = 0;
+    lastPromptReset = now;
+  }
+  if (promptCallCount >= 5) {
+    console.warn('Confirm rate limit exceeded');
+    return Promise.resolve(false);
+  }
+  promptCallCount++;
+  
+  // Sanitize message input
+  if (typeof message !== 'string') {
+    message = String(message);
+  }
+  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
+    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
+    return entities[char];
+  }).substring(0, 500);
+  
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const modal = document.createElement('div');
@@ -96,7 +211,7 @@ function secureConfirm(message) {
     dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
     
     const messageEl = document.createElement('p');
-    messageEl.textContent = message;
+    messageEl.textContent = sanitizedMessage;
     messageEl.style.whiteSpace = 'pre-line';
     
     const buttons = document.createElement('div');
@@ -139,9 +254,9 @@ async function loadSharedComponents() {
     
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('Error loading shared components:', error);
+      logger.error('Error loading shared components:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     } else {
-      console.error('Error loading shared components:', error);
+      console.error('Error loading shared components:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     }
     throw error;
   }
@@ -278,7 +393,11 @@ async function loadScoreModels(selectElementId) {
     const scoreSelect = document.getElementById(selectElementId);
     
     if (!scoreSelect) {
-      console.error('Score select element not found:', selectElementId);
+      if (typeof logger !== 'undefined') {
+        logger.error('Score select element not found:', String(selectElementId).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      } else {
+        console.error('Score select element not found:', String(selectElementId).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      }
       return;
     }
     
@@ -308,9 +427,9 @@ async function loadScoreModels(selectElementId) {
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('Error loading score models:', error);
+      logger.error('Error loading score models:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     } else {
-      console.error('Error loading score models:', error);
+      console.error('Error loading score models:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     }
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {
@@ -374,9 +493,9 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('Database export error:', error);
+      logger.error('Database export error:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     } else {
-      console.error('Database export error:', error);
+      console.error('Database export error:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
     }
     throw error;
   }

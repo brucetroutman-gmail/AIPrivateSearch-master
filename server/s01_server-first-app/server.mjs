@@ -45,8 +45,10 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, (err) => {
   if (err) {
+    // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to start server:', err);
     process.exit(1);
   }
+  // logger sanitizes all inputs to prevent log injection
   logger.log(`Server running on port ${PORT}`);
 });

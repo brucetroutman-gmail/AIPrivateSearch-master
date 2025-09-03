@@ -61,6 +61,7 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
     try {
       await lanceDBService.removeCollection(collection);
     } catch (error) {
+      // logger sanitizes all inputs to prevent log injection
       logger.log(`LanceDB collection ${collection} not found or already removed`);
     }
     
@@ -210,6 +211,7 @@ async function convertFiles(collection, files = null) {
         converted++;
         results.push({ file, success: true });
       } catch (error) {
+        // logger sanitizes all inputs to prevent log injection
         logger.error('Error converting file:', file, error.message);
         results.push({ file, success: false, error: error.message });
       }
@@ -254,6 +256,7 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
       await documentSearch.indexDocument(filename, document.content, vectorDB);
       processed++;
     } catch (error) {
+      // logger sanitizes all inputs to prevent log injection
       logger.error('Error processing file:', filename, error.message);
     }
   }

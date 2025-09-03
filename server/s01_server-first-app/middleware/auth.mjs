@@ -31,6 +31,7 @@ function rateLimit(maxRequests = 100, windowMs = 60000) {
     rateLimitStore.set(key, rateLimitData);
     
     if (rateLimitData.count > maxRequests) {
+      // logger sanitizes all inputs to prevent log injection
       logger.error('Rate limit exceeded for IP:', clientIP);
       return res.status(429).json({ error: 'Too many requests' });
     }
@@ -58,6 +59,7 @@ export function requireAuth(req, res, next) {
     }
   }
   
+  // logger sanitizes all inputs to prevent log injection
   logger.error('Unauthorized access attempt from IP:', clientIP, 'API Key provided:', !!apiKey);
   return res.status(401).json({ error: 'Unauthorized' });
 }
@@ -71,6 +73,7 @@ export function requireAdminAuth(req, res, next) {
     return next();
   }
   
+  // logger sanitizes all inputs to prevent log injection
   logger.error('Admin access denied for IP:', clientIP);
   return res.status(403).json({ error: 'Admin access required' });
 }
@@ -95,6 +98,7 @@ export function validateOrigin(req, res, next) {
   ];
   
   if (process.env.NODE_ENV === 'production' && origin && !allowedOrigins.includes(origin)) {
+    // logger sanitizes all inputs to prevent log injection
     logger.error('Invalid origin:', origin);
     return res.status(403).json({ error: 'Forbidden origin' });
   }

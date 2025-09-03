@@ -5,6 +5,8 @@ import path from 'path';
 import { EmbeddingService } from '../lib/documents/embeddingService.mjs';
 import { VectorStore } from '../lib/documents/vectorStore.mjs';
 import lanceDBService from '../lib/documents/lanceDBService.mjs';
+import loggerPkg from '../../../shared/utils/logger.mjs';
+const { logger } = loggerPkg;
 
 const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
 const embeddingsPath = path.join(process.cwd(), 'data', 'embeddings');
@@ -14,7 +16,7 @@ async function reembedAllCollections(vectorDB = 'both') {
   
   try {
     const collections = await fs.readdir(documentsPath);
-    console.log(`Found ${collections.length} collections to process`);
+    logger.log(`Found ${collections.length} collections to process`);
     
     for (const collection of collections) {
       const collectionPath = path.join(documentsPath, collection);
@@ -22,7 +24,7 @@ async function reembedAllCollections(vectorDB = 'both') {
       
       if (!stat.isDirectory()) continue;
       
-      console.log(`\nProcessing collection: ${collection}`);
+      logger.log(`\nProcessing collection: ${collection}`);
       
       const files = await fs.readdir(collectionPath);
       const documents = [];
@@ -36,7 +38,7 @@ async function reembedAllCollections(vectorDB = 'both') {
           
           for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
-            console.log(`  Embedding ${file} chunk ${i + 1}/${chunks.length}`);
+            logger.log(`  Embedding ${file} chunk ${i + 1}/${chunks.length}`);
             const embedding = await embeddingService.generateEmbedding(chunk);
             
             documents.push({
@@ -51,7 +53,7 @@ async function reembedAllCollections(vectorDB = 'both') {
       }
       
       if (documents.length === 0) {
-        console.log(`  No documents found in ${collection}`);
+        logger.log(`  No documents found in ${collection}`);
         continue;
       }
       
@@ -64,23 +66,23 @@ async function reembedAllCollections(vectorDB = 'both') {
           ...doc,
           embedding: doc.vector
         })));
-        console.log(`  ✓ Saved ${documents.length} chunks to local storage`);
+        logger.log(`  ✓ Saved ${documents.length} chunks to local storage`);
       }
       
       // Save to LanceDB
       if (vectorDB === 'lanceDB' || vectorDB === 'both') {
         await lanceDBService.createCollection(collection, documents);
-        console.log(`  ✓ Saved ${documents.length} chunks to LanceDB`);
+        logger.log(`  ✓ Saved ${documents.length} chunks to LanceDB`);
       }
     }
     
-    console.log('\n🎉 All collections re-embedded successfully!');
+    logger.log('\n🎉 All collections re-embedded successfully!');
   } catch (error) {
-    console.error('Error re-embedding collections:', error);
+    logger.error('Error re-embedding collections:', error);
     process.exit(1);
   }
 }
 
 const vectorDB = process.argv[2] || 'both';
-console.log(`Re-embedding all collections using: ${vectorDB}`);
+logger.log(`Re-embedding all collections using: ${vectorDB}`);
 reembedAllCollections(vectorDB);

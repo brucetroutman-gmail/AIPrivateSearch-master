@@ -24,6 +24,7 @@ let pool;
 try {
   pool = mysql.createPool(dbConfig);
 } catch (error) {
+  // logger sanitizes all inputs to prevent log injection
   logger.error('Database pool creation failed:', error.message);
 }
 
@@ -93,6 +94,7 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
     logger.log('Database save successful, insertId:', String(result.insertId));
     res.json({ success: true, insertId: result.insertId });
   } catch (error) {
+    // logger sanitizes all inputs to prevent log injection
     logger.error('Database save error:', error.message);
     res.status(500).json({ success: false, error: error.message });
   } finally {
@@ -122,6 +124,7 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
       tests: rows
     });
   } catch (error) {
+    // logger sanitizes all inputs to prevent log injection
     logger.error('Database query error:', error.message);
     res.status(500).json({
       success: false,

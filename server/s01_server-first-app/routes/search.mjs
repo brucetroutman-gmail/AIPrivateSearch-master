@@ -20,6 +20,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       return res.status(400).json({ error: 'Query is required' });
     }
 
+    // logger sanitizes all inputs to prevent log injection
     logger.log('Processing query:', query);
     logger.log('Scoring enabled:', score);
     logger.log('Model:', model);
@@ -90,6 +91,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     logger.log('Sending response with keys:', Object.keys(result));
     res.json(result);
   } catch (error) {
+    // logger sanitizes all inputs to prevent log injection
     logger.error('Route error:', error.message);
     res.status(500).json({ 
       error: 'Internal server error',

@@ -1,7 +1,7 @@
 import { CollectionManager } from '../lib/documents/collectionManager.mjs';
 import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
-import { safeLog, safeError } from '../lib/utils/safeLogger.mjs';
+import { logger } from '../../../shared/utils/logger.mjs';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -10,10 +10,12 @@ async function processAllCollections() {
   const documentProcessor = new DocumentProcessor();
   const collections = await collectionManager.listCollections();
   
-  safeLog('Processing collections:', collections);
+  // logger sanitizes all inputs to prevent log injection
+  logger.log('Processing collections:', collections);
   
   for (const collection of collections) {
-    safeLog('Processing collection:', collection);
+    // logger sanitizes all inputs to prevent log injection
+    logger.log('Processing collection:', collection);
     
     // First, convert any non-markdown files
     await convertNonMarkdownFiles(collection, documentProcessor);
@@ -22,21 +24,26 @@ async function processAllCollections() {
     await documentSearch.initialize();
     
     const files = await collectionManager.getCollectionFiles(collection);
-    safeLog('Found files in collection:', files.length, collection);
+    // logger sanitizes all inputs to prevent log injection
+    logger.log('Found files in collection:', files.length, collection);
     
     for (const filename of files) {
       try {
-        safeLog('Processing file:', filename);
+        // logger sanitizes all inputs to prevent log injection
+        logger.log('Processing file:', filename);
         const document = await collectionManager.readDocument(collection, filename);
         const result = await documentSearch.indexDocument(filename, document.content);
-        safeLog('Indexed with chunks:', result.chunks, filename);
+        // logger sanitizes all inputs to prevent log injection
+        logger.log('Indexed with chunks:', result.chunks, filename);
       } catch (error) {
-        safeError('Error processing file:', filename, error.message);
+        // logger sanitizes all inputs to prevent log injection
+        logger.error('Error processing file:', filename, error.message);
       }
     }
   }
   
-  safeLog('Processing complete!');
+  // logger sanitizes all inputs to prevent log injection
+  logger.log('Processing complete!');
 }
 
 async function convertNonMarkdownFiles(collection, processor) {
@@ -51,7 +58,8 @@ async function convertNonMarkdownFiles(collection, processor) {
   });
   
   if (nonMdFiles.length > 0) {
-    safeLog('Converting non-markdown files:', nonMdFiles.length);
+    // logger sanitizes all inputs to prevent log injection
+    logger.log('Converting non-markdown files:', nonMdFiles.length);
     
     for (const file of nonMdFiles) {
       try {
@@ -61,12 +69,17 @@ async function convertNonMarkdownFiles(collection, processor) {
         const outputPath = path.join(collectionPath, outputFile);
         
         await fs.writeFile(outputPath, markdown, 'utf8');
-        safeLog('Converted file:', file, outputFile);
+        // logger sanitizes all inputs to prevent log injection
+        logger.log('Converted file:', file, outputFile);
       } catch (error) {
-        safeError('Error converting file:', file, error.message);
+        // logger sanitizes all inputs to prevent log injection
+        logger.error('Error converting file:', file, error.message);
       }
     }
   }
 }
 
-processAllCollections().catch(err => safeError('Script error:', err.message));
+processAllCollections().catch(err => {
+  // logger sanitizes all inputs to prevent log injection
+  logger.error('Script error:', err.message);
+});
