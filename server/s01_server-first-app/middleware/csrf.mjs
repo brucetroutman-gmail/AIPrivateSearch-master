@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { logger } from '../../../shared/utils/logger.mjs';
+import { secureLog } from '../../../shared/utils/logger.mjs';
 
 // Store CSRF tokens in memory (in production, use Redis or database)
 const csrfTokens = new Map();
@@ -36,8 +36,8 @@ export function validateCSRFToken(req, res, next) {
   
   // In development, allow requests without CSRF token with warning
   if (!submittedToken) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('CSRF token missing for method:', req.method);
+    // secureLog sanitizes all inputs to prevent log injection
+    secureLog.error('CSRF token missing for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -47,8 +47,8 @@ export function validateCSRFToken(req, res, next) {
   const storedTokenData = csrfTokens.get(sessionId);
   
   if (!storedTokenData) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('CSRF token invalid for method:', req.method);
+    // secureLog sanitizes all inputs to prevent log injection
+    secureLog.error('CSRF token invalid for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -58,8 +58,8 @@ export function validateCSRFToken(req, res, next) {
   // Check if token expired
   if (Date.now() > storedTokenData.expires) {
     csrfTokens.delete(sessionId);
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('CSRF token expired for method:', req.method);
+    // secureLog sanitizes all inputs to prevent log injection
+    secureLog.error('CSRF token expired for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -68,8 +68,8 @@ export function validateCSRFToken(req, res, next) {
   
   // Validate token
   if (storedTokenData.token !== submittedToken) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('CSRF token mismatch for method:', req.method);
+    // secureLog sanitizes all inputs to prevent log injection
+    secureLog.error('CSRF token mismatch for method:', req.method);
     if (process.env.NODE_ENV === 'development') {
       return next();
     }

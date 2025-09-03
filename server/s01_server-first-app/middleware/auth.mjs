@@ -1,5 +1,6 @@
+import crypto from 'crypto';
 import loggerPkg from '../../../shared/utils/logger.mjs';
-const { logger } = loggerPkg;
+const { secureLog } = loggerPkg;
 
 // Rate limiting store
 const rateLimitStore = new Map();
@@ -31,8 +32,8 @@ function rateLimit(maxRequests = 100, windowMs = 60000) {
     rateLimitStore.set(key, rateLimitData);
     
     if (rateLimitData.count > maxRequests) {
-      // logger sanitizes all inputs to prevent log injection
-      logger.error('Rate limit exceeded for IP:', clientIP);
+      // secureLog sanitizes all inputs to prevent log injection
+      secureLog.error('Rate limit exceeded for IP:', clientIP);
       return res.status(429).json({ error: 'Too many requests' });
     }
     
@@ -45,22 +46,25 @@ export function requireAuth(req, res, next) {
   const apiKey = req.headers['x-api-key'];
   const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   
-  // Check for valid API key
-  if (process.env.API_KEY && apiKey === process.env.API_KEY) {
-    logger.log('Authorized request from IP:', clientIP);
+  // Check for valid API key using timing-safe comparison
+  if (process.env.API_KEY && apiKey && crypto.timingSafeEqual(
+    Buffer.from(apiKey, 'utf8'),
+    Buffer.from(process.env.API_KEY, 'utf8')
+  )) {
+    secureLog.log('Authorized request from IP:', clientIP);
     return next();
   }
   
   // Allow localhost in development only
   if (process.env.NODE_ENV === 'development') {
     if (clientIP === '127.0.0.1' || clientIP === '::1' || clientIP === '::ffff:127.0.0.1') {
-      logger.log('Development localhost access from IP:', clientIP);
+      secureLog.log('Development localhost access from IP:', clientIP);
       return next();
     }
   }
   
-  // logger sanitizes all inputs to prevent log injection
-  logger.error('Unauthorized access attempt from IP:', clientIP, 'API Key provided:', !!apiKey);
+  // secureLog sanitizes all inputs to prevent log injection
+  secureLog.error('Unauthorized access attempt from IP:', clientIP, 'API Key provided:', !!apiKey);
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
@@ -68,13 +72,16 @@ export function requireAdminAuth(req, res, next) {
   const adminKey = req.headers['x-admin-key'];
   const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   
-  if (process.env.ADMIN_KEY && adminKey === process.env.ADMIN_KEY) {
-    logger.log('Admin authorized from IP:', clientIP);
+  if (process.env.ADMIN_KEY && adminKey && crypto.timingSafeEqual(
+    Buffer.from(adminKey, 'utf8'),
+    Buffer.from(process.env.ADMIN_KEY, 'utf8')
+  )) {
+    secureLog.log('Admin authorized from IP:', clientIP);
     return next();
   }
   
-  // logger sanitizes all inputs to prevent log injection
-  logger.error('Admin access denied for IP:', clientIP);
+  // secureLog sanitizes all inputs to prevent log injection
+  secureLog.error('Admin access denied for IP:', clientIP);
   return res.status(403).json({ error: 'Admin access required' });
 }
 
@@ -98,8 +105,8 @@ export function validateOrigin(req, res, next) {
   ];
   
   if (process.env.NODE_ENV === 'production' && origin && !allowedOrigins.includes(origin)) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Invalid origin:', origin);
+    // secureLog sanitizes all inputs to prevent log injection
+    secureLog.error('Invalid origin:', origin);
     return res.status(403).json({ error: 'Forbidden origin' });
   }
   

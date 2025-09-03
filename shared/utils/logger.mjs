@@ -23,7 +23,7 @@ function sanitizeLogInput(input) {
 /**
  * Safe logging functions that sanitize all inputs
  */
-const logger = {
+const secureLog = {
   log: (...args) => {
     const sanitizedArgs = args.map(sanitizeLogInput);
     console.log(...sanitizedArgs);
@@ -50,12 +50,16 @@ const logger = {
   }
 };
 
+// Keep logger for backward compatibility
+const logger = secureLog;
+
 // ES module exports
-export { logger, sanitizeLogInput };
-export default { logger, sanitizeLogInput };
+export { secureLog, logger, sanitizeLogInput };
+export default { secureLog, logger, sanitizeLogInput };
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
+  window.secureLog = secureLog;
   window.logger = logger;
   window.sanitizeLogInput = sanitizeLogInput;
 }
