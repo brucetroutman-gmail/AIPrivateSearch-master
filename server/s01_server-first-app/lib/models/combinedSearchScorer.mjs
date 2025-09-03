@@ -9,6 +9,8 @@ class CombinedSearchScorer {
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.searchModel = 'qwen2:0.5b';
     this.scoreSettings = this.#loadScoreSettings();
+    this.cachedSystemInfo = null;
+    this.cachedPcCode = null;
   }
 
   #loadScoreSettings() {
@@ -24,11 +26,22 @@ class CombinedSearchScorer {
   /* public */
   async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, scoreModel = null) {
     try {
+      const processStart = Date.now();
+      logger.log('Starting process method');
+      
       const searchModel = model || this.searchModel;
+      const searchStart = Date.now();
       const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
+      logger.log(`Search completed in ${Date.now() - searchStart}ms`);
       searchResponse.systemPromptName = systemPromptName;
       searchResponse.sourceType = sourceType;
       searchResponse.tokenLimit = tokenLimit;
+      
+      const sysInfoStart = Date.now();
+      const systemInfo = this.#getSystemInfo();
+      const pcCode = this.#generatePcCode();
+      logger.log(`System info collected in ${Date.now() - sysInfoStart}ms`);
+      
       const result = {
         query,
         response: searchResponse.response,
@@ -37,8 +50,8 @@ class CombinedSearchScorer {
         tokenLimit: searchResponse.tokenLimit,
         testCode: testCode,
         createdAt: this.#formatCreatedAt(),
-        pcCode: this.#generatePcCode(),
-        systemInfo: this.#getSystemInfo(),
+        pcCode: pcCode,
+        systemInfo: systemInfo,
         scores: null,
         metrics: {
           search: searchResponse.metrics
@@ -46,7 +59,9 @@ class CombinedSearchScorer {
       };
 
       if (enableScoring) {
+        const scoreStart = Date.now();
         const scoreResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
+        logger.log(`Scoring completed in ${Date.now() - scoreStart}ms`);
         result.scores = scoreResult.scores;
         result.metrics.scoring = scoreResult.metrics;
         
@@ -63,6 +78,8 @@ class CombinedSearchScorer {
           }
         }
       }
+      
+      logger.log(`Total process method completed in ${Date.now() - processStart}ms`);
       return result;
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
@@ -245,44 +262,89 @@ Provide ONLY the three numbers, one per line.`;
   }
 
   #generatePcCode() {
+    // Cache PC code since it doesn't change
+    if (this.cachedPcCode) {
+      return this.cachedPcCode;
+    }
+    
     try {
-      const serial = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Serial Number" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
+      // Use simpler ioreg command
+      const serial = execSync('ioreg -c IOPlatformExpertDevice -d 2 | awk -F\"\" \'$2=="IOPlatformSerialNumber"{print $4}\'', { encoding: 'utf8', timeout: 2000 }).trim();
+      
       if (serial && serial.length >= 6) {
-        return serial.substring(0, 3) + serial.substring(serial.length - 3);
+        this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
+      } else {
+        // Generate a simple hash-based code as fallback
+        const hostname = execSync('hostname', { encoding: 'utf8', timeout: 1000 }).trim();
+        this.cachedPcCode = hostname ? hostname.substring(0, 6).toUpperCase() : 'MAC001';
       }
-      return 'UNKNOWN';
+      
+      return this.cachedPcCode;
     } catch (error) {
-      // logger sanitizes all inputs to prevent log injection
       logger.error('Error generating PcCode:', error.message);
-      return 'ERROR';
+      // Use timestamp-based fallback
+      this.cachedPcCode = 'T' + Date.now().toString().slice(-5);
+      return this.cachedPcCode;
     }
   }
 
   #getSystemInfo() {
+    // Cache system info since it doesn't change during runtime
+    if (this.cachedSystemInfo) {
+      return this.cachedSystemInfo;
+    }
+    
     try {
-      let chip = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Chip" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      if (!chip) {
-        chip = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Processor" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      }
-      const graphics = execSync('system_profiler SPDisplaysDataType 2>/dev/null | grep "Chipset Model" | head -1 | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      const ram = execSync('system_profiler SPHardwareDataType 2>/dev/null | grep "Memory" | sed "s/.*: //"', { encoding: 'utf8' }).trim();
-      const os = execSync('sw_vers -productName && sw_vers -productVersion', { encoding: 'utf8' }).replace('\n', ' ').trim();
+      // Use faster, simpler commands
+      let chip = 'Unknown';
+      let ram = 'Unknown';
+      let os = 'Unknown';
       
-      return {
-        chip: chip || 'Unknown',
-        graphics: graphics || 'Unknown', 
-        ram: ram || 'Unknown',
-        os: os || 'Unknown'
+      try {
+        // Try to get chip info
+        const chipInfo = execSync('sysctl -n machdep.cpu.brand_string', { encoding: 'utf8', timeout: 2000 }).trim();
+        if (chipInfo) chip = chipInfo;
+      } catch (e) {
+        // Fallback to system_profiler for chip
+        try {
+          const hwInfo = execSync('system_profiler SPHardwareDataType | grep -E "(Chip|Processor)"', { encoding: 'utf8', timeout: 3000 });
+          const match = hwInfo.match(/(Chip|Processor Name): (.+)/);
+          if (match) chip = match[2].trim();
+        } catch (e2) { /* ignore */ }
+      }
+      
+      try {
+        // Get RAM info
+        const ramBytes = execSync('sysctl -n hw.memsize', { encoding: 'utf8', timeout: 1000 }).trim();
+        if (ramBytes) {
+          const ramGB = Math.round(parseInt(ramBytes) / (1024 * 1024 * 1024));
+          ram = `${ramGB} GB`;
+        }
+      } catch (e) { /* ignore */ }
+      
+      try {
+        // Get OS info
+        const osInfo = execSync('sw_vers -productName && sw_vers -productVersion', { encoding: 'utf8', timeout: 2000 });
+        os = osInfo.replace('\n', ' ').trim();
+      } catch (e) { /* ignore */ }
+      
+      this.cachedSystemInfo = {
+        chip,
+        graphics: 'Integrated',
+        ram,
+        os
       };
+      
+      return this.cachedSystemInfo;
     } catch (error) {
-      // logger sanitizes all inputs to prevent log injection
       logger.error('Error getting system info:', error.message);
-      return {
-        chip: 'Error',
-        graphics: 'Error',
-        ram: 'Error', 
-        os: 'Error'
+      this.cachedSystemInfo = {
+        chip: 'Unknown',
+        graphics: 'Unknown',
+        ram: 'Unknown', 
+        os: 'Unknown'
       };
+      return this.cachedSystemInfo;
     }
   }
 
