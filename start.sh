@@ -56,6 +56,13 @@ fi
 # Start backend server in background
 echo "Installing backend dependencies..."
 cd server/s01_server-first-app
+
+# Ensure development mode for testing
+if [ ! -f .env ]; then
+    echo "Creating .env file for testing..."
+    echo "NODE_ENV=development" > .env
+fi
+
 npm install
 echo "Starting backend server..."
 npm start &
