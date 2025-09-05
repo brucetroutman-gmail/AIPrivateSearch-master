@@ -438,8 +438,8 @@ async function loadScoreModels(selectElementId) {
   }
 }
 
-// Common database export function
-async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null) {
+// Common database export function with retry logic
+async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null, retryCount = 0) {
   const dbData = {
     TestCode: result.testCode || '',
     TestCategory: testCategory || null,
@@ -455,7 +455,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       try {
         const date = new Date(result.createdAt);
         const formatted = date.toISOString().slice(0, 19).replace('T', ' ');
-        console.log('CreatedAt formatting:', { original: result.createdAt, formatted, length: formatted.length });
+        console.log('CreatedAt formatting:', 'original:', result.createdAt, 'formatted:', formatted, 'length:', formatted.length);
         return formatted;
       } catch (e) {
         console.error('Date formatting error:', e);
@@ -502,20 +502,37 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       body: JSON.stringify(dbData)
     });
     
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+    
     const saveResult = await response.json();
     
     if (saveResult.success) {
       return { success: true, insertId: saveResult.insertId };
     } else {
-      throw new Error(saveResult.error);
+      throw new Error(`Database error: ${saveResult.error} (Code: ${saveResult.code || 'unknown'})`);
     }
   } catch (error) {
-    if (typeof logger !== 'undefined') {
-      logger.error('Database export error:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
-    } else {
-      console.error('Database export error:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+    console.error('Full database export error:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Retry on connection reset (common on M4 Macs)
+    if (error.message && error.message.includes('ECONNRESET') && retryCount < 2) {
+      console.log(`Database connection reset, retrying... (attempt ${retryCount + 1})`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      return exportToDatabase(result, testCategory, testDescription, testParams, retryCount + 1);
     }
-    throw error;
+    
+    const errorMsg = error.message || error.toString() || 'Unknown database error';
+    if (typeof logger !== 'undefined') {
+      logger.error('Database export error:', errorMsg);
+    } else {
+      console.error('Database export error:', errorMsg);
+    }
+    throw new Error(errorMsg);
   }
 }
 

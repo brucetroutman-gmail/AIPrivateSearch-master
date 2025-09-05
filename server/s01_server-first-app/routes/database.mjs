@@ -35,7 +35,9 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
     
     const data = req.body;
     logger.log('Database save request received');
+    logger.log('CreatedAt value:', data.CreatedAt);
     logger.log('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
+    logger.log('Data keys:', Object.keys(data));
     
     connection = await pool.getConnection();
     
@@ -93,8 +95,11 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
     res.json({ success: true, insertId: result.insertId });
   } catch (error) {
     // logger sanitizes all inputs to prevent log injection
-    logger.error('Database save error:', error.message);
-    res.status(500).json({ success: false, error: error.message });
+    logger.error('Database save error - Full error:', error);
+    logger.error('Database save error - Message:', error.message);
+    logger.error('Database save error - Code:', error.code);
+    logger.error('Database save error - SQL State:', error.sqlState);
+    res.status(500).json({ success: false, error: error.message, code: error.code, sqlState: error.sqlState });
   } finally {
     if (connection) connection.release();
   }
