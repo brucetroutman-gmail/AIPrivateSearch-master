@@ -2,6 +2,7 @@
   "model-tests": {
     "performance_tests_model": {
       "title": "Performance Tests Local Model Only",
+      "enabled": true,
       "test_count": 4,
       "tests": [
         {
@@ -24,6 +25,7 @@
     },
     "performance_tests_docs": {
       "title": "Performance Tests - Local Docs Only",
+      "enabled": false,
       "test_count": 4,
       "tests": [
         {

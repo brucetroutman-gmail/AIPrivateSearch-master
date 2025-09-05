@@ -5,7 +5,7 @@ import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const router = express.Router();
 
@@ -15,9 +15,7 @@ const dbConfig = {
   user: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'aisearchscore',
-  connectionLimit: 10,
-  acquireTimeout: 60000,
-  timeout: 60000
+  connectionLimit: 10
 };
 
 let pool;

@@ -101,6 +101,9 @@ specs-3-scoring
 
 44. Fix processing to disable other controls --done
 
+45. Fix dotenv 7.2.1  --done
+
+46. 
 
 
 

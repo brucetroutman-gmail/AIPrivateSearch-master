@@ -14,7 +14,7 @@
             --success-border: #28a745;
             --error-bg: #f8d7da;
             --error-border: #dc3545;
-            --status-bg: #e3f2fd;
+            --status-bg: #f39c12;
         }
         
         [data-theme="dark"] {
@@ -22,7 +22,7 @@
             --success-border: #28a745;
             --error-bg: #4d1e1e;
             --error-border: #dc3545;
-            --status-bg: #1e3a4d;
+            --status-bg: #f39c12;
         }
         
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
@@ -37,6 +37,12 @@
         .execute-btn:hover { background: #0056b3; }
         .execute-btn:disabled { background: #ccc; cursor: not-allowed; }
         .results { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; min-height: 100px; transition: background-color 0.3s; }
+        .test-item.disabled { opacity: 0.5; }
+        .test-item.disabled input { cursor: not-allowed; }
+        .test-item.disabled label { color: #999; cursor: not-allowed; }
+        .section-header.disabled { opacity: 0.5; }
+        .section-header.disabled input { cursor: not-allowed; }
+        .section-header.disabled label { color: #999; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -73,7 +79,7 @@
         <label><input type="checkbox" id="selectAll"> Select All Tests</label>
         <button class="execute-btn" onclick="executeSelectedTests()">Execute Selected Tests</button>
         <span id="selectedCount">0 tests selected</span>
-        <div id="executionStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+        <div id="executionStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: #2c3e50; font-weight: bold; transition: background-color 0.3s;">
             <strong>🔄 Test Execution in Progress...</strong>
             <div id="progressIndicator"></div>
         </div>
@@ -88,6 +94,24 @@
 
     <script>
         let modelTests = {};
+        let isProcessing = false;
+        
+        // Global processing state management
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const selects = document.querySelectorAll('select');
+            const buttons = document.querySelectorAll('button, .execute-btn');
+            
+            checkboxes.forEach(cb => {
+                // Don't enable permanently disabled checkboxes (like performance_tests_docs)
+                if (!cb.hasAttribute('data-permanently-disabled')) {
+                    cb.disabled = processing;
+                }
+            });
+            selects.forEach(select => select.disabled = processing);
+            buttons.forEach(btn => btn.disabled = processing);
+        }
 
         async function loadModelTests() {
             try {
@@ -122,27 +146,30 @@
 
         function createSection(type, data) {
             const section = document.createElement('div');
+            const isDisabled = !data.enabled;
+            
             section.className = 'section';
             section.innerHTML = `
-                <div class="section-header">
-                    <label><input type="checkbox" id="select${type.charAt(0).toUpperCase() + type.slice(1)}"> ${data.title}</label>
+                <div class="section-header ${isDisabled ? 'disabled' : ''}">
+                    <label><input type="checkbox" id="select${type.charAt(0).toUpperCase() + type.slice(1)}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}> ${data.title}${isDisabled ? ' (Coming Soon)' : ''}</label>
                 </div>
             `;
             
             data.tests.forEach(test => {
-                section.appendChild(createTestItem(test, type));
+                section.appendChild(createTestItem(test, type, isDisabled));
             });
             
             return section;
         }
 
-        function createTestItem(test, group) {
+        function createTestItem(test, group, isDisabled) {
             const item = document.createElement('div');
-            item.className = 'test-item';
+            
+            item.className = isDisabled ? 'test-item disabled' : 'test-item';
             item.innerHTML = `
                 <label>
-                    <input type="checkbox" class="test-checkbox" data-testcode="${test.testcode}" data-group="${group}">
-                    <span class="test-code">${test.testcode}</span> - ${test.description}
+                    <input type="checkbox" class="test-checkbox" data-testcode="${test.testcode}" data-group="${group}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}>
+                    <span class="test-code">${test.testcode}</span> - ${test.description}${isDisabled ? ' (Coming Soon)' : ''}
                 </label>
             `;
             return item;
@@ -153,7 +180,7 @@
             const selectAllEl = document.getElementById('selectAll');
             if (selectAllEl) {
                 selectAllEl.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.test-checkbox');
+                    const checkboxes = document.querySelectorAll('.test-checkbox:not([disabled])');
                     checkboxes.forEach(cb => cb.checked = this.checked);
                     updateSelectedCount();
                 });
@@ -222,9 +249,11 @@
                 return;
             }
 
-            // Disable button and change appearance
+            // Disable all controls
+            setProcessingState(true);
+            
+            // Update button appearance
             const executeBtn = document.querySelector('.execute-btn');
-            executeBtn.disabled = true;
             executeBtn.textContent = 'Processing';
             executeBtn.classList.add('processing-button');
 
@@ -283,10 +312,12 @@
             statusDiv.style.display = 'none';
             displayTestResults(results);
             
-            // Re-enable button and restore appearance
-            executeBtn.disabled = false;
+            // Restore button appearance first
             executeBtn.textContent = 'Execute Selected Tests';
             executeBtn.classList.remove('processing-button');
+            
+            // Re-enable all controls
+            setProcessingState(false);
         }
         
         function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {
