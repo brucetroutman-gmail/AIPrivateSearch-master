@@ -268,18 +268,37 @@ Provide ONLY the three numbers, one per line.`;
     }
     
     try {
-      // Use simpler ioreg command
-      const serial = execSync('ioreg -c IOPlatformExpertDevice -d 2 | awk -F\"\" \'$2=="IOPlatformSerialNumber"{print $4}\'', { encoding: 'utf8', timeout: 2000 }).trim();
-      
-      if (serial && serial.length >= 6) {
-        this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
-      } else {
-        // Generate a simple hash-based code as fallback
-        const hostname = execSync('hostname', { encoding: 'utf8', timeout: 1000 }).trim();
-        this.cachedPcCode = hostname ? hostname.substring(0, 6).toUpperCase() : 'MAC001';
+      // Try ioreg first (faster)
+      try {
+        const output = execSync('ioreg -l | grep IOPlatformSerialNumber', { encoding: 'utf8', timeout: 2000 }).trim();
+        const match = output.match(/"IOPlatformSerialNumber" = "([^"]+)"/);
+        if (match && match[1] && match[1].length >= 6) {
+          const serial = match[1].trim();
+          this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
+          return this.cachedPcCode;
+        }
+      } catch (e) {
+        // Continue to system_profiler fallback
       }
       
+      // Fallback to system_profiler with longer timeout
+      try {
+        const output = execSync('system_profiler SPHardwareDataType | grep "Serial Number"', { encoding: 'utf8', timeout: 10000 }).trim();
+        const match = output.match(/Serial Number \(system\): (.+)/);
+        if (match && match[1] && match[1].length >= 6) {
+          const serial = match[1].trim();
+          this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
+          return this.cachedPcCode;
+        }
+      } catch (e) {
+        // Continue to hostname fallback
+      }
+      
+      // Fallback to hostname
+      const hostname = execSync('hostname', { encoding: 'utf8', timeout: 1000 }).trim();
+      this.cachedPcCode = hostname ? hostname.substring(0, 6).toUpperCase() : 'MAC001';
       return this.cachedPcCode;
+      
     } catch (error) {
       logger.error('Error generating PcCode:', error.message);
       // Use timestamp-based fallback

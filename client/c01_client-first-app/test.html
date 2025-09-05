@@ -226,8 +226,7 @@
             const executeBtn = document.querySelector('.execute-btn');
             executeBtn.disabled = true;
             executeBtn.textContent = 'Processing';
-            executeBtn.style.backgroundColor = '#1e3a8a';
-            executeBtn.style.cursor = 'not-allowed';
+            executeBtn.classList.add('processing-button');
 
             // Show execution status at top
             const statusDiv = document.getElementById('executionStatus');
@@ -287,8 +286,7 @@
             // Re-enable button and restore appearance
             executeBtn.disabled = false;
             executeBtn.textContent = 'Execute Selected Tests';
-            executeBtn.style.backgroundColor = '#007bff';
-            executeBtn.style.cursor = 'pointer';
+            executeBtn.classList.remove('processing-button');
         }
         
         function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {

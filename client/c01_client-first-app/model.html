@@ -160,6 +160,28 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        let isProcessing = false;
+        
+        // Global processing state management
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            const buttons = document.querySelectorAll('.update-btn');
+            const inputs = document.querySelectorAll('input, select');
+            
+            buttons.forEach(btn => {
+                btn.disabled = processing;
+                if (processing) {
+                    btn.classList.add('processing-button');
+                } else {
+                    btn.classList.remove('processing-button');
+                }
+            });
+            
+            inputs.forEach(input => {
+                input.disabled = processing;
+            });
+        }
+        
         // Load models from models-list.json
         async function loadModels() {
             try {
@@ -237,6 +259,7 @@
                 return;
             }
             
+            setProcessingState(true);
             document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
             
             const statusDiv = document.getElementById('updateStatus');
@@ -256,7 +279,44 @@
                 });
                 
                 if (response.ok) {
-                    // Simple approach: assume pull worked, use unknown size
+                    // Process the streaming response
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let done = false;
+                    let lastStatus = '';
+                    let hasError = false;
+                    
+                    while (!done) {
+                        const { value, done: readerDone } = await reader.read();
+                        done = readerDone;
+                        
+                        if (value) {
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n').filter(line => line.trim());
+                            
+                            for (const line of lines) {
+                                try {
+                                    const data = JSON.parse(line);
+                                    if (data.status) {
+                                        progressDiv.innerHTML = `Adding ${modelName}: ${data.status}`;
+                                        lastStatus = data.status;
+                                    }
+                                    if (data.error) {
+                                        hasError = true;
+                                        lastStatus = `Error: ${data.error}`;
+                                    }
+                                } catch (e) {
+                                    // Ignore JSON parse errors
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (hasError) {
+                        throw new Error(lastStatus);
+                    }
+                    
+                    // Use unknown size since we can't easily get it
                     const size = 'unknown';
                     
                     try {
@@ -326,9 +386,10 @@
                     </div>
                 `;
                 resultsDiv.innerHTML = resultHtml;
+            } finally {
+                statusDiv.style.display = 'none';
+                setProcessingState(false);
             }
-            
-            statusDiv.style.display = 'none';
         }
         
         function formatSize(bytes) {
@@ -350,11 +411,25 @@
                 return;
             }
             
-            // Clear previous results
-            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            // Get the button and set processing state
+            const updateBtn = event.target;
+            const originalText = updateBtn.textContent;
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Processing...';
+            updateBtn.classList.add('processing-button');
             
-            for (const model of selectedModels) {
-                await pullModel(model, 'update');
+            try {
+                // Clear previous results
+                document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+                
+                for (const model of selectedModels) {
+                    await pullModel(model, 'update');
+                }
+            } finally {
+                // Restore button state
+                updateBtn.disabled = false;
+                updateBtn.textContent = originalText;
+                updateBtn.classList.remove('processing-button');
             }
         }
         
@@ -371,6 +446,7 @@
                 return;
             }
             
+            setProcessingState(true);
             document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
             const statusDiv = document.getElementById('updateStatus');
             const progressDiv = document.getElementById('progressIndicator');
@@ -437,6 +513,7 @@
             }
             
             statusDiv.style.display = 'none';
+            setProcessingState(false);
             loadModels();
         }
         

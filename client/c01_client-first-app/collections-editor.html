@@ -136,6 +136,13 @@
       color: var(--text-color);
     }
     
+    .log-item.processing {
+      border-color: #f39c12;
+      background: #f39c12;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+    
     [data-theme="dark"] .log-item.success {
       background: #1e4d3a;
       color: var(--text-color);
@@ -149,6 +156,12 @@
     [data-theme="dark"] .log-item.info {
       background: #1e3a4d;
       color: var(--text-color);
+    }
+    
+    [data-theme="dark"] .log-item.processing {
+      background: #f39c12;
+      color: #2c3e50;
+      border-color: #f39c12;
     }
   </style>
 </head>
@@ -223,6 +236,21 @@
     let currentCollection = '';
     let documents = [];
     let indexedDocuments = [];
+    let isProcessing = false;
+    
+    // Global processing state management
+    function setProcessingState(processing) {
+      isProcessing = processing;
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.disabled = processing;
+        if (processing) {
+          btn.classList.add('processing-button');
+        } else {
+          btn.classList.remove('processing-button');
+        }
+      });
+    }
     
     // Get collection name from URL parameter or sessionStorage fallback
     const urlParams = new URLSearchParams(window.location.search);
@@ -372,10 +400,12 @@
         return;
       }
       
+      setProcessingState(true);
       clearLog();
       showLog(`Adding ${files.length} file(s) to collection...`);
       
-      for (let i = 0; i < files.length; i++) {
+      try {
+        for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const progress = `${i + 1}/${files.length}`;
         showLog(`${progress} Adding: ${file.name}`);
@@ -399,12 +429,15 @@
         } catch (error) {
           showLog(`${progress} ✗ Error adding: ${file.name} - ${error.message}`, 'error');
         }
-        showLog(''); // Add blank line after each file
+          showLog(''); // Add blank line after each file
+        }
+        
+        showLog(`✓ File addition complete: ${files.length} files processed`, 'success');
+        fileInput.value = ''; // Clear the file input
+        loadDocuments(); // Refresh the document list
+      } finally {
+        setProcessingState(false);
       }
-      
-      showLog(`✓ File addition complete: ${files.length} files processed`, 'success');
-      fileInput.value = ''; // Clear the file input
-      loadDocuments(); // Refresh the document list
     }
     
     async function convertDocuments() {
@@ -414,6 +447,7 @@
         return;
       }
       
+      setProcessingState(true);
       clearLog();
       showLog(`Converting ${selected.length} selected documents...`);
       
@@ -434,6 +468,8 @@
         }
       } catch (error) {
         showLog(`✗ Error: ${error.message}`, 'error');
+      } finally {
+        setProcessingState(false);
       }
     }
     
@@ -446,10 +482,13 @@
         return;
       }
       
+      setProcessingState(true);
       const vectorDB = document.getElementById('vectorDBSelect').value;
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Processing ${selectedMD.length} selected MD files to ${vectorDB}...`);
+      showLog(`Processing ${selectedMD.length} selected MD files to ${vectorDB}...`, 'processing');
+      
+      try {
       
       // Show progress for each file
       for (let i = 0; i < selectedMD.length; i++) {
@@ -465,7 +504,7 @@
           
           // Show processing message with chunk estimation if large file
           const chunkInfo = estimatedChunks > 5 ? ` (~${estimatedChunks} chunks estimated)` : '';
-          showLog(`${progress} Processing: ${filename}${chunkInfo}`, 'info');
+          showLog(`${progress} Processing: ${filename}${chunkInfo}`, 'processing');
           
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'POST',
@@ -502,6 +541,9 @@
       } catch (error) {
         console.error('Error refreshing indexed status:', error);
         loadDocuments(); // Fallback to full reload
+      }
+      } finally {
+        setProcessingState(false);
       }
     }
     

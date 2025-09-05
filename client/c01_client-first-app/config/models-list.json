@@ -7,11 +7,6 @@
     },
     {
       "category": "search",
-      "modelName": "qwen2:0.5b",
-      "size": "352 MB"
-    },
-    {
-      "category": "search",
       "modelName": "qwen2:1.5b",
       "size": "934 MB"
     },
@@ -49,6 +44,16 @@
       "category": "search",
       "modelName": "gemma3:1b-it-q4_K_M",
       "size": "815 MB"
+    },
+    {
+      "category": "embed",
+      "modelName": "embeddinggemma",
+      "size": "unknown"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2:0.5b",
+      "size": "unknown"
     }
   ]
 }

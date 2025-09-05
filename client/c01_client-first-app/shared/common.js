@@ -462,7 +462,14 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
     'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
     'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
-    'EvalTokensPerSecond-search': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+    'EvalTokensPerSecond-ssearch': (() => {
+      const search = result.metrics?.search;
+      if (!search || !search.eval_count || !search.eval_duration || search.eval_duration === 0) {
+        return null;
+      }
+      const tokensPerSec = search.eval_count / (search.eval_duration / 1000000000);
+      return isFinite(tokensPerSec) ? Math.round(tokensPerSec * 100) / 100 : null;
+    })(),
     'Answer-search': result.response || null,
     'ModelName-score': result.metrics?.scoring?.model || null,
     'ModelContextSize-score': result.metrics?.scoring?.context_size || null,

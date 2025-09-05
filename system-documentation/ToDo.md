@@ -87,13 +87,21 @@ specs-3-scoring
 
 37. Create Doctors and lawyers document set
 
-38. processing consistent color scheme
+38. processing consistent color scheme -- Done 
 
-39. secureUser  set dark mode
+39. secureUser  set dark mode -- done ??
 
-40. EvalTokensperSecond-search not showing in DB
+40. EvalTokensperSecond-search not showing in DB  --done
 
-41. security (code issues)
+41. security (code issues) --done (using ESLint)
+
+42. Fix Show Chunks issue --done
+
+43. Persist User Prompt  --done
+
+44. Fix processing to disable other controls --done
+
+
 
 
 

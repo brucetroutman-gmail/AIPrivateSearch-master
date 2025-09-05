@@ -90,10 +90,12 @@ async function loadSourceTypes() {
     } else {
       sourceTypeEl.value = data.source_types[0]?.name || '';
     }
+    return Promise.resolve();
   } catch (error) {
     sourceTypeEl.innerHTML = '<option value="">Error loading source types</option>';
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load source types:', error);
+    return Promise.reject(error);
   }
 }
 
@@ -137,20 +139,42 @@ async function loadModels() {
   }
 }
 
-loadSourceTypes();
+// Add CSS rule to hide checkbox
+const hideCheckboxStyle = document.createElement('style');
+hideCheckboxStyle.textContent = '.hide-chunks-checkbox { display: none !important; }';
+document.head.appendChild(hideCheckboxStyle);
 
-// Check initial source type and show collection/vectorDB dropdowns if needed
-setTimeout(() => {
+// Hide checkbox immediately on page load
+const showChunksLabel = document.getElementById('showChunksLabel');
+const showChunksToggle = document.getElementById('showChunksToggle');
+if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
+if (showChunksToggle) showChunksToggle.checked = false;
+
+loadSourceTypes().then(() => {
+  // Check source type after it's loaded and set checkbox visibility
+  const showChunksLabel = document.getElementById('showChunksLabel');
+  const showChunksToggle = document.getElementById('showChunksToggle');
+  
+  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+    if (showChunksLabel) showChunksLabel.classList.remove('hide-chunks-checkbox');
+  } else {
+    if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
+    if (showChunksToggle) showChunksToggle.checked = false;
+  }
+  
+  // Handle collection/vectorDB sections
   if (sourceTypeEl.value.includes('Docu')) {
     collectionSection.style.display = 'block';
     if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
-    
-    // Also show the source chunks checkbox
-    const showChunksLabel = document.getElementById('showChunksLabel');
-    if (showChunksLabel) showChunksLabel.style.display = 'inline';
   }
-}, 100);
+}).catch(() => {
+  // Fallback: keep checkbox hidden if source types fail to load
+  const showChunksLabel = document.getElementById('showChunksLabel');
+  const showChunksToggle = document.getElementById('showChunksToggle');
+  if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
+  if (showChunksToggle) showChunksToggle.checked = false;
+});
 loadModels();
 loadSystemPrompts();
 loadUserPrompts();
@@ -307,6 +331,7 @@ async function loadUserPrompts() {
 userPromptsEl.addEventListener('change', () => {
   if (userPromptsEl.value) {
     queryEl.value = userPromptsEl.value;
+    localStorage.setItem('lastPrompt', userPromptsEl.value);
   }
 });
 
@@ -344,13 +369,14 @@ sourceTypeEl.addEventListener('change', () => {
     if (vectorDBSection) vectorDBSection.style.display = 'none';
   }
   
-  // Show/hide source chunks checkbox for document source types
+  // Show/hide source chunks checkbox only for Local Documents source types
   const showChunksLabel = document.getElementById('showChunksLabel');
   const showChunksToggle = document.getElementById('showChunksToggle');
-  if (sourceTypeEl.value.includes('Docu')) {
-    if (showChunksLabel) showChunksLabel.style.display = 'inline';
+  
+  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
+    if (showChunksLabel) showChunksLabel.classList.remove('hide-chunks-checkbox');
   } else {
-    if (showChunksLabel) showChunksLabel.style.display = 'none';
+    if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
     if (showChunksToggle) showChunksToggle.checked = false;
   }
   
@@ -397,11 +423,13 @@ if (generateScoresSetting === 'true') {
   document.getElementById('scoringSection').style.display = 'block';
 }
 
-// Restore prompt text
-const lastPrompt = localStorage.getItem('lastPrompt');
-if (lastPrompt) {
-  queryEl.value = lastPrompt;
-}
+// Restore prompt text after page loads
+setTimeout(() => {
+  const lastPrompt = localStorage.getItem('lastPrompt');
+  if (lastPrompt && queryEl) {
+    queryEl.value = lastPrompt;
+  }
+}, 50);
 
 // Load and populate scoring options
 async function loadScoringOptions() {
@@ -843,8 +871,7 @@ form.addEventListener('submit', async (e) => {
   const originalText = submitBtn.textContent;
   submitBtn.disabled = true;
   submitBtn.textContent = 'Processing...';
-  submitBtn.style.color = '#1e3a8a';
-  submitBtn.style.fontWeight = 'bold';
+  submitBtn.classList.add('processing-button');
   
   let progressMessages = [];
   
@@ -923,8 +950,7 @@ form.addEventListener('submit', async (e) => {
     // Re-enable submit button
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
-    submitBtn.style.color = '';
-    submitBtn.style.fontWeight = '';
+    submitBtn.classList.remove('processing-button');
   }
 });
 
@@ -1069,7 +1095,14 @@ async function handleExport() {
         (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
       'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
       'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
-      'EvalTokensPerSecond-ssearch': result.metrics?.search ? (result.metrics.search.eval_count / (result.metrics.search.eval_duration / 1000000000)) : null,
+      'EvalTokensPerSecond-ssearch': (() => {
+        const search = result.metrics?.search;
+        if (!search || !search.eval_count || !search.eval_duration || search.eval_duration === 0) {
+          return null;
+        }
+        const tokensPerSec = search.eval_count / (search.eval_duration / 1000000000);
+        return isFinite(tokensPerSec) ? Math.round(tokensPerSec * 100) / 100 : null;
+      })(),
       'Answer-search': result.response || null,
       'ModelName-score': result.metrics?.scoring?.model || null,
       'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
