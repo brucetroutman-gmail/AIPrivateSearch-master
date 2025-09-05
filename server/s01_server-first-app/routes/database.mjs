@@ -1,11 +1,21 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 
-dotenv.config({ quiet: true });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from /Users/Shared
+const envPath = '/Users/Shared/.env';
+dotenv.config({ path: envPath });
+logger.log('Environment variables loaded from:', envPath);
+logger.log('NODE_ENV:', process.env.NODE_ENV);
+logger.log('DB_HOST from env:', process.env.DB_HOST);
 
 const router = express.Router();
 
@@ -18,9 +28,19 @@ const dbConfig = {
   connectionLimit: 10
 };
 
+// Log database configuration (without password)
+logger.log('Database config:', {
+  host: dbConfig.host,
+  port: dbConfig.port,
+  user: dbConfig.user,
+  database: dbConfig.database,
+  hasPassword: !!dbConfig.password
+});
+
 let pool;
 try {
   pool = mysql.createPool(dbConfig);
+  logger.log('Database pool created successfully');
 } catch (error) {
   // logger sanitizes all inputs to prevent log injection
   logger.error('Database pool creation failed:', error.message);

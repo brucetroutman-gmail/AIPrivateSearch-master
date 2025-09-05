@@ -57,20 +57,21 @@ fi
 echo "Installing backend dependencies..."
 cd server/s01_server-first-app
 
-# Ensure development mode and database config for testing
-if [ ! -f .env ]; then
-    echo "Creating .env file for testing..."
-    cat > .env << EOF
-NODE_ENV=development
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=root
-DB_PASSWORD=
-DB_DATABASE=aisearchscore
-EOF
-    echo "✅ .env file created with default database settings"
+# Check for .env file in /Users/Shared
+if [ ! -f /Users/Shared/.env ]; then
+    echo "⚠️  .env file not found in /Users/Shared!"
+    echo "Please create /Users/Shared/.env with your database configuration."
+    echo "Example .env file contents:"
+    echo "NODE_ENV=development"
+    echo "DB_HOST=your.database.host"
+    echo "DB_PORT=3306"
+    echo "DB_USERNAME=your_username"
+    echo "DB_PASSWORD=your_password"
+    echo "DB_DATABASE=aisearchscore"
+    echo ""
+    read -p "Press Enter to continue without database functionality..."
 else
-    echo "✅ .env file already exists"
+    echo "✅ .env file found in /Users/Shared"
 fi
 
 npm install
