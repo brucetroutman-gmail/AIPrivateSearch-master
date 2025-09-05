@@ -57,10 +57,20 @@ fi
 echo "Installing backend dependencies..."
 cd server/s01_server-first-app
 
-# Ensure development mode for testing
+# Ensure development mode and database config for testing
 if [ ! -f .env ]; then
     echo "Creating .env file for testing..."
-    echo "NODE_ENV=development" > .env
+    cat > .env << EOF
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+DB_DATABASE=aisearchscore
+EOF
+    echo "✅ .env file created with default database settings"
+else
+    echo "✅ .env file already exists"
 fi
 
 npm install

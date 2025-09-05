@@ -519,10 +519,10 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     
-    // Retry on connection reset (common on M4 Macs)
-    if (error.message && error.message.includes('ECONNRESET') && retryCount < 2) {
-      console.log(`Database connection reset, retrying... (attempt ${retryCount + 1})`);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+    // Retry on connection issues (common on M4 Macs)
+    if (error.message && (error.message.includes('ECONNRESET') || error.message.includes('ECONNREFUSED')) && retryCount < 3) {
+      console.log(`Database connection issue (${error.message.includes('ECONNREFUSED') ? 'refused' : 'reset'}), retrying... (attempt ${retryCount + 1})`);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return exportToDatabase(result, testCategory, testDescription, testParams, retryCount + 1);
     }
     
