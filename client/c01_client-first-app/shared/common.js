@@ -450,7 +450,18 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     PcGraphics: result.systemInfo?.graphics || null,
     PcRAM: result.systemInfo?.ram || null,
     PcOS: result.systemInfo?.os || null,
-    CreatedAt: result.createdAt ? new Date(result.createdAt).toLocaleString('sv-SE').replace('T', ' ') : null,
+    CreatedAt: (() => {
+      if (!result.createdAt) return null;
+      try {
+        const date = new Date(result.createdAt);
+        const formatted = date.toISOString().slice(0, 19).replace('T', ' ');
+        console.log('CreatedAt formatting:', { original: result.createdAt, formatted, length: formatted.length });
+        return formatted;
+      } catch (e) {
+        console.error('Date formatting error:', e);
+        return null;
+      }
+    })(),
     SourceType: result.sourceType || null,
     SystemPrompt: result.systemPromptName || null,
     Prompt: result.query || null,

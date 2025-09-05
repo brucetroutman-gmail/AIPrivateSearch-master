@@ -558,7 +558,12 @@
             );
             
             // Export to database with category and description
-            await exportToDatabase(result, testCategory, testDescription, params);
+            try {
+                await exportToDatabase(result, testCategory, testDescription, params);
+            } catch (dbError) {
+                console.error('Database save error:', dbError);
+                // Don't fail the test, just log the error
+            }
             
             return result;
         }
