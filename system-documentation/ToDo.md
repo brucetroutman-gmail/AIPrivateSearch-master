@@ -103,7 +103,7 @@ specs-3-scoring
 
 45. Fix dotenv 7.2.1  --done
 
-46. 
+46. Fix close browser and terminal
 
 
 
