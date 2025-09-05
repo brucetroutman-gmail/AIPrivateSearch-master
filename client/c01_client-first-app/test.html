@@ -558,13 +558,19 @@
             );
             
             // Export to database with category and description
+            let dbSaveSuccess = false;
+            let dbInsertId = null;
             try {
-                await exportToDatabase(result, testCategory, testDescription, params);
+                const dbResult = await exportToDatabase(result, testCategory, testDescription, params);
+                dbSaveSuccess = true;
+                dbInsertId = dbResult.insertId;
             } catch (dbError) {
                 console.error('Database save error:', dbError);
-                // Don't fail the test, just log the error
+                result.dbSaveError = dbError.message;
             }
             
+            result.dbSaveSuccess = dbSaveSuccess;
+            result.dbInsertId = dbInsertId;
             return result;
         }
         
@@ -577,11 +583,15 @@
             
             results.forEach(({ testCode, model, result, success, error, elapsedTime }) => {
                 if (success) {
+                    const dbStatus = result.dbSaveSuccess ? 
+                        `<small style="color: green;">✅ Saved to database (ID: ${result.dbInsertId})</small>` : 
+                        `<small style="color: red;">❌ Database save failed: ${result.dbSaveError || 'Unknown error'}</small>`;
+                    
                     html += `
                         <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
                             <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ✅ Success
                             <br><small>Response: ${result.response?.substring(0, 100)}...</small>
-                            <br><small>Saved to database</small>
+                            <br>${dbStatus}
                         </div>
                     `;
                 } else {
@@ -589,6 +599,7 @@
                         <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
                             <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ❌ Failed
                             <br><small>Error: ${error}</small>
+                            <br><small style="color: red;">❌ Not saved to database</small>
                         </div>
                     `;
                 }
