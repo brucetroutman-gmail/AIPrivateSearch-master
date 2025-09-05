@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ quiet: true });
+dotenv.config({ path: '/Users/Shared/.env', quiet: true });
 import express from 'express';
 import cors from 'cors';
 import path from 'path';

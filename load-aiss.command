@@ -65,6 +65,24 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 2
 
+# Create shared .env file
+echo "🔧 Creating shared .env file..."
+cat > /Users/Shared/.env << 'EOF'
+# API Keys
+API_KEY=dev-key
+ADMIN_KEY=admin-key
+NODE_ENV=development
+
+# Database Configuration
+DB_HOST=92.112.184.206
+DB_PORT=3306
+DB_DATABASE=aisearchscore
+DB_USERNAME=nimdas
+DB_PASSWORD=FormR!1234
+EOF
+
+echo "✅ Shared .env file created at /Users/Shared/.env"
+
 # Start the application
 echo "🚀 Starting AISearchScore application..."
 bash start.sh
