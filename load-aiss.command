@@ -23,6 +23,37 @@ fi
 
 echo "✅ No running processes detected, proceeding with installation..."
 
+# Check for NVS installation
+echo "🔍 Checking for NVS (Node Version Switcher)..."
+if [ ! -d "$HOME/.nvs" ]; then
+    echo "❌ NVS not found. Installing NVS and Node.js 22..."
+    
+    # Clone NVS
+    git clone https://github.com/jasongin/nvs.git ~/.nvs
+    
+    # Add to shell configs
+    echo 'export NVS_HOME="$HOME/.nvs"' >> ~/.zshrc 2>/dev/null || true
+    echo 'export PATH="$NVS_HOME:$PATH"' >> ~/.zshrc 2>/dev/null || true
+    echo 'export NVS_HOME="$HOME/.nvs"' >> ~/.bash_profile 2>/dev/null || true
+    echo 'export PATH="$NVS_HOME:$PATH"' >> ~/.bash_profile 2>/dev/null || true
+    
+    # Set up environment for current session
+    export NVS_HOME="$HOME/.nvs"
+    export PATH="$NVS_HOME:$PATH"
+    
+    # Install and link Node.js 22
+    ~/.nvs/nvs add 22
+    ~/.nvs/nvs link 22
+    
+    echo "✅ NVS and Node.js 22 installed successfully"
+else
+    echo "✅ NVS found, ensuring Node.js 22 is available..."
+    export NVS_HOME="$HOME/.nvs"
+    export PATH="$NVS_HOME:$PATH"
+    ~/.nvs/nvs add 22 2>/dev/null || true
+    ~/.nvs/nvs link 22 2>/dev/null || true
+fi
+
 # Always go to /Users/Shared (works from any location)
 echo "📂 Navigating to /Users/Shared..."
 cd /Users/Shared
@@ -59,13 +90,7 @@ echo "✅ Clone successful"
 cd aisearchscore
 echo "📂 Changed to: $(pwd)"
 
-# Final cleanup before starting
-echo "🧹 Final cleanup of any remaining processes..."
-pkill -f "node server.mjs" 2>/dev/null || true
-pkill -f "npx serve" 2>/dev/null || true
-sleep 2
-
-# Create shared .env file
+# Create shared .env file BEFORE starting the app
 echo "🔧 Creating shared .env file..."
 cat > /Users/Shared/.env << 'EOF'
 # API Keys
@@ -82,6 +107,12 @@ DB_PASSWORD=FormR!1234
 EOF
 
 echo "✅ Shared .env file created at /Users/Shared/.env"
+
+# Final cleanup before starting
+echo "🧹 Final cleanup of any remaining processes..."
+pkill -f "node server.mjs" 2>/dev/null || true
+pkill -f "npx serve" 2>/dev/null || true
+sleep 2
 
 # Start the application
 echo "🚀 Starting AISearchScore application..."

@@ -74,7 +74,7 @@ else
     echo "✅ .env file found in /Users/Shared"
 fi
 
-npm install
+npm install --silent
 echo "Starting backend server..."
 npm start &
 BACKEND_PID=$!

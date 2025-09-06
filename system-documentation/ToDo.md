@@ -105,7 +105,11 @@ specs-3-scoring
 
 46. Fix close browser and terminal
 
-47. fix .env file issue
+47. fix .env file issue --done
+
+48. fix npm warning msgs  --done
+
+
 
 
 
