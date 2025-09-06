@@ -142,18 +142,26 @@ class CombinedSearchScorer {
     try {
       logger.log('Starting scoring process');
       
-      const scoringPrompt = `Rate this answer on a scale of 1-3 for each criterion:
+      if (!scoreModel) {
+        throw new Error('Score model is required for scoring');
+      }
+      
+      const scoringPrompt = `Evaluate this answer using a 1-3 scale where:
+1 = Poor/Incorrect
+2 = Adequate/Mostly correct  
+3 = Excellent/Completely correct
 
 Query: ${query}
 Answer: ${answer}
 
-Accurate: [1-3]
-Relevant: [1-3] 
-Organized: [1-3]
+Rate each criterion (1-3):
+Accuracy (factual correctness): 
+Relevance (addresses the query): 
+Organization (clear structure): 
 
-Provide ONLY the three numbers, one per line.`;
+Respond with only three numbers, one per line.`;
 
-      const modelToUse = scoreModel || this.scoreSettings.model;
+      const modelToUse = scoreModel;
       
       const res = await this.ollama.generate({
         model: modelToUse,
@@ -198,11 +206,7 @@ Provide ONLY the three numbers, one per line.`;
           relevance: null,
           organization: null,
           total: null,
-          justifications: { 
-            accuracy: 'Scoring failed due to error', 
-            relevance: 'Scoring failed due to error', 
-            organization: 'Scoring failed due to error' 
-          },
+
           overallComments: `Scoring error: ${error.message}`,
           error: error.message
         },
@@ -220,7 +224,7 @@ Provide ONLY the three numbers, one per line.`;
         relevance: null,
         organization: null,
         total: null,
-        justifications: { accuracy: 'Auto-generated', relevance: 'Auto-generated', organization: 'Auto-generated' },
+
         overallComments: 'Scores extracted from model response'
       };
 
@@ -249,7 +253,7 @@ Provide ONLY the three numbers, one per line.`;
         relevance: null,
         organization: null,
         total: null,
-        justifications: { accuracy: '', relevance: '', organization: '' },
+
         overallComments: 'Parsing failed',
         error: error.message
       };

@@ -12,10 +12,7 @@ const __dirname = path.dirname(__filename);
 
 // Load .env from /Users/Shared
 const envPath = '/Users/Shared/.env';
-dotenv.config({ path: envPath });
-logger.log('Environment variables loaded from:', envPath);
-logger.log('NODE_ENV:', process.env.NODE_ENV);
-logger.log('DB_HOST from env:', process.env.DB_HOST);
+dotenv.config({ path: envPath, quiet: true, debug: false });
 
 const router = express.Router();
 
@@ -28,14 +25,7 @@ const dbConfig = {
   connectionLimit: 10
 };
 
-// Log database configuration (without password)
-logger.log('Database config:', {
-  host: dbConfig.host,
-  port: dbConfig.port,
-  user: dbConfig.user,
-  database: dbConfig.database,
-  hasPassword: !!dbConfig.password
-});
+
 
 let pool;
 try {

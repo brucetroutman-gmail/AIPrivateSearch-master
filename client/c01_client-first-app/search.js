@@ -669,7 +669,7 @@ function render(result) {
     
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    ['Criterion', 'Score', 'Justification'].forEach(text => {
+    ['Criterion', 'Score'].forEach(text => {
       const th = document.createElement('th');
       th.textContent = text;
       headerRow.appendChild(th);
@@ -677,12 +677,12 @@ function render(result) {
     thead.appendChild(headerRow);
     
     const tbody = document.createElement('tbody');
-    [['Accuracy', s.accuracy ?? '-', s.justifications.accuracy],
-     ['Relevance', s.relevance ?? '-', s.justifications.relevance],
-     ['Organization', s.organization ?? '-', s.justifications.organization],
-     ['Weighted Score', s.total ? s.total + '%' : '-', '']].forEach(([criterion, score, justification]) => {
+    [['Accuracy', s.accuracy ?? '-'],
+     ['Relevance', s.relevance ?? '-'],
+     ['Organization', s.organization ?? '-'],
+     ['Weighted Score', s.total ? s.total + '%' : '-']].forEach(([criterion, score]) => {
       const row = document.createElement('tr');
-      [criterion, score, justification].forEach(text => {
+      [criterion, score].forEach(text => {
         const td = document.createElement('td');
         td.textContent = text;
         row.appendChild(td);
@@ -863,6 +863,11 @@ form.addEventListener('submit', async (e) => {
     return;
   }
   
+  if (scoreTglEl.checked && !document.getElementById('scoreModel').value) {
+    outputEl.textContent = 'Please select a score model when scoring is enabled.';
+    return;
+  }
+  
   // Start timing
   const startTime = Date.now();
   
@@ -1020,12 +1025,12 @@ async function handleExport() {
     if (result.scores) {
       const s = result.scores;
       markdown += `## Scores\n\n`;
-      markdown += `| Criterion | Score | Justification |\n`;
-      markdown += `|-----------|-------------|---------------|\n`;
-      markdown += `| Accuracy | ${s.accuracy ?? '-'} | ${s.justifications.accuracy} |\n`;
-      markdown += `| Relevance | ${s.relevance ?? '-'} | ${s.justifications.relevance} |\n`;
-      markdown += `| Organization | ${s.organization ?? '-'} | ${s.justifications.organization} |\n`;
-      markdown += `| **Weighted Score** | **${s.total ? s.total + '%' : '-'}** | |\n\n`;
+      markdown += `| Criterion | Score |\n`;
+      markdown += `|-----------|-------|\n`;
+      markdown += `| Accuracy | ${s.accuracy ?? '-'} |\n`;
+      markdown += `| Relevance | ${s.relevance ?? '-'} |\n`;
+      markdown += `| Organization | ${s.organization ?? '-'} |\n`;
+      markdown += `| **Weighted Score** | **${s.total ? s.total + '%' : '-'}** |\n\n`;
       
       if (s.overallComments) {
         markdown += `### Overall Comments\n\n${s.overallComments}\n\n`;
