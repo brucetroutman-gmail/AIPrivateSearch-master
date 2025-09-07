@@ -35,7 +35,7 @@ load-aiss.command
 ```
 
 **That's it!** The load-aiss.command script will:
-- Install Git automatically (if not already installed)
+- Install command line developer tools automatically (Xcode Command Line Tools with Git, make, etc.)
 - Install Node.js automatically (if not already installed)
 - Install Ollama automatically (if not already installed)
 - Install Chrome browser (if not already installed)
@@ -78,7 +78,7 @@ Test local document search:
 ### Troubleshooting
 - **Port 3000 busy**: Close Terminal windows and restart load-aiss.command
 - **Folder locked**: Close VS Code and restart load-aiss.command
-- **Git installation**: Complete Xcode Command Line Tools dialog if it appears
+- **Command Line Tools**: Script automatically installs Xcode Command Line Tools (Git, make, compilers). Complete dialog if prompted and wait for installation (up to 5 minutes)
 - **No scores**: Ensure score model is selected when scoring enabled
 - **Models not loading**: Script handles this automatically, wait for completion
 

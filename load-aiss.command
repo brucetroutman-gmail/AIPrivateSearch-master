@@ -3,37 +3,76 @@
 echo "🔄 AISearchScore One-Click Installer"
 echo "===================================="
 
-# Check if Git is installed
-echo "🔍 Checking Git installation..."
-if ! command -v git &> /dev/null; then
-    echo "📦 Git not found. Installing Git..."
+# Check if Git and command line developer tools are installed
+echo "🔍 Checking Git and command line developer tools installation..."
+
+# Function to check if Git is properly installed and functional
+check_git_functional() {
+    if command -v git &> /dev/null && git --version &> /dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to check if command line developer tools are installed
+check_command_line_tools() {
+    if xcode-select -p &> /dev/null && [ -d "$(xcode-select -p)" ] && command -v make &> /dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if ! check_git_functional || ! check_command_line_tools; then
+    echo "📦 Command line developer tools not found or not functional. Installing..."
     
-    # Check if Xcode Command Line Tools are installed
-    if ! xcode-select -p &> /dev/null; then
-        echo "⬇️  Installing Xcode Command Line Tools (includes Git)..."
-        xcode-select --install
+    # Check if Command Line Tools are installed
+    if ! check_command_line_tools; then
+        echo "⬇️  Installing Xcode Command Line Tools (includes Git, make, and other dev tools)..."
         
-        echo "⚠️  Please complete the Xcode Command Line Tools installation in the dialog that appeared."
+        # Trigger installation
+        xcode-select --install 2>/dev/null || true
+        
+        echo "⚠️  Please complete the Xcode Command Line Tools installation in the dialog."
         echo "⏳ Waiting for installation to complete..."
+        echo "   This may take several minutes..."
         
-        # Wait for installation to complete
-        while ! xcode-select -p &> /dev/null; do
-            sleep 5
+        # Wait for installation with timeout
+        TIMEOUT=300  # 5 minutes
+        ELAPSED=0
+        
+        while ! check_command_line_tools && [ $ELAPSED -lt $TIMEOUT ]; do
+            sleep 10
+            ELAPSED=$((ELAPSED + 10))
+            echo "   Still waiting... (${ELAPSED}s elapsed)"
         done
         
-        echo "✅ Xcode Command Line Tools installed successfully"
+        if [ $ELAPSED -ge $TIMEOUT ]; then
+            echo "⏰ Installation timeout. Please complete manually and restart."
+            read -p "Press Enter to close..."
+            exit 1
+        fi
+        
+        echo "✅ Xcode Command Line Tools installation completed"
+    else
+        echo "✅ Xcode Command Line Tools already installed"
     fi
     
-    # Verify Git is now available
-    if command -v git &> /dev/null; then
-        echo "✅ Git is now available"
+    # Verify tools are now functional
+    if check_git_functional && check_command_line_tools; then
+        GIT_VERSION=$(git --version)
+        echo "✅ Command line developer tools are now functional: $GIT_VERSION"
     else
-        echo "❌ Git installation failed. Please install manually."
+        echo "❌ Command line developer tools installation failed or not functional."
+        echo "   Please install Xcode Command Line Tools manually:"
+        echo "   Run: xcode-select --install"
         read -p "Press Enter to close..."
         exit 1
     fi
 else
-    echo "✅ Git is already installed"
+    GIT_VERSION=$(git --version)
+    echo "✅ Command line developer tools are already installed and functional: $GIT_VERSION"
 fi
 
 # Check for running processes
