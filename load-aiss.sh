@@ -13,38 +13,6 @@ fi
 
 echo "✅ Running from correct directory: $(pwd)"
 
-# Check if Git is installed
-echo "🔍 Checking Git installation..."
-if ! command -v git &> /dev/null; then
-    echo "📦 Git not found. Installing Git..."
-    
-    # Check if Xcode Command Line Tools are installed
-    if ! xcode-select -p &> /dev/null; then
-        echo "⬇️  Installing Xcode Command Line Tools (includes Git)..."
-        xcode-select --install
-        
-        echo "⚠️  Please complete the Xcode Command Line Tools installation in the dialog that appeared."
-        echo "⏳ Waiting for installation to complete..."
-        
-        # Wait for installation to complete
-        while ! xcode-select -p &> /dev/null; do
-            sleep 5
-        done
-        
-        echo "✅ Xcode Command Line Tools installed successfully"
-    fi
-    
-    # Verify Git is now available
-    if command -v git &> /dev/null; then
-        echo "✅ Git is now available"
-    else
-        echo "❌ Git installation failed. Please install manually."
-        exit 1
-    fi
-else
-    echo "✅ Git is already installed"
-fi
-
 # Check if Ollama is installed
 echo "🔍 Checking Ollama installation..."
 if ! command -v ollama &> /dev/null; then

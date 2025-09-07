@@ -22,10 +22,9 @@ AISearchScore is a comprehensive AI model evaluation platform that combines inte
 
 ### Prerequisites
 - **macOS** (tested on macOS 12+)
-- **Node.js** v16 or higher
-- **MySQL** database (optional, for result storage)
 - **4GB+ RAM** available for AI models
-- **Internet connection** (for Ollama and model downloads)
+- **Internet connection** (for downloads)
+- **MySQL** database (optional, for result storage)
 
 ### Quick Start (2 Minutes)
 
@@ -37,6 +36,7 @@ load-aiss.command
 
 **That's it!** The load-aiss.command script will:
 - Install Git automatically (if not already installed)
+- Install Node.js automatically (if not already installed)
 - Install Ollama automatically (if not already installed)
 - Install Chrome browser (if not already installed)
 - Start Ollama service
@@ -76,10 +76,11 @@ Test local document search:
 4. Query your documents with AI-powered search
 
 ### Troubleshooting
-- **Port 3000 busy**: Close Terminal windows and restart
-- **Models not loading**: Verify Ollama is running (`ollama list`)
+- **Port 3000 busy**: Close Terminal windows and restart load-aiss.command
 - **Folder locked**: Close VS Code and restart load-aiss.command
+- **Git installation**: Complete Xcode Command Line Tools dialog if it appears
 - **No scores**: Ensure score model is selected when scoring enabled
+- **Models not loading**: Script handles this automatically, wait for completion
 
 ### Next Steps
 - Explore different model combinations for optimal performance
