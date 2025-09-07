@@ -8,71 +8,67 @@ echo "🔍 Checking Git and command line developer tools installation..."
 
 # Function to check if Git is properly installed and functional
 check_git_functional() {
-    if command -v git &> /dev/null && git --version &> /dev/null; then
-        return 0
-    else
-        return 1
+    if command -v git &> /dev/null; then
+        # Test git with a simple command that doesn't require command line tools
+        if git --version &> /dev/null 2>&1; then
+            return 0
+        fi
     fi
+    return 1
 }
 
 # Function to check if command line developer tools are installed
 check_command_line_tools() {
-    if xcode-select -p &> /dev/null && [ -d "$(xcode-select -p)" ] && command -v make &> /dev/null; then
-        return 0
-    else
-        return 1
+    # Check if xcode-select works and tools are actually installed
+    if xcode-select -p &> /dev/null 2>&1; then
+        local dev_dir=$(xcode-select -p 2>/dev/null)
+        if [ -d "$dev_dir" ] && [ -f "$dev_dir/usr/bin/git" ]; then
+            return 0
+        fi
     fi
+    return 1
 }
 
-if ! check_git_functional || ! check_command_line_tools; then
-    echo "📦 Command line developer tools not found or not functional. Installing..."
+# Always check and ensure command line tools are properly installed
+if ! check_command_line_tools; then
+    echo "📦 Command line developer tools required. Installing Xcode Command Line Tools..."
     
-    # Check if Command Line Tools are installed
-    if ! check_command_line_tools; then
-        echo "⬇️  Installing Xcode Command Line Tools (includes Git, make, and other dev tools)..."
-        
-        # Trigger installation
-        xcode-select --install 2>/dev/null || true
-        
-        echo "⚠️  Please complete the Xcode Command Line Tools installation in the dialog."
-        echo "⏳ Waiting for installation to complete..."
-        echo "   This may take several minutes..."
-        
-        # Wait for installation with timeout
-        TIMEOUT=300  # 5 minutes
-        ELAPSED=0
-        
-        while ! check_command_line_tools && [ $ELAPSED -lt $TIMEOUT ]; do
-            sleep 10
-            ELAPSED=$((ELAPSED + 10))
-            echo "   Still waiting... (${ELAPSED}s elapsed)"
-        done
-        
-        if [ $ELAPSED -ge $TIMEOUT ]; then
-            echo "⏰ Installation timeout. Please complete manually and restart."
-            read -p "Press Enter to close..."
-            exit 1
-        fi
-        
-        echo "✅ Xcode Command Line Tools installation completed"
-    else
-        echo "✅ Xcode Command Line Tools already installed"
-    fi
+    # Trigger installation
+    xcode-select --install 2>/dev/null || true
     
-    # Verify tools are now functional
-    if check_git_functional && check_command_line_tools; then
-        GIT_VERSION=$(git --version)
-        echo "✅ Command line developer tools are now functional: $GIT_VERSION"
-    else
-        echo "❌ Command line developer tools installation failed or not functional."
-        echo "   Please install Xcode Command Line Tools manually:"
+    echo "⚠️  Please complete the Xcode Command Line Tools installation in the dialog."
+    echo "⏳ Waiting for installation to complete..."
+    echo "   This may take several minutes..."
+    
+    # Wait for installation with timeout
+    TIMEOUT=600  # 10 minutes for slower systems
+    ELAPSED=0
+    
+    while ! check_command_line_tools && [ $ELAPSED -lt $TIMEOUT ]; do
+        sleep 15
+        ELAPSED=$((ELAPSED + 15))
+        echo "   Still waiting... (${ELAPSED}s elapsed)"
+    done
+    
+    if [ $ELAPSED -ge $TIMEOUT ]; then
+        echo "⏰ Installation timeout. Please complete manually and restart."
         echo "   Run: xcode-select --install"
         read -p "Press Enter to close..."
         exit 1
     fi
+    
+    echo "✅ Xcode Command Line Tools installation completed"
+fi
+
+# Verify Git is functional after command line tools installation
+if check_git_functional; then
+    GIT_VERSION=$(git --version 2>/dev/null || echo "Git available")
+    echo "✅ Command line developer tools are functional: $GIT_VERSION"
 else
-    GIT_VERSION=$(git --version)
-    echo "✅ Command line developer tools are already installed and functional: $GIT_VERSION"
+    echo "❌ Git still not functional after command line tools installation."
+    echo "   Please restart Terminal and try again."
+    read -p "Press Enter to close..."
+    exit 1
 fi
 
 # Check for running processes
