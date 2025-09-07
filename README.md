@@ -36,6 +36,7 @@ load-aiss.command
 ```
 
 **That's it!** The load-aiss.command script will:
+- Install Git automatically (if not already installed)
 - Install Ollama automatically (if not already installed)
 - Install Chrome browser (if not already installed)
 - Start Ollama service
