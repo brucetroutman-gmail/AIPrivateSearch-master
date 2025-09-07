@@ -13,6 +13,51 @@ fi
 
 echo "✅ Running from correct directory: $(pwd)"
 
+# Check if Ollama is installed
+echo "🔍 Checking Ollama installation..."
+if ! command -v ollama &> /dev/null; then
+    echo "📥 Ollama not found. Installing Ollama..."
+    
+    # Download and install Ollama
+    echo "⬇️  Downloading Ollama installer..."
+    curl -fsSL https://ollama.com/install.sh | sh
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Ollama installation failed. Please install manually from https://ollama.com/download"
+        exit 1
+    fi
+    
+    echo "✅ Ollama installed successfully"
+else
+    echo "✅ Ollama is already installed"
+fi
+
+# Start Ollama service if not running
+echo "🚀 Starting Ollama service..."
+if ! pgrep -f "ollama serve" > /dev/null; then
+    ollama serve &
+    echo "✅ Ollama service started"
+    sleep 3
+else
+    echo "✅ Ollama service is already running"
+fi
+
+# Verify Ollama is accessible
+echo "🔍 Verifying Ollama accessibility..."
+for i in {1..10}; do
+    if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+        echo "✅ Ollama is accessible"
+        break
+    fi
+    if [ $i -eq 10 ]; then
+        echo "❌ Ollama is not accessible after 10 attempts"
+        echo "Please check if Ollama is running: ollama serve"
+        exit 1
+    fi
+    echo "⏳ Waiting for Ollama to start... (attempt $i/10)"
+    sleep 2
+done
+
 # Create repos directory if it doesn't exist
 if [ ! -d "repos" ]; then
     echo "📁 Creating repos directory..."
