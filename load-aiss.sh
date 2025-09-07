@@ -58,6 +58,36 @@ for i in {1..10}; do
     sleep 2
 done
 
+# Check if Chrome is installed
+echo "🔍 Checking Chrome browser installation..."
+if [ ! -d "/Applications/Google Chrome.app" ]; then
+    echo "📦 Chrome not found. Installing Chrome..."
+    
+    # Download Chrome
+    echo "⬇️  Downloading Chrome installer..."
+    curl -L -o /tmp/googlechrome.dmg "https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg"
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Chrome download failed. Please install manually from https://www.google.com/chrome/"
+    else
+        # Mount and install Chrome
+        echo "📦 Installing Chrome..."
+        hdiutil attach /tmp/googlechrome.dmg -quiet
+        cp -R "/Volumes/Google Chrome/Google Chrome.app" /Applications/
+        hdiutil detach "/Volumes/Google Chrome" -quiet
+        rm /tmp/googlechrome.dmg
+        
+        echo "✅ Chrome installed successfully"
+        
+        # Set Chrome as default browser
+        echo "🔧 Setting Chrome as default browser..."
+        open -a "Google Chrome" --args --make-default-browser
+        echo "✅ Chrome set as default browser"
+    fi
+else
+    echo "✅ Chrome is already installed"
+fi
+
 # Create repos directory if it doesn't exist
 if [ ! -d "repos" ]; then
     echo "📁 Creating repos directory..."

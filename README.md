@@ -37,6 +37,7 @@ load-aiss.command
 
 **That's it!** The load-aiss.command script will:
 - Install Ollama automatically (if not already installed)
+- Install Chrome browser (if not already installed)
 - Start Ollama service
 - Clone the repository to the correct location
 - Pull required AI models automatically
