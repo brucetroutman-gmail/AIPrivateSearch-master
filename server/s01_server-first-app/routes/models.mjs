@@ -11,7 +11,7 @@ router.get('/', requireAuthWithRateLimit(10, 60000), async (req, res) => {
   try {
     const response = await ollama.list();
     const models = response.models
-      .map(model => model.name)
+      .map(model => model.name.replace(':latest', ''))
       .filter(name => !name.includes('nomic-embed-text'))
       .sort();
     res.json({ models });

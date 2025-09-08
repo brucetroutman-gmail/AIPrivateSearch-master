@@ -59,6 +59,11 @@
       "category": "embed",
       "modelName": "BGE-M3",
       "size": "1.2 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "phi3:3.8b",
+      "size": "2.2 GB"
     }
   ]
 }

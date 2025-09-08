@@ -136,7 +136,7 @@
             <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
             <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
             <button class="update-btn" style="background: #dc3545;" onclick="removeSelectedModels()">Remove Selected Models</button>
-            <button class="update-btn" style="background: #ffc107; color: #000;" onclick="removeUnusedModels()">Remove Unused Models</button>
+            <button class="update-btn" style="background: #ffc107; color: #000;" onclick="removeUnusedModels()">Remove Unlisted Models</button>
             <span id="selectedCount">0 models selected</span>
             <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
                 <strong>🔄 Model Update in Progress...</strong>
@@ -439,22 +439,22 @@
                 // Get models from Ollama
                 const ollamaResponse = await fetch('http://localhost:11434/api/tags');
                 const ollamaData = await ollamaResponse.json();
-                const installedModels = ollamaData.models.map(m => m.name);
+                const installedModels = ollamaData.models.map(m => m.name.replace(':latest', ''));
                 
                 // Get models from models-list.json
                 const configResponse = await fetch('config/models-list.json');
                 const configData = await configResponse.json();
                 const configuredModels = [...new Set(configData.models.map(m => m.modelName))];
                 
-                // Find unused models (in Ollama but not in config)
-                const unusedModels = installedModels.filter(model => !configuredModels.includes(model));
+                // Find unlisted models (in Ollama but not in config)
+                const unlistedModels = installedModels.filter(model => !configuredModels.includes(model));
                 
-                if (unusedModels.length === 0) {
-                    showUserMessage('No unused models found. All installed models are in the configuration.', 'info');
+                if (unlistedModels.length === 0) {
+                    showUserMessage('No unlisted models found. All installed models are in the configuration.', 'info');
                     return;
                 }
                 
-                if (!await secureConfirm(`Found ${unusedModels.length} unused models:\n${unusedModels.join(', ')}\n\nRemove these models? This action cannot be undone.`)) {
+                if (!await secureConfirm(`Found ${unlistedModels.length} unlisted models:\n${unlistedModels.join(', ')}\n\nRemove these models? This action cannot be undone.`)) {
                     return;
                 }
                 
@@ -466,9 +466,9 @@
                 
                 statusDiv.style.display = 'block';
                 
-                for (const modelName of unusedModels) {
+                for (const modelName of unlistedModels) {
                     const startTime = Date.now();
-                    progressDiv.innerHTML = `Removing unused model: ${modelName}...`;
+                    progressDiv.innerHTML = `Removing unlisted model: ${modelName}...`;
                     
                     try {
                         const response = await fetch('http://localhost:11434/api/delete', {
@@ -482,7 +482,7 @@
                         if (response.ok) {
                             const resultHtml = `
                                 <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
-                                    <strong>${modelName}</strong> ${elapsedTime}s - ✅ Unused Model Removed
+                                    <strong>${modelName}</strong> ${elapsedTime}s - ✅ Unlisted Model Removed
                                 </div>
                             `;
                             if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
@@ -514,7 +514,7 @@
                 loadModels();
                 
             } catch (error) {
-                showUserMessage(`Error checking for unused models: ${error.message}`, 'error');
+                showUserMessage(`Error checking for unlisted models: ${error.message}`, 'error');
             }
         }
         

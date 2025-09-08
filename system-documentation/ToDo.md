@@ -125,7 +125,19 @@ specs-3-scoring
 
 56. Uncheck Search checkbox by default on model page --done
 
-57. Add Remove Unused Models button to clean up models not in models-list.json --done
+57. Add Remove Unlisted Models button to clean up models not in models-list.json --done
+
+58. Remove :latest suffix from Ollama model names --done
+
+59. Left align scoring table content --done
+
+60. Fix criterion column width to fit "Weighted Score" --done
+
+61. Rename "Remove Unused Models" to "Remove Unlisted Models" --done
+
+62. Fix dark mode processing text to use light gray background --done
+
+63. Fix dark mode processing button and inline elements styling --done
 
 
 

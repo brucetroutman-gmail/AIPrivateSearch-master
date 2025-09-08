@@ -69,6 +69,23 @@ th {
     font-weight: 600;
 }
 
+/* Score table specific styling - force left alignment */
+.score-table th,
+.score-table td {
+    text-align: left !important;
+}
+
+table.score-table th,
+table.score-table td {
+    text-align: left !important;
+}
+
+/* Set first column width to fit "Weighted Score" */
+.score-table th:first-child,
+.score-table td:first-child {
+    width: 140px !important;
+}
+
 /* Content Areas */
 #output, .results {
     background: white;
