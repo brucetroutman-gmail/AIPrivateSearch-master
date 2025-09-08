@@ -8,15 +8,57 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
-# Check if Ollama is available
+# Check if Ollama is available and start if needed
 echo "Checking Ollama availability..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-    echo "❌ Ollama not available at http://localhost:11434"
-    echo "📥 Please install Ollama from: https://ollama.com/download"
-    echo "🚀 Then run: ollama serve"
-    exit 1
+    echo "⚠️  Ollama not running."
+    
+    # Check if Ollama is installed
+    if command -v ollama &> /dev/null; then
+        echo "   Ollama is installed but not running."
+        echo ""
+        read -p "Would you like to start Ollama now? (y/n): " -n 1 -r
+        echo ""
+        
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "🚀 Starting Ollama service..."
+            # Start Ollama in background
+            nohup ollama serve > /tmp/ollama.log 2>&1 &
+            OLLAMA_PID=$!
+            
+            # Wait for Ollama to start (up to 30 seconds)
+            echo "⏳ Waiting for Ollama to start..."
+            for i in {1..30}; do
+                if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+                    echo "✅ Ollama started successfully"
+                    break
+                fi
+                sleep 1
+                echo "   Waiting... (${i}s)"
+            done
+            
+            # Final check
+            if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+                echo "❌ Failed to start Ollama"
+                echo "📋 Check log: tail /tmp/ollama.log"
+                echo "   You can start Ollama manually by running: ollama serve"
+                exit 1
+            fi
+        else
+            echo "❌ Ollama startup cancelled."
+            echo "   Please start Ollama manually by running: ollama serve"
+            echo "   Then run this script again."
+            exit 1
+        fi
+    else
+        echo "❌ Ollama not installed"
+        echo "📥 Please install Ollama from: https://ollama.com/download"
+        echo "🚀 Or run the load-aiss.command installer again"
+        exit 1
+    fi
+else
+    echo "✅ Ollama is already running"
 fi
-echo "✅ Ollama is running"
 
 # Pull required models (only if not pulled in last 24 hours)
 echo "Checking model status..."
@@ -100,5 +142,5 @@ echo ""
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for user interrupt
-trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID; exit" INT
+trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; pkill -f 'ollama serve' 2>/dev/null; exit" INT
 wait

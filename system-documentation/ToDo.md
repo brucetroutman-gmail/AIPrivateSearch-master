@@ -111,6 +111,18 @@ specs-3-scoring
 
 49. test scoring
 
+50. User-confirmed install Node.js in load-aiss.command --done
+
+51. User-confirmed install Ollama in load-aiss.command --done
+
+52. User-confirmed install Chrome browser --done
+
+53. User-confirmed start Ollama service in start.sh --done
+
+54. Enhanced error handling for missing dependencies --done
+
+55. Changed from auto-install to user confirmation for all dependencies --done
+
 
 
 
