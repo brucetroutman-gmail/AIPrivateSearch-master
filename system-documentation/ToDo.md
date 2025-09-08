@@ -123,6 +123,10 @@ specs-3-scoring
 
 55. Changed from auto-install to user confirmation for all dependencies --done
 
+56. Uncheck Search checkbox by default on model page --done
+
+57. Add Remove Unused Models button to clean up models not in models-list.json --done
+
 
 
 

@@ -124,7 +124,7 @@
             <div style="margin-bottom: 10px;">
                 <label style="display: inline-block; width: 100px; font-weight: bold; vertical-align: top;">Category:</label>
                 <div style="display: inline-block;">
-                    <label><input type="checkbox" id="categorySearch" value="search" checked> Search</label><br>
+                    <label><input type="checkbox" id="categorySearch" value="search"> Search</label><br>
                     <label><input type="checkbox" id="categoryScore" value="score"> Score</label><br>
                     <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label>
                 </div>
@@ -136,6 +136,7 @@
             <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
             <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
             <button class="update-btn" style="background: #dc3545;" onclick="removeSelectedModels()">Remove Selected Models</button>
+            <button class="update-btn" style="background: #ffc107; color: #000;" onclick="removeUnusedModels()">Remove Unused Models</button>
             <span id="selectedCount">0 models selected</span>
             <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
                 <strong>🔄 Model Update in Progress...</strong>
@@ -430,6 +431,90 @@
                 updateBtn.disabled = false;
                 updateBtn.textContent = originalText;
                 updateBtn.classList.remove('processing-button');
+            }
+        }
+        
+        async function removeUnusedModels() {
+            try {
+                // Get models from Ollama
+                const ollamaResponse = await fetch('http://localhost:11434/api/tags');
+                const ollamaData = await ollamaResponse.json();
+                const installedModels = ollamaData.models.map(m => m.name);
+                
+                // Get models from models-list.json
+                const configResponse = await fetch('config/models-list.json');
+                const configData = await configResponse.json();
+                const configuredModels = [...new Set(configData.models.map(m => m.modelName))];
+                
+                // Find unused models (in Ollama but not in config)
+                const unusedModels = installedModels.filter(model => !configuredModels.includes(model));
+                
+                if (unusedModels.length === 0) {
+                    showUserMessage('No unused models found. All installed models are in the configuration.', 'info');
+                    return;
+                }
+                
+                if (!await secureConfirm(`Found ${unusedModels.length} unused models:\n${unusedModels.join(', ')}\n\nRemove these models? This action cannot be undone.`)) {
+                    return;
+                }
+                
+                setProcessingState(true);
+                document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+                const statusDiv = document.getElementById('updateStatus');
+                const progressDiv = document.getElementById('progressIndicator');
+                const resultsDiv = document.getElementById('updateResults');
+                
+                statusDiv.style.display = 'block';
+                
+                for (const modelName of unusedModels) {
+                    const startTime = Date.now();
+                    progressDiv.innerHTML = `Removing unused model: ${modelName}...`;
+                    
+                    try {
+                        const response = await fetch('http://localhost:11434/api/delete', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: modelName })
+                        });
+                        
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        
+                        if (response.ok) {
+                            const resultHtml = `
+                                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                    <strong>${modelName}</strong> ${elapsedTime}s - ✅ Unused Model Removed
+                                </div>
+                            `;
+                            if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                                resultsDiv.innerHTML = resultHtml;
+                            } else {
+                                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                            }
+                        } else {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                    } catch (error) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        const resultHtml = `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                                <strong>${modelName}</strong> ${elapsedTime}s - ❌ Remove Failed
+                                <br><small>Error: ${error.message}</small>
+                            </div>
+                        `;
+                        if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                            resultsDiv.innerHTML = resultHtml;
+                        } else {
+                            resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                        }
+                    }
+                }
+                
+                statusDiv.style.display = 'none';
+                setProcessingState(false);
+                loadModels();
+                
+            } catch (error) {
+                showUserMessage(`Error checking for unused models: ${error.message}`, 'error');
             }
         }
         
