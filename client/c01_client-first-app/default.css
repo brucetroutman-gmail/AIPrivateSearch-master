@@ -129,3 +129,113 @@ nav a:hover {
     border-radius: 6px;
     margin: 1rem 0;
 }
+
+/* Model selector styling */
+.model-selector {
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--card-bg);
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.model-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.model-list {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 5px;
+    background: var(--input-bg);
+}
+
+.score-model-select {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.token-override-select {
+    width: 200px;
+    padding: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.execution-status {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--status-bg);
+    border-radius: 5px;
+    display: none;
+    color: #2c3e50;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.success-message {
+    color: green;
+}
+
+.error-message {
+    color: red;
+}
+
+.result-success {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--success-border);
+    border-radius: 5px;
+    background: var(--success-bg);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.result-error {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--error-border);
+    border-radius: 5px;
+    background: var(--error-bg);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.result-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    text-align: left;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.testcode-display {
+    font-family: monospace;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+.testcode-item {
+    /* Default styling for testcode items */
+}
+
+.testcode-item.invalid {
+    color: #dc3545;
+}
+
+.footer-link {
+    color: #bdc3c7;
+}

@@ -175,7 +175,7 @@
         function displayBreakdown(breakdown, testCode) {
             const breakdownDiv = document.getElementById('breakdown');
             
-            let html = `<div style="font-family: monospace; font-size: 18px; margin-bottom: 20px; color: #007bff;">${testCode}</div>`;
+            let html = `<div class="testcode-display">${testCode}</div>`;
             html += '<div class="digit-breakdown">';
             
             const positions = [
@@ -194,7 +194,7 @@
                 const isInvalid = item.meaning === 'Invalid';
                 html += `
                     <div class="digit ${isInvalid ? 'error' : ''}">${item.digit}</div>
-                    <div style="${isInvalid ? 'color: #dc3545;' : ''}">${item.digit} - ${pos.label}: ${item.meaning}</div>
+                    <div class="testcode-item ${isInvalid ? 'invalid' : ''}">${item.digit} - ${pos.label}: ${item.meaning}</div>
                 `;
             });
             
