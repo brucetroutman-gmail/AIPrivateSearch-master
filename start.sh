@@ -60,37 +60,69 @@ else
     echo "✅ Ollama is already running"
 fi
 
-# Pull required models (only if not pulled in last 24 hours)
+# Check and pull required models
 echo "Checking model status..."
 LAST_PULL_FILE=".last_model_pull"
 CURRENT_TIME=$(date +%s)
-SHOULD_PULL=false
+SHOULD_UPDATE=false
+MISSING_MODELS=()
 
+# Get list of required models
+REQUIRED_MODELS=$(grep '"modelName"' client/c01_client-first-app/config/models-list.json | cut -d'"' -f4 | sort -u)
+
+# Get list of installed models
+INSTALLED_MODELS=$(ollama list | tail -n +2 | awk '{print $1}' | sed 's/:latest$//')
+
+# Check for missing models
+echo "🔍 Checking for missing models..."
+for model in $REQUIRED_MODELS; do
+    if ! echo "$INSTALLED_MODELS" | grep -q "^${model}$"; then
+        MISSING_MODELS+=("$model")
+        echo "❌ Missing: $model"
+    fi
+done
+
+# Check if we need to update (24 hour check)
 if [ -f "$LAST_PULL_FILE" ]; then
     LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
     TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
     # 86400 seconds = 24 hours
     if [ $TIME_DIFF -gt 86400 ]; then
-        SHOULD_PULL=true
-        echo "⏰ Last model pull was over 24 hours ago, updating models..."
-    else
-        echo "✅ Models were pulled recently (within 24 hours), skipping pull"
+        SHOULD_UPDATE=true
+        echo "⏰ Last model update was over 24 hours ago"
     fi
 else
-    SHOULD_PULL=true
-    echo "📥 First time setup, pulling models..."
+    SHOULD_UPDATE=true
+    echo "📥 First time setup detected"
 fi
 
-if [ "$SHOULD_PULL" = true ]; then
-    MODELS=$(grep '"modelName"' client/c01_client-first-app/config/models-list.json | cut -d'"' -f4 | sort -u)
-    for model in $MODELS; do
+# Pull missing models immediately
+if [ ${#MISSING_MODELS[@]} -gt 0 ]; then
+    echo "📥 Pulling missing models..."
+    for model in "${MISSING_MODELS[@]}"; do
         echo "📥 Pulling $model..."
         ollama pull "$model"
-        echo "✅ $model ready"
+        if [ $? -eq 0 ]; then
+            echo "✅ $model ready"
+        else
+            echo "❌ Failed to pull $model"
+        fi
     done
-    # Record the current time
+fi
+
+# Update all models if needed (24 hour check)
+if [ "$SHOULD_UPDATE" = true ] && [ ${#MISSING_MODELS[@]} -eq 0 ]; then
+    echo "🔄 Updating all models..."
+    for model in $REQUIRED_MODELS; do
+        echo "🔄 Updating $model..."
+        ollama pull "$model"
+    done
     echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
     echo "✅ All models updated"
+elif [ ${#MISSING_MODELS[@]} -gt 0 ]; then
+    # Update timestamp after pulling missing models
+    echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
+    echo "✅ Missing models installed"
 else
     echo "✅ All models ready (using cached versions)"
 fi

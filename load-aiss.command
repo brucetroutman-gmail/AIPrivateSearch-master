@@ -299,22 +299,35 @@ else
         
         if [ -f "/tmp/googlechrome.dmg" ]; then
             echo "   Installing Chrome..."
+            
             # Mount the DMG
-            hdiutil attach "/tmp/googlechrome.dmg" -quiet -nobrowse
-            
-            # Copy Chrome to Applications
-            cp -R "/Volumes/Google Chrome/Google Chrome.app" "/Applications/" 2>/dev/null
-            
-            # Unmount the DMG
-            hdiutil detach "/Volumes/Google Chrome" -quiet
-            
-            # Clean up
-            rm -f "/tmp/googlechrome.dmg"
-            
-            if [ -d "/Applications/Google Chrome.app" ]; then
-                echo "   ✅ Chrome installed successfully"
+            if hdiutil attach "/tmp/googlechrome.dmg" -quiet -nobrowse 2>/dev/null; then
+                # Copy Chrome to Applications with proper permissions
+                if sudo cp -R "/Volumes/Google Chrome/Google Chrome.app" "/Applications/" 2>/dev/null || \
+                   cp -R "/Volumes/Google Chrome/Google Chrome.app" "/Applications/" 2>/dev/null; then
+                    
+                    # Unmount the DMG
+                    hdiutil detach "/Volumes/Google Chrome" -quiet 2>/dev/null
+                    
+                    # Clean up
+                    rm -f "/tmp/googlechrome.dmg"
+                    
+                    if [ -d "/Applications/Google Chrome.app" ]; then
+                        echo "   ✅ Chrome installed successfully"
+                        # Fix permissions
+                        sudo chown -R root:admin "/Applications/Google Chrome.app" 2>/dev/null || true
+                    else
+                        echo "   ⚠️  Chrome installation verification failed"
+                    fi
+                else
+                    echo "   ❌ Failed to copy Chrome to Applications"
+                    echo "   Please check permissions or install manually"
+                    hdiutil detach "/Volumes/Google Chrome" -quiet 2>/dev/null
+                    rm -f "/tmp/googlechrome.dmg"
+                fi
             else
-                echo "   ⚠️  Chrome installation may have failed"
+                echo "   ❌ Failed to mount Chrome installer"
+                rm -f "/tmp/googlechrome.dmg"
             fi
         else
             echo "   ❌ Failed to download Chrome"
