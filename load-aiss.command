@@ -281,11 +281,11 @@ fi
 
 # Check for Chrome installation
 echo "🔍 Checking for Chrome browser..."
-if [ -d "/Applications/Google Chrome.app" ] || [ -d "/Applications/Safari.app" ] || [ -d "/Applications/Firefox.app" ]; then
-    echo "✅ Web browser found"
+if [ -d "/Applications/Google Chrome.app" ]; then
+    echo "✅ Chrome browser found"
 else
-    echo "❌ No web browser found."
-    echo "   AISearchScore works best with Chrome, but any modern browser will work."
+    echo "❌ Chrome browser not found."
+    echo "   AISearchScore requires Chrome browser for optimal performance."
     echo ""
     read -p "Would you like to install Chrome now? (y/n): " -n 1 -r
     echo ""
