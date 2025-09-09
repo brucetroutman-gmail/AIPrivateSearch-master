@@ -442,3 +442,4 @@ sleep 2
 # Start the application
 echo "🚀 Starting AISearchScore application..."
 bash start.sh
+# Updated with enhanced Chrome installation and command line tools
