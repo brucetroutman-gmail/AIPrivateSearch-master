@@ -157,21 +157,10 @@
       try {
         console.log('🔄 Ensuring all models are available in Ollama...');
         
-        // Check if required services are available
-        if (!window.csrfManager) {
-          console.log('⚠️  CSRF Manager not loaded, skipping model sync');
-          return;
-        }
-        
         // Get current models-list.json
         const configResponse = await window.csrfManager.fetch('http://localhost:3001/api/config/models-list.json', {
           headers: { 'X-API-Key': 'dev-key' }
         });
-        
-        if (!configResponse.ok) {
-          console.log('⚠️  Backend not available, skipping model sync');
-          return;
-        }
         const configData = await configResponse.json();
         const modelsList = JSON.parse(configData.content);
         
