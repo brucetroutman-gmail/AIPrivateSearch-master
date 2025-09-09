@@ -163,8 +163,22 @@ fi
 # Start frontend client
 echo "Starting frontend client..."
 cd ../../client/c01_client-first-app
-npx serve . &
+
+# Kill any existing serve processes
+pkill -f "npx serve" 2>/dev/null || true
+sleep 1
+
+# Start frontend with the working command
+npx serve . -l 3000 &
 FRONTEND_PID=$!
+
+# Wait for frontend to start
+sleep 3
+if kill -0 $FRONTEND_PID 2>/dev/null; then
+    echo "✅ Frontend server started successfully"
+else
+    echo "❌ Frontend server failed to start"
+fi
 
 echo ""
 echo "✅ Application started successfully!"
@@ -174,5 +188,13 @@ echo ""
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for user interrupt
-trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; pkill -f 'ollama serve' 2>/dev/null; exit" INT
-wait
+trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; pkill -f 'npx serve' 2>/dev/null; pkill -f 'node server.mjs' 2>/dev/null; exit" INT
+
+# Keep both servers running
+while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do
+    sleep 5
+done
+
+echo "One or both servers stopped unexpectedly"
+echo "Backend running: $(kill -0 $BACKEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
+echo "Frontend running: $(kill -0 $FRONTEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
