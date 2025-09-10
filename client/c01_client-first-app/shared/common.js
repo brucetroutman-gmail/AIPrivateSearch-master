@@ -1,64 +1,18 @@
-// Rate limiting for message display
+// Simple rate limiting
 let messageCallCount = 0;
 let lastMessageReset = Date.now();
-
-// Rate limiting for prompts
 let promptCallCount = 0;
 let lastPromptReset = Date.now();
 
-// Authorization system
-const AUTHORIZED_FUNCTIONS = new Set([
-  'toggleDeveloperMode', 'promptForEmail', 'updateUserEmail', 'showUserInfo',
-  'exportToDatabase', 'loadScoreModels', 'loadSharedComponents', 'handleExport',
-  'search.js', 'collections.html', 'test.html', 'model.html', 'collections-editor.html'
-]);
-
-function isAuthorizedCaller() {
-  const stack = new Error().stack;
-  if (!stack) return false;
-  
-  // Check if call comes from authorized functions
-  for (const funcName of AUTHORIZED_FUNCTIONS) {
-    if (stack.includes(funcName)) return true;
-  }
-  
-  // Check if call comes from legitimate application files
-  const legitimateFiles = [
-    'search.js', 'common.js', 'collections.html', 'test.html', 
-    'model.html', 'collections-editor.html'
-  ];
-  
-  for (const file of legitimateFiles) {
-    if (stack.includes(file)) return true;
-  }
-  
-  // Check if call comes from same origin and not from eval/Function
-  if (window.location.origin === document.location.origin && 
-      !stack.includes('eval') && !stack.includes('Function')) {
-    return true;
-  }
-  
-  return false;
-}
-
-// Secure user message system
+// User message system with rate limiting
 function showUserMessage(message, type = 'info') {
-  // Authorization check
-  if (!isAuthorizedCaller()) {
-    console.warn('Unauthorized message display attempt');
-    return;
-  }
-  
   // Rate limiting - max 10 messages per 30 seconds
   const now = Date.now();
   if (now - lastMessageReset > 30000) {
     messageCallCount = 0;
     lastMessageReset = now;
   }
-  if (messageCallCount >= 10) {
-    console.warn('Message rate limit exceeded');
-    return;
-  }
+  if (messageCallCount >= 10) return;
   messageCallCount++;
   
   // Sanitize input
@@ -101,34 +55,19 @@ function showUserMessage(message, type = 'info') {
   }, 3000);
 }
 
-// Secure prompt replacement
+// Prompt replacement with rate limiting
 function securePrompt(message, defaultValue = '') {
-  // Authorization check
-  if (!isAuthorizedCaller()) {
-    console.warn('Unauthorized prompt attempt');
-    return Promise.resolve(null);
-  }
-  
   // Rate limiting - max 5 prompts per 60 seconds
   const now = Date.now();
   if (now - lastPromptReset > 60000) {
     promptCallCount = 0;
     lastPromptReset = now;
   }
-  if (promptCallCount >= 5) {
-    console.warn('Prompt rate limit exceeded');
-    return Promise.resolve(null);
-  }
+  if (promptCallCount >= 5) return Promise.resolve(null);
   promptCallCount++;
   
-  // Sanitize message input
-  if (typeof message !== 'string') {
-    message = String(message);
-  }
-  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
-    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
-    return entities[char];
-  }).substring(0, 500);
+  // Basic sanitization
+  const sanitizedMessage = String(message).replace(/[<>&"']/g, '').substring(0, 500);
   
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -173,34 +112,19 @@ function securePrompt(message, defaultValue = '') {
   });
 }
 
-// Secure confirm replacement
+// Confirm replacement with rate limiting
 function secureConfirm(message) {
-  // Authorization check
-  if (!isAuthorizedCaller()) {
-    console.warn('Unauthorized confirm attempt');
-    return Promise.resolve(false);
-  }
-  
   // Rate limiting - max 5 confirms per 60 seconds
   const now = Date.now();
   if (now - lastPromptReset > 60000) {
     promptCallCount = 0;
     lastPromptReset = now;
   }
-  if (promptCallCount >= 5) {
-    console.warn('Confirm rate limit exceeded');
-    return Promise.resolve(false);
-  }
+  if (promptCallCount >= 5) return Promise.resolve(false);
   promptCallCount++;
   
-  // Sanitize message input
-  if (typeof message !== 'string') {
-    message = String(message);
-  }
-  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
-    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
-    return entities[char];
-  }).substring(0, 500);
+  // Basic sanitization
+  const sanitizedMessage = String(message).replace(/[<>&"']/g, '').substring(0, 500);
   
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -254,9 +178,9 @@ async function loadSharedComponents() {
     
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('Error loading shared components:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      logger.error('Error loading shared components:', error);
     } else {
-      console.error('Error loading shared components:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      console.error('Error loading shared components:', error);
     }
     throw error;
   }
@@ -394,9 +318,9 @@ async function loadScoreModels(selectElementId) {
     
     if (!scoreSelect) {
       if (typeof logger !== 'undefined') {
-        logger.error('Score select element not found:', String(selectElementId).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+        logger.error('Score select element not found:', selectElementId);
       } else {
-        console.error('Score select element not found:', String(selectElementId).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+        console.error('Score select element not found:', selectElementId);
       }
       return;
     }
@@ -427,9 +351,9 @@ async function loadScoreModels(selectElementId) {
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('Error loading score models:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      logger.error('Error loading score models:', error);
     } else {
-      console.error('Error loading score models:', String(error).replace(/[\r\n\t]/g, ' ').substring(0, 200));
+      console.error('Error loading score models:', error);
     }
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {

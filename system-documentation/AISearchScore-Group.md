@@ -1,4 +1,4 @@
-## AISEARCH-N_SCORE GROUP
+## AISEARCH-N-SCORE GROUP
 
 Primary Team
 

@@ -1,4 +1,4 @@
-import { search, getModels } from './services/api.js';
+import { search } from './services/api.js';
 import { logger } from './shared/utils/logger.js';
 
 // Import showUserMessage from global scope - wait for it to be available
@@ -99,50 +99,58 @@ async function loadSourceTypes() {
   }
 }
 
-// Load models from models-list.json (search category only)
-async function loadModels() {
+// Unified configuration loader
+async function loadConfig(configFile, defaultValue = []) {
   try {
-    logger.log('Loading models...');
-    const response = await fetch('config/models-list.json');
-    const data = await response.json();
-    
-    // Get unique search models
-    const searchModels = [...new Set(
-      data.models
-        .filter(model => model.category === 'search')
-        .map(model => model.modelName)
-    )].sort();
-    
-    logger.log('Models received:', searchModels);
-    modelEl.innerHTML = '';
-    searchModels.forEach(model => {
-      const option = document.createElement('option');
-      option.value = model;
-      option.textContent = model;
-      modelEl.appendChild(option);
-    });
-    
-    // Restore last used model or set default
-    const lastUsedModel = localStorage.getItem('lastUsedModel');
-    if (lastUsedModel && searchModels.includes(lastUsedModel)) {
-      modelEl.value = lastUsedModel;
-    } else if (searchModels.includes('qwen2:0.5b')) {
-      modelEl.value = 'qwen2:0.5b';
-    } else if (searchModels.length > 0) {
-      modelEl.value = searchModels[0];
-    }
-    logger.log('Models loaded successfully');
+    const response = await fetch(`./config/${configFile}`);
+    if (!response.ok) throw new Error(`Failed to fetch ${configFile}`);
+    return await response.json();
   } catch (error) {
-    modelEl.innerHTML = '<option value="">Error loading models</option>';
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load models:', error);
+    logger.error(`Failed to load ${configFile}:`, error);
+    return defaultValue;
   }
 }
 
-// Add CSS rule to hide checkbox
-const hideCheckboxStyle = document.createElement('style');
-hideCheckboxStyle.textContent = '.hide-chunks-checkbox { display: none !important; }';
-document.head.appendChild(hideCheckboxStyle);
+// Populate select element with options
+function populateSelect(element, options, valueKey, textKey, storageKey = null, defaultValue = null) {
+  if (!element) return;
+  
+  element.innerHTML = '';
+  options.forEach((option, index) => {
+    const optionEl = document.createElement('option');
+    optionEl.value = option[valueKey] || option;
+    optionEl.textContent = option[textKey] || option;
+    element.appendChild(optionEl);
+  });
+  
+  // Restore saved value or set default
+  const savedValue = storageKey ? localStorage.getItem(storageKey) : null;
+  if (savedValue && options.find(opt => (opt[valueKey] || opt) === savedValue)) {
+    element.value = savedValue;
+  } else if (defaultValue && options.find(opt => (opt[valueKey] || opt) === defaultValue)) {
+    element.value = defaultValue;
+  } else if (options.length > 0) {
+    element.value = options[0][valueKey] || options[0];
+  }
+}
+
+// Load models from models-list.json (search category only)
+async function loadModels() {
+  const data = await loadConfig('models-list.json', { models: [] });
+  const searchModels = [...new Set(
+    data.models
+      .filter(model => model.category === 'search')
+      .map(model => model.modelName)
+  )].sort();
+  
+  if (searchModels.length === 0) {
+    modelEl.innerHTML = '<option value="">No search models available</option>';
+    return;
+  }
+  
+  populateSelect(modelEl, searchModels, null, null, 'lastUsedModel', 'qwen2:0.5b');
+  logger.log('Models loaded successfully');
+}
 
 // Hide checkbox immediately on page load
 const showChunksLabel = document.getElementById('showChunksLabel');
@@ -182,77 +190,26 @@ loadUserPrompts();
 loadTokensOptions();
 loadTemperatureOptions();
 loadContextOptions();
-restoreModelOptions();
 loadScoreModels('scoreModel');
 loadScoringOptions();
 
 // Load temperature options from JSON file
 async function loadTemperatureOptions() {
-  try {
-    const response = await fetch('./config/temperature.json');
-    const data = await response.json();
-    
-    temperatureEl.innerHTML = '';
-    data.temperature.forEach(temp => {
-      const option = document.createElement('option');
-      option.value = temp.value;
-      option.textContent = temp.name;
-      temperatureEl.appendChild(option);
-    });
-  } catch (error) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load temperature options:', error);
-  }
+  const data = await loadConfig('temperature.json', { temperature: [] });
+  populateSelect(temperatureEl, data.temperature, 'value', 'name', 'lastTemperature');
 }
 
 // Load context options from JSON file
 async function loadContextOptions() {
-  try {
-    const response = await fetch('./config/context.json');
-    const data = await response.json();
-    
-    contextEl.innerHTML = '';
-    data.context.forEach(context => {
-      const option = document.createElement('option');
-      option.value = context.name;
-      option.textContent = context.name;
-      contextEl.appendChild(option);
-    });
-  } catch (error) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load context options:', error);
-  }
+  const data = await loadConfig('context.json', { context: [] });
+  populateSelect(contextEl, data.context, 'name', 'name', 'lastContext');
 }
 
 // Load vectorDB options from JSON file
 async function loadVectorDBOptions() {
   if (!vectorDBEl) return;
-  
-  try {
-    const response = await fetch('./config/vectorDB.json');
-    if (!response.ok) throw new Error('Failed to fetch vectorDB options');
-    const data = await response.json();
-    
-    vectorDBEl.innerHTML = '';
-    data.vectorDB.forEach(db => {
-      const option = document.createElement('option');
-      option.value = db.value;
-      option.textContent = db.name;
-      vectorDBEl.appendChild(option);
-    });
-    
-    // Restore last used selection
-    const lastUsed = localStorage.getItem('lastVectorDB');
-    if (lastUsed && data.vectorDB.find(db => db.value === lastUsed)) {
-      vectorDBEl.value = lastUsed;
-    } else {
-      vectorDBEl.value = data.vectorDB[0]?.value || 'local';
-    }
-  } catch (error) {
-    vectorDBEl.innerHTML = '<option value="local">Local</option>';
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load vectorDB options:', error);
-  }
+  const data = await loadConfig('vectorDB.json', { vectorDB: [{ value: 'local', name: 'Local' }] });
+  populateSelect(vectorDBEl, data.vectorDB, 'value', 'name', 'lastVectorDB', 'local');
 }
 loadVectorDBOptions();
 
@@ -433,72 +390,27 @@ setTimeout(() => {
 
 // Load and populate scoring options
 async function loadScoringOptions() {
-  try {
-    // Load temperature options
-    const tempResponse = await fetch('./config/temperature.json');
-    const tempData = await tempResponse.json();
-    const scoreTemperatureEl = document.getElementById('scoreTemperature');
-    scoreTemperatureEl.innerHTML = '';
-    tempData.temperature.forEach(temp => {
-      const option = document.createElement('option');
-      option.value = temp.value;
-      option.textContent = temp.name;
-      scoreTemperatureEl.appendChild(option);
+  const [tempData, contextData, tokensData] = await Promise.all([
+    loadConfig('temperature.json', { temperature: [] }),
+    loadConfig('context.json', { context: [] }),
+    loadConfig('tokens.json', { tokens: [] })
+  ]);
+  
+  const scoreTemperatureEl = document.getElementById('scoreTemperature');
+  const scoreContextEl = document.getElementById('scoreContext');
+  const scoreTokensEl = document.getElementById('scoreTokens');
+  
+  populateSelect(scoreTemperatureEl, tempData.temperature, 'value', 'name', 'lastScoreTemperature');
+  populateSelect(scoreContextEl, contextData.context, 'name', 'name', 'lastScoreContext');
+  populateSelect(scoreTokensEl, tokensData.tokens, 'name', 'name', 'lastScoreTokens');
+  
+  // Add event listeners for persistence
+  [scoreTemperatureEl, scoreContextEl, scoreTokensEl].forEach((el, index) => {
+    const keys = ['lastScoreTemperature', 'lastScoreContext', 'lastScoreTokens'];
+    el?.addEventListener('change', () => {
+      localStorage.setItem(keys[index], el.value);
     });
-    
-    // Load context options
-    const contextResponse = await fetch('./config/context.json');
-    const contextData = await contextResponse.json();
-    const scoreContextEl = document.getElementById('scoreContext');
-    scoreContextEl.innerHTML = '';
-    contextData.context.forEach(context => {
-      const option = document.createElement('option');
-      option.value = context.name;
-      option.textContent = context.name;
-      scoreContextEl.appendChild(option);
-    });
-    
-    // Load tokens options
-    const tokensResponse = await fetch('./config/tokens.json');
-    const tokensData = await tokensResponse.json();
-    const scoreTokensEl = document.getElementById('scoreTokens');
-    scoreTokensEl.innerHTML = '';
-    tokensData.tokens.forEach(token => {
-      const option = document.createElement('option');
-      option.value = token.name;
-      option.textContent = token.name;
-      scoreTokensEl.appendChild(option);
-    });
-    
-    // Restore saved values
-    const lastScoreTemp = localStorage.getItem('lastScoreTemperature');
-    if (lastScoreTemp) scoreTemperatureEl.value = lastScoreTemp;
-    
-    const lastScoreContext = localStorage.getItem('lastScoreContext');
-    if (lastScoreContext) scoreContextEl.value = lastScoreContext;
-    
-    const lastScoreTokens = localStorage.getItem('lastScoreTokens');
-    if (lastScoreTokens) scoreTokensEl.value = lastScoreTokens;
-    
-    // Add event listeners for persistence
-    scoreTemperatureEl.addEventListener('change', () => {
-      localStorage.setItem('lastScoreTemperature', scoreTemperatureEl.value);
-    });
-    
-    scoreContextEl.addEventListener('change', () => {
-      localStorage.setItem('lastScoreContext', scoreContextEl.value);
-    });
-    
-    scoreTokensEl.addEventListener('change', () => {
-      // Sanitize value before storing to prevent XSS
-      const sanitizedValue = scoreTokensEl.value.replace(/[<>"'&]/g, '');
-      localStorage.setItem('lastScoreTokens', sanitizedValue);
-    });
-    
-  } catch (error) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load scoring options:', error);
-  }
+  });
 }
 
 
@@ -517,31 +429,8 @@ queryEl.addEventListener('input', () => {
 
 // Load tokens options from JSON file
 async function loadTokensOptions() {
-  try {
-    const response = await fetch('./config/tokens.json');
-    if (!response.ok) throw new Error('Failed to fetch tokens');
-    const data = await response.json();
-    
-    tokensEl.innerHTML = '';
-    data.tokens.forEach(token => {
-      const option = document.createElement('option');
-      option.value = token.name;
-      option.textContent = token.name;
-      tokensEl.appendChild(option);
-    });
-    
-    // Restore last used selection
-    const lastUsed = localStorage.getItem('lastTokens');
-    if (lastUsed && data.tokens.find(t => t.name === lastUsed)) {
-      tokensEl.value = lastUsed;
-    } else {
-      tokensEl.value = data.tokens[0]?.name || '';
-    }
-  } catch (error) {
-    tokensEl.innerHTML = '<option value="">Error loading tokens</option>';
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to load tokens options:', error);
-  }
+  const data = await loadConfig('tokens.json', { tokens: [] });
+  populateSelect(tokensEl, data.tokens, 'name', 'name', 'lastTokens');
 }
 
 // Generate TestCode based on current form selections
@@ -612,35 +501,7 @@ function generateTestCode() {
   return testCode;
 }
 
-// Restore model options from localStorage
-function restoreModelOptions() {
-  const lastTemperature = localStorage.getItem('lastTemperature');
-  if (lastTemperature) {
-    temperatureEl.value = lastTemperature;
-  }
-  
-  const lastContext = localStorage.getItem('lastContext');
-  if (lastContext) {
-    contextEl.value = lastContext;
-  }
-  
-  const lastTokens = localStorage.getItem('lastTokens');
-  if (lastTokens) {
-    tokensEl.value = lastTokens;
-  }
-}
 
-function formatMetrics(metrics) {
-  if (!metrics) return 'N/A';
-  
-  const totalSecs = (metrics.total_duration / 1000000000).toFixed(1);
-  const loadMs = (metrics.load_duration / 1000000).toFixed(0);
-  const tokensPerSec = (metrics.eval_count / (metrics.eval_duration / 1000000000)).toFixed(1);
-  const contextSize = metrics.context_size || 'N/A';
-  const temperature = metrics.temperature || 'N/A';
-  
-  return `${metrics.model} - Duration: ${totalSecs}s, Load: ${loadMs}ms, Eval: ${tokensPerSec} tokens/sec, ContextSize: ${contextSize}, Temperature: ${temperature}`;
-}
 
 function render(result) {
   // clear then build markup
@@ -804,26 +665,25 @@ function render(result) {
 
   // 5. created at, test code, and execution time
   const meta = document.createElement('p');
-  meta.style.fontSize = '.8rem';
-  meta.style.color = 'var(--text-color)';
+  meta.className = 'result-meta';
   meta.textContent = `CreatedAt: ${formatCreatedAt(result.createdAt)} | Test Code: ${result.testCode || 'N/A'}${result.executionTime ? ` | Time: ${result.executionTime}` : ''}`;
   outputEl.append(meta);
 
   // 6. Add export section at the end
   const exportDiv = document.createElement('div');
-  exportDiv.style.cssText = 'margin-top: 1.5rem; padding: 1rem; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--border-color);';
+  exportDiv.className = 'export-section';
   
   const innerDiv = document.createElement('div');
-  innerDiv.style.cssText = 'display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;';
+  innerDiv.className = 'export-controls';
   
   const label = document.createElement('label');
   label.setAttribute('for', 'exportFormat');
-  label.style.cssText = 'margin: 0; font-weight: 600;';
+  label.className = 'export-label';
   label.textContent = 'Export to:';
   
   const select = document.createElement('select');
   select.id = 'exportFormat';
-  select.style.cssText = 'background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;';
+  select.className = 'export-select';
   ['pdf', 'markdown', 'json', 'database'].forEach(value => {
     const option = document.createElement('option');
     option.value = value;
@@ -834,7 +694,7 @@ function render(result) {
   const button = document.createElement('button');
   button.type = 'button';
   button.id = 'exportBtn';
-  button.style.cssText = 'background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;';
+  button.className = 'export-button';
   button.textContent = 'Export';
   
   innerDiv.appendChild(label);
