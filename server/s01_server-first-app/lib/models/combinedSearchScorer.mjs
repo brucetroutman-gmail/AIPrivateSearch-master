@@ -29,6 +29,9 @@ class CombinedSearchScorer {
       const processStart = Date.now();
       logger.log('Starting process method');
       
+      // Check if Ollama is working before proceeding
+      await this.#checkOllamaHealth();
+      
       const searchModel = model || this.searchModel;
       const searchStart = Date.now();
       const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
@@ -97,11 +100,12 @@ class CombinedSearchScorer {
   /* private */
   async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null, tokenLimit = null) {
     try {
+      logger.log(`Starting search with model: ${model}`);
       const finalPrompt = systemPrompt ? `${systemPrompt}\n\nUser: ${query}` : query;
       
       const options = {
         temperature: temperature,
-        num_ctx: context
+        num_ctx: typeof context === 'number' && context > 1 ? context : 2048
       };
       
       // Add token limit if specified
@@ -109,12 +113,20 @@ class CombinedSearchScorer {
         options.num_predict = tokenLimit;
       }
       
-      const res = await this.ollama.generate({
-        model: model,
-        prompt: finalPrompt,
-        stream: false,
-        options: options
-      });
+      logger.log('Calling Ollama generate...');
+      const res = await Promise.race([
+        this.ollama.generate({
+          model: model,
+          prompt: finalPrompt,
+          stream: false,
+          options: options
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Ollama request timeout after 60 seconds')), 60000)
+        )
+      ]);
+      
+      logger.log('Ollama generate completed');
       return {
         response: res.response,
         systemPromptName: null, // Will be set by caller
@@ -373,6 +385,32 @@ Respond with only three numbers, one per line.`;
 
   #formatCreatedAt() {
     return new Date().toISOString();
+  }
+
+  async #checkOllamaHealth() {
+    try {
+      logger.log('Checking Ollama health...');
+      const response = await fetch('http://localhost:11434/api/tags', {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Ollama API returned ${response.status}`);
+      }
+      
+      logger.log('Ollama health check passed');
+    } catch (error) {
+      logger.error('Ollama health check failed:', error.message);
+      
+      if (error.name === 'TimeoutError' || error.message.includes('timeout')) {
+        throw new Error('Ollama service is not responding. Please restart Ollama with: sudo pkill -9 ollama && ollama serve &');
+      } else if (error.message.includes('ECONNREFUSED')) {
+        throw new Error('Ollama service is not running. Please start Ollama with: ollama serve &');
+      } else {
+        throw new Error(`Ollama service error: ${error.message}. Try restarting Ollama.`);
+      }
+    }
   }
 }
 

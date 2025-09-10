@@ -245,11 +245,7 @@ function loadDeveloperMode() {
 // Email management
 function checkUserEmail() {
   const email = localStorage.getItem('userEmail');
-  if (!email) {
-    promptForEmail();
-    return false;
-  }
-  return true;
+  return !!email;
 }
 
 async function promptForEmail() {
@@ -466,14 +462,13 @@ if (typeof window !== 'undefined') {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   loadTheme();
   
-  // Check email first - block page loading if no email
-  if (!checkUserEmail()) {
-    // Hide page content until email is provided
-    document.body.style.display = 'none';
-    return;
+  // Check email first - handle async properly
+  const hasEmail = checkUserEmail();
+  if (!hasEmail) {
+    await promptForEmail();
   }
   
   loadSharedComponents().then(() => {
