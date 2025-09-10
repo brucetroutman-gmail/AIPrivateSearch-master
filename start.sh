@@ -8,12 +8,32 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
-# Quick check if Ollama is running
+# Ensure Ollama service is running
+echo "🔍 Checking Ollama service..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-    echo "❌ Ollama not running. Please run: bash load-aiss.sh"
-    exit 1
+    echo "🚀 Starting Ollama service..."
+    if ! pgrep -f "ollama serve" > /dev/null; then
+        ollama serve &
+        sleep 3
+    fi
+    
+    # Verify Ollama is accessible
+    for i in {1..5}; do
+        if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+            echo "✅ Ollama is accessible"
+            break
+        fi
+        if [ $i -eq 5 ]; then
+            echo "❌ Ollama not accessible after 5 attempts"
+            echo "Please check if Ollama is installed: ollama --version"
+            exit 1
+        fi
+        echo "⏳ Waiting for Ollama... (attempt $i/5)"
+        sleep 2
+    done
+else
+    echo "✅ Ollama is running"
 fi
-echo "✅ Ollama is running"
 
 # Check and pull required models
 echo "Checking model status..."

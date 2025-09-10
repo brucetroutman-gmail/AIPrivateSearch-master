@@ -269,6 +269,30 @@ EOF
 
 echo "✅ Shared .env file created at /Users/Shared/.env"
 
+# Start Ollama service
+echo "🚀 Starting Ollama service..."
+if ! pgrep -f "ollama serve" > /dev/null; then
+    ollama serve &
+    sleep 3
+    echo "✅ Ollama service started"
+else
+    echo "✅ Ollama service already running"
+fi
+
+# Verify Ollama is accessible
+for i in {1..5}; do
+    if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+        echo "✅ Ollama is accessible"
+        break
+    fi
+    if [ $i -eq 5 ]; then
+        echo "⚠️  Ollama not accessible, but continuing..."
+        break
+    fi
+    echo "⏳ Waiting for Ollama... (attempt $i/5)"
+    sleep 2
+done
+
 # Final cleanup before starting
 echo "🧹 Final cleanup of any remaining processes..."
 pkill -f "node server.mjs" 2>/dev/null || true
