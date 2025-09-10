@@ -57,40 +57,52 @@ for model in $REQUIRED_MODELS; do
     fi
 done
 
+# Auto-update control flag (set to false to disable automatic updates)
+AUTO_UPDATE_MODELS=true
+
 # Check if we need to update (24 hour check)
-if [ -f "$LAST_PULL_FILE" ]; then
-    LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
-    TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
-    # 86400 seconds = 24 hours
-    if [ $TIME_DIFF -gt 86400 ]; then
+if [ "$AUTO_UPDATE_MODELS" = true ]; then
+    if [ -f "$LAST_PULL_FILE" ]; then
+        LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
+        TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
+        # 86400 seconds = 24 hours
+        if [ $TIME_DIFF -gt 86400 ]; then
+            SHOULD_UPDATE=true
+            echo "⏰ Last model update was over 24 hours ago"
+        fi
+    else
         SHOULD_UPDATE=true
-        echo "⏰ Last model update was over 24 hours ago"
+        echo "📥 First time setup detected"
     fi
 else
-    SHOULD_UPDATE=true
-    echo "📥 First time setup detected"
+    echo "🚫 Automatic model updates disabled"
 fi
 
-# Pull missing models immediately
+# Pull missing models immediately (M4-safe: one at a time)
 if [ ${#MISSING_MODELS[@]} -gt 0 ]; then
-    echo "📥 Pulling missing models..."
+    echo "📥 Pulling missing models (one at a time for M4 compatibility)..."
     for model in "${MISSING_MODELS[@]}"; do
         echo "📥 Pulling $model..."
-        ollama pull "$model"
-        if [ $? -eq 0 ]; then
+        if timeout 300 ollama pull "$model"; then
             echo "✅ $model ready"
         else
-            echo "❌ Failed to pull $model"
+            echo "❌ Failed to pull $model (timeout or error)"
         fi
+        sleep 3  # Prevent overwhelming Ollama on M4 Macs
     done
 fi
 
-# Update all models if needed (24 hour check)
+# Update all models if needed (24 hour check) - M4-safe
 if [ "$SHOULD_UPDATE" = true ] && [ ${#MISSING_MODELS[@]} -eq 0 ]; then
-    echo "🔄 Updating all models..."
+    echo "🔄 Updating all models (one at a time for M4 compatibility)..."
     for model in $REQUIRED_MODELS; do
         echo "🔄 Updating $model..."
-        ollama pull "$model"
+        if timeout 300 ollama pull "$model"; then
+            echo "✅ $model updated"
+        else
+            echo "❌ Failed to update $model (timeout or error)"
+        fi
+        sleep 3  # Prevent overwhelming Ollama on M4 Macs
     done
     echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
     echo "✅ All models updated"
