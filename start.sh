@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting AI Search & Score Application..."
+echo "🚀 Starting AI Search & Score Application..."
 
 # Kill any existing server processes to free up ports
 echo "Stopping any existing servers..."
@@ -8,57 +8,12 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
-# Check if Ollama is available and start if needed
-echo "Checking Ollama availability..."
+# Quick check if Ollama is running
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-    echo "⚠️  Ollama not running."
-    
-    # Check if Ollama is installed
-    if command -v ollama &> /dev/null; then
-        echo "   Ollama is installed but not running."
-        echo ""
-        read -p "Would you like to start Ollama now? (y/n): " -n 1 -r
-        echo ""
-        
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            echo "🚀 Starting Ollama service..."
-            # Start Ollama in background
-            nohup ollama serve > /tmp/ollama.log 2>&1 &
-            OLLAMA_PID=$!
-            
-            # Wait for Ollama to start (up to 30 seconds)
-            echo "⏳ Waiting for Ollama to start..."
-            for i in {1..30}; do
-                if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-                    echo "✅ Ollama started successfully"
-                    break
-                fi
-                sleep 1
-                echo "   Waiting... (${i}s)"
-            done
-            
-            # Final check
-            if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-                echo "❌ Failed to start Ollama"
-                echo "📋 Check log: tail /tmp/ollama.log"
-                echo "   You can start Ollama manually by running: ollama serve"
-                exit 1
-            fi
-        else
-            echo "❌ Ollama startup cancelled."
-            echo "   Please start Ollama manually by running: ollama serve"
-            echo "   Then run this script again."
-            exit 1
-        fi
-    else
-        echo "❌ Ollama not installed"
-        echo "📥 Please install Ollama from: https://ollama.com/download"
-        echo "🚀 Or run the load-aiss.command installer again"
-        exit 1
-    fi
-else
-    echo "✅ Ollama is already running"
+    echo "❌ Ollama not running. Please run: bash load-aiss.sh"
+    exit 1
 fi
+echo "✅ Ollama is running"
 
 # Check and pull required models
 echo "Checking model status..."
@@ -184,6 +139,9 @@ echo ""
 echo "✅ Application started successfully!"
 echo "🔗 Frontend: http://localhost:3000"
 echo "🔗 Backend API: http://localhost:3001"
+echo ""
+echo "🌐 Opening Chrome browser..."
+open -a "Google Chrome" http://localhost:3000 2>/dev/null || open http://localhost:3000
 echo ""
 echo "Press Ctrl+C to stop both servers"
 
