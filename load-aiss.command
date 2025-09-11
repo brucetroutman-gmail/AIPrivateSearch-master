@@ -320,9 +320,15 @@ sleep 2
 
 echo "✅ Installation complete!"
 echo ""
-echo "Next steps:"
-echo "1. Run: bash start.sh (to start the application)"
-echo "2. Browse to: http://localhost:3000"
+echo "🚀 Starting AISearchScore application..."
 echo ""
-read -p "Press Enter to close installer..."
+
+# Execute start.sh to launch the application
+if [ -f "start.sh" ]; then
+    bash start.sh
+else
+    echo "❌ start.sh not found in current directory"
+    echo "Please run: bash start.sh manually"
+    read -p "Press Enter to close..."
+fi
 # Updated with enhanced Chrome installation and command line tools

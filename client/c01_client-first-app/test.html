@@ -79,7 +79,7 @@
         <label><input type="checkbox" id="selectAll"> Select All Tests</label>
         <button class="execute-btn" onclick="executeSelectedTests()">Execute Selected Tests</button>
         <span id="selectedCount">0 tests selected</span>
-        <div id="executionStatus" class="execution-status">
+        <div id="executionStatus" class="execution-status" style="display: none;">
             <strong>🔄 Test Execution in Progress...</strong>
             <div id="progressIndicator"></div>
         </div>
@@ -305,6 +305,11 @@
                     
                     completedTests++;
                     progressDiv.innerHTML = `Completed ${completedTests}/${selected.length * selectedModels.length} tests...`;
+                    
+                    // Add delay between tests to prevent overwhelming Ollama
+                    if (completedTests < selected.length * selectedModels.length) {
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+                    }
                 }
             }
             

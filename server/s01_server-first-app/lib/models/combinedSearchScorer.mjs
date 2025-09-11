@@ -113,7 +113,21 @@ class CombinedSearchScorer {
         options.num_predict = tokenLimit;
       }
       
-      logger.log('Calling Ollama generate...');
+      // Set timeout based on model size
+      const getTimeoutForModel = (modelName) => {
+        const name = modelName.toLowerCase();
+        if (name.includes('9b') || name.includes('7b') || name.includes('13b')) {
+          return 300000; // 5 minutes for larger models
+        }
+        if (name.includes('3b') || name.includes('1.5b')) {
+          return 180000; // 3 minutes for medium models
+        }
+        return 120000; // 2 minutes for small models
+      };
+      
+      const timeout = getTimeoutForModel(model);
+      logger.log(`Calling Ollama generate with ${timeout/1000}s timeout...`);
+      
       const res = await Promise.race([
         this.ollama.generate({
           model: model,
@@ -122,7 +136,7 @@ class CombinedSearchScorer {
           options: options
         }),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Ollama request timeout after 60 seconds')), 60000)
+          setTimeout(() => reject(new Error(`Ollama request timeout after ${timeout/1000} seconds`)), timeout)
         )
       ]);
       

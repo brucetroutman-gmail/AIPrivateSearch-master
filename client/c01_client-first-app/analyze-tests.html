@@ -537,13 +537,73 @@
       tbody.innerHTML = rows || '<tr><td colspan="9">No data available</td></tr>';
     }
     
-    function updateScoring() {
-      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
-      const tbody = document.querySelector('#scoringTable tbody');
+    function updateHardware() {
+      const pcCodes = [...new Set(filteredData.map(test => test.PcCode).filter(Boolean))];
+      const totalHardware = pcCodes.length;
+      const avgScore = filteredData.filter(test => test['WeightedScore-pct']).length > 0 ? 
+        (filteredData.reduce((sum, test) => sum + (test['WeightedScore-pct'] || 0), 0) / filteredData.filter(test => test['WeightedScore-pct']).length).toFixed(1) : 'N/A';
       
-      const rows = models.map(model => {
-        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
-        const scoredTests = modelTests.filter(test => test['WeightedScore-pct']);
+      const statsHtml = `
+        <div class="stat-card">
+          <div class="stat-value">${totalHardware}</div>
+          <div class="stat-label">Hardware Configs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgScore}${avgScore !== 'N/A' ? '%' : ''}</div>
+          <div class="stat-label">Avg Performance</div>
+        </div>
+      `;
+      
+      document.getElementById('hardwareStats').innerHTML = statsHtml;
+      
+      // Hardware Performance Table
+      const tbody = document.querySelector('#hardwareTable tbody');
+      const hardwareStats = pcCodes.map(pcCode => {
+        const pcTests = filteredData.filter(test => test.PcCode === pcCode);
+        const scoredTests = pcTests.filter(test => test['WeightedScore-pct']);
+        
+        return {
+          pcCode,
+          cpu: pcTests[0]?.PcCPU || 'Unknown',
+          ram: pcTests[0]?.PcRAM || 'Unknown',
+          testCount: pcTests.length,
+          avgScore: scoredTests.length > 0 ? 
+            (scoredTests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / scoredTests.length).toFixed(1) : 'N/A',
+          avgDuration: (pcTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / pcTests.length).toFixed(1),
+          avgTokens: (pcTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / pcTests.length).toFixed(1)
+        };
+      }).sort((a, b) => parseFloat(b.avgScore) - parseFloat(a.avgScore));
+      
+      const rows = hardwareStats.map(stats => {
+        const scoreClass = parseFloat(stats.avgScore) > 75 ? 'best-score' : parseFloat(stats.avgScore) < 50 ? 'worst-score' : '';
+        return `
+          <tr class="${scoreClass}">
+            <td>${stats.pcCode}</td>
+            <td>${stats.cpu}</td>
+            <td>${stats.ram}</td>
+            <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
+            <td>${stats.avgDuration}s</td>
+            <td>${stats.avgTokens}</td>
+            <td>${stats.testCount}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="7">No data available</td></tr>';
+      
+      // Hardware Matrix placeholder
+      document.getElementById('hardwareMatrix').innerHTML = '<div>Hardware vs Model performance matrix would go here</div>';
+    }
+    
+    function updateParameters() {
+      // Temperature Analysis
+      const tempTbody = document.querySelector('#temperatureTable tbody');
+      const tempData = {};
+      
+      filteredData.forEach(test => {
+        const model = test['ModelName-search'];
+        const temp = test['ModelTemperature-search'];
+        const score = test['WeightedScore-pct'];
         
         if (model && temp && score) {
           const key = `${model}_${temp}`;

@@ -22,7 +22,9 @@ const dbConfig = {
   user: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'aisearchscore',
-  connectionLimit: 10
+  connectionLimit: 10,
+  acquireTimeout: 60000,
+  idleTimeout: 300000
 };
 
 
@@ -38,18 +40,19 @@ try {
 
 router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
   let connection;
-  try {
-    if (!pool) {
-      return res.status(500).json({ success: false, error: 'Database not configured' });
-    }
-    
-    const data = req.body;
-    logger.log('Database save request received');
-    logger.log('CreatedAt value:', data.CreatedAt);
-    logger.log('CreatedAt value length:', data.CreatedAt ? String(data.CreatedAt).length : 0);
-    logger.log('Data keys:', Object.keys(data));
-    
-    connection = await pool.getConnection();
+  let retries = 3;
+  
+  while (retries > 0) {
+    try {
+      if (!pool) {
+        return res.status(500).json({ success: false, error: 'Database not configured' });
+      }
+      
+      const data = req.body;
+      logger.log('Database save request received');
+      logger.log('CreatedAt value:', data.CreatedAt);
+      
+      connection = await pool.getConnection();
     
     const insertQuery = `
       INSERT INTO searches (
@@ -98,20 +101,36 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data['WeightedScore-pct'] || null
     ];
     
-    logger.log('Executing query with', values.length, 'parameters');
-    const [result] = await connection.execute(insertQuery, values);
-    
-    logger.log('Database save successful, insertId:', String(result.insertId));
-    res.json({ success: true, insertId: result.insertId });
-  } catch (error) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Database save error - Full error:', error);
-    logger.error('Database save error - Message:', error.message);
-    logger.error('Database save error - Code:', error.code);
-    logger.error('Database save error - SQL State:', error.sqlState);
-    res.status(500).json({ success: false, error: error.message, code: error.code, sqlState: error.sqlState });
-  } finally {
-    if (connection) connection.release();
+      logger.log('Executing query with', values.length, 'parameters');
+      const [result] = await connection.execute(insertQuery, values);
+      
+      logger.log('Database save successful, insertId:', String(result.insertId));
+      res.json({ success: true, insertId: result.insertId });
+      return; // Success, exit retry loop
+      
+    } catch (error) {
+      retries--;
+      logger.error('Database save error - Message:', error.message);
+      logger.error('Database save error - Code:', error.code);
+      
+      if (connection) {
+        connection.release();
+        connection = null;
+      }
+      
+      // If connection reset and retries left, try again
+      if (error.code === 'ECONNRESET' && retries > 0) {
+        logger.log('Retrying database save, attempts left:', retries);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        continue;
+      }
+      
+      // Final error response
+      res.status(500).json({ success: false, error: error.message, code: error.code });
+      return;
+    } finally {
+      if (connection) connection.release();
+    }
   }
 });
 
@@ -126,7 +145,7 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
     connection = await pool.getConnection();
     
     const query = `
-      SELECT * FROM searches 
+      SELECT * FROM \`searches-testresults\` 
       ORDER BY CreatedAt DESC
     `;
     
