@@ -110,6 +110,78 @@ export class DocumentProcessor {
     return results;
   }
 
+  async generateDocumentMetadata(collection) {
+    this.clearModelCache();
+    
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(collection, baseDir);
+    const files = await fs.readdir(collectionPath);
+    
+    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('_') && !f.startsWith('META_'));
+    const results = [];
+    
+    for (const mdFile of mdFiles) {
+      try {
+        const filePath = path.join(collectionPath, mdFile);
+        const content = await fs.readFile(filePath, 'utf8');
+        
+        const metadata = await this.createDocumentMetadata(content, mdFile, collection);
+        const metadataPath = path.join(collectionPath, `META_${mdFile}`);
+        
+        await fs.writeFile(metadataPath, metadata, 'utf8');
+        results.push({ file: mdFile, success: true });
+      } catch (error) {
+        results.push({ file: mdFile, error: error.message, success: false });
+      }
+    }
+    
+    return { collection, processed: results };
+  }
+
+  async createDocumentMetadata(content, filename, collection) {
+    const prompt = `Analyze this document and create metadata in the following markdown format:
+
+# Document Metadata: [Document Title]
+
+## Basic Information
+- **Collection**: ${collection}
+- **Document Type**: [Brief classification]
+- **Date**: [Document date if available]
+- **Length**: [Approximate word count]
+
+## Content Summary
+[2-3 sentences describing main content/purpose]
+
+## Key Topics
+- [Topic 1]
+- [Topic 2]
+- [Topic 3]
+
+## Important Keywords
+[Comma-separated list of 8-10 key terms for search]
+
+## Document Relationships
+[Any references to other documents or related topics]
+
+---
+Document content:
+${content.substring(0, 2000)}${content.length > 2000 ? '...' : ''}`;
+
+    try {
+      const model = await this.getMetadataModel();
+      const response = await this.ollama.generate({
+        model,
+        prompt,
+        stream: false,
+        options: { temperature: 0.3, num_predict: 500 }
+      });
+      
+      return response.response;
+    } catch (error) {
+      return `# Document Metadata: ${filename}\n\nError generating metadata: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+    }
+  }
+
   async generateCollectionMetadata(collection) {
     // Clear cached model to ensure we use latest config
     this.clearModelCache();
@@ -130,6 +202,9 @@ export class DocumentProcessor {
     
     if (documents.length === 0) return { message: 'No documents found' };
     
+    // Generate individual document metadata first
+    await this.generateDocumentMetadata(collection);
+    
     // Generate metadata
     const summary = await this.createCollectionSummary(documents, collection);
     const index = await this.createDocumentIndex(documents);
@@ -143,7 +218,7 @@ export class DocumentProcessor {
     return {
       collection,
       documentsProcessed: documents.length,
-      metadataGenerated: ['summary', 'index', 'topic_map']
+      metadataGenerated: ['individual_metadata', 'summary', 'index', 'topic_map']
     };
   }
   

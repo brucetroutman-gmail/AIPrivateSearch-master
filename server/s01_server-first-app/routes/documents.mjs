@@ -353,6 +353,17 @@ router.get('/collections/:collection/embeddings-info', requireAuth, async (req, 
   }
 });
 
+// Generate individual document metadata
+router.post('/collections/:collection/generate-document-metadata', requireAuth, asyncHandler(async (req, res) => {
+  try {
+    const { collection } = req.params;
+    const result = await documentProcessor.generateDocumentMetadata(collection);
+    res.json({ success: true, result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}));
+
 // Generate collection metadata
 router.post('/collections/:collection/generate-metadata', requireAuth, asyncHandler(async (req, res) => {
   try {

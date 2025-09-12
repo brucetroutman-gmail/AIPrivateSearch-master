@@ -561,7 +561,7 @@
     }
     
     async function generateMetadata() {
-      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will create:\n• Collection summary\n• Document index\n• Topic map\n\nExisting metadata files will be overwritten.`)) {
+      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will create:\n• Individual document metadata (META_filename.md)\n• Collection summary\n• Document index\n• Topic map\n\nExisting metadata files will be overwritten.`)) {
         return;
       }
       
@@ -570,6 +570,33 @@
       showLog(`Generating AI metadata for collection: ${currentCollection}...`, 'processing');
       
       try {
+        // First generate individual document metadata
+        showLog(`Step 1: Generating individual document metadata...`);
+        const docMetaResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/generate-document-metadata`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const docMetaResult = await docMetaResponse.json();
+        
+        if (docMetaResult.success) {
+          const successCount = docMetaResult.result.processed.filter(p => p.success).length;
+          const totalCount = docMetaResult.result.processed.length;
+          showLog(`✓ Individual metadata complete: ${successCount}/${totalCount} documents`, 'success');
+          
+          docMetaResult.result.processed.forEach(item => {
+            if (item.success) {
+              showLog(`  • META_${item.file} - Generated`);
+            } else {
+              showLog(`  • META_${item.file} - Failed: ${item.error}`, 'error');
+            }
+          });
+        } else {
+          showLog(`✗ Individual metadata failed: ${docMetaResult.error}`, 'error');
+        }
+        
+        // Then generate collection-level metadata
+        showLog(`\nStep 2: Generating collection-level metadata...`);
         const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/generate-metadata`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
@@ -578,17 +605,18 @@
         const result = await response.json();
         
         if (result.success) {
-          showLog(`✓ Metadata generation complete!`, 'success');
+          showLog(`✓ Collection metadata complete!`, 'success');
           showLog(`  • Collection: ${result.result.collection}`);
           showLog(`  • Documents processed: ${result.result.documentsProcessed}`);
           showLog(`  • Files generated: ${result.result.metadataGenerated.join(', ')}`);
-          showLog(`\nGenerated files:`);
+          showLog(`\nAll generated files:`);
+          showLog(`  • META_[filename].md - Individual document metadata`);
           showLog(`  • _collection_summary.md - AI overview of the collection`);
           showLog(`  • _document_index.md - Individual document descriptions`);
           showLog(`  • _topic_map.md - Key concepts and search terms`);
           loadDocuments(); // Refresh to show new metadata files
         } else {
-          showLog(`✗ Metadata generation failed: ${result.error}`, 'error');
+          showLog(`✗ Collection metadata failed: ${result.error}`, 'error');
         }
       } catch (error) {
         showLog(`✗ Error generating metadata: ${error.message}`, 'error');
