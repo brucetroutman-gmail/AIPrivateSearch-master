@@ -51,12 +51,6 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
   const collection = req.params.collection;
   
   try {
-    // Remove all embeddings from local storage
-    const localEmbeddingsPath = path.join(process.cwd(), 'data', 'embeddings', collection);
-    if (await fs.pathExists(localEmbeddingsPath)) {
-      await fs.remove(localEmbeddingsPath);
-    }
-    
     // Remove all embeddings from LanceDB
     try {
       await lanceDBService.removeCollection(collection);
@@ -235,7 +229,7 @@ router.post('/convert-selected', requireAuth, asyncHandler(async (req, res) => {
 }));
 
 // Shared processing utility
-async function processFiles(collection, files = null, vectorDB = 'local') {
+async function processFiles(collection, files = null) {
   const documentSearch = new DocumentSearch(collection);
   await documentSearch.initialize();
   
@@ -253,7 +247,7 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
   for (const filename of filesToProcess) {
     try {
       const document = await collectionManager.readDocument(collection, filename);
-      await documentSearch.indexDocument(filename, document.content, vectorDB);
+      await documentSearch.indexDocument(filename, document.content);
       processed++;
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
@@ -266,21 +260,20 @@ async function processFiles(collection, files = null, vectorDB = 'local') {
 
 // Document Processing
 router.post('/process', requireAuth, asyncHandler(async (req, res) => {
-  const { collection, vectorDB } = req.body;
-  const result = await processFiles(collection, null, vectorDB);
+  const { collection } = req.body;
+  const result = await processFiles(collection, null);
   res.json({ success: true, ...result });
 }));
 
 router.post('/process-selected', requireAuth, asyncHandler(async (req, res) => {
-  const { collection, files, vectorDB } = req.body;
-  const result = await processFiles(collection, files, vectorDB);
+  const { collection, files } = req.body;
+  const result = await processFiles(collection, files);
   res.json({ success: true, ...result });
 }));
 
 // Embedding Operations
 router.post('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
-    const { vectorDB = 'local' } = req.body;
     const documentSearch = new DocumentSearch(req.params.collection);
     await documentSearch.initialize();
     
@@ -289,7 +282,7 @@ router.post('/collections/:collection/index/:filename', requireAuth, async (req,
     // Estimate chunks based on content length (roughly 500 chars per chunk)
     const estimatedChunks = Math.ceil(document.content.length / 500);
     
-    const result = await documentSearch.indexDocument(req.params.filename, document.content, vectorDB);
+    const result = await documentSearch.indexDocument(req.params.filename, document.content);
     
     // Add chunk information to result
     result.estimatedChunks = estimatedChunks;
@@ -303,16 +296,7 @@ router.post('/collections/:collection/index/:filename', requireAuth, async (req,
 
 router.delete('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
-    const { vectorDB = 'local' } = req.body;
-    
-    if (vectorDB === 'lanceDB') {
-      await lanceDBService.removeDocument(req.params.collection, req.params.filename);
-    } else {
-      const localSearch = new DocumentSearch(req.params.collection, 'local');
-      await localSearch.initialize();
-      await localSearch.removeDocument(req.params.filename);
-    }
-    
+    await lanceDBService.removeDocument(req.params.collection, req.params.filename);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -322,8 +306,7 @@ router.delete('/collections/:collection/index/:filename', requireAuth, async (re
 // Search Operations
 router.post('/collections/:collection/search', requireAuth, async (req, res) => {
   try {
-    const { vectorDB = 'local' } = req.body;
-    const documentSearch = new DocumentSearch(req.params.collection, vectorDB);
+    const documentSearch = new DocumentSearch(req.params.collection);
     await documentSearch.initialize();
     
     const results = await documentSearch.searchDocuments(req.body.query, req.body.limit || 5);
@@ -335,27 +318,15 @@ router.post('/collections/:collection/search', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/indexed', requireAuth, async (req, res) => {
   try {
-    const localSearch = new DocumentSearch(req.params.collection, 'local');
-    await localSearch.initialize();
-    
-    const localDocs = await localSearch.listIndexedDocuments();
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     
-    logger.log('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
+    logger.log('Collection indexed docs - LanceDB:', lanceDocs.length);
     
-    // Combine and mark which storage each document is in
-    const allFilenames = new Set([...localDocs.map(d => d.filename), ...lanceDocs.map(d => d.filename)]);
-    const documents = Array.from(allFilenames).map(filename => {
-      const localDoc = localDocs.find(d => d.filename === filename);
-      const lanceDoc = lanceDocs.find(d => d.filename === filename);
-      
-      return {
-        filename,
-        inLocal: !!localDoc,
-        inLanceDB: !!lanceDoc,
-        metadata: localDoc?.metadata || lanceDoc?.metadata || {}
-      };
-    });
+    const documents = lanceDocs.map(doc => ({
+      filename: doc.filename,
+      inLanceDB: true,
+      metadata: doc.metadata || {}
+    }));
     
     res.json({ documents });
   } catch (error) {
@@ -365,20 +336,8 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/embeddings-info', requireAuth, async (req, res) => {
   try {
-    const localSearch = new DocumentSearch(req.params.collection, 'local');
-    await localSearch.initialize();
-    
-    const localDocs = await localSearch.listIndexedDocuments();
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     const lanceChunks = await lanceDBService.getChunkCounts(req.params.collection);
-    
-    const localInfo = {
-      documents: localDocs.map(doc => ({
-        filename: doc.filename,
-        chunks: doc.chunks || 0
-      })),
-      totalChunks: localDocs.reduce((sum, doc) => sum + (doc.chunks || 0), 0)
-    };
     
     const lanceInfo = {
       documents: Object.entries(lanceChunks).map(([filename, chunks]) => ({
@@ -388,11 +347,22 @@ router.get('/collections/:collection/embeddings-info', requireAuth, async (req, 
       totalChunks: Object.values(lanceChunks).reduce((sum, count) => sum + count, 0)
     };
     
-    res.json({ local: localInfo, lanceDB: lanceInfo });
+    res.json({ lanceDB: lanceInfo });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Generate collection metadata
+router.post('/collections/:collection/generate-metadata', requireAuth, asyncHandler(async (req, res) => {
+  try {
+    const { collection } = req.params;
+    const result = await documentProcessor.generateCollectionMetadata(collection);
+    res.json({ success: true, result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}));
 
 
 

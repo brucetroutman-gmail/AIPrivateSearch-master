@@ -51,6 +51,11 @@
       "size": "986 MB"
     },
     {
+      "category": "metadata",
+      "modelName": "qwen2.5-coder:1.5b",
+      "size": "986 MB"
+    },
+    {
       "category": "search",
       "modelName": "gemma2:9b",
       "size": "5.4 GB"

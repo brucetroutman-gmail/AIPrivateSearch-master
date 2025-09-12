@@ -782,7 +782,7 @@ form.addEventListener('submit', async (e) => {
     const collection = (sourceTypeEl.value.includes('Docu')) ? collectionEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
-    const vectorDB = (sourceTypeEl.value.includes('Docu') && vectorDBEl) ? vectorDBEl.value : 'local';
+    // VectorDB removed - using LanceDB only
     
     // Validate collection selection for local documents
     if (sourceTypeEl.value.includes('Docu') && !collection) {
@@ -791,7 +791,7 @@ form.addEventListener('submit', async (e) => {
     }
     
     updateProgress('Searching');
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, vectorDB);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel);
     
     // Show scoring phase if scores were generated
     if (result.scores) {
