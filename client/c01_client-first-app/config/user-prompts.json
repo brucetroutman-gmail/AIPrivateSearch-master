@@ -1,0 +1,24 @@
+{
+  "user_prompts": [
+    {
+      "name": "KNOWLEDGE-Quantum",
+      "prompt": "What are the primary challenges in quantum computing, and how might they be overcome?"
+    },
+    {
+      "name": "REASON-AI-adopt",
+      "prompt": "Analyze the potential economic impacts of widespread AI adoption in the next decade."
+    },
+    {
+      "name": "CREATE-AI-dialog",
+      "prompt": "Create a dialogue between two AI systems discussing what it means to be conscious."
+    },
+    {
+      "name": "CODE-Pseudo",
+      "prompt": "Write pseudocode for an efficient algorithm to detect anomalies in streaming data."
+    },
+    {
+      "name": "INSTRUCT-Fix wifi",
+      "prompt": "Create a troubleshooting flowchart for common home WiFi problems."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+/dist
+/electron-app
+.env
+node_modules
+.DS_Store
+yarn.lock
+*.bak
+*_v[0-9]*
+*_t[0-9]*
+.vscode/
+*.log
+data/lancedb/
+data/embeddings/
+

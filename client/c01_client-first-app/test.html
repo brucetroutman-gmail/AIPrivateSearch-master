@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test-n-Save</title>
+    <link rel="stylesheet" href="default.css">
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
+    <script src="shared/common.js"></script>
+    <style>
+        :root {
+            --success-bg: #d4edda;
+            --success-border: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #dc3545;
+            --status-bg: #f39c12;
+        }
+        
+        [data-theme="dark"] {
+            --success-bg: #1e4d3a;
+            --success-border: #28a745;
+            --error-bg: #4d1e1e;
+            --error-border: #dc3545;
+            --status-bg: #f39c12;
+        }
+        
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+        .section { margin: 20px 0; border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; background: var(--card-bg); transition: background-color 0.3s; }
+        .section-header { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        .subsection { margin: 10px 0 10px 20px; }
+        .subsection-header { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .test-item { margin: 5px 0; padding: 5px; }
+        .test-code { font-family: monospace; font-weight: bold; color: #0066cc; }
+        .controls { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s; }
+        .execute-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .execute-btn:hover { background: #0056b3; }
+        .execute-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .results { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; min-height: 100px; transition: background-color 0.3s; }
+        .test-item.disabled { opacity: 0.5; }
+        .test-item.disabled input { cursor: not-allowed; }
+        .test-item.disabled label { color: #999; cursor: not-allowed; }
+        .section-header.disabled { opacity: 0.5; }
+        .section-header.disabled input { cursor: not-allowed; }
+        .section-header.disabled label { color: #999; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+    <h1>Test-n-Save</h1>
+    
+    <div class="model-selector">
+        <div class="model-label">Search Model:</div>
+        <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
+        <div id="modelList" class="model-list">
+            Loading models...
+        </div>
+    </div>
+    
+    <div class="model-selector">
+        <div class="model-label">Score Model:</div>
+        <select id="scoreModelSelect" class="score-model-select">
+            <option value="">Loading score models...</option>
+        </select>
+    </div>
+    
+    <div class="model-selector">
+        <div class="model-label">Token Override:</div>
+        <select id="tokenOverride" class="token-override-select">
+            <option value="" selected>No Override</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+        </select>
+    </div>
+    
+    <div class="controls">
+        <label><input type="checkbox" id="selectAll"> Select All Tests</label>
+        <button class="execute-btn" onclick="executeSelectedTests()">Execute Selected Tests</button>
+        <span id="selectedCount">0 tests selected</span>
+        <div id="executionStatus" class="execution-status" style="display: none;">
+            <strong>🔄 Test Execution in Progress...</strong>
+            <div id="progressIndicator"></div>
+        </div>
+    </div>
+
+    <div id="testSections"></div>
+
+    <div class="results">
+        <h3>Test Results:</h3>
+        <div id="testResults">No tests executed yet.</div>
+    </div>
+
+    <script>
+        let modelTests = {};
+        let isProcessing = false;
+        
+        // Global processing state management
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const selects = document.querySelectorAll('select');
+            const buttons = document.querySelectorAll('button, .execute-btn');
+            
+            checkboxes.forEach(cb => {
+                // Don't enable permanently disabled checkboxes (like performance_tests_docs)
+                if (!cb.hasAttribute('data-permanently-disabled')) {
+                    cb.disabled = processing;
+                }
+            });
+            selects.forEach(select => select.disabled = processing);
+            buttons.forEach(btn => btn.disabled = processing);
+        }
+
+        async function loadModelTests() {
+            try {
+                const response = await fetch('./config/model-tests.json');
+                const data = await response.json();
+                modelTests = data['model-tests'];
+                renderTests();
+            } catch (error) {
+                console.error('Error loading model tests:', error);
+                document.getElementById('testSections').innerHTML = '<div class="section">Error loading test configuration</div>';
+            }
+        }
+
+        function renderTests() {
+            if (!modelTests || Object.keys(modelTests).length === 0) {
+                document.getElementById('testSections').innerHTML = '<div class="section">No tests available</div>';
+                return;
+            }
+            
+            const container = document.getElementById('testSections');
+            container.innerHTML = ''; // Clear existing content
+            
+            // Render all test sections dynamically
+            Object.entries(modelTests).forEach(([key, section]) => {
+                if (section.tests) {
+                    container.appendChild(createSection(key, section));
+                }
+            });
+            
+            setupEventListeners();
+        }
+
+        function createSection(type, data) {
+            const section = document.createElement('div');
+            const isDisabled = !data.enabled;
+            const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            section.className = 'section';
+            section.innerHTML = `
+                <div class="section-header ${isDisabled ? 'disabled' : ''}">
+                    <label><input type="checkbox" id="select${capitalizedType}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}> ${data.title}${isDisabled ? ' (Coming Soon)' : ''}</label>
+                </div>
+            `;
+            
+            data.tests.forEach(test => {
+                section.appendChild(createTestItem(test, type, isDisabled));
+            });
+            
+            return section;
+        }
+
+        function createTestItem(test, group, isDisabled) {
+            const item = document.createElement('div');
+            
+            item.className = isDisabled ? 'test-item disabled' : 'test-item';
+            item.innerHTML = `
+                <label>
+                    <input type="checkbox" class="test-checkbox" data-testcode="${test.testcode}" data-group="${group}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}>
+                    <span class="test-code">${test.testcode}</span> - ${test.description}${isDisabled ? ' (Coming Soon)' : ''}
+                </label>
+            `;
+            return item;
+        }
+
+        function setupEventListeners() {
+            // Select All
+            const selectAllEl = document.getElementById('selectAll');
+            if (selectAllEl) {
+                selectAllEl.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.test-checkbox:not([disabled])');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            }
+
+            // Section selectors - handle all dynamically created sections
+            Object.keys(modelTests).forEach(key => {
+                const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+                const selector = document.getElementById(`select${capitalizedKey}`);
+                if (selector) {
+                    selector.addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll(`[data-group="${key}"]`);
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                        updateSelectedCount();
+                    });
+                }
+            });
+
+            // Parameter section
+            const selectParameterEl = document.getElementById('selectParameter');
+            if (selectParameterEl) {
+                selectParameterEl.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('[data-group="parameter"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            }
+
+            // Subsection selectors
+            document.querySelectorAll('.subsection-select').forEach(selector => {
+                selector.addEventListener('change', function() {
+                    const group = this.dataset.group;
+                    const checkboxes = this.closest('.subsection').querySelectorAll('.test-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+            });
+
+            // Individual test checkboxes
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('test-checkbox')) {
+                    updateSelectedCount();
+                }
+            });
+        }
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.test-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = `${selected} tests selected`;
+        }
+
+        async function executeSelectedTests() {
+            const selected = Array.from(document.querySelectorAll('.test-checkbox:checked'))
+                .map(cb => cb.dataset.testcode);
+            
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selected.length === 0) {
+                showUserMessage('Please select at least one test to execute.', 'error');
+                return;
+            }
+            
+            if (selectedModels.length === 0) {
+                showUserMessage('Please select at least one model first.', 'error');
+                return;
+            }
+
+            // Disable all controls
+            setProcessingState(true);
+            
+            // Update button appearance
+            const executeBtn = document.querySelector('.execute-btn');
+            executeBtn.textContent = 'Processing';
+            executeBtn.classList.add('processing-button');
+
+            // Show execution status at top
+            const statusDiv = document.getElementById('executionStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Executing ${selected.length} tests with ${selectedModels.length} model(s)...`;
+            
+            // Clear bottom results
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            // Load configuration data
+            const [sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions] = await Promise.all([
+                fetch('./config/source-types.json').then(r => r.json()),
+                fetch('./config/system-prompts.json').then(r => r.json()),
+                fetch('./config/user-prompts.json').then(r => r.json()),
+                fetch('./config/temperature.json').then(r => r.json()),
+                fetch('./config/context.json').then(r => r.json()),
+                fetch('./config/tokens.json').then(r => r.json())
+            ]);
+            
+            let completedTests = 0;
+            const results = [];
+            
+            for (const testCode of selected) {
+                for (const model of selectedModels) {
+                    const startTime = Date.now();
+                    try {
+                        const params = parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions);
+                        
+                        // Apply token override if selected
+                        const tokenOverride = document.getElementById('tokenOverride').value;
+                        if (tokenOverride) {
+                            params.tokens = parseInt(tokenOverride);
+                        }
+                        
+                        // Get category and description from JSON based on testCode
+                        const { testCategory, testDescription } = getTestCategoryAndDescriptionFromJSON(testCode);
+                        
+                        const result = await executeTest(params, model, testCode, testCategory, testDescription);
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ testCode, model, result, success: true, elapsedTime });
+                    } catch (error) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        results.push({ testCode, model, error: error.message, success: false, elapsedTime });
+                    }
+                    
+                    completedTests++;
+                    progressDiv.innerHTML = `Completed ${completedTests}/${selected.length * selectedModels.length} tests...`;
+                    
+                    // Add delay between tests to prevent overwhelming Ollama
+                    if (completedTests < selected.length * selectedModels.length) {
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+                    }
+                }
+            }
+            
+            // Hide execution status and display results
+            statusDiv.style.display = 'none';
+            displayTestResults(results);
+            
+            // Restore button appearance first
+            executeBtn.textContent = 'Execute Selected Tests';
+            executeBtn.classList.remove('processing-button');
+            
+            // Re-enable all controls
+            setProcessingState(false);
+        }
+        
+        function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {
+            // Parse testcode pattern: t[1-3][1-5][1-5][1-3][1-4][1-3][0-1]
+            const sourceTypeMap = ['Local Model Only', 'Local Documents Only', 'Local Model and Documents'];
+            const assistantTypeMap = ['Simple Assistant', 'Detailed Assistant', 'Reasoned Assistant', 'Creative Assistant', 'Coding Assistant'];
+            const userPromptMap = ['KNOWLEDGE-Quantum', 'REASON-AI-adopt', 'CREATE-AI-dialog', 'CODE-Pseudo', 'INSTRUCT-Fix wifi'];
+            const temperatureMap = [0.3, 0.6, 0.9];
+            const contextMap = [2048, 4096, 8192, 16384];
+            const tokenMap = ['No Limit', '250', '500'];
+            
+            const sourceType = sourceTypeMap[parseInt(testCode[1]) - 1];
+            const assistantType = assistantTypeMap[parseInt(testCode[2]) - 1];
+            const userPromptType = userPromptMap[parseInt(testCode[3]) - 1];
+            const temperature = temperatureMap[parseInt(testCode[4]) - 1];
+            const context = contextMap[parseInt(testCode[5]) - 1];
+            const tokens = tokenMap[parseInt(testCode[6]) - 1];
+            const generateScores = testCode[7] === '1';
+            
+            // Determine test category and description
+            const { testCategory, testDescription } = getTestCategoryAndDescription(testCode);
+            
+            // Get system prompt by id from testcode (position 2)
+            const assistantId = testCode[2];
+            const systemPrompt = systemPrompts.system_prompts.find(p => p.id === assistantId);
+            
+            // Get user prompt
+            const userPrompt = userPrompts.user_prompts.find(p => p.name === userPromptType);
+            
+            return {
+                sourceType,
+                assistantType,
+                systemPrompt: systemPrompt?.prompt || '',
+                systemPromptName: systemPrompt?.name || 'Unknown Assistant',
+                userPrompt: userPrompt?.prompt || 'Default test prompt',
+                temperature,
+                context,
+                tokens: tokens === 'No Limit' ? null : parseInt(tokens),
+                generateScores,
+                testCategory,
+                testDescription
+            };
+        }
+        
+        function getTestCategoryAndDescription(testCode) {
+            // Define test categories based on the test patterns from AISearchScore-Testcodes.md
+            const baselineTests = ['t1111110', 't3554341', 't2323230', 't1452121', 't1234561', 't3521430', 't2143120', 't3415231'];
+            const sourceTypeTests = ['t1111110', 't2111110', 't3111110'];
+            const assistantTypeTests = ['t1111110', 't1211110', 't1311110', 't1411110', 't1511110'];
+            const userPromptTests = ['t1111110', 't1121110', 't1131110', 't1141110', 't1151110'];
+            const temperatureTests = ['t1111110', 't1111210', 't1111310'];
+            const contextTests = ['t1111110', 't1111120', 't1111130', 't1111140'];
+            const tokenTests = ['t1111110', 't1111120', 't1111130'];
+            const scoringTests = ['t1111110', 't1111111'];
+            const edgeCaseTests = ['t1111431', 't1413111', 't1544111', 't3254321', 't2135140'];
+            const compatibilityTests = ['t1444331', 't5511111', 't1611111'];
+            
+            if (baselineTests.includes(testCode)) {
+                return {
+                    testCategory: 'Baseline Tests',
+                    testDescription: getBaselineDescription(testCode)
+                };
+            } else if (edgeCaseTests.includes(testCode)) {
+                return {
+                    testCategory: 'Edge Case Tests',
+                    testDescription: getEdgeCaseDescription(testCode)
+                };
+            } else if (compatibilityTests.includes(testCode)) {
+                return {
+                    testCategory: 'Compatibility Tests',
+                    testDescription: getCompatibilityDescription(testCode)
+                };
+            } else if (sourceTypeTests.includes(testCode)) {
+                return {
+                    testCategory: 'Source Type Variations',
+                    testDescription: getSourceTypeDescription(testCode)
+                };
+            } else if (assistantTypeTests.includes(testCode)) {
+                return {
+                    testCategory: 'Assistant Type Variations',
+                    testDescription: getAssistantTypeDescription(testCode)
+                };
+            } else if (userPromptTests.includes(testCode)) {
+                return {
+                    testCategory: 'User Prompt Variations',
+                    testDescription: getUserPromptDescription(testCode)
+                };
+            } else if (temperatureTests.includes(testCode)) {
+                return {
+                    testCategory: 'Temperature Variations',
+                    testDescription: getTemperatureDescription(testCode)
+                };
+            } else if (contextTests.includes(testCode)) {
+                return {
+                    testCategory: 'Context Variations',
+                    testDescription: getContextDescription(testCode)
+                };
+            } else if (tokenTests.includes(testCode)) {
+                return {
+                    testCategory: 'Token Limit Variations',
+                    testDescription: getTokenDescription(testCode)
+                };
+            } else if (scoringTests.includes(testCode)) {
+                return {
+                    testCategory: 'Scoring Variations',
+                    testDescription: getScoringDescription(testCode)
+                };
+            } else {
+                return {
+                    testCategory: 'Custom Test',
+                    testDescription: 'Custom test configuration'
+                };
+            }
+        }
+        
+        function getBaselineDescription(testCode) {
+            const descriptions = {
+                't1111110': 'All minimum values, no scoring',
+                't3554341': 'All maximum values, with scoring',
+                't2323230': 'Mixed values, no scoring',
+                't1452121': 'Mixed values, with scoring',
+                't1234561': 'Sequential progression, with scoring',
+                't3521430': 'Reverse progression, no scoring',
+                't2143120': 'Random mix A, no scoring',
+                't3415231': 'Random mix B, with scoring'
+            };
+            return descriptions[testCode] || 'Baseline test';
+        }
+        
+        function getEdgeCaseDescription(testCode) {
+            const descriptions = {
+                't1111431': 'Maximum Context + Maximum Tokens + Scoring',
+                't1413111': 'Creative Assistant + Creative Temperature + Scoring',
+                't1544111': 'Coding Assistant + CODE-Pseudo + Scoring',
+                't3254321': 'All Documents + Detailed + AI-adopt + Moderate + 8192 + 250 + Scoring',
+                't2135140': 'Documents + Simple + CREATE + Creative + 16384 + No Limit + No Scoring'
+            };
+            return descriptions[testCode] || 'Edge case test';
+        }
+        
+        function getCompatibilityDescription(testCode) {
+            const descriptions = {
+                't1444331': 'Creative Assistant + Creative Temperature + Creative Tokens + Scoring',
+                't5511111': 'Invalid (Assistant Type 5 max) - Error handling test',
+                't1611111': 'Invalid (User Prompt 6 max) - Error handling test'
+            };
+            return descriptions[testCode] || 'Compatibility test';
+        }
+        
+        function getSourceTypeDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Local Model Only baseline',
+                't2111110': 'Local Documents Only baseline',
+                't3111110': 'Local Model and Documents baseline'
+            };
+            return descriptions[testCode] || 'Source type variation';
+        }
+        
+        function getAssistantTypeDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Simple Assistant baseline',
+                't1211110': 'Detailed Assistant baseline',
+                't1311110': 'Reasoned Assistant baseline',
+                't1411110': 'Creative Assistant baseline',
+                't1511110': 'Coding Assistant baseline'
+            };
+            return descriptions[testCode] || 'Assistant type variation';
+        }
+        
+        function getUserPromptDescription(testCode) {
+            const descriptions = {
+                't1111110': 'KNOWLEDGE-Quantum baseline',
+                't1121110': 'REASON-AI-adopt baseline',
+                't1131110': 'CREATE-AI-dialog baseline',
+                't1141110': 'CODE-Pseudo baseline',
+                't1151110': 'INSTRUCT-Fix wifi baseline'
+            };
+            return descriptions[testCode] || 'User prompt variation';
+        }
+        
+        function getTemperatureDescription(testCode) {
+            const descriptions = {
+                't1111110': 'Predictable (0.3) baseline',
+                't1111210': 'Moderate (0.6) baseline',
+                't1111310': 'Creative (0.9) baseline'
+            };
+            return descriptions[testCode] || 'Temperature variation';
+        }
+        
+        function getContextDescription(testCode) {
+            const descriptions = {
+                't1111110': '2048 context baseline',
+                't1111120': '4096 context baseline',
+                't1111130': '8192 context baseline',
+                't1111140': '16384 context baseline'
+            };
+            return descriptions[testCode] || 'Context variation';
+        }
+        
+        function getTokenDescription(testCode) {
+            const descriptions = {
+                't1111110': 'No Limit baseline',
+                't1111120': '250 tokens baseline',
+                't1111130': '500 tokens baseline'
+            };
+            return descriptions[testCode] || 'Token limit variation';
+        }
+        
+        function getScoringDescription(testCode) {
+            const descriptions = {
+                't1111110': 'No scoring baseline',
+                't1111111': 'With scoring baseline'
+            };
+            return descriptions[testCode] || 'Scoring variation';
+        }
+        
+        async function executeTest(params, model, testCode, testCategory, testDescription) {
+            const response = await fetch('./services/api.js');
+            const apiModule = await import('./services/api.js');
+            
+            // Get selected score model
+            const scoreModel = document.getElementById('scoreModelSelect').value || model;
+            
+            const result = await apiModule.search(
+                params.userPrompt,
+                params.generateScores,
+                model,
+                params.temperature,
+                params.context,
+                params.systemPrompt,
+                params.systemPromptName,
+                params.tokens,
+                params.sourceType,
+                testCode,
+                null, // collection
+                false, // showChunks
+                scoreModel
+            );
+            
+            // Export to database with category and description
+            let dbSaveSuccess = false;
+            let dbInsertId = null;
+            try {
+                const dbResult = await exportToDatabase(result, testCategory, testDescription, params);
+                dbSaveSuccess = true;
+                dbInsertId = dbResult.insertId;
+            } catch (dbError) {
+                console.error('Database save error:', dbError);
+                result.dbSaveError = dbError.message;
+            }
+            
+            result.dbSaveSuccess = dbSaveSuccess;
+            result.dbInsertId = dbInsertId;
+            return result;
+        }
+        
+        // Use common exportToDatabase function from common.js
+        // Function is now available globally
+        
+        function displayTestResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            let html = `<h4>Test Execution Complete (${results.length} tests)</h4>`;
+            
+            results.forEach(({ testCode, model, result, success, error, elapsedTime }) => {
+                if (success) {
+                    const dbStatus = result.dbSaveSuccess ? 
+                        `<small class="success-message">✅ Saved to database (ID: ${result.dbInsertId})</small>` : 
+                        `<small class="error-message">❌ Database save failed: ${result.dbSaveError || 'Unknown error'}</small>`;
+                    
+                    html += `
+                        <div class="result-success">
+                            <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ✅ Success
+                            <br><small>Response: ${result.response?.substring(0, 100)}...</small>
+                            <br>${dbStatus}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="result-error">
+                            <strong>${testCode}</strong> (${model}) ${elapsedTime}s - ❌ Failed
+                            <br><small>Error: ${error}</small>
+                            <br><small class="error-message">❌ Not saved to database</small>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Calculate and display total elapsed time
+            const totalElapsedTime = results.reduce((sum, result) => sum + parseFloat(result.elapsedTime), 0);
+            const formattedTime = formatTime(totalElapsedTime);
+            html += `
+                <div class="result-container">
+                    Total Elapsed Time: ${formattedTime}
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Load models from models-list.json (search category only)
+        async function loadModels() {
+            try {
+                const response = await fetch('config/models-list.json');
+                const data = await response.json();
+                const modelList = document.getElementById('modelList');
+                modelList.innerHTML = '';
+                
+                // Get unique search models
+                const searchModels = [...new Set(
+                    data.models
+                        .filter(model => model.category === 'search')
+                        .map(model => model.modelName)
+                )].sort();
+                
+                searchModels.forEach(modelName => {
+                    const label = document.createElement('label');
+                    label.style.display = 'block';
+                    label.style.margin = '5px 0';
+                    label.innerHTML = `<input type="checkbox" class="model-checkbox" value="${modelName}"> ${modelName}`;
+                    modelList.appendChild(label);
+                });
+                
+                // Load score models using common function
+                loadScoreModels('scoreModelSelect');
+                
+                // Setup select all models functionality
+                document.getElementById('selectAllModels').addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.model-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                });
+                
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('modelList').innerHTML = 'Error loading Ollama models';
+            }
+        }
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = (totalSeconds % 60).toFixed(1);
+            
+            if (minutes > 0) {
+                return `${minutes}m ${seconds}s`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+        
+        function getTestCategoryAndDescriptionFromJSON(testCode) {
+            // Search through all test categories in modelTests
+            for (const [key, category] of Object.entries(modelTests)) {
+                if (category.tests) {
+                    const test = category.tests.find(t => t.testcode === testCode);
+                    if (test) {
+                        return {
+                            testCategory: category.title,
+                            testDescription: test.description
+                        };
+                    }
+                }
+            }
+            return {
+                testCategory: 'Unknown Category',
+                testDescription: 'Unknown test'
+            };
+        }
+        
+        // Initialize
+        loadModels();
+        loadModelTests();
+    </script>
+    
+    </div>
+
+    <div id="footer-placeholder"></div>
+</body>
+</html>

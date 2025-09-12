@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AISearch-n-Score - AI Model Evaluation Platform</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="csrf.js"></script>
+  <script src="shared/common.js"></script>
+  <style>
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      min-height: calc(100vh - 200px);
+    }
+    
+    .hero {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #3498db;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+    
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    
+    .feature {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px var(--shadow);
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    
+    .feature h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    
+    [data-theme="dark"] .hero h1 {
+      color: #87ceeb;
+    }
+    
+    [data-theme="dark"] .feature h3 {
+      color: #87ceeb;
+    }
+    
+
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="hero">
+      <h1>AI Model Evaluation Platform</h1>
+      <p>Comprehensive testing and scoring system for AI models with systematic parameter evaluation, performance metrics, and detailed analytics.</p>
+      <div class="cta-buttons">
+        <a href="./search.html" class="btn btn-primary">Start Searching</a>
+        <a href="./test.html" class="btn btn-secondary">Run Tests</a>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <h3>🔍 AI Search & Score</h3>
+        <p>Search internet sources or local document collections with AI-powered responses and comprehensive scoring across accuracy, relevance, and organization metrics.</p>
+      </div>
+      <div class="feature">
+        <h3>🧪 Automated Testing</h3>
+        <p>Execute systematic test suites across 5,400 possible parameter combinations with automated result tracking.</p>
+      </div>
+      <div class="feature">
+        <h3>📊 Performance Analytics</h3>
+        <p>Detailed performance metrics including response times, token generation rates, and system resource usage.</p>
+      </div>
+      <div class="feature">
+        <h3>🎯 Parameter Control</h3>
+        <p>Fine-tune model behavior with temperature, context size, token limits, and assistant type configurations.</p>
+      </div>
+      <div class="feature">
+        <h3>💾 Data Export</h3>
+        <p>Export results in multiple formats including JSON, PDF, Markdown, and direct database storage.</p>
+      </div>
+      <div class="feature">
+        <h3>📚 Document Collections</h3>
+        <p>Upload, convert, and search your own document collections using semantic vector search with AI-powered responses based on your content.</p>
+      </div>
+      <div class="feature">
+        <h3>🔧 Model Integration</h3>
+        <p>Seamless integration with Ollama for local AI model execution and evaluation.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+
+</body>
+</html>

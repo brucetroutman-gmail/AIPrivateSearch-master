@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Models</title>
+    <link rel="stylesheet" href="default.css">
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
+    <script src="shared/common.js"></script>
+    <style>
+        :root {
+            --success-bg: #d4edda;
+            --success-border: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #dc3545;
+            --status-bg: #e3f2fd;
+        }
+        
+        [data-theme="dark"] {
+            --success-bg: #1e4d3a;
+            --success-border: #28a745;
+            --error-bg: #4d1e1e;
+            --error-border: #dc3545;
+            --status-bg: #1e3a4d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .section {
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            transition: background-color 0.3s;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .update-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .update-btn:hover {
+            background: #0056b3;
+        }
+        
+        .update-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 5px;
+            min-height: 100px;
+            transition: background-color 0.3s;
+        }
+        
+        .model-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 5px;
+            background: var(--input-bg);
+            transition: background-color 0.3s;
+        }
+        
+        .model-item {
+            margin: 5px 0;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+      <!-- Main Content -->
+      <main class="main-content">
+        <h1>Manage Models</h1>
+        <p>Add, update, or remove models from Ollama registry.</p>
+        
+        <div class="section">
+            <div style="font-weight: bold; margin-bottom: 10px;">Add New Model: <a href="http://ollama.com/library" target="_blank" style="font-weight: normal; color: #007bff;">Browse Ollama Library</a></div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: inline-block; width: 100px; font-weight: bold;">Model Name:</label>
+                <input type="text" id="newModelName" placeholder="Enter model name (e.g., llama2, gemma:2b)" style="width: 300px; padding: 0.5rem; margin-right: 10px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: inline-block; width: 100px; font-weight: bold; vertical-align: top;">Category:</label>
+                <div style="display: inline-block;">
+                    <label><input type="checkbox" id="categorySearch" value="search"> Search</label><br>
+                    <label><input type="checkbox" id="categoryScore" value="score"> Score</label><br>
+                    <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label>
+                </div>
+            </div>
+            <button class="update-btn" onclick="addNewModel()">Add Model</button>
+        </div>
+        
+        <div class="controls">
+            <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
+            <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
+            <button class="update-btn" style="background: #dc3545;" onclick="removeSelectedModels()">Remove Selected Models</button>
+            <button class="update-btn" style="background: #ffc107; color: #000;" onclick="removeUnusedModels()">Remove Unlisted Models</button>
+            <span id="selectedCount">0 models selected</span>
+            <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                <strong>🔄 Model Update in Progress...</strong>
+                <div id="progressIndicator"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="font-weight: bold; margin-bottom: 10px;">Installed Models (Update):</div>
+            <div id="modelList" class="model-list">
+                Loading models...
+            </div>
+        </div>
+
+        <div class="results">
+            <h3>Results:</h3>
+            <div id="updateResults">No operations executed yet.</div>
+        </div>
+      </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        let isProcessing = false;
+        
+        // Global processing state management
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            const buttons = document.querySelectorAll('.update-btn');
+            const inputs = document.querySelectorAll('input, select');
+            
+            buttons.forEach(btn => {
+                btn.disabled = processing;
+                if (processing) {
+                    btn.classList.add('processing-button');
+                } else {
+                    btn.classList.remove('processing-button');
+                }
+            });
+            
+            inputs.forEach(input => {
+                input.disabled = processing;
+            });
+        }
+        
+        // Load models from models-list.json
+        async function loadModels() {
+            try {
+                const configResponse = await fetch('config/models-list.json');
+                const configData = await configResponse.json();
+                const modelConfig = {};
+                
+                // Group models by name and collect categories
+                configData.models.forEach(model => {
+                    if (!modelConfig[model.modelName]) {
+                        modelConfig[model.modelName] = { categories: [], size: model.size };
+                    }
+                    modelConfig[model.modelName].categories.push(model.category);
+                });
+                
+                const modelList = document.getElementById('modelList');
+                modelList.innerHTML = '';
+                
+                // Display models from config file
+                Object.keys(modelConfig)
+                    .sort()
+                    .forEach(modelName => {
+                        const config = modelConfig[modelName];
+                        const categoriesText = config.categories.join(', ');
+                        const label = document.createElement('label');
+                        label.className = 'model-item';
+                        label.style.display = 'block';
+                        label.innerHTML = `
+                            <input type="checkbox" class="model-checkbox" value="${modelName}"> 
+                            <strong>${modelName}</strong> 
+                            <span style="color: #666; margin-left: 10px;">[${categoriesText}] ${config.size}</span>
+                        `;
+                        modelList.appendChild(label);
+                    });
+                
+                // Setup select all functionality
+                document.getElementById('selectAllModels').addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.model-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateSelectedCount();
+                });
+                
+                // Setup individual checkbox listeners
+                document.addEventListener('change', function(e) {
+                    if (e.target.classList.contains('model-checkbox')) {
+                        updateSelectedCount();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('modelList').innerHTML = 'Error loading Ollama models';
+            }
+        }
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.model-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = `${selected} models selected`;
+        }
+
+        async function addNewModel() {
+            const modelName = document.getElementById('newModelName').value.trim();
+            const selectedCategories = [];
+            if (document.getElementById('categorySearch').checked) selectedCategories.push('search');
+            if (document.getElementById('categoryScore').checked) selectedCategories.push('score');
+            if (document.getElementById('categoryEmbed').checked) selectedCategories.push('embed');
+            
+            if (!modelName) {
+                showUserMessage('Please enter a model name.', 'error');
+                return;
+            }
+            
+            if (selectedCategories.length === 0) {
+                showUserMessage('Please select at least one category.', 'error');
+                return;
+            }
+            
+            setProcessingState(true);
+            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            const resultsDiv = document.getElementById('updateResults');
+            
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Adding ${modelName}...`;
+            
+            const startTime = Date.now();
+            try {
+                // First, pull the model from Ollama
+                const response = await fetch('http://localhost:11434/api/pull', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: modelName })
+                });
+                
+                if (response.ok) {
+                    // Process the streaming response
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let done = false;
+                    let lastStatus = '';
+                    let hasError = false;
+                    
+                    while (!done) {
+                        const { value, done: readerDone } = await reader.read();
+                        done = readerDone;
+                        
+                        if (value) {
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n').filter(line => line.trim());
+                            
+                            for (const line of lines) {
+                                try {
+                                    const data = JSON.parse(line);
+                                    if (data.status) {
+                                        progressDiv.innerHTML = `Adding ${modelName}: ${data.status}`;
+                                        lastStatus = data.status;
+                                    }
+                                    if (data.error) {
+                                        hasError = true;
+                                        lastStatus = `Error: ${data.error}`;
+                                    }
+                                } catch (e) {
+                                    // Ignore JSON parse errors
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (hasError) {
+                        throw new Error(lastStatus);
+                    }
+                    
+                    // Use unknown size since we can't easily get it
+                    const size = 'unknown';
+                    
+                    try {
+                        // Load current models-list.json
+                        const configResponse = await fetch('http://localhost:3001/api/config/models-list.json');
+                        const configData = await configResponse.json();
+                        const models = JSON.parse(configData.content);
+                        
+                        // Add entry for each selected category
+                        selectedCategories.forEach(category => {
+                            models.models.push({
+                                category: category,
+                                modelName: modelName,
+                                size: size
+                            });
+                        });
+                        
+                        // Save updated config
+                        const saveResponse = await window.csrfManager.fetch('http://localhost:3001/api/config/models-list.json', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
+                        });
+                        
+                        if (saveResponse.ok) {
+                            const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                            const sizeNote = size === 'unknown' ? ' (size detection failed)' : '';
+                            const resultHtml = `
+                                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                    <strong>${modelName}</strong> ${elapsedTime}s - ✅ Added Successfully [${selectedCategories.join(', ')}] ${size}${sizeNote}
+                                </div>
+                            `;
+                            resultsDiv.innerHTML = resultHtml;
+                            
+                            document.getElementById('newModelName').value = '';
+                            loadModels();
+                        } else {
+                            throw new Error('Failed to save to models-list.json');
+                        }
+                    } catch (configError) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        const resultHtml = `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                                <strong>${modelName}</strong> ${elapsedTime}s - ✅ Ollama Pull OK, ❌ Config Save Failed
+                                <br><small>Error: ${configError.message}</small>
+                            </div>
+                        `;
+                        resultsDiv.innerHTML = resultHtml;
+                    }
+                } else {
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    const errorText = await response.text();
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ❌ Ollama Pull Failed
+                            <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = resultHtml;
+                }
+            } catch (error) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                const resultHtml = `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <strong>${modelName}</strong> ${elapsedTime}s - ❌ Add Failed
+                        <br><small>Network Error: ${error.message}</small>
+                    </div>
+                `;
+                resultsDiv.innerHTML = resultHtml;
+            } finally {
+                statusDiv.style.display = 'none';
+                setProcessingState(false);
+            }
+        }
+        
+        function formatSize(bytes) {
+            if (bytes >= 1024 * 1024 * 1024) {
+                return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+            } else if (bytes >= 1024 * 1024) {
+                return (bytes / (1024 * 1024)).toFixed(0) + ' MB';
+            } else {
+                return (bytes / 1024).toFixed(0) + ' KB';
+            }
+        }
+        
+        async function updateSelectedModels() {
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedModels.length === 0) {
+                showUserMessage('Please select at least one model to update.', 'error');
+                return;
+            }
+            
+            // Get the button and set processing state
+            const updateBtn = event.target;
+            const originalText = updateBtn.textContent;
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Processing...';
+            updateBtn.classList.add('processing-button');
+            
+            try {
+                // Clear previous results
+                document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+                
+                for (const model of selectedModels) {
+                    await pullModel(model, 'update');
+                }
+            } finally {
+                // Restore button state
+                updateBtn.disabled = false;
+                updateBtn.textContent = originalText;
+                updateBtn.classList.remove('processing-button');
+            }
+        }
+        
+        async function removeUnusedModels() {
+            try {
+                // Get models from Ollama
+                const ollamaResponse = await fetch('http://localhost:11434/api/tags');
+                const ollamaData = await ollamaResponse.json();
+                const installedModels = ollamaData.models.map(m => m.name.replace(':latest', ''));
+                
+                // Get models from models-list.json
+                const configResponse = await fetch('config/models-list.json');
+                const configData = await configResponse.json();
+                const configuredModels = [...new Set(configData.models.map(m => m.modelName))];
+                
+                // Find unlisted models (in Ollama but not in config)
+                const unlistedModels = installedModels.filter(model => !configuredModels.includes(model));
+                
+                if (unlistedModels.length === 0) {
+                    showUserMessage('No unlisted models found. All installed models are in the configuration.', 'info');
+                    return;
+                }
+                
+                if (!await secureConfirm(`Found ${unlistedModels.length} unlisted models:\n${unlistedModels.join(', ')}\n\nRemove these models? This action cannot be undone.`)) {
+                    return;
+                }
+                
+                setProcessingState(true);
+                document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+                const statusDiv = document.getElementById('updateStatus');
+                const progressDiv = document.getElementById('progressIndicator');
+                const resultsDiv = document.getElementById('updateResults');
+                
+                statusDiv.style.display = 'block';
+                
+                for (const modelName of unlistedModels) {
+                    const startTime = Date.now();
+                    progressDiv.innerHTML = `Removing unlisted model: ${modelName}...`;
+                    
+                    try {
+                        const response = await fetch('http://localhost:11434/api/delete', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: modelName })
+                        });
+                        
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        
+                        if (response.ok) {
+                            const resultHtml = `
+                                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                    <strong>${modelName}</strong> ${elapsedTime}s - ✅ Unlisted Model Removed
+                                </div>
+                            `;
+                            if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                                resultsDiv.innerHTML = resultHtml;
+                            } else {
+                                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                            }
+                        } else {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                    } catch (error) {
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        const resultHtml = `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                                <strong>${modelName}</strong> ${elapsedTime}s - ❌ Remove Failed
+                                <br><small>Error: ${error.message}</small>
+                            </div>
+                        `;
+                        if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                            resultsDiv.innerHTML = resultHtml;
+                        } else {
+                            resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                        }
+                    }
+                }
+                
+                statusDiv.style.display = 'none';
+                setProcessingState(false);
+                loadModels();
+                
+            } catch (error) {
+                showUserMessage(`Error checking for unlisted models: ${error.message}`, 'error');
+            }
+        }
+        
+        async function removeSelectedModels() {
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedModels.length === 0) {
+                showUserMessage('Please select at least one model to remove.', 'error');
+                return;
+            }
+            
+            if (!await secureConfirm(`Are you sure you want to remove ${selectedModels.length} selected models? This action cannot be undone.`)) {
+                return;
+            }
+            
+            setProcessingState(true);
+            document.getElementById('updateResults').innerHTML = 'No operations executed yet.';
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            const resultsDiv = document.getElementById('updateResults');
+            
+            statusDiv.style.display = 'block';
+            
+            for (const modelName of selectedModels) {
+                const startTime = Date.now();
+                progressDiv.innerHTML = `Removing ${modelName}...`;
+                
+                try {
+                    // Remove from Ollama
+                    const response = await fetch('http://localhost:11434/api/delete', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: modelName })
+                    });
+                    
+                    if (response.ok) {
+                        // Remove from models-list.json
+                        const configResponse = await fetch('http://localhost:3001/api/config/models-list.json');
+                        const configData = await configResponse.json();
+                        const models = JSON.parse(configData.content);
+                        
+                        // Remove all entries for this model
+                        models.models = models.models.filter(model => model.modelName !== modelName);
+                        
+                        // Save updated config
+                        await window.csrfManager.fetch('http://localhost:3001/api/config/models-list.json', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
+                        });
+                        
+                        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                        const resultHtml = `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                <strong>${modelName}</strong> ${elapsedTime}s - ✅ Removed Successfully
+                            </div>
+                        `;
+                        if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                            resultsDiv.innerHTML = resultHtml;
+                        } else {
+                            resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                        }
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ❌ Remove Failed
+                            <br><small>Error: ${error.message}</small>
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                }
+            }
+            
+            statusDiv.style.display = 'none';
+            setProcessingState(false);
+            loadModels();
+        }
+        
+        async function pullModel(modelName, action) {
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            const resultsDiv = document.getElementById('updateResults');
+            
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `${action === 'add' ? 'Adding' : 'Updating'} ${modelName}...`;
+            
+            const startTime = Date.now();
+            try {
+                const response = await fetch('http://localhost:11434/api/pull', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: modelName })
+                });
+                
+                if (response.ok) {
+                    // Read the streaming response
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let done = false;
+                    let lastMessage = '';
+                    let finalStatus = '';
+                    
+                    while (!done) {
+                        const { value, done: readerDone } = await reader.read();
+                        done = readerDone;
+                        
+                        if (value) {
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n').filter(line => line.trim());
+                            
+                            for (const line of lines) {
+                                try {
+                                    const data = JSON.parse(line);
+                                    if (data.status) {
+                                        progressDiv.innerHTML = `${modelName}: ${data.status}`;
+                                        lastMessage = data.status;
+                                    }
+                                    if (data.error) {
+                                        finalStatus = `Error: ${data.error}`;
+                                    }
+                                } catch (e) {
+                                    // Ignore JSON parse errors
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Set final status if no error was captured
+                    if (!finalStatus) {
+                        finalStatus = lastMessage || 'Completed';
+                    }
+                    
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    
+                    // Check if there was actually an error despite HTTP 200
+                    const isActualError = finalStatus.toLowerCase().includes('error') || finalStatus.toLowerCase().includes('failed');
+                    
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(${isActualError ? '--error-border' : '--success-border'}); border-radius: 5px; background: var(${isActualError ? '--error-bg' : '--success-bg'}); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ${isActualError ? '❌' : '✅'} ${action === 'add' ? 'Add' : 'Update'} ${isActualError ? 'Failed' : 'Successful'}
+                            <br><small>Ollama: ${finalStatus}</small>
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                } else {
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    const errorText = await response.text();
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
+                            <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                }
+            } catch (error) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                const resultHtml = `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
+                        <br><small>Network Error: ${error.message}</small>
+                    </div>
+                `;
+                if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                    resultsDiv.innerHTML = resultHtml;
+                } else {
+                    resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                }
+            }
+            
+            statusDiv.style.display = 'none';
+        }
+        
+        async function removeModel(modelName) {
+            const statusDiv = document.getElementById('updateStatus');
+            const progressDiv = document.getElementById('progressIndicator');
+            const resultsDiv = document.getElementById('updateResults');
+            
+            statusDiv.style.display = 'block';
+            progressDiv.innerHTML = `Removing ${modelName}...`;
+            
+            const startTime = Date.now();
+            try {
+                const response = await fetch('http://localhost:11434/api/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: modelName })
+                });
+                
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                
+                if (response.ok) {
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ✓ Remove Successful
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    const resultHtml = `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
+                            <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
+                        </div>
+                    `;
+                    if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                        resultsDiv.innerHTML = resultHtml;
+                    } else {
+                        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                    }
+                }
+            } catch (error) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                const resultHtml = `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
+                        <br><small>Network Error: ${error.message}</small>
+                    </div>
+                `;
+                if (resultsDiv.innerHTML.includes('No operations executed yet.')) {
+                    resultsDiv.innerHTML = resultHtml;
+                } else {
+                    resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                }
+            }
+            
+            statusDiv.style.display = 'none';
+        }
+
+        function displayUpdateResults(results) {
+            const resultsDiv = document.getElementById('updateResults');
+            let html = `<h4>Model Update Complete (${results.length} models)</h4>`;
+            
+            results.forEach(({ model, success, error, elapsedTime }) => {
+                if (success) {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${model}</strong> ${elapsedTime}s - ✅ Updated Successfully
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                            <strong>${model}</strong> ${elapsedTime}s - ❌ Update Failed
+                            <br><small>Error: ${error}</small>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Calculate and display total elapsed time
+            const totalElapsedTime = results.reduce((sum, result) => sum + parseFloat(result.elapsedTime), 0).toFixed(1);
+            html += `
+                <div style="margin: 20px 0; padding: 15px; border: 2px solid var(--border-color); border-radius: 5px; background: var(--card-bg); color: var(--text-color); text-align: left; font-weight: bold; transition: background-color 0.3s, color 0.3s;">
+                    Total Elapsed Time: ${totalElapsedTime}s
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Initialize
+        loadModels();
+    </script>
+</body>
+</html>

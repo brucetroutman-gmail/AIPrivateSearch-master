@@ -1,0 +1,13 @@
+{
+  "score-settings": [
+    {
+      "temperature": 0.3
+    },
+    {
+      "context": 1024
+    },
+    {
+      "maxtokens": 200
+    }
+  ]
+}

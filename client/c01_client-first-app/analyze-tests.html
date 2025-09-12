@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Model Performance Analysis - AISearch-n-Score</title>
+  <link rel="stylesheet" href="default.css">
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="shared/common.js"></script>
+  <style>
+    .analyze-container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .analyze-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+    
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    
+    .filter-group label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+    
+    .filter-group select {
+      padding: 0.4rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    
+    .report-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+    
+    .tab-button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab-button.active {
+      border-bottom-color: #3498db;
+      color: #3498db;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: var(--card-bg);
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      color: var(--text-color);
+    }
+    
+    .comparison-table th {
+      background: var(--bg-color);
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    .comparison-table tbody tr:nth-child(even) {
+      background: var(--bg-color);
+    }
+    
+    .comparison-table tbody tr:hover {
+      background: var(--border-color);
+    }
+    
+    .best-score {
+      background: #d4edda !important;
+      color: #155724 !important;
+    }
+    
+    .worst-score {
+      background: #f8d7da !important;
+      color: #721c24 !important;
+    }
+    
+    [data-theme="dark"] .comparison-table th {
+      background: #2c3e50;
+      border-color: #34495e;
+    }
+    
+    [data-theme="dark"] .comparison-table tbody tr:nth-child(even) {
+      background: #34495e;
+    }
+    
+    [data-theme="dark"] .comparison-table tbody tr:hover {
+      background: #3c5a78;
+    }
+    
+    [data-theme="dark"] .best-score {
+      background: #1e4d3a !important;
+      color: #28a745 !important;
+    }
+    
+    [data-theme="dark"] .worst-score {
+      background: #4d1e1e !important;
+      color: #dc3545 !important;
+    }
+    
+    .chart-container {
+      margin: 1rem 0;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 1rem;
+      color: var(--text-color);
+      overflow-x: auto;
+    }
+    
+    .chart-container .comparison-table {
+      margin: 0;
+    }
+    
+    .chart-container .comparison-table td small {
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .stat-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3498db;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-color);
+      margin-top: 0.5rem;
+    }
+    
+    [data-theme="dark"] h1 {
+      color: #87ceeb;
+    }
+    
+    [data-theme="dark"] h2, [data-theme="dark"] h3 {
+      color: #87ceeb;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="page-content">
+    <main class="analyze-container">
+      <h1>Model Performance Analysis</h1>
+      <p>Comprehensive analysis of AI model performance across hardware configurations and test parameters.</p>
+      
+      <div class="analyze-section">
+        <h2>Filters</h2>
+        <div class="filters">
+          <div class="filter-group">
+            <label>PC Code:</label>
+            <select id="pcCodeFilter">
+              <option value="">All PC Codes</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Model:</label>
+            <select id="modelFilter">
+              <option value="">All Models</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Source Type:</label>
+            <select id="sourceTypeFilter">
+              <option value="">All Source Types</option>
+              <option value="Local Model Only">Local Model Only</option>
+              <option value="Local Documents Only">Local Documents Only</option>
+              <option value="Local Model and Documents">Local Model and Documents</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Date Range:</label>
+            <select id="dateRangeFilter">
+              <option value="">All Dates</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Test Type:</label>
+            <select id="testTypeFilter">
+              <option value="">All Tests</option>
+              <option value="scoring">Scoring Only</option>
+              <option value="no-scoring">No Scoring Only</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="loadAnalysis()" style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Update Analysis</button>
+      </div>
+      
+      <div class="analyze-section">
+        <div class="report-tabs">
+          <button class="tab-button active" onclick="showTab('leaderboard')">Model Leaderboard</button>
+          <button class="tab-button" onclick="showTab('hardware')">Hardware Impact</button>
+          <button class="tab-button" onclick="showTab('parameters')">Parameter Optimization</button>
+          <button class="tab-button" onclick="showTab('categories')">Test Categories</button>
+          <button class="tab-button" onclick="showTab('consistency')">Consistency</button>
+        </div>
+        
+        <div id="leaderboard" class="tab-content active">
+          <h3>Model Performance Leaderboard</h3>
+          <div class="stats-grid" id="leaderboardStats">
+            <div class="loading">Loading model statistics...</div>
+          </div>
+          <table class="comparison-table" id="leaderboardTable">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Model</th>
+                <th>Avg Score</th>
+                <th>Accuracy</th>
+                <th>Relevance</th>
+                <th>Organization</th>
+                <th>Avg Duration</th>
+                <th>Tokens/sec</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="9" class="loading">Loading leaderboard...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="hardware" class="tab-content">
+          <h3>Hardware Performance Impact</h3>
+          <div class="stats-grid" id="hardwareStats">
+            <div class="loading">Loading hardware statistics...</div>
+          </div>
+          <table class="comparison-table" id="hardwareTable">
+            <thead>
+              <tr>
+                <th>PC Code</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Avg Score</th>
+                <th>Avg Duration</th>
+                <th>Tokens/sec</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" class="loading">Loading hardware data...</td></tr>
+            </tbody>
+          </table>
+          <h4>Model vs Hardware Matrix</h4>
+          <div id="hardwareMatrix" class="chart-container">
+            <div class="loading">Loading hardware matrix...</div>
+          </div>
+        </div>
+        
+        <div id="parameters" class="tab-content">
+          <h3>Parameter Optimization</h3>
+          <h4>Temperature Sweet Spots</h4>
+          <table class="comparison-table" id="temperatureTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Temperature</th>
+                <th>Avg Score</th>
+                <th>Consistency</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="loading">Loading temperature data...</td></tr>
+            </tbody>
+          </table>
+          <h4>Context Size Efficiency</h4>
+          <table class="comparison-table" id="contextTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Context Size</th>
+                <th>Avg Score</th>
+                <th>Avg Duration</th>
+                <th>Efficiency Ratio</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="loading">Loading context data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="categories" class="tab-content">
+          <h3>Performance by Test Category</h3>
+          <table class="comparison-table" id="categoryTable">
+            <thead>
+              <tr>
+                <th>Test Category</th>
+                <th>Avg Score</th>
+                <th>Min Score</th>
+                <th>Max Score</th>
+                <th>Avg Duration</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="loading">Loading category data...</td></tr>
+            </tbody>
+          </table>
+          <h4>Model Strengths by Category</h4>
+          <div id="categoryMatrix" class="chart-container">
+            <div class="loading">Loading category matrix...</div>
+          </div>
+        </div>
+        
+        <div id="consistency" class="tab-content">
+          <h3>Model Reliability & Consistency</h3>
+          <table class="comparison-table" id="consistencyTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Total Tests</th>
+                <th>Avg Score</th>
+                <th>Std Deviation</th>
+                <th>Min Score</th>
+                <th>Max Score</th>
+                <th>Consistency %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" class="loading">Loading consistency data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script>
+    let testData = [];
+    let filteredData = [];
+    
+    // Load test data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTestData();
+    });
+    
+    async function loadTestData() {
+      try {
+        const response = await fetch('http://localhost:3001/api/database/tests');
+        const data = await response.json();
+        
+        if (data.success) {
+          testData = data.tests;
+          populateFilters();
+          loadAnalysis();
+        } else {
+          showError('Failed to load test data: ' + data.error);
+        }
+      } catch (error) {
+        showError('Error loading test data: ' + error.message);
+      }
+    }
+    
+    function populateFilters() {
+      // Populate PC Code filter
+      const pcCodes = [...new Set(testData.map(test => test.PcCode).filter(Boolean))];
+      const pcCodeFilter = document.getElementById('pcCodeFilter');
+      pcCodeFilter.innerHTML = '<option value="">All PC Codes</option>' + 
+        pcCodes.map(code => `<option value="${code}">${code}</option>`).join('');
+      
+      // Populate Model filter
+      const models = [...new Set(testData.map(test => test['ModelName-search']).filter(Boolean))];
+      const modelFilter = document.getElementById('modelFilter');
+      modelFilter.innerHTML = '<option value="">All Models</option>' + 
+        models.map(model => `<option value="${model}">${model}</option>`).join('');
+    }
+    
+    function loadAnalysis() {
+      applyFilters();
+      updateLeaderboard();
+      updateHardware();
+      updateParameters();
+      updateCategories();
+      updateConsistency();
+    }
+    
+    function applyFilters() {
+      filteredData = testData.filter(test => {
+        const pcCode = document.getElementById('pcCodeFilter').value;
+        const selectedModel = document.getElementById('modelFilter').value;
+        const sourceType = document.getElementById('sourceTypeFilter').value;
+        const dateRange = document.getElementById('dateRangeFilter').value;
+        const testType = document.getElementById('testTypeFilter').value;
+        
+        if (pcCode && test.PcCode !== pcCode) return false;
+        if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
+        if (sourceType && test.SourceType !== sourceType) return false;
+        if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
+        if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
+        
+        if (dateRange) {
+          const testDate = new Date(test.CreatedAt);
+          const now = new Date();
+          const daysDiff = (now - testDate) / (1000 * 60 * 60 * 24);
+          
+          if (dateRange === 'today' && daysDiff > 1) return false;
+          if (dateRange === 'week' && daysDiff > 7) return false;
+          if (dateRange === 'month' && daysDiff > 30) return false;
+        }
+        
+        return true;
+      });
+    }
+    
+    function updateLeaderboard() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const totalTests = filteredData.length;
+      const scoredTests = filteredData.filter(test => test['WeightedScore-pct']).length;
+      const avgScore = scoredTests > 0 ? 
+        (filteredData.reduce((sum, test) => sum + (test['WeightedScore-pct'] || 0), 0) / scoredTests).toFixed(1) : 'N/A';
+      
+      const statsHtml = `
+        <div class="stat-card">
+          <div class="stat-value">${models.length}</div>
+          <div class="stat-label">Models Analyzed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${totalTests}</div>
+          <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${scoredTests}</div>
+          <div class="stat-label">Scored Tests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgScore}${avgScore !== 'N/A' ? '%' : ''}</div>
+          <div class="stat-label">Overall Avg</div>
+        </div>
+      `;
+      
+      document.getElementById('leaderboardStats').innerHTML = statsHtml;
+      
+      // Model Leaderboard Table
+      const tbody = document.querySelector('#leaderboardTable tbody');
+      const modelStats = models.map(model => {
+        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
+        const scoredModelTests = modelTests.filter(test => test['WeightedScore-pct']);
+        
+        return {
+          model,
+          testCount: modelTests.length,
+          avgScore: scoredModelTests.length > 0 ? 
+            (scoredModelTests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / scoredModelTests.length).toFixed(1) : 'N/A',
+          avgAccuracy: scoredModelTests.length > 0 ? 
+            (scoredModelTests.reduce((sum, test) => sum + (test.AccurateScore || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
+          avgRelevance: scoredModelTests.length > 0 ? 
+            (scoredModelTests.reduce((sum, test) => sum + (test.RelevantScore || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
+          avgOrganization: scoredModelTests.length > 0 ? 
+            (scoredModelTests.reduce((sum, test) => sum + (test.OrganizedScore || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
+          avgDuration: (modelTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / modelTests.length).toFixed(1),
+          avgTokens: (modelTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / modelTests.length).toFixed(1)
+        };
+      }).sort((a, b) => parseFloat(b.avgScore) - parseFloat(a.avgScore));
+      
+      const rows = modelStats.map((stats, index) => {
+        const rankClass = index === 0 ? 'best-score' : index === modelStats.length - 1 ? 'worst-score' : '';
+        return `
+          <tr class="${rankClass}">
+            <td>${index + 1}</td>
+            <td>${stats.model}</td>
+            <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
+            <td>${stats.avgAccuracy}</td>
+            <td>${stats.avgRelevance}</td>
+            <td>${stats.avgOrganization}</td>
+            <td>${stats.avgDuration}s</td>
+            <td>${stats.avgTokens}</td>
+            <td>${stats.testCount}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="9">No data available</td></tr>';
+    }
+    
+    function updateHardwareMatrix() {
+      // This function is now defined above in the updateHardware function
+    }
+    
+    function updateHardware() {
+      const pcCodes = [...new Set(filteredData.map(test => test.PcCode).filter(Boolean))];
+      const totalHardware = pcCodes.length;
+      const avgScore = filteredData.filter(test => test['WeightedScore-pct']).length > 0 ? 
+        (filteredData.reduce((sum, test) => sum + (test['WeightedScore-pct'] || 0), 0) / filteredData.filter(test => test['WeightedScore-pct']).length).toFixed(1) : 'N/A';
+      
+      const statsHtml = `
+        <div class="stat-card">
+          <div class="stat-value">${totalHardware}</div>
+          <div class="stat-label">Hardware Configs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgScore}${avgScore !== 'N/A' ? '%' : ''}</div>
+          <div class="stat-label">Avg Performance</div>
+        </div>
+      `;
+      
+      document.getElementById('hardwareStats').innerHTML = statsHtml;
+      
+      // Hardware Performance Table
+      const tbody = document.querySelector('#hardwareTable tbody');
+      const hardwareStats = pcCodes.map(pcCode => {
+        const pcTests = filteredData.filter(test => test.PcCode === pcCode);
+        const scoredTests = pcTests.filter(test => test['WeightedScore-pct']);
+        
+        return {
+          pcCode,
+          cpu: pcTests[0]?.PcCPU || 'Unknown',
+          ram: pcTests[0]?.PcRAM || 'Unknown',
+          testCount: pcTests.length,
+          avgScore: scoredTests.length > 0 ? 
+            (scoredTests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / scoredTests.length).toFixed(1) : 'N/A',
+          avgDuration: (pcTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / pcTests.length).toFixed(1),
+          avgTokens: (pcTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / pcTests.length).toFixed(1)
+        };
+      }).sort((a, b) => parseFloat(b.avgScore) - parseFloat(a.avgScore));
+      
+      const rows = hardwareStats.map(stats => {
+        const scoreClass = parseFloat(stats.avgScore) > 75 ? 'best-score' : parseFloat(stats.avgScore) < 50 ? 'worst-score' : '';
+        return `
+          <tr class="${scoreClass}">
+            <td>${stats.pcCode}</td>
+            <td>${stats.cpu}</td>
+            <td>${stats.ram}</td>
+            <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
+            <td>${stats.avgDuration}s</td>
+            <td>${stats.avgTokens}</td>
+            <td>${stats.testCount}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="7">No data available</td></tr>';
+      
+      // Model vs Hardware Matrix
+      updateHardwareMatrix();
+    }
+    
+    function updateHardwareMatrix() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const pcCodes = [...new Set(filteredData.map(test => test.PcCode).filter(Boolean))];
+      
+      if (models.length === 0 || pcCodes.length === 0) {
+        document.getElementById('hardwareMatrix').innerHTML = '<div class="loading">No data available for matrix</div>';
+        return;
+      }
+      
+      // Create matrix data
+      const matrixData = {};
+      models.forEach(model => {
+        matrixData[model] = {};
+        pcCodes.forEach(pcCode => {
+          const tests = filteredData.filter(test => 
+            test['ModelName-search'] === model && test.PcCode === pcCode && test['WeightedScore-pct']
+          );
+          
+          if (tests.length > 0) {
+            const avgScore = tests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / tests.length;
+            const avgDuration = tests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / tests.length;
+            const avgTokens = tests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / tests.length;
+            
+            matrixData[model][pcCode] = {
+              score: avgScore.toFixed(1),
+              duration: avgDuration.toFixed(1),
+              tokens: avgTokens.toFixed(1),
+              count: tests.length
+            };
+          } else {
+            matrixData[model][pcCode] = null;
+          }
+        });
+      });
+      
+      // Generate matrix table
+      let matrixHtml = `
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              ${pcCodes.map(pcCode => {
+                const pcInfo = filteredData.find(test => test.PcCode === pcCode);
+                const cpu = pcInfo?.PcCPU || 'Unknown';
+                const ram = pcInfo?.PcRAM || 'Unknown';
+                return `<th>${pcCode}<br><small>${cpu}<br>${ram}</small></th>`;
+              }).join('')}
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      models.forEach(model => {
+        matrixHtml += `<tr><td><strong>${model}</strong></td>`;
+        
+        pcCodes.forEach(pcCode => {
+          const data = matrixData[model][pcCode];
+          
+          if (data) {
+            // Color coding based on score
+            const score = parseFloat(data.score);
+            let cellClass = '';
+            if (score >= 80) cellClass = 'best-score';
+            else if (score <= 50) cellClass = 'worst-score';
+            
+            matrixHtml += `
+              <td class="${cellClass}">
+                <strong>${data.score}%</strong><br>
+                <small>${data.duration}s | ${data.tokens} t/s<br>(${data.count} tests)</small>
+              </td>
+            `;
+          } else {
+            matrixHtml += '<td>-</td>';
+          }
+        });
+        
+        matrixHtml += '</tr>';
+      });
+      
+      matrixHtml += `
+          </tbody>
+        </table>
+        <p><small>Values show: <strong>Score%</strong> | Duration(s) | Tokens/sec | (Test count)</small></p>
+      `;
+      
+      document.getElementById('hardwareMatrix').innerHTML = matrixHtml;
+    }
+    
+    function updateParameters() {
+      // Temperature Analysis
+      const tempTbody = document.querySelector('#temperatureTable tbody');
+      const tempData = {};
+      
+      filteredData.forEach(test => {
+        const model = test['ModelName-search'];
+        const temp = test['ModelTemperature-search'];
+        const score = test['WeightedScore-pct'];
+        
+        if (model && temp && score) {
+          const key = `${model}_${temp}`;
+          if (!tempData[key]) {
+            tempData[key] = { model, temp, scores: [] };
+          }
+          tempData[key].scores.push(score);
+        }
+      });
+      
+      const tempRows = Object.values(tempData)
+        .filter(data => data.scores.length >= 2)
+        .map(data => {
+          const avgScore = (data.scores.reduce((sum, score) => sum + score, 0) / data.scores.length).toFixed(1);
+          const variance = data.scores.reduce((sum, score) => sum + Math.pow(score - avgScore, 2), 0) / data.scores.length;
+          const consistency = (100 - Math.sqrt(variance)).toFixed(1);
+          
+          return `
+            <tr>
+              <td>${data.model}</td>
+              <td>${parseFloat(data.temp).toFixed(1)}</td>
+              <td>${avgScore}%</td>
+              <td>${consistency}%</td>
+              <td>${data.scores.length}</td>
+            </tr>
+          `;
+        })
+        .sort((a, b) => parseFloat(b.split('<td>')[3]) - parseFloat(a.split('<td>')[3]))
+        .join('');
+      
+      tempTbody.innerHTML = tempRows || '<tr><td colspan="5">No data available</td></tr>';
+      
+      // Context Size Analysis
+      const contextTbody = document.querySelector('#contextTable tbody');
+      const contextData = {};
+      
+      filteredData.forEach(test => {
+        const model = test['ModelName-search'];
+        const context = test['ModelContextSize-search'];
+        const score = test['WeightedScore-pct'];
+        const duration = test['Duration-search-s'];
+        
+        if (model && context && score && duration) {
+          const key = `${model}_${context}`;
+          if (!contextData[key]) {
+            contextData[key] = { model, context, scores: [], durations: [] };
+          }
+          contextData[key].scores.push(score);
+          contextData[key].durations.push(duration);
+        }
+      });
+      
+      const contextRows = Object.values(contextData)
+        .filter(data => data.scores.length >= 2)
+        .map(data => {
+          const avgScore = (data.scores.reduce((sum, score) => sum + score, 0) / data.scores.length).toFixed(1);
+          const avgDuration = (data.durations.reduce((sum, dur) => sum + dur, 0) / data.durations.length).toFixed(1);
+          const efficiency = (avgScore / avgDuration).toFixed(2);
+          
+          return `
+            <tr>
+              <td>${data.model}</td>
+              <td>${data.context}</td>
+              <td>${avgScore}%</td>
+              <td>${avgDuration}s</td>
+              <td>${efficiency}</td>
+              <td>${data.scores.length}</td>
+            </tr>
+          `;
+        })
+        .sort((a, b) => parseFloat(b.split('<td>')[5]) - parseFloat(a.split('<td>')[5]))
+        .join('');
+      
+      contextTbody.innerHTML = contextRows || '<tr><td colspan="6">No data available</td></tr>';
+    }
+    
+    function updateCategories() {
+      const categories = [...new Set(filteredData.map(test => test.TestCategory).filter(Boolean))];
+      const tbody = document.querySelector('#categoryTable tbody');
+      
+      const categoryStats = categories.map(category => {
+        const categoryTests = filteredData.filter(test => test.TestCategory === category);
+        const scoredTests = categoryTests.filter(test => test['WeightedScore-pct']);
+        
+        if (scoredTests.length === 0) {
+          return {
+            category,
+            avgScore: 'N/A',
+            minScore: 'N/A',
+            maxScore: 'N/A',
+            avgDuration: (categoryTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / categoryTests.length).toFixed(1),
+            testCount: categoryTests.length
+          };
+        }
+        
+        const scores = scoredTests.map(test => test['WeightedScore-pct']);
+        return {
+          category,
+          avgScore: (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1),
+          minScore: Math.min(...scores),
+          maxScore: Math.max(...scores),
+          avgDuration: (categoryTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / categoryTests.length).toFixed(1),
+          testCount: categoryTests.length
+        };
+      }).sort((a, b) => parseFloat(b.avgScore) - parseFloat(a.avgScore));
+      
+      const rows = categoryStats.map(stats => `
+        <tr>
+          <td>${stats.category}</td>
+          <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
+          <td>${stats.minScore}${stats.minScore !== 'N/A' ? '%' : ''}</td>
+          <td>${stats.maxScore}${stats.maxScore !== 'N/A' ? '%' : ''}</td>
+          <td>${stats.avgDuration}s</td>
+          <td>${stats.testCount}</td>
+        </tr>
+      `).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="6">No data available</td></tr>';
+      
+      // Category Matrix placeholder
+      document.getElementById('categoryMatrix').innerHTML = '<div>Model strengths by category visualization would go here</div>';
+    }
+    
+    function updateConsistency() {
+      const models = [...new Set(filteredData.map(test => test['ModelName-search']).filter(Boolean))];
+      const tbody = document.querySelector('#consistencyTable tbody');
+      
+      const consistencyStats = models.map(model => {
+        const modelTests = filteredData.filter(test => test['ModelName-search'] === model);
+        const scoredTests = modelTests.filter(test => test['WeightedScore-pct']);
+        
+        if (scoredTests.length < 3) {
+          return null;
+        }
+        
+        const scores = scoredTests.map(test => test['WeightedScore-pct']);
+        const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        const variance = scores.reduce((sum, score) => sum + Math.pow(score - avgScore, 2), 0) / scores.length;
+        const stdDev = Math.sqrt(variance);
+        const consistency = ((1 - (stdDev / avgScore)) * 100).toFixed(1);
+        
+        return {
+          model,
+          totalTests: modelTests.length,
+          avgScore: avgScore.toFixed(1),
+          stdDev: stdDev.toFixed(1),
+          minScore: Math.min(...scores),
+          maxScore: Math.max(...scores),
+          consistency: Math.max(0, consistency)
+        };
+      }).filter(Boolean).sort((a, b) => parseFloat(b.consistency) - parseFloat(a.consistency));
+      
+      const rows = consistencyStats.map(stats => {
+        const consistencyClass = parseFloat(stats.consistency) > 80 ? 'best-score' : parseFloat(stats.consistency) < 60 ? 'worst-score' : '';
+        return `
+          <tr class="${consistencyClass}">
+            <td>${stats.model}</td>
+            <td>${stats.totalTests}</td>
+            <td>${stats.avgScore}%</td>
+            <td>${stats.stdDev}</td>
+            <td>${stats.minScore}%</td>
+            <td>${stats.maxScore}%</td>
+            <td>${stats.consistency}%</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = rows || '<tr><td colspan="7">No data available (minimum 3 scored tests per model required)</td></tr>';
+    }
+    
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function showError(message) {
+      console.error(message);
+      // You could add a toast notification here
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Config Editor - AISearch-n-Score</title>
+  <link rel="stylesheet" href="default.css">
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="csrf.js"></script>
+  <script src="shared/common.js"></script>
+  <style>
+    
+    .editor-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+    
+    .file-info h2 {
+      margin: 0;
+      color: var(--text-color);
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary { background: #3498db; color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    
+    .btn:hover { opacity: 0.8; }
+    
+    .editor-content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+    
+    .json-editor {
+      width: 100%;
+      min-height: 500px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.9rem;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      resize: vertical;
+    }
+    
+    .status-message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .json-tools {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="editor-container">
+    <div class="editor-header">
+      <div class="file-info">
+        <h2 id="fileName">Loading...</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-success" onclick="saveFile()">Save</button>
+        <button class="btn btn-warning" onclick="reloadFile()">Reload</button>
+        <button class="btn btn-secondary" onclick="goBack()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="editor-content">
+      <div class="json-tools">
+        <button class="btn btn-primary" onclick="formatJSON()">Format JSON</button>
+        <button class="btn btn-warning" onclick="validateJSON()">Validate</button>
+      </div>
+      
+      <textarea id="jsonEditor" class="json-editor" placeholder="Loading file content..."></textarea>
+      
+      <div id="statusMessage" class="status-message"></div>
+    </div>
+  </main>
+
+  <script>
+    let currentFileName = '';
+    let originalContent = '';
+    
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    
+    async function loadFile() {
+      console.log('Loading file...');
+      currentFileName = getQueryParam('file');
+      console.log('File name:', currentFileName);
+      
+      if (!currentFileName) {
+        showError('No file specified');
+        return;
+      }
+      
+      document.getElementById('fileName').textContent = currentFileName;
+      
+      try {
+        console.log('Fetching from API...');
+        const response = await fetch(`http://localhost:3001/api/config/${currentFileName}`);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        console.log('Data received:', data);
+        
+        originalContent = data.content;
+        document.getElementById('jsonEditor').value = data.content;
+        
+        // Try to format if it's valid JSON
+        try {
+          const parsed = JSON.parse(data.content);
+          document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
+          console.log('JSON formatted successfully');
+        } catch (e) {
+          console.log('Not valid JSON, keeping original format');
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+        showError('Failed to load file: ' + error.message);
+      }
+    }
+    
+    async function saveFile() {
+      const content = document.getElementById('jsonEditor').value;
+      
+      // Validate JSON before saving
+      try {
+        JSON.parse(content);
+      } catch (error) {
+        showError('Invalid JSON: ' + error.message);
+        return;
+      }
+      
+      try {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/config/${currentFileName}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        
+        if (response.ok) {
+          originalContent = content;
+          showSuccess('File saved successfully');
+        } else {
+          showError('Failed to save file');
+        }
+      } catch (error) {
+        showError('Error saving file: ' + error.message);
+      }
+    }
+    
+    async function reloadFile() {
+      if (hasUnsavedChanges()) {
+        if (!await secureConfirm('You have unsaved changes. Reload anyway?')) {
+          return;
+        }
+      }
+      loadFile();
+    }
+    
+    function formatJSON() {
+      const content = document.getElementById('jsonEditor').value;
+      try {
+        const parsed = JSON.parse(content);
+        document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
+        showSuccess('JSON formatted');
+      } catch (error) {
+        showError('Invalid JSON: ' + error.message);
+      }
+    }
+    
+    function validateJSON() {
+      const content = document.getElementById('jsonEditor').value;
+      try {
+        JSON.parse(content);
+        showSuccess('JSON is valid');
+      } catch (error) {
+        showError('Invalid JSON: ' + error.message);
+      }
+    }
+    
+    function hasUnsavedChanges() {
+      return document.getElementById('jsonEditor').value !== originalContent;
+    }
+    
+    async function goBack() {
+      if (hasUnsavedChanges()) {
+        if (!await secureConfirm('You have unsaved changes. Leave anyway?')) {
+          return;
+        }
+      }
+      window.location.href = 'config.html';
+    }
+    
+    function showSuccess(message) {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.textContent = message;
+      statusDiv.className = 'status-message status-success';
+      statusDiv.style.display = 'block';
+      setTimeout(() => statusDiv.style.display = 'none', 3000);
+    }
+    
+    function showError(message) {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.textContent = message;
+      statusDiv.className = 'status-message status-error';
+      statusDiv.style.display = 'block';
+    }
+    
+    // Warn about unsaved changes
+    window.addEventListener('beforeunload', (e) => {
+      if (hasUnsavedChanges()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+    
+
+    
+    // Load file on page load
+    loadFile();
+  </script>
+
+  <div id="footer-placeholder"></div>
+</body>
+</html>

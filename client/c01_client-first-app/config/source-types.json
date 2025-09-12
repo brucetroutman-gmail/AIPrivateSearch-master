@@ -1,0 +1,13 @@
+{
+  "source_types": [
+    {
+      "name": "Local Model Only"
+    },
+    {
+      "name": "Local Documents Only"
+    },
+    {
+      "name": "Local Model and Documents"
+    }
+  ]
+}

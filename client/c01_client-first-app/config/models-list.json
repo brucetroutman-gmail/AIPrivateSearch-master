@@ -1,0 +1,69 @@
+{
+  "models": [
+    {
+      "category": "embed",
+      "modelName": "nomic-embed-text",
+      "size": "274 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "llama3.2:3b",
+      "size": "2.0 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "gemma2:2b",
+      "size": "1.6 GB"
+    },
+    {
+      "category": "score",
+      "modelName": "gemma2:2b",
+      "size": "1.6 GB"
+    },
+    {
+      "category": "embed",
+      "modelName": "embeddinggemma",
+      "size": "621 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2:0.5b",
+      "size": "532 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "mistral:7b",
+      "size": "4.4 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2.5:7b",
+      "size": "4.7 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2.5:3b",
+      "size": "1.9 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "qwen2.5-coder:1.5b",
+      "size": "986 MB"
+    },
+    {
+      "category": "search",
+      "modelName": "gemma2:9b",
+      "size": "5.4 GB"
+    },
+    {
+      "category": "embed",
+      "modelName": "BGE-M3",
+      "size": "1.2 GB"
+    },
+    {
+      "category": "search",
+      "modelName": "phi3:3.8b",
+      "size": "2.2 GB"
+    }
+  ]
+}
