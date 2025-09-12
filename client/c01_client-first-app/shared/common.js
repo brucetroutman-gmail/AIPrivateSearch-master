@@ -168,16 +168,25 @@ async function loadSharedComponents() {
     const headerResponse = await fetch('./shared/header.html');
     const headerHTML = await headerResponse.text();
     const headerEl = document.getElementById('header-placeholder');
-    if (headerEl) headerEl.innerHTML = headerHTML;
+    if (headerEl) {
+      // SECURITY NOTE: innerHTML used here for trusted static content only
+      // headerHTML comes from local ./shared/header.html file, not user input
+      headerEl.innerHTML = headerHTML;  
+    }
     
     // Load footer
     const footerResponse = await fetch('./shared/footer.html');
     const footerHTML = await footerResponse.text();
     const footerEl = document.getElementById('footer-placeholder');
-    if (footerEl) footerEl.innerHTML = footerHTML;
+    if (footerEl) {
+      // SECURITY NOTE: innerHTML used here for trusted static content only
+      // footerHTML comes from local ./shared/footer.html file, not user input
+      footerEl.innerHTML = footerHTML;  
+    }
     
   } catch (error) {
     if (typeof logger !== 'undefined') {
+      // eslint-disable-next-line no-undef
       logger.error('Error loading shared components:', error);
     } else {
       console.error('Error loading shared components:', error);
@@ -187,6 +196,7 @@ async function loadSharedComponents() {
 }
 
 // Dark mode toggle function
+// eslint-disable-next-line no-unused-vars
 function toggleDarkMode() {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -201,6 +211,7 @@ function loadTheme() {
 }
 
 // Toggle mobile menu
+// eslint-disable-next-line no-unused-vars
 function toggleMenu() {
   const navMenu = document.getElementById('navMenu');
   if (navMenu) {
@@ -209,6 +220,7 @@ function toggleMenu() {
 }
 
 // Developer mode toggle
+// eslint-disable-next-line no-unused-vars
 function toggleDeveloperMode() {
   const isDeveloperMode = localStorage.getItem('developerMode') === 'true';
   const newMode = !isDeveloperMode;
@@ -306,6 +318,7 @@ function setupLoginIcon() {
 }
 
 // Common score model loading function
+// eslint-disable-next-line no-unused-vars
 async function loadScoreModels(selectElementId) {
   try {
     const response = await fetch('config/models-list.json');
@@ -314,6 +327,7 @@ async function loadScoreModels(selectElementId) {
     
     if (!scoreSelect) {
       if (typeof logger !== 'undefined') {
+        // eslint-disable-next-line no-undef
         logger.error('Score select element not found:', selectElementId);
       } else {
         console.error('Score select element not found:', selectElementId);
@@ -329,10 +343,20 @@ async function loadScoreModels(selectElementId) {
     
     if (scoreModels.length > 0) {
       const savedScoreModel = localStorage.getItem('selectedScoreModel');
-      scoreSelect.innerHTML = scoreModels.map((modelName, index) => {
-        const isSelected = savedScoreModel ? modelName === savedScoreModel : index === 0;
-        return `<option value="${modelName}" ${isSelected ? 'selected' : ''}>${modelName}</option>`;
-      }).join('');
+      // Clear existing options safely
+      while (scoreSelect.firstChild) {
+        scoreSelect.removeChild(scoreSelect.firstChild);
+      }
+      
+      scoreModels.forEach((modelName, index) => {
+        const option = document.createElement('option');
+        option.value = modelName;
+        option.textContent = modelName;
+        if (savedScoreModel ? modelName === savedScoreModel : index === 0) {
+          option.selected = true;
+        }
+        scoreSelect.appendChild(option);
+      });
       
       // Remove existing event listeners to prevent duplicates
       const newSelect = scoreSelect.cloneNode(true);
@@ -343,22 +367,36 @@ async function loadScoreModels(selectElementId) {
         localStorage.setItem('selectedScoreModel', this.value);
       });
     } else {
-      scoreSelect.innerHTML = '<option value="">No score models available</option>';
+      while (scoreSelect.firstChild) {
+        scoreSelect.removeChild(scoreSelect.firstChild);
+      }
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'No score models available';
+      scoreSelect.appendChild(option);
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
+      // eslint-disable-next-line no-undef
       logger.error('Error loading score models:', error);
     } else {
       console.error('Error loading score models:', error);
     }
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {
-      selectEl.innerHTML = '<option value="">Error loading score models</option>';
+      while (selectEl.firstChild) {
+        selectEl.removeChild(selectEl.firstChild);
+      }
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Error loading score models';
+      selectEl.appendChild(option);
     }
   }
 }
 
 // Common database export function with retry logic
+// eslint-disable-next-line no-unused-vars
 async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null, retryCount = 0) {
   const dbData = {
     TestCode: result.testCode || '',
@@ -448,6 +486,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     
     const errorMsg = error.message || error.toString() || 'Unknown database error';
     if (typeof logger !== 'undefined') {
+      // eslint-disable-next-line no-undef
       logger.error('Database export error:', errorMsg);
     } else {
       console.error('Database export error:', errorMsg);

@@ -2,6 +2,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 
+/* global process */
+
 export class DocumentProcessor {
   constructor() {
     this.supportedFormats = ['.txt', '.pdf'];

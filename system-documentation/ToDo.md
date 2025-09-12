@@ -109,7 +109,7 @@ specs-3-scoring
 
 48. fix npm warning msgs  --done
 
-49. test scoring
+49. test scoring --done
 
 50. User-confirmed install Node.js in load-aiss.command --done
 

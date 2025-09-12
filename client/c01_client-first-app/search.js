@@ -1,5 +1,7 @@
 import { search } from './services/api.js';
 import { logger } from './shared/utils/logger.js';
+// Import loadScoreModels if available
+// Import removed - loadScoreModels is available globally from common.js
 
 // Import showUserMessage from global scope - wait for it to be available
 let showUserMessage = function(msg, type) { logger.log(`${type}: ${msg}`); };
@@ -116,7 +118,7 @@ function populateSelect(element, options, valueKey, textKey, storageKey = null, 
   if (!element) return;
   
   element.innerHTML = '';
-  options.forEach((option, index) => {
+  options.forEach(option => {
     const optionEl = document.createElement('option');
     optionEl.value = option[valueKey] || option;
     optionEl.textContent = option[textKey] || option;
@@ -190,8 +192,21 @@ loadUserPrompts();
 loadTokensOptions();
 loadTemperatureOptions();
 loadContextOptions();
-loadScoreModels('scoreModel');
 loadScoringOptions();
+
+// Load score models after ensuring common.js is loaded
+if (typeof loadScoreModels === 'function') {
+  // eslint-disable-next-line no-undef
+  loadScoreModels('scoreModel');
+} else {
+  // Wait for common.js to load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof loadScoreModels === 'function') {
+      // eslint-disable-next-line no-undef
+      loadScoreModels('scoreModel');
+    }
+  });
+}
 
 // Load temperature options from JSON file
 async function loadTemperatureOptions() {
@@ -278,7 +293,13 @@ async function loadUserPrompts() {
       userPromptsEl.appendChild(option);
     });
   } catch (error) {
-    userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
+    while (userPromptsEl.firstChild) {
+      userPromptsEl.removeChild(userPromptsEl.firstChild);
+    }
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Error loading user prompts';
+    userPromptsEl.appendChild(option);
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load user prompts:', error);
   }
@@ -505,7 +526,9 @@ function generateTestCode() {
 
 function render(result) {
   // clear then build markup
-  outputEl.innerHTML = '';
+  while (outputEl.firstChild) {
+    outputEl.removeChild(outputEl.firstChild);
+  }
   
   // Store result for export
   window.currentResult = result;
@@ -570,32 +593,15 @@ function render(result) {
     metricsH.textContent = 'Performance Metrics';
     outputEl.append(metricsH);
 
-    const tbl = document.createElement('table');
-    tbl.className = 'score-table';
-    
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    ['Operation', 'Model', 'Duration', 'Load', 'Tokens', 'Eval Rate', 'Context', 'Temperature'].forEach(text => {
-      const th = document.createElement('th');
-      th.textContent = text;
-      headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    
-    const tbody = document.createElement('tbody');
+    const metricsData = [];
+    const headers = ['Operation', 'Model', 'Duration', 'Load', 'Tokens', 'Eval Rate', 'Context', 'Temperature'];
     
     if (result.metrics.search) {
       const m = result.metrics.search;
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      const row = document.createElement('tr');
-      ['Search', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
-        const td = document.createElement('td');
-        td.textContent = text;
-        row.appendChild(td);
-      });
-      tbody.appendChild(row);
+      metricsData.push(['Search', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
     }
 
     if (result.metrics.scoring) {
@@ -603,13 +609,7 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      const row = document.createElement('tr');
-      ['Scoring', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
-        const td = document.createElement('td');
-        td.textContent = text;
-        row.appendChild(td);
-      });
-      tbody.appendChild(row);
+      metricsData.push(['Scoring', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
     }
 
     if (result.metrics.scoringRetry) {
@@ -617,14 +617,31 @@ function render(result) {
       const totalSecs = (m.total_duration / 1000000000).toFixed(1);
       const loadMs = (m.load_duration / 1000000).toFixed(0);
       const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      metricsData.push(['Scoring Retry', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
+    }
+    
+    const tbl = document.createElement('table');
+    tbl.className = 'score-table';
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headers.forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    metricsData.forEach(rowData => {
       const row = document.createElement('tr');
-      ['Scoring Retry', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+      rowData.forEach(cellData => {
         const td = document.createElement('td');
-        td.textContent = text;
+        td.textContent = cellData;
         row.appendChild(td);
       });
       tbody.appendChild(row);
-    }
+    });
     
     tbl.appendChild(thead);
     tbl.appendChild(tbody);
@@ -796,9 +813,14 @@ form.addEventListener('submit', async (e) => {
     // Auto export to database if enabled and test didn't fail
     if (autoExportToggle.checked && result.shouldSaveToDatabase !== false) {
       try {
-        const exportResult = await exportToDatabase(window.currentResult, null, null, null);
-        logger.log('Auto-exported to database with ID:', exportResult.insertId);
-        showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
+        if (typeof exportToDatabase === 'function') {
+          // eslint-disable-next-line no-undef
+          const exportResult = await exportToDatabase(window.currentResult, null, null, null);
+          logger.log('Auto-exported to database with ID:', exportResult.insertId);
+          showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
+        } else {
+          showUserMessage('Database export function not available', 'error');
+        }
       } catch (error) {
         // logger sanitizes all inputs to prevent log injection
       logger.error('Auto-export failed:', error);
@@ -847,30 +869,33 @@ async function handleExport() {
   const filename = `AISearch-${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}-${String(createdAt.getDate()).padStart(2, '0')}-${String(createdAt.getHours()).padStart(2, '0')}-${String(createdAt.getMinutes()).padStart(2, '0')}-${String(createdAt.getSeconds()).padStart(2, '0')}`;
   
   if (exportFormat === 'pdf') {
-    // Create a new window for printing
+    // Create a new window for printing with safe DOM creation
     const printWindow = window.open('', '_blank');
-    // Sanitize content by creating a temporary element and using textContent
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = outputEl.innerHTML;
-    const sanitizedContent = tempDiv.textContent || tempDiv.innerText || '';
+    const doc = printWindow.document;
     
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>AI Search Results</title>
-          <style>
-            body { font-family: system-ui, sans-serif; margin: 2rem; white-space: pre-wrap; }
-            h1 { margin-top: 1rem; }
-          </style>
-        </head>
-        <body>
-          <h1>AI Search Results</h1>
-          <pre>${sanitizedContent}</pre>
-        </body>
-      </html>
-    `);
+    // Create document structure safely
+    doc.open();
+    const html = doc.createElement('html');
+    const head = doc.createElement('head');
+    const title = doc.createElement('title');
+    title.textContent = 'AI Search Results';
+    const style = doc.createElement('style');
+    style.textContent = 'body { font-family: system-ui, sans-serif; margin: 2rem; } h1 { margin-top: 1rem; }';
     
-    printWindow.document.close();
+    const body = doc.createElement('body');
+    const h1 = doc.createElement('h1');
+    h1.textContent = 'AI Search Results';
+    const content = doc.createElement('div');
+    content.textContent = outputEl.textContent;
+    
+    head.appendChild(title);
+    head.appendChild(style);
+    body.appendChild(h1);
+    body.appendChild(content);
+    html.appendChild(head);
+    html.appendChild(body);
+    doc.appendChild(html);
+    doc.close();
     
     // Wait for content to load then print
     setTimeout(() => {
@@ -1005,9 +1030,14 @@ async function handleExport() {
     
     // Export to database using common function
     try {
-      const result = await exportToDatabase(window.currentResult, null, null, null);
-      logger.log(`Successfully saved to database with ID: ${result.insertId}`);
-      showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
+      if (typeof exportToDatabase === 'function') {
+        // eslint-disable-next-line no-undef
+        const result = await exportToDatabase(window.currentResult, null, null, null);
+        logger.log(`Successfully saved to database with ID: ${result.insertId}`);
+        showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
+      } else {
+        showUserMessage('Database export function not available', 'error');
+      }
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
       logger.error('Database save error:', error.message);
