@@ -183,134 +183,92 @@ ${content.substring(0, 2000)}${content.length > 2000 ? '...' : ''}`;
   }
 
   async generateCollectionMetadata(collection) {
-    // Clear cached model to ensure we use latest config
+    // Generate individual document metadata first
+    const docResult = await this.generateDocumentMetadata(collection);
+    
+    // Generate collection-level summary using the new META_ approach
+    await this.generateCollectionSummary(collection);
+    
+    return {
+      collection,
+      documentsProcessed: docResult.processed.length,
+      metadataGenerated: ['META_document_files', 'META_collection_summary']
+    };
+  }
+
+  async generateCollectionSummary(collection) {
     this.clearModelCache();
     
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
     const files = await fs.readdir(collectionPath);
     
-    // Get all markdown files (converted documents)
-    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('_'));
-    const documents = [];
+    // Get all META files (individual document metadata)
+    const metaFiles = files.filter(f => f.startsWith('META_') && f.endsWith('.md') && !f.includes('_Collection'));
     
-    // Read all documents
-    for (const file of mdFiles) {
-      const content = await fs.readFile(path.join(collectionPath, file), 'utf8');
-      documents.push({ filename: file, content });
+    if (metaFiles.length === 0) {
+      return { message: 'No individual metadata files found. Generate document metadata first.' };
     }
     
-    if (documents.length === 0) return { message: 'No documents found' };
+    // Read all individual metadata
+    let allMetadata = '';
+    for (const metaFile of metaFiles) {
+      const content = await fs.readFile(path.join(collectionPath, metaFile), 'utf8');
+      allMetadata += `\n--- ${metaFile} ---\n${content}`;
+    }
     
-    // Generate individual document metadata first
-    await this.generateDocumentMetadata(collection);
-    
-    // Generate metadata
-    const summary = await this.createCollectionSummary(documents, collection);
-    const index = await this.createDocumentIndex(documents);
-    const topicMap = await this.extractTopicMap(documents);
-    
-    // Save metadata files
-    await fs.writeFile(path.join(collectionPath, '_collection_summary.md'), summary, 'utf8');
-    await fs.writeFile(path.join(collectionPath, '_document_index.md'), index, 'utf8');
-    await fs.writeFile(path.join(collectionPath, '_topic_map.md'), topicMap, 'utf8');
-    
-    return {
-      collection,
-      documentsProcessed: documents.length,
-      metadataGenerated: ['individual_metadata', 'summary', 'index', 'topic_map']
-    };
-  }
-  
-  async createCollectionSummary(documents, collection) {
-    const docList = documents.map(d => `- ${d.filename}`).join('\n');
-    const sampleContent = documents.slice(0, 3).map(d => 
-      `**${d.filename}**: ${d.content.substring(0, 200)}...`
-    ).join('\n\n');
-    
-    const prompt = `Analyze this document collection "${collection}" and create a comprehensive summary.
+    const prompt = `Analyze all the individual document metadata below and create a collection-level summary:
 
-Documents (${documents.length} total):
-${docList}
+# Collection Metadata: ${collection}
 
-Sample content:
-${sampleContent}
+## Collection Overview
+- **Total Documents**: ${metaFiles.length}
+- **Date Range**: [Earliest to latest dates found]
+- **Document Types**: [List of types found]
+- **Total Estimated Words**: [Sum if available]
 
-Provide:
-1. Collection overview (2-3 sentences)
-2. Main topics covered
-3. Document types and purposes
-4. Key themes and relationships
+## Content Categories
+[Group documents by themes, genres, or types]
 
-Keep it concise but informative.`;
-    
+## Major Themes
+[Cross-cutting themes that appear across multiple documents]
+
+## Key Topics Across Collection
+[Most frequent/important topics from all documents]
+
+## Collection Keywords
+[Master list of most important search terms for this collection]
+
+## Document Interconnections
+[How documents relate to each other, common references]
+
+## Notable Patterns
+[Any interesting patterns observed across the collection]
+
+---
+Individual document metadata:
+${allMetadata.substring(0, 3000)}${allMetadata.length > 3000 ? '...' : ''}`;
+
     try {
       const model = await this.getMetadataModel();
       const response = await this.ollama.generate({
         model,
         prompt,
         stream: false,
-        options: { temperature: 0.3, num_predict: 300 }
+        options: { temperature: 0.3, num_predict: 600 }
       });
       
-      return `# Collection Summary: ${collection}\n\n${response.response}\n\n*Generated: ${new Date().toISOString()}*`;
-    } catch (error) {
-      return `# Collection Summary: ${collection}\n\nError generating summary: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
-    }
-  }
-  
-  async createDocumentIndex(documents) {
-    let index = '# Document Index\n\n';
-    
-    for (const doc of documents) {
-      const firstLines = doc.content.split('\n').slice(0, 5).join(' ').substring(0, 150);
-      const prompt = `Summarize this document in 1-2 sentences and list 3-5 key topics:\n\n${firstLines}...`;
+      const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
+      await fs.writeFile(summaryPath, response.response, 'utf8');
       
-      try {
-        const model = await this.getMetadataModel();
-        const response = await this.ollama.generate({
-          model,
-          prompt,
-          stream: false,
-          options: { temperature: 0.2, num_predict: 100 }
-        });
-        
-        index += `## ${doc.filename}\n${response.response}\n\n`;
-      } catch (error) {
-        index += `## ${doc.filename}\nError generating description: ${error.message}\n\n`;
-      }
-    }
-    
-    index += `*Generated: ${new Date().toISOString()}*`;
-    return index;
-  }
-  
-  async extractTopicMap(documents) {
-    const allContent = documents.map(d => d.content.substring(0, 500)).join('\n\n');
-    const prompt = `Extract key topics and concepts from this document collection. Provide:
-
-1. **Main Topics** (5-8 topics)
-2. **Key Concepts** (important terms and ideas)
-3. **Suggested Search Terms** (what users might search for)
-4. **Document Relationships** (how documents connect)
-
-Content sample:
-${allContent.substring(0, 1000)}...
-
-Format as markdown with clear sections.`;
-    
-    try {
-      const model = await this.getMetadataModel();
-      const response = await this.ollama.generate({
-        model,
-        prompt,
-        stream: false,
-        options: { temperature: 0.4, num_predict: 400 }
-      });
-      
-      return `# Topic Map\n\n${response.response}\n\n*Generated: ${new Date().toISOString()}*`;
+      return { success: true, file: `META_${collection}_Collection.md` };
     } catch (error) {
-      return `# Topic Map\n\nError generating topic map: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+      const errorContent = `# Collection Metadata: ${collection}\n\nError generating collection summary: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+      const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
+      await fs.writeFile(summaryPath, errorContent, 'utf8');
+      
+      return { success: false, error: error.message };
     }
   }
+
 }

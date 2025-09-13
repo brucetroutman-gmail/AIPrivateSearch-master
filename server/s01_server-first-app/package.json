@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
+    "start": "node --max-old-space-size=8192 --expose-gc server.mjs",
     "process-docs": "node scripts/processAllCollections.mjs"
   },
   "dependencies": {

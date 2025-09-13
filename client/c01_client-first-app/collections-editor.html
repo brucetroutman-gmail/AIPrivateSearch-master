@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Collection - AISearch-n-Score</title>
-  <link rel="stylesheet" href="default.css">
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
   <script src="shared/common.js"></script>
@@ -36,7 +35,7 @@
       color: var(--text-color);
     }
     
-    .document-list {
+    .document-table-container {
       max-height: 400px;
       overflow-y: auto;
       border: 1px solid var(--border-color);
@@ -44,32 +43,71 @@
       background: var(--bg-color);
     }
     
-    .document-item {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem;
+    .document-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    
+    .document-table th {
+      background: var(--card-bg);
+      padding: 0.75rem 0.5rem;
+      text-align: left;
+      border-bottom: 2px solid var(--border-color);
+      font-weight: bold;
+      color: var(--text-color);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    .document-table td {
+      padding: 0.5rem;
       border-bottom: 1px solid var(--border-color);
-    }
-    
-    .document-item:last-child {
-      border-bottom: none;
-    }
-    
-    .document-checkbox {
-      margin-right: 0.75rem;
-    }
-    
-    .document-name {
-      flex: 1;
       color: var(--text-color);
     }
     
-    .document-type {
+    .document-table tbody tr:hover {
+      background: var(--card-bg);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .status-yes {
+      background: #27ae60;
+      color: white;
+    }
+    
+    .status-no {
       background: #95a5a6;
       color: white;
-      padding: 0.2rem 0.5rem;
+    }
+    
+    .ext-badge {
+      background: #3498db;
+      color: white;
+      padding: 0.2rem 0.4rem;
       border-radius: 3px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+    
+    .filename-link {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    
+    .filename-link:hover {
+      text-decoration: underline;
     }
     
     .action-buttons {
@@ -190,24 +228,26 @@
       
       <div class="editor-section">
         <div class="editor-header">
-          <div style="display: flex; gap: 1rem; align-items: center;">
-            <div class="editor-title">Documents</div>
-            <select id="fileTypeFilter" onchange="filterDocuments()" style="padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--card-bg); color: var(--text-color);">
-              <option value="all">All Files</option>
-              <option value="md">MD</option>
-              <option value="pdf">PDF</option>
-              <option value="txt">TXT</option>
-            </select>
-            <div style="display: flex; align-items: center; gap: 0.3rem;">
-              <input type="checkbox" id="selectAllDocs">
-              <span style="white-space: nowrap;">Select All</span>
-            </div>
-          </div>
+          <div class="editor-title">Documents</div>
         </div>
-        <div class="document-list" id="documentList">
-          <div class="document-item">
-            <div class="document-name">Loading documents...</div>
-          </div>
+        <div class="document-table-container">
+          <table class="document-table" id="documentTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="selectAllDocs"></th>
+                <th>Filename</th>
+                <th>Source</th>
+                <th>Converted</th>
+                <th>MetaData</th>
+                <th>Embed</th>
+              </tr>
+            </thead>
+            <tbody id="documentTableBody">
+              <tr>
+                <td colspan="6">Loading documents...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         
         <div class="action-buttons">
@@ -287,77 +327,127 @@
     }
     
     function renderDocuments() {
-      const container = document.getElementById('documentList');
-      const filter = document.getElementById('fileTypeFilter').value;
-      container.innerHTML = '';
+      const tbody = document.getElementById('documentTableBody');
+      tbody.innerHTML = '';
       
-      let filteredDocs = documents;
-      if (filter !== 'all') {
-        filteredDocs = documents.filter(doc => {
-          const fileName = typeof doc === 'string' ? doc : doc.name;
-          const ext = fileName.split('.').pop().toLowerCase();
-          return ext === filter;
-        });
-      }
+      // Group documents by base name
+      const docGroups = new Map();
       
-      if (filteredDocs.length === 0) {
-        container.innerHTML = '<div class="document-item"><div class="document-name">No documents found</div></div>';
+      documents.forEach(doc => {
+        const fileName = typeof doc === 'string' ? doc : doc.name;
+        const ext = fileName.split('.').pop().toLowerCase();
+        
+        // Handle META_ files - associate them with their base document
+        if (fileName.startsWith('META_')) {
+          const baseFileName = fileName.substring(5); // Remove 'META_' prefix
+          const baseName = baseFileName.substring(0, baseFileName.lastIndexOf('.')) || baseFileName;
+          
+          if (!docGroups.has(baseName)) {
+            docGroups.set(baseName, {
+              baseName,
+              sourceFiles: [],
+              mdFile: null,
+              metaFile: null
+            });
+          }
+          
+          docGroups.get(baseName).metaFile = fileName;
+          return; // Don't process META_ files as regular documents
+        }
+        
+        // Handle regular files
+        const baseName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+        
+        if (!docGroups.has(baseName)) {
+          docGroups.set(baseName, {
+            baseName,
+            sourceFiles: [],
+            mdFile: null,
+            metaFile: null
+          });
+        }
+        
+        const group = docGroups.get(baseName);
+        
+        if (ext === 'md') {
+          group.mdFile = fileName;
+        } else {
+          group.sourceFiles.push({ fileName, ext, size: typeof doc === 'string' ? 0 : doc.size });
+        }
+      });
+      
+      const allGroups = Array.from(docGroups.values());
+      
+      if (allGroups.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">No documents found</td></tr>';
         return;
       }
       
-      filteredDocs.forEach(doc => {
-        const item = document.createElement('div');
-        item.className = 'document-item';
+      allGroups.forEach(group => {
+        const row = document.createElement('tr');
         
-        const fileName = typeof doc === 'string' ? doc : doc.name;
-        const fileSize = typeof doc === 'string' ? 0 : doc.size;
-        const ext = fileName.split('.').pop().toLowerCase();
-        const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
-        const indexedDoc = indexedDocuments.find(item => item.filename === fileName);
+        // Find if this document is embedded
+        const isEmbedded = indexedDocuments.some(doc => 
+          doc.filename === group.mdFile && doc.inLanceDB
+        );
         
-        const formatFileSize = (bytes) => {
-          if (bytes === 0) return '';
-          const k = 1024;
-          const sizes = ['B', 'KB', 'MB', 'GB'];
-          const i = Math.floor(Math.log(bytes) / Math.log(k));
-          return ' (' + parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i] + ')';
-        };
+        // Create source extension links (exclude .md files)
+        const nonMdSources = group.sourceFiles.filter(f => f.ext !== 'md');
+        const sourceLinks = nonMdSources.map(f => 
+          `<a href="#" onclick="openFile('${f.fileName}')" class="ext-badge">${f.ext}</a>`
+        ).join(' ');
+        const hasSource = nonMdSources.length > 0;
+        const hasMd = !!group.mdFile;
         
-        let fileLinks = '';
-        if (ext === 'pdf') {
-          fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #e74c3c; text-decoration: none; margin-left: 10px;">PDF</a>`;
-        } else if (ext === 'txt') {
-          fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #3498db; text-decoration: none; margin-left: 10px;">TXT</a>`;
-        } else if (ext === 'md') {
-          let statusIcons = '';
-          let tooltipText = 'Not processed';
-          
-          if (indexedDoc) {
-            if (indexedDoc.inLanceDB) {
-              statusIcons = '<span style="color: #27ae60; margin-left: 5px;">✓</span>';
-              tooltipText = 'Processed in LanceDB';
-            }
-          } else {
-            statusIcons = '<span style="color: #95a5a6; margin-left: 5px;">○</span>';
-          }
-          
-          fileLinks = ` <a href="#" onclick="openFile('${fileName}')" style="color: #27ae60; text-decoration: none; margin-left: 10px;">MD</a> <span title="${tooltipText}">${statusIcons}</span>`;
-        }
+        // Create MD link or status
+        const mdContent = hasMd ? 
+          `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>` :
+          `<span class="status-badge status-no">○</span>`;
         
-        item.innerHTML = `
-          <input type="checkbox" class="document-checkbox" value="${fileName}">
-          <div class="document-name">${nameWithoutExt}${formatFileSize(fileSize)}${fileLinks}</div>
+        // Create Meta link or status
+        const hasMeta = !!group.metaFile;
+        const metaContent = hasMeta ? 
+          `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>` :
+          `<span class="status-badge status-no">○</span>`;
+        
+        // Determine which files to include in selection
+        const selectableFiles = [];
+        if (hasSource) selectableFiles.push(...group.sourceFiles.map(f => f.fileName));
+        if (hasMd) selectableFiles.push(group.mdFile);
+        if (hasMeta) selectableFiles.push(group.metaFile);
+        
+        row.innerHTML = `
+          <td>
+            <input type="checkbox" class="document-checkbox" value="${selectableFiles.join(',')}" data-basename="${group.baseName}">
+          </td>
+          <td>
+            <a href="#" onclick="openFile('${group.mdFile || group.sourceFiles[0]?.fileName}')" class="filename-link">
+              ${group.baseName}
+            </a>
+          </td>
+          <td>
+            ${hasSource ? sourceLinks : '-'}
+          </td>
+          <td>
+            ${mdContent}
+          </td>
+          <td>
+            ${metaContent}
+          </td>
+          <td>
+            <span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">
+              ${isEmbedded ? '✓' : '○'}
+            </span>
+          </td>
         `;
         
-        container.appendChild(item);
+        tbody.appendChild(row);
       });
       
       setupCheckboxListeners();
     }
     
-    function filterDocuments() {
-      renderDocuments();
-    }
+
     
     function setupCheckboxListeners() {
       const selectAll = document.getElementById('selectAllDocs');
@@ -378,7 +468,12 @@
     }
     
     function getSelectedDocuments() {
-      return Array.from(document.querySelectorAll('.document-checkbox:checked')).map(cb => cb.value);
+      const selected = [];
+      document.querySelectorAll('.document-checkbox:checked').forEach(cb => {
+        const files = cb.value.split(',');
+        selected.push(...files);
+      });
+      return selected;
     }
     
     async function handleFileSelection() {
@@ -566,6 +661,7 @@
       }
       
       setProcessingState(true);
+      const totalStartTime = Date.now();
       clearLog();
       showLog(`Generating AI metadata for collection: ${currentCollection}...`, 'processing');
       
@@ -582,11 +678,12 @@
         if (docMetaResult.success) {
           const successCount = docMetaResult.result.processed.filter(p => p.success).length;
           const totalCount = docMetaResult.result.processed.length;
-          showLog(`✓ Individual metadata complete: ${successCount}/${totalCount} documents`, 'success');
+          const docElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
+          showLog(`✓ Individual metadata: ${successCount}/${totalCount} documents (${docElapsed}s)`, 'success');
           
           docMetaResult.result.processed.forEach(item => {
             if (item.success) {
-              showLog(`  • META_${item.file} - Generated`);
+              showLog(`  • META_${item.file}`);
             } else {
               showLog(`  • META_${item.file} - Failed: ${item.error}`, 'error');
             }
@@ -605,15 +702,10 @@
         const result = await response.json();
         
         if (result.success) {
-          showLog(`✓ Collection metadata complete!`, 'success');
-          showLog(`  • Collection: ${result.result.collection}`);
-          showLog(`  • Documents processed: ${result.result.documentsProcessed}`);
-          showLog(`  • Files generated: ${result.result.metadataGenerated.join(', ')}`);
-          showLog(`\nAll generated files:`);
-          showLog(`  • META_[filename].md - Individual document metadata`);
-          showLog(`  • _collection_summary.md - AI overview of the collection`);
-          showLog(`  • _document_index.md - Individual document descriptions`);
-          showLog(`  • _topic_map.md - Key concepts and search terms`);
+          const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
+          showLog(`✓ Collection metadata complete (${totalElapsed}s)`, 'success');
+          showLog(`  • ${result.result.collection}: ${result.result.documentsProcessed} documents`);
+          showLog(`  • META_${result.result.collection}_Collection.md - Created`);
           loadDocuments(); // Refresh to show new metadata files
         } else {
           showLog(`✗ Collection metadata failed: ${result.error}`, 'error');

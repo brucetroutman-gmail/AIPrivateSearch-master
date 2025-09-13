@@ -4,9 +4,14 @@ echo "🚀 Starting AI Search & Score Application..."
 
 # Kill any existing server processes to free up ports
 echo "Stopping any existing servers..."
+# Kill processes by port to ensure clean shutdown
+lsof -ti :3001 | xargs kill -9 2>/dev/null || true
+lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+# Also kill by process name as backup
 pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
-sleep 1
+pkill -f "npm start" 2>/dev/null || true
+sleep 2
 
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
@@ -137,7 +142,7 @@ echo ""
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for user interrupt
-trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; pkill -f 'npx serve' 2>/dev/null; pkill -f 'node server.mjs' 2>/dev/null; exit" INT
+trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; lsof -ti :3001 | xargs kill -9 2>/dev/null; lsof -ti :3000 | xargs kill -9 2>/dev/null; pkill -f 'npx serve' 2>/dev/null; pkill -f 'node server.mjs' 2>/dev/null; pkill -f 'npm start' 2>/dev/null; exit" INT
 
 # Keep both servers running
 while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do

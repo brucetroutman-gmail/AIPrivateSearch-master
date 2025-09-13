@@ -273,23 +273,40 @@ router.post('/process-selected', requireAuth, asyncHandler(async (req, res) => {
 
 // Embedding Operations
 router.post('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
+  let timeoutId;
   try {
-    const documentSearch = new DocumentSearch(req.params.collection);
-    await documentSearch.initialize();
+    // Set a 60-second timeout for the entire operation
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('Embedding operation timed out after 60 seconds'));
+      }, 60000);
+    });
     
-    const document = await collectionManager.readDocument(req.params.collection, req.params.filename);
+    const embeddingPromise = (async () => {
+      const documentSearch = new DocumentSearch(req.params.collection);
+      await documentSearch.initialize();
+      
+      const document = await collectionManager.readDocument(req.params.collection, req.params.filename);
+      
+      // Estimate chunks based on content length (roughly 500 chars per chunk)
+      const estimatedChunks = Math.ceil(document.content.length / 500);
+      
+      const result = await documentSearch.indexDocument(req.params.filename, document.content);
+      
+      // Add chunk information to result
+      result.estimatedChunks = estimatedChunks;
+      result.actualChunks = result.chunks || estimatedChunks;
+      
+      return result;
+    })();
     
-    // Estimate chunks based on content length (roughly 500 chars per chunk)
-    const estimatedChunks = Math.ceil(document.content.length / 500);
+    const result = await Promise.race([embeddingPromise, timeoutPromise]);
     
-    const result = await documentSearch.indexDocument(req.params.filename, document.content);
-    
-    // Add chunk information to result
-    result.estimatedChunks = estimatedChunks;
-    result.actualChunks = result.chunks || estimatedChunks;
-    
+    if (timeoutId) clearTimeout(timeoutId);
     res.json(result);
   } catch (error) {
+    if (timeoutId) clearTimeout(timeoutId);
+    logger.error('Embedding operation failed:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
