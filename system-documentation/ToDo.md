@@ -141,6 +141,11 @@ specs-3-scoring
 
 64. Where is the meta_collection .md file being saved?
 
+67. Load-aiss.command is not pulling latest from github using curl
+
+68. analyze LanceDB vs ChromaDB
+
+
 
 
 
