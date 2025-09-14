@@ -1,21 +1,10 @@
-# Document Metadata: [Document Title]
+# marine-poem.md
 
-## Basic Information
-- **Collection**: My-Literature
-- **Document Type**: [Brief classification]
-- **Date**: [Document date if available]
-- **Length**: [Approximate word count]
+**Metadata for "marine-poem.md":**
 
-## Content Summary
-[2-3 sentences describing main content/purpose]
+- **Title:** marine-poem.md
+- **Summary:** A poignant poem exploring the dual loyalties of a marine, balancing duty and personal devotion.
+- **Topics:** Marine life, Dual Loyalty, Personal Devotion
+- **Keywords:** marine, loyalty, soldier, love, sacrifice
 
-## Key Topics
-- [Topic 1]
-- [Topic 2]
-- [Topic 3]
-
-## Important Keywords
-[Comma-separated list of 8-10 key terms for search]
-
-## Document Relationships
-[Any references to other documents or related topics]
+*Generated: 2025-09-13T17:34:52.077Z*

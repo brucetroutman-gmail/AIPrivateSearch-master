@@ -117,55 +117,47 @@ export class DocumentProcessor {
     const collectionPath = validatePath(collection, baseDir);
     const files = await fs.readdir(collectionPath);
     
-    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('_') && !f.startsWith('META_'));
+    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('META_'));
+    
+    // Process in parallel (but limit concurrency to avoid overwhelming Ollama)
+    const batchSize = 2; // Process 2 at a time
     const results = [];
     
-    for (const mdFile of mdFiles) {
-      try {
-        const filePath = path.join(collectionPath, mdFile);
-        const content = await fs.readFile(filePath, 'utf8');
-        
-        const metadata = await this.createDocumentMetadata(content, mdFile, collection);
-        const metadataPath = path.join(collectionPath, `META_${mdFile}`);
-        
-        await fs.writeFile(metadataPath, metadata, 'utf8');
-        results.push({ file: mdFile, success: true });
-      } catch (error) {
-        results.push({ file: mdFile, error: error.message, success: false });
-      }
+    for (let i = 0; i < mdFiles.length; i += batchSize) {
+      const batch = mdFiles.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (mdFile) => {
+        try {
+          const filePath = path.join(collectionPath, mdFile);
+          const content = await fs.readFile(filePath, 'utf8');
+          
+          const metadata = await this.createDocumentMetadata(content, mdFile, collection);
+          const metadataPath = path.join(collectionPath, `META_${mdFile}`);
+          
+          await fs.writeFile(metadataPath, metadata, 'utf8');
+          return { file: mdFile, success: true };
+        } catch (error) {
+          return { file: mdFile, error: error.message, success: false };
+        }
+      });
+      
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
     }
     
     return { collection, processed: results };
   }
 
   async createDocumentMetadata(content, filename, collection) {
-    const prompt = `Analyze this document and create metadata in the following markdown format:
+    // Shorter, faster prompt
+    const prompt = `Create brief metadata for this ${collection} document:
 
-# Document Metadata: [Document Title]
+Title: ${filename}
+Summary: [1 sentence]
+Topics: [3 key topics]
+Keywords: [5 search terms]
 
-## Basic Information
-- **Collection**: ${collection}
-- **Document Type**: [Brief classification]
-- **Date**: [Document date if available]
-- **Length**: [Approximate word count]
-
-## Content Summary
-[2-3 sentences describing main content/purpose]
-
-## Key Topics
-- [Topic 1]
-- [Topic 2]
-- [Topic 3]
-
-## Important Keywords
-[Comma-separated list of 8-10 key terms for search]
-
-## Document Relationships
-[Any references to other documents or related topics]
-
----
-Document content:
-${content.substring(0, 2000)}${content.length > 2000 ? '...' : ''}`;
+Content: ${content.substring(0, 800)}${content.length > 800 ? '...' : ''}`;
 
     try {
       const model = await this.getMetadataModel();
@@ -173,12 +165,15 @@ ${content.substring(0, 2000)}${content.length > 2000 ? '...' : ''}`;
         model,
         prompt,
         stream: false,
-        options: { temperature: 0.3, num_predict: 500 }
+        options: { 
+          temperature: 0.1, // Lower for faster generation
+          num_predict: 200   // Much shorter output
+        }
       });
       
-      return response.response;
+      return `# ${filename}\n\n${response.response}\n\n*Generated: ${new Date().toISOString()}*`;
     } catch (error) {
-      return `# Document Metadata: ${filename}\n\nError generating metadata: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+      return `# ${filename}\n\nError: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
     }
   }
 
@@ -217,37 +212,13 @@ ${content.substring(0, 2000)}${content.length > 2000 ? '...' : ''}`;
       allMetadata += `\n--- ${metaFile} ---\n${content}`;
     }
     
-    const prompt = `Analyze all the individual document metadata below and create a collection-level summary:
+    const prompt = `Summarize this ${collection} collection (${metaFiles.length} documents):
 
-# Collection Metadata: ${collection}
+Overview: [1 sentence about the collection]
+Main themes: [3 key themes]
+Search keywords: [10 important terms]
 
-## Collection Overview
-- **Total Documents**: ${metaFiles.length}
-- **Date Range**: [Earliest to latest dates found]
-- **Document Types**: [List of types found]
-- **Total Estimated Words**: [Sum if available]
-
-## Content Categories
-[Group documents by themes, genres, or types]
-
-## Major Themes
-[Cross-cutting themes that appear across multiple documents]
-
-## Key Topics Across Collection
-[Most frequent/important topics from all documents]
-
-## Collection Keywords
-[Master list of most important search terms for this collection]
-
-## Document Interconnections
-[How documents relate to each other, common references]
-
-## Notable Patterns
-[Any interesting patterns observed across the collection]
-
----
-Individual document metadata:
-${allMetadata.substring(0, 3000)}${allMetadata.length > 3000 ? '...' : ''}`;
+Documents: ${allMetadata.substring(0, 1500)}${allMetadata.length > 1500 ? '...' : ''}`;
 
     try {
       const model = await this.getMetadataModel();
@@ -255,7 +226,7 @@ ${allMetadata.substring(0, 3000)}${allMetadata.length > 3000 ? '...' : ''}`;
         model,
         prompt,
         stream: false,
-        options: { temperature: 0.3, num_predict: 600 }
+        options: { temperature: 0.1, num_predict: 300 }
       });
       
       const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);

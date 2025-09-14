@@ -12,10 +12,16 @@ export class DocumentSearch {
 
   async searchDocuments(query, limit = 5) {
     try {
-      // Use dummy query vector matching existing dimensions (768)
-      const queryVector = new Array(768).fill(0.15);
+      const { Ollama } = await import('ollama');
+      const ollama = new Ollama({ host: 'http://localhost:11434' });
       
-      const results = await lanceDBService.search(this.collection, queryVector, limit);
+      // Generate real embedding for query
+      const queryEmbedding = await ollama.embeddings({
+        model: 'nomic-embed-text',
+        prompt: query
+      });
+      
+      const results = await lanceDBService.search(this.collection, queryEmbedding.embedding, limit);
       return results.map(result => ({
         filename: result.source,
         content: result.text,
@@ -29,45 +35,82 @@ export class DocumentSearch {
   }
 
   async indexDocument(filename, content) {
-    // Skip embedding generation for metadata files
-    if (filename.startsWith('_')) {
-      return { success: true, chunks: 0, skipped: 'metadata file' };
-    }
-    
-    // MINIMAL approach - bypass all our complex logic
-    // Use the EXACT same approach as our working tests
     const { connect } = await import('@lancedb/lancedb');
     const path = await import('path');
+    const { Ollama } = await import('ollama');
     
     try {
-      // Connect directly (same as working tests)
+      const ollama = new Ollama({ host: 'http://localhost:11434' });
       const dbPath = path.join(process.cwd(), 'data', 'lancedb');
       const db = await connect(dbPath);
       
-      // Create simple document (same as working tests)
-      const testDoc = {
-        vector: new Array(768).fill(0.1),
-        text: content.substring(0, 200), // Limit text size
-        source: filename,
-        chunkIndex: 0,
-        timestamp: new Date().toISOString()
-      };
+      const chunks = this.chunkText(content, 6000, 300); // ~1500 tokens per chunk with overlap
+      const documents = [];
       
-      // Add directly to table (handle creation if needed)
-      let table;
-      try {
-        table = await db.openTable(this.collection);
-        await table.add([testDoc]);
-      } catch (error) {
-        // Table doesn't exist, create it
-        table = await db.createTable(this.collection, [testDoc]);
+      // Process chunks in batches for large files
+      const batchSize = 5; // Process 5 chunks at a time
+      
+      for (let batchStart = 0; batchStart < chunks.length; batchStart += batchSize) {
+        const batchEnd = Math.min(batchStart + batchSize, chunks.length);
+        const batchChunks = chunks.slice(batchStart, batchEnd);
+        
+        // Process batch sequentially to avoid overwhelming Ollama
+        const batchDocuments = [];
+        for (let idx = 0; idx < batchChunks.length; idx++) {
+          const chunk = batchChunks[idx];
+          const chunkIndex = batchStart + idx;
+          
+          try {
+            const embedding = await ollama.embeddings({
+              model: 'nomic-embed-text',
+              prompt: chunk
+            });
+            
+            if (!embedding.embedding || embedding.embedding.length !== 768) {
+              throw new Error(`Invalid embedding dimensions: ${embedding.embedding?.length || 'undefined'}`);
+            }
+            
+            batchDocuments.push({
+              vector: embedding.embedding,
+              text: chunk,
+              source: filename,
+              chunkIndex,
+              timestamp: new Date().toISOString()
+            });
+          } catch (embError) {
+            throw new Error(`Embedding failed for chunk ${chunkIndex}: ${embError.message}`);
+          }
+        }
+        documents.push(...batchDocuments);
+        
+        // Add batch to database immediately to avoid memory buildup
+        if (documents.length >= batchSize) {
+          let table;
+          try {
+            table = await db.openTable(this.collection);
+            await table.add(documents);
+          } catch (error) {
+            table = await db.createTable(this.collection, documents);
+          }
+          documents.length = 0; // Clear processed documents
+        }
+      }
+      
+      // Add any remaining documents
+      if (documents.length > 0) {
+        let table;
+        try {
+          table = await db.openTable(this.collection);
+          await table.add(documents);
+        } catch (error) {
+          table = await db.createTable(this.collection, documents);
+        }
       }
       
       return { 
         success: true, 
-        chunks: 1, 
-        totalChunks: 1,
-        note: 'Direct LanceDB approach (bypassing service layer)'
+        chunks: chunks.length, 
+        totalChunks: chunks.length
       };
       
     } catch (error) {
@@ -76,19 +119,33 @@ export class DocumentSearch {
   }
   
   chunkText(text, chunkSize = 500, overlap = 50) {
+    if (!text || typeof text !== 'string') {
+      return [''];
+    }
+    
     const chunks = [];
     let start = 0;
     
     while (start < text.length) {
       const end = Math.min(start + chunkSize, text.length);
-      const chunk = text.slice(start, end);
-      chunks.push(chunk);
-      start = end - overlap;
+      const chunk = text.slice(start, end).trim();
+      
+      if (chunk.length > 0) {
+        chunks.push(chunk);
+      }
+      
+      // Fix: ensure we always advance, prevent infinite loop
+      const nextStart = end - overlap;
+      if (nextStart <= start) {
+        start = end; // Jump to end if overlap would cause infinite loop
+      } else {
+        start = nextStart;
+      }
       
       if (start >= text.length) break;
     }
     
-    return chunks;
+    return chunks.length > 0 ? chunks : [text];
   }
 
   async removeDocument(filename) {
