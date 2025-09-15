@@ -409,23 +409,18 @@
           } else {
             mdContent = `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>`;
           }
+        } else if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/)) {
+          // Show dash for META collection files in Converted column when no regular MD file exists
+          mdContent = '-';
         } else {
           mdContent = `<span class="status-badge status-no">○</span>`;
         }
         
         // Create Meta link or status
         const hasMeta = !!group.metaFile;
-        let metaContent;
-        if (hasMeta) {
-          // Check if this is a META collection file (META_xxx-xxx_Collection.md pattern)
-          if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/)) {
-            metaContent = '-';
-          } else {
-            metaContent = `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>`;
-          }
-        } else {
-          metaContent = `<span class="status-badge status-no">○</span>`;
-        }
+        const metaContent = hasMeta ? 
+          `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>` :
+          `<span class="status-badge status-no">○</span>`;
         
         // Determine which files to include in selection
         const selectableFiles = [];
