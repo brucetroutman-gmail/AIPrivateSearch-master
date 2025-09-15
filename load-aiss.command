@@ -217,6 +217,7 @@ if [ -d "aisearchscore" ]; then
     rm -rf aisearchscore
 fi
 
+# comment for testing
 # Download fresh copy using curl with cache-busting
 echo "📥 Downloading latest version from GitHub..."
 curl -L -H "Cache-Control: no-cache" --retry 3 -o aisearchscore.zip "https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip?$(date +%s)"
