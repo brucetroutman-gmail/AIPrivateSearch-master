@@ -221,6 +221,13 @@ echo "🌐 Opening Chrome browser..."
 open -a "Google Chrome" http://localhost:3000 2>/dev/null || open http://localhost:3000
 echo ""
 echo "Press Ctrl+C to stop both servers"
+echo ""
+if [[ $(uname -m) == "arm64" ]]; then
+    echo "⚠️  Apple Silicon Mac detected:"
+    echo "   If terminal hangs after Ctrl+C, simply close the Terminal window."
+    echo "   This is a known macOS Terminal.app issue on M1/M4 Macs."
+    echo ""
+fi
 
 # Cleanup function
 cleanup() {
