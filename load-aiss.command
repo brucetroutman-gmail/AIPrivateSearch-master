@@ -219,7 +219,7 @@ fi
 
 # Download fresh copy using curl with cache-busting
 echo "📥 Downloading latest version from GitHub..."
-curl -L -H "Cache-Control: no-cache" -o aisearchscore.zip "https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip?$(date +%s)" 2>/dev/null
+curl -L -H "Cache-Control: no-cache" --retry 3 -o aisearchscore.zip "https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip?$(date +%s)"
 
 if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     echo "   Extracting repository..."
@@ -293,24 +293,7 @@ for i in {1..5}; do
     sleep 2
 done
 
-# Pull essential models for first-time setup
-echo "📥 Downloading essential AI models (this may take a few minutes)..."
-echo "   This is a one-time setup - future updates can be done via the Models page"
-
-# Pull core models one at a time to prevent overwhelming Ollama
-CORE_MODELS=("qwen2:0.5b" "gemma2:2b" "qwen2.5:3b")
-
-for model in "${CORE_MODELS[@]}"; do
-    echo "📥 Pulling $model..."
-    if ollama pull "$model"; then
-        echo "✅ $model ready"
-    else
-        echo "⚠️  Failed to pull $model (you can download it later)"
-    fi
-    sleep 2  # Prevent overwhelming Ollama
-done
-
-echo "✅ Essential models downloaded"
+echo "✅ Ollama ready - models will be downloaded when starting the application"
 
 # Final cleanup before starting
 echo "🧹 Final cleanup of any remaining processes..."
