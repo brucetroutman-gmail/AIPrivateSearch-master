@@ -226,22 +226,22 @@ echo "Press Ctrl+C to stop both servers"
 cleanup() {
     echo "Stopping servers..."
     kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
-    sleep 2
+    sleep 1
     lsof -ti :3001 | xargs kill -9 2>/dev/null || true
     lsof -ti :3000 | xargs kill -9 2>/dev/null || true
     pkill -f 'npx serve' 2>/dev/null || true
     pkill -f 'node server.mjs' 2>/dev/null || true
     pkill -f 'npm start' 2>/dev/null || true
     
-    # Force exit for Apple Silicon Macs
+    # Force exit for Apple Silicon Macs to prevent terminal lockup
     if [[ $(uname -m) == "arm64" ]]; then
-        exec /bin/bash -c "exit 0"
+        kill -9 $$ 2>/dev/null || true
     fi
     exit 0
 }
 
 # Set trap for cleanup
-trap cleanup INT TERM
+trap cleanup INT TERM EXIT
 
 # Keep both servers running
 while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do
