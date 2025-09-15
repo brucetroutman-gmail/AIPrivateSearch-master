@@ -1,6 +1,6 @@
-# marine-poem
+# US marine-poem
 
-# Marine's Devotion
+# United States Marine's Devotion
 
 Two loves he carries through this fragile world:
 His rifle, sleek and deadly in his hands,

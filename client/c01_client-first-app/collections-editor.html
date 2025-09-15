@@ -415,9 +415,17 @@
         
         // Create Meta link or status
         const hasMeta = !!group.metaFile;
-        const metaContent = hasMeta ? 
-          `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>` :
-          `<span class="status-badge status-no">○</span>`;
+        let metaContent;
+        if (hasMeta) {
+          // Check if this is a META collection file (META_xxx-xxx_Collection.md pattern)
+          if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollections?\.md$/)) {
+            metaContent = '-';
+          } else {
+            metaContent = `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>`;
+          }
+        } else {
+          metaContent = `<span class="status-badge status-no">○</span>`;
+        }
         
         // Determine which files to include in selection
         const selectableFiles = [];
