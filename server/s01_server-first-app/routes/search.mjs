@@ -79,8 +79,6 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       const result = testCode ? 
         await scorer.processWithRetry(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
         await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
-      // Process through AI model using existing scorer
-      const result = await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
       
       // Add collection info to result
       result.collection = collection;
@@ -93,8 +91,6 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     const result = testCode ? 
       await scorer.processWithRetry(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
       await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
-    // Use existing internet search for non-collection queries
-    const result = await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
     
     logger.log('Sending response with keys:', Object.keys(result));
     res.json(result);
