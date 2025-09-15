@@ -51,7 +51,7 @@ pull_model_safe() {
     local model="$1"
     echo "📥 Pulling $model..."
     
-    if gtimeout 600 ollama pull "$model" 2>/dev/null || ollama pull "$model" 2>/dev/null; then
+    if ollama pull "$model" 2>/dev/null; then
         echo "✅ $model ready"
         return 0
     else
@@ -128,7 +128,7 @@ if [ ${#MISSING_MODELS[@]} -gt 0 ]; then
     echo "📥 Pulling missing models (one at a time for M4 compatibility)..."
     for model in "${MISSING_MODELS[@]}"; do
         echo "📥 Pulling $model..."
-        if gtimeout 300 ollama pull "$model" 2>/dev/null || ollama pull "$model" 2>/dev/null; then
+        if ollama pull "$model" 2>/dev/null; then
             echo "✅ $model ready"
         else
             echo "❌ Failed to pull $model (timeout or error)"
@@ -142,7 +142,7 @@ if [ "$SHOULD_UPDATE" = true ] && [ ${#MISSING_MODELS[@]} -eq 0 ]; then
     echo "🔄 Updating all models (one at a time for M4 compatibility)..."
     for model in $REQUIRED_MODELS; do
         echo "🔄 Updating $model..."
-        if gtimeout 300 ollama pull "$model" 2>/dev/null || ollama pull "$model" 2>/dev/null; then
+        if ollama pull "$model" 2>/dev/null; then
             echo "✅ $model updated"
         else
             echo "❌ Failed to update $model (timeout or error)"
