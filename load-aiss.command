@@ -234,9 +234,31 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     
     if [ -d "aisearchscore" ]; then
         echo "   ✅ Repository downloaded successfully"
+        
+        # Create .env file if it doesn't exist
+        if [ ! -f "/Users/Shared/.env" ]; then
+            echo "📝 Creating .env configuration file..."
+            cat > "/Users/Shared/.env" << 'EOF'
+NODE_ENV=development
+DB_HOST=9.112.184.206
+DB_PORT=3306
+DB_USERNAME=nimdas
+DB_PASSWORD=FormR!1234
+DB_DATABASE=aisearchscore
+EOF
+            echo "   ✅ .env file created at /Users/Shared/.env"
+            echo "   💡 Edit this file to configure your database connection"
+        else
+            echo "   ✅ .env file already exists"
+        fi
+        
+        # Start the application
+        cd aisearchscore
+        echo "🚀 Starting AISearchScore..."
+        ./start.sh
     else
         echo "   ❌ Failed to extract repository"
-        read -p "Press Enter to close..."
+        read -p "Press Enter to close..."lose..."
         exit 1
     fi
 else
