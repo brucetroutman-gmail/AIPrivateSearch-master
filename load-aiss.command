@@ -217,9 +217,9 @@ if [ -d "aisearchscore" ]; then
     rm -rf aisearchscore
 fi
 
-# Download fresh copy using curl
-echo "📥 Downloading fresh copy from GitHub..."
-curl -L -o aisearchscore.zip https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip 2>/dev/null
+# Download fresh copy using curl with cache-busting
+echo "📥 Downloading latest version from GitHub..."
+curl -L -H "Cache-Control: no-cache" -o aisearchscore.zip "https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip?$(date +%s)" 2>/dev/null
 
 if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     echo "   Extracting repository..."
