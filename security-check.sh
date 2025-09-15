@@ -52,7 +52,7 @@ SECRET_PATTERNS=(
 )
 
 for pattern in "${SECRET_PATTERNS[@]}"; do
-    matches=$(grep -r -i "$pattern" client/c01_client-first-app/ --include="*.js" --include="*.mjs" || true)
+    matches=$(grep -r -i "$pattern" . --include="*.js" --include="*.mjs" --exclude="load-aiss.command" --exclude-dir="node_modules" || true)
     if [ ! -z "$matches" ]; then
         echo "    ⚠️  POTENTIAL SECRET FOUND:"
         echo "$matches"

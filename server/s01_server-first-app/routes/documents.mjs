@@ -51,6 +51,15 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
   const collection = req.params.collection;
   
   try {
+<<<<<<< HEAD
+=======
+    // Remove all embeddings from local storage
+    const localEmbeddingsPath = path.join(process.cwd(), 'data', 'embeddings', collection);
+    if (await fs.pathExists(localEmbeddingsPath)) {
+      await fs.remove(localEmbeddingsPath);
+    }
+    
+>>>>>>> master-repo/main
     // Remove all embeddings from LanceDB
     try {
       await lanceDBService.removeCollection(collection);
@@ -229,7 +238,11 @@ router.post('/convert-selected', requireAuth, asyncHandler(async (req, res) => {
 }));
 
 // Shared processing utility
+<<<<<<< HEAD
 async function processFiles(collection, files = null) {
+=======
+async function processFiles(collection, files = null, vectorDB = 'local') {
+>>>>>>> master-repo/main
   const documentSearch = new DocumentSearch(collection);
   await documentSearch.initialize();
   
@@ -247,7 +260,11 @@ async function processFiles(collection, files = null) {
   for (const filename of filesToProcess) {
     try {
       const document = await collectionManager.readDocument(collection, filename);
+<<<<<<< HEAD
       await documentSearch.indexDocument(filename, document.content);
+=======
+      await documentSearch.indexDocument(filename, document.content, vectorDB);
+>>>>>>> master-repo/main
       processed++;
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
@@ -260,20 +277,34 @@ async function processFiles(collection, files = null) {
 
 // Document Processing
 router.post('/process', requireAuth, asyncHandler(async (req, res) => {
+<<<<<<< HEAD
   const { collection } = req.body;
   const result = await processFiles(collection, null);
+=======
+  const { collection, vectorDB } = req.body;
+  const result = await processFiles(collection, null, vectorDB);
+>>>>>>> master-repo/main
   res.json({ success: true, ...result });
 }));
 
 router.post('/process-selected', requireAuth, asyncHandler(async (req, res) => {
+<<<<<<< HEAD
   const { collection, files } = req.body;
   const result = await processFiles(collection, files);
+=======
+  const { collection, files, vectorDB } = req.body;
+  const result = await processFiles(collection, files, vectorDB);
+>>>>>>> master-repo/main
   res.json({ success: true, ...result });
 }));
 
 // Embedding Operations
 router.post('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
+<<<<<<< HEAD
+=======
+    const { vectorDB = 'local' } = req.body;
+>>>>>>> master-repo/main
     const documentSearch = new DocumentSearch(req.params.collection);
     await documentSearch.initialize();
     
@@ -282,7 +313,11 @@ router.post('/collections/:collection/index/:filename', requireAuth, async (req,
     // Estimate chunks based on content length (roughly 500 chars per chunk)
     const estimatedChunks = Math.ceil(document.content.length / 500);
     
+<<<<<<< HEAD
     const result = await documentSearch.indexDocument(req.params.filename, document.content);
+=======
+    const result = await documentSearch.indexDocument(req.params.filename, document.content, vectorDB);
+>>>>>>> master-repo/main
     
     // Add chunk information to result
     result.estimatedChunks = estimatedChunks;
@@ -290,14 +325,30 @@ router.post('/collections/:collection/index/:filename', requireAuth, async (req,
     
     res.json(result);
   } catch (error) {
+<<<<<<< HEAD
     logger.error('Embedding operation failed:', error.message);
+=======
+>>>>>>> master-repo/main
     res.status(500).json({ error: error.message });
   }
 });
 
 router.delete('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
+<<<<<<< HEAD
     await lanceDBService.removeDocument(req.params.collection, req.params.filename);
+=======
+    const { vectorDB = 'local' } = req.body;
+    
+    if (vectorDB === 'lanceDB') {
+      await lanceDBService.removeDocument(req.params.collection, req.params.filename);
+    } else {
+      const localSearch = new DocumentSearch(req.params.collection, 'local');
+      await localSearch.initialize();
+      await localSearch.removeDocument(req.params.filename);
+    }
+    
+>>>>>>> master-repo/main
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -307,7 +358,12 @@ router.delete('/collections/:collection/index/:filename', requireAuth, async (re
 // Search Operations
 router.post('/collections/:collection/search', requireAuth, async (req, res) => {
   try {
+<<<<<<< HEAD
     const documentSearch = new DocumentSearch(req.params.collection);
+=======
+    const { vectorDB = 'local' } = req.body;
+    const documentSearch = new DocumentSearch(req.params.collection, vectorDB);
+>>>>>>> master-repo/main
     await documentSearch.initialize();
     
     const results = await documentSearch.searchDocuments(req.body.query, req.body.limit || 5);
@@ -319,6 +375,7 @@ router.post('/collections/:collection/search', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/indexed', requireAuth, async (req, res) => {
   try {
+<<<<<<< HEAD
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     
     logger.log('Collection indexed docs - LanceDB:', lanceDocs.length);
@@ -328,6 +385,29 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
       inLanceDB: true,
       metadata: doc.metadata || {}
     }));
+=======
+    const localSearch = new DocumentSearch(req.params.collection, 'local');
+    await localSearch.initialize();
+    
+    const localDocs = await localSearch.listIndexedDocuments();
+    const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
+    
+    logger.log('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
+    
+    // Combine and mark which storage each document is in
+    const allFilenames = new Set([...localDocs.map(d => d.filename), ...lanceDocs.map(d => d.filename)]);
+    const documents = Array.from(allFilenames).map(filename => {
+      const localDoc = localDocs.find(d => d.filename === filename);
+      const lanceDoc = lanceDocs.find(d => d.filename === filename);
+      
+      return {
+        filename,
+        inLocal: !!localDoc,
+        inLanceDB: !!lanceDoc,
+        metadata: localDoc?.metadata || lanceDoc?.metadata || {}
+      };
+    });
+>>>>>>> master-repo/main
     
     res.json({ documents });
   } catch (error) {
@@ -337,9 +417,27 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/embeddings-info', requireAuth, async (req, res) => {
   try {
+<<<<<<< HEAD
     const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
     const lanceChunks = await lanceDBService.getChunkCounts(req.params.collection);
     
+=======
+    const localSearch = new DocumentSearch(req.params.collection, 'local');
+    await localSearch.initialize();
+    
+    const localDocs = await localSearch.listIndexedDocuments();
+    const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
+    const lanceChunks = await lanceDBService.getChunkCounts(req.params.collection);
+    
+    const localInfo = {
+      documents: localDocs.map(doc => ({
+        filename: doc.filename,
+        chunks: doc.chunks || 0
+      })),
+      totalChunks: localDocs.reduce((sum, doc) => sum + (doc.chunks || 0), 0)
+    };
+    
+>>>>>>> master-repo/main
     const lanceInfo = {
       documents: Object.entries(lanceChunks).map(([filename, chunks]) => ({
         filename,
@@ -348,12 +446,17 @@ router.get('/collections/:collection/embeddings-info', requireAuth, async (req, 
       totalChunks: Object.values(lanceChunks).reduce((sum, count) => sum + count, 0)
     };
     
+<<<<<<< HEAD
     res.json({ lanceDB: lanceInfo });
+=======
+    res.json({ local: localInfo, lanceDB: lanceInfo });
+>>>>>>> master-repo/main
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+<<<<<<< HEAD
 // Generate individual document metadata
 router.post('/collections/:collection/generate-document-metadata', requireAuth, asyncHandler(async (req, res) => {
   try {
@@ -376,6 +479,8 @@ router.post('/collections/:collection/generate-metadata', requireAuth, asyncHand
   }
 }));
 
+=======
+>>>>>>> master-repo/main
 
 
 export default router;

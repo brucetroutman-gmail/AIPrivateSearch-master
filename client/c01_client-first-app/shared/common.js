@@ -186,7 +186,6 @@ async function loadSharedComponents() {
     
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      // eslint-disable-next-line no-undef
       logger.error('Error loading shared components:', error);
     } else {
       console.error('Error loading shared components:', error);
@@ -196,7 +195,6 @@ async function loadSharedComponents() {
 }
 
 // Dark mode toggle function
-// eslint-disable-next-line no-unused-vars
 function toggleDarkMode() {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -211,7 +209,6 @@ function loadTheme() {
 }
 
 // Toggle mobile menu
-// eslint-disable-next-line no-unused-vars
 function toggleMenu() {
   const navMenu = document.getElementById('navMenu');
   if (navMenu) {
@@ -220,7 +217,6 @@ function toggleMenu() {
 }
 
 // Developer mode toggle
-// eslint-disable-next-line no-unused-vars
 function toggleDeveloperMode() {
   const isDeveloperMode = localStorage.getItem('developerMode') === 'true';
   const newMode = !isDeveloperMode;
@@ -318,7 +314,6 @@ function setupLoginIcon() {
 }
 
 // Common score model loading function
-// eslint-disable-next-line no-unused-vars
 async function loadScoreModels(selectElementId) {
   try {
     const response = await fetch('config/models-list.json');
@@ -327,7 +322,6 @@ async function loadScoreModels(selectElementId) {
     
     if (!scoreSelect) {
       if (typeof logger !== 'undefined') {
-        // eslint-disable-next-line no-undef
         logger.error('Score select element not found:', selectElementId);
       } else {
         console.error('Score select element not found:', selectElementId);
@@ -377,7 +371,6 @@ async function loadScoreModels(selectElementId) {
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      // eslint-disable-next-line no-undef
       logger.error('Error loading score models:', error);
     } else {
       console.error('Error loading score models:', error);
@@ -396,7 +389,6 @@ async function loadScoreModels(selectElementId) {
 }
 
 // Common database export function with retry logic
-// eslint-disable-next-line no-unused-vars
 async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null, retryCount = 0) {
   const dbData = {
     TestCode: result.testCode || '',
@@ -486,7 +478,6 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     
     const errorMsg = error.message || error.toString() || 'Unknown database error';
     if (typeof logger !== 'undefined') {
-      // eslint-disable-next-line no-undef
       logger.error('Database export error:', errorMsg);
     } else {
       console.error('Database export error:', errorMsg);

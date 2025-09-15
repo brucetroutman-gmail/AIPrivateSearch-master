@@ -1,6 +1,5 @@
 import { search } from './services/api.js';
 import { logger } from './shared/utils/logger.js';
-// Import loadScoreModels if available
 // Import removed - loadScoreModels is available globally from common.js
 
 // Import showUserMessage from global scope - wait for it to be available
@@ -192,22 +191,8 @@ loadUserPrompts();
 loadTokensOptions();
 loadTemperatureOptions();
 loadContextOptions();
+loadScoreModels('scoreModel');
 loadScoringOptions();
-
-// Load score models after ensuring common.js is loaded
-if (typeof loadScoreModels === 'function') {
-  // eslint-disable-next-line no-undef
-  loadScoreModels('scoreModel');
-} else {
-  // Wait for common.js to load
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof loadScoreModels === 'function') {
-      // eslint-disable-next-line no-undef
-      loadScoreModels('scoreModel');
-    }
-  });
-}
-
 // Load temperature options from JSON file
 async function loadTemperatureOptions() {
   const data = await loadConfig('temperature.json', { temperature: [] });
@@ -293,13 +278,7 @@ async function loadUserPrompts() {
       userPromptsEl.appendChild(option);
     });
   } catch (error) {
-    while (userPromptsEl.firstChild) {
-      userPromptsEl.removeChild(userPromptsEl.firstChild);
-    }
-    const option = document.createElement('option');
-    option.value = '';
-    option.textContent = 'Error loading user prompts';
-    userPromptsEl.appendChild(option);
+    userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load user prompts:', error);
   }
@@ -526,9 +505,7 @@ function generateTestCode() {
 
 function render(result) {
   // clear then build markup
-  while (outputEl.firstChild) {
-    outputEl.removeChild(outputEl.firstChild);
-  }
+  outputEl.innerHTML = '';
   
   // Store result for export
   window.currentResult = result;
@@ -593,39 +570,12 @@ function render(result) {
     metricsH.textContent = 'Performance Metrics';
     outputEl.append(metricsH);
 
-    const metricsData = [];
-    const headers = ['Operation', 'Model', 'Duration', 'Load', 'Tokens', 'Eval Rate', 'Context', 'Temperature'];
-    
-    if (result.metrics.search) {
-      const m = result.metrics.search;
-      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
-      const loadMs = (m.load_duration / 1000000).toFixed(0);
-      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      metricsData.push(['Search', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
-    }
-
-    if (result.metrics.scoring) {
-      const m = result.metrics.scoring;
-      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
-      const loadMs = (m.load_duration / 1000000).toFixed(0);
-      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      metricsData.push(['Scoring', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
-    }
-
-    if (result.metrics.scoringRetry) {
-      const m = result.metrics.scoringRetry;
-      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
-      const loadMs = (m.load_duration / 1000000).toFixed(0);
-      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
-      metricsData.push(['Scoring Retry', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature]);
-    }
-    
     const tbl = document.createElement('table');
     tbl.className = 'score-table';
     
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    headers.forEach(text => {
+    ['Operation', 'Model', 'Duration', 'Load', 'Tokens', 'Eval Rate', 'Context', 'Temperature'].forEach(text => {
       const th = document.createElement('th');
       th.textContent = text;
       headerRow.appendChild(th);
@@ -633,15 +583,48 @@ function render(result) {
     thead.appendChild(headerRow);
     
     const tbody = document.createElement('tbody');
-    metricsData.forEach(rowData => {
+    
+    if (result.metrics.search) {
+      const m = result.metrics.search;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
       const row = document.createElement('tr');
-      rowData.forEach(cellData => {
+      ['Search', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
         const td = document.createElement('td');
-        td.textContent = cellData;
+        td.textContent = text;
         row.appendChild(td);
       });
       tbody.appendChild(row);
-    });
+    }
+
+    if (result.metrics.scoring) {
+      const m = result.metrics.scoring;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      const row = document.createElement('tr');
+      ['Scoring', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    }
+
+    if (result.metrics.scoringRetry) {
+      const m = result.metrics.scoringRetry;
+      const totalSecs = (m.total_duration / 1000000000).toFixed(1);
+      const loadMs = (m.load_duration / 1000000).toFixed(0);
+      const tokensPerSec = (m.eval_count / (m.eval_duration / 1000000000)).toFixed(1);
+      const row = document.createElement('tr');
+      ['Scoring Retry', m.model, totalSecs + 's', loadMs + 'ms', m.eval_count || 0, tokensPerSec + ' t/s', m.context_size, m.temperature].forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    }
     
     tbl.appendChild(thead);
     tbl.appendChild(tbody);
@@ -810,24 +793,17 @@ form.addEventListener('submit', async (e) => {
     
     render(result);
     
-    // Auto export to database if enabled and test didn't fail
-    if (autoExportToggle.checked && result.shouldSaveToDatabase !== false) {
+    // Auto export to database if enabled
+    if (autoExportToggle.checked) {
       try {
-        if (typeof exportToDatabase === 'function') {
-          // eslint-disable-next-line no-undef
-          const exportResult = await exportToDatabase(window.currentResult, null, null, null);
-          logger.log('Auto-exported to database with ID:', exportResult.insertId);
-          showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
-        } else {
-          showUserMessage('Database export function not available', 'error');
-        }
+        const exportResult = await exportToDatabase(window.currentResult, null, null, null);
+        logger.log('Auto-exported to database with ID:', exportResult.insertId);
+        showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
       } catch (error) {
         // logger sanitizes all inputs to prevent log injection
       logger.error('Auto-export failed:', error);
         showUserMessage(`Auto-save failed: ${error.message}`, 'error');
       }
-    } else if (result.shouldSaveToDatabase === false) {
-      showUserMessage('Test failed after retries - not saved to database', 'warning');
     }
     
     // Export section is now part of the answer
@@ -1022,22 +998,11 @@ async function handleExport() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } else if (exportFormat === 'database') {
-    // Check if result should be saved to database
-    if (window.currentResult.shouldSaveToDatabase === false) {
-      showUserMessage('Cannot save failed test to database', 'warning');
-      return;
-    }
-    
     // Export to database using common function
     try {
-      if (typeof exportToDatabase === 'function') {
-        // eslint-disable-next-line no-undef
-        const result = await exportToDatabase(window.currentResult, null, null, null);
-        logger.log(`Successfully saved to database with ID: ${result.insertId}`);
-        showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
-      } else {
-        showUserMessage('Database export function not available', 'error');
-      }
+      const result = await exportToDatabase(window.currentResult, null, null, null);
+      logger.log(`Successfully saved to database with ID: ${result.insertId}`);
+      showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
       logger.error('Database save error:', error.message);

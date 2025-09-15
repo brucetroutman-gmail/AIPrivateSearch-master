@@ -22,7 +22,13 @@ const dbConfig = {
   user: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'aisearchscore',
+<<<<<<< HEAD
   connectionLimit: 10
+=======
+  connectionLimit: 10,
+  acquireTimeout: 60000,
+  idleTimeout: 300000
+>>>>>>> master-repo/main
 };
 
 

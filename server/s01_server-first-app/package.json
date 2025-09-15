@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+<<<<<<< HEAD
     "start": "node --max-old-space-size=8192 --expose-gc server.mjs",
+=======
+    "start": "node server.mjs",
+>>>>>>> master-repo/main
     "process-docs": "node scripts/processAllCollections.mjs"
   },
   "dependencies": {

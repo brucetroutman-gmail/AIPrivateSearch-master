@@ -147,12 +147,19 @@
         function createSection(type, data) {
             const section = document.createElement('div');
             const isDisabled = !data.enabled;
+<<<<<<< HEAD
             const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+=======
+>>>>>>> master-repo/main
             
             section.className = 'section';
             section.innerHTML = `
                 <div class="section-header ${isDisabled ? 'disabled' : ''}">
+<<<<<<< HEAD
                     <label><input type="checkbox" id="select${capitalizedType}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}> ${data.title}${isDisabled ? ' (Coming Soon)' : ''}</label>
+=======
+                    <label><input type="checkbox" id="select${type.charAt(0).toUpperCase() + type.slice(1)}" ${isDisabled ? 'disabled data-permanently-disabled="true"' : ''}> ${data.title}${isDisabled ? ' (Coming Soon)' : ''}</label>
+>>>>>>> master-repo/main
                 </div>
             `;
             
@@ -187,6 +194,7 @@
                 });
             }
 
+<<<<<<< HEAD
             // Section selectors - handle all dynamically created sections
             Object.keys(modelTests).forEach(key => {
                 const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
@@ -194,6 +202,15 @@
                 if (selector) {
                     selector.addEventListener('change', function() {
                         const checkboxes = document.querySelectorAll(`[data-group="${key}"]`);
+=======
+            // Section selectors
+            ['Performance', 'Baseline', 'Edge', 'Compatibility'].forEach(type => {
+                const selector = document.getElementById(`select${type}`);
+                if (selector) {
+                    selector.addEventListener('change', function() {
+                        const group = type.toLowerCase();
+                        const checkboxes = document.querySelectorAll(`[data-group="${group}"]`);
+>>>>>>> master-repo/main
                         checkboxes.forEach(cb => cb.checked = this.checked);
                         updateSelectedCount();
                     });

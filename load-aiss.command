@@ -217,7 +217,6 @@ if [ -d "aisearchscore" ]; then
     rm -rf aisearchscore
 fi
 
-# comment for testing
 # Download fresh copy using curl with cache-busting
 echo "📥 Downloading latest version from GitHub..."
 curl -L -H "Cache-Control: no-cache" --retry 3 -o aisearchscore.zip "https://github.com/brucetroutman-gmail/AISearchScore-master/archive/refs/heads/main.zip?$(date +%s)"
@@ -256,16 +255,16 @@ echo "📂 Changed to: $(pwd)"
 echo "🔧 Creating shared .env file..."
 cat > /Users/Shared/.env << 'EOF'
 # API Keys
-API_KEY=dev-key
-ADMIN_KEY=admin-key
+API_KEY=${API_KEY:-dev-key}
+ADMIN_KEY=${ADMIN_KEY:-admin-key}
 NODE_ENV=development
 
 # Database Configuration
-DB_HOST=92.112.184.206
-DB_PORT=3306
-DB_DATABASE=aisearchscore
-DB_USERNAME=nimdas
-DB_PASSWORD=FormR!1234
+DB_HOST=${DB_HOST:-localhost}
+DB_PORT=${DB_PORT:-3306}
+DB_DATABASE=${DB_DATABASE:-aisearchscore}
+DB_USERNAME=${DB_USERNAME:-user}
+DB_PASSWORD=${DB_PASSWORD:-password}
 EOF
 
 echo "✅ Shared .env file created at /Users/Shared/.env"

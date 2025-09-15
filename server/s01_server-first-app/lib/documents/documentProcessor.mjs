@@ -1,13 +1,17 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
+<<<<<<< HEAD
 import { Ollama } from 'ollama';
 
 /* global process */
+=======
+>>>>>>> master-repo/main
 
 export class DocumentProcessor {
   constructor() {
     this.supportedFormats = ['.txt', '.pdf'];
+<<<<<<< HEAD
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.metadataModel = null;
   }
@@ -47,6 +51,8 @@ export class DocumentProcessor {
     }
     
     return this.metadataModel;
+=======
+>>>>>>> master-repo/main
   }
 
   async convertToMarkdown(filePath) {
@@ -109,6 +115,7 @@ export class DocumentProcessor {
 
     return results;
   }
+<<<<<<< HEAD
 
   async generateDocumentMetadata(collection) {
     this.clearModelCache();
@@ -242,4 +249,6 @@ Documents: ${allMetadata.substring(0, 1500)}${allMetadata.length > 1500 ? '...' 
     }
   }
 
+=======
+>>>>>>> master-repo/main
 }
