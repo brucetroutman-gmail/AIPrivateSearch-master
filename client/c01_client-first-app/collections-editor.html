@@ -386,9 +386,10 @@
       allGroups.forEach(group => {
         const row = document.createElement('tr');
         
-        // Find if this document is embedded
+        // Find if this document or its META file is embedded
         const isEmbedded = indexedDocuments.some(doc => 
-          doc.filename === group.mdFile && doc.inLanceDB
+          (doc.filename === group.mdFile && doc.inLanceDB) ||
+          (doc.filename === group.metaFile && doc.inLanceDB)
         );
         
         // Create source extension links (exclude .md files)
