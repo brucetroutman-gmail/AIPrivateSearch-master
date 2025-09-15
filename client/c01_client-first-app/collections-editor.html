@@ -403,8 +403,8 @@
         // Create MD link or status
         let mdContent;
         if (hasMd) {
-          // Check if this is a collection file (xxx-xxx_collections.md pattern)
-          if (group.mdFile && group.mdFile.match(/.*-.*_collections\.md$/)) {
+          // Check if this is a collection file (xxx-xxx_Collection.md or xxx-xxx_collections.md pattern)
+          if (group.mdFile && group.mdFile.match(/.*-.*_[Cc]ollections?\.md$/)) {
             mdContent = '-';
           } else {
             mdContent = `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>`;
