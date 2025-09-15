@@ -109,11 +109,7 @@ specs-3-scoring
 
 48. fix npm warning msgs  --done
 
-<<<<<<< HEAD
 49. test scoring --done
-=======
-49. test scoring
->>>>>>> master-repo/main
 
 50. User-confirmed install Node.js in load-aiss.command --done
 
@@ -143,17 +139,11 @@ specs-3-scoring
 
 63. Fix dark mode processing button and inline elements styling --done
 
-<<<<<<< HEAD
 64. Where is the meta_collection .md file being saved?
 
 67. Load-aiss.command is not pulling latest from github using curl
 
 68. analyze LanceDB vs ChromaDB
-
-
-
-=======
->>>>>>> master-repo/main
 
 
 

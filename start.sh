@@ -4,7 +4,6 @@ echo "🚀 Starting AI Search & Score Application..."
 
 # Kill any existing server processes to free up ports
 echo "Stopping any existing servers..."
-<<<<<<< HEAD
 # Kill processes by port to ensure clean shutdown
 lsof -ti :3001 | xargs kill -9 2>/dev/null || true
 lsof -ti :3000 | xargs kill -9 2>/dev/null || true
@@ -13,11 +12,9 @@ pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 pkill -f "npm start" 2>/dev/null || true
 sleep 2
-=======
 pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
->>>>>>> master-repo/main
 
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
@@ -46,7 +43,6 @@ else
     echo "✅ Ollama is running"
 fi
 
-<<<<<<< HEAD
 # Simplified and reliable model management
 echo "Checking model status..."
 
@@ -84,7 +80,6 @@ for model in $REQUIRED_MODELS; do
 done
 
 echo "💡 To update or install additional models, use the Models page in the application"
-=======
 # Check and pull required models
 echo "Checking model status..."
 LAST_PULL_FILE=".last_model_pull"
@@ -163,7 +158,6 @@ elif [ ${#MISSING_MODELS[@]} -gt 0 ]; then
 else
     echo "✅ All models ready (using cached versions)"
 fi
->>>>>>> master-repo/main
 
 # Start backend server in background
 echo "Installing backend dependencies..."
@@ -229,11 +223,8 @@ echo ""
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for user interrupt
-<<<<<<< HEAD
 trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; lsof -ti :3001 | xargs kill -9 2>/dev/null; lsof -ti :3000 | xargs kill -9 2>/dev/null; pkill -f 'npx serve' 2>/dev/null; pkill -f 'node server.mjs' 2>/dev/null; pkill -f 'npm start' 2>/dev/null; exit" INT
-=======
 trap "echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; pkill -f 'npx serve' 2>/dev/null; pkill -f 'node server.mjs' 2>/dev/null; exit" INT
->>>>>>> master-repo/main
 
 # Keep both servers running
 while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do

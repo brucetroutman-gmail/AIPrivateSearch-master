@@ -66,14 +66,11 @@ export function requireAuth(req, res, next) {
 }
 
 export function requireAdminAuth(req, res, next) {
-<<<<<<< HEAD
   // TEMPORARY: Allow admin operations in development mode
   if (process.env.NODE_ENV === 'development') {
     return next();
   }
   
-=======
->>>>>>> master-repo/main
   const adminKey = req.headers['x-admin-key'];
   const clientIP = req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   

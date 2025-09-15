@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import lanceDBService from './lanceDBService.mjs';
 
 export class DocumentSearch {
@@ -155,7 +154,6 @@ export class DocumentSearch {
 
   async listIndexedDocuments() {
     return await lanceDBService.listDocuments(this.collection);
-=======
 import { EmbeddingService } from './embeddingService.mjs';
 import { VectorStore } from './vectorStore.mjs';
 import lanceDBService from './lanceDBService.mjs';
@@ -231,6 +229,5 @@ export class DocumentSearch {
 
   async listIndexedDocuments() {
     return await this.vectorStore.listDocuments();
->>>>>>> master-repo/main
   }
 }

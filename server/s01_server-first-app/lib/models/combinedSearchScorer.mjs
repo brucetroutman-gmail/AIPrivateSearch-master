@@ -24,7 +24,6 @@ class CombinedSearchScorer {
   }
 
   /* public */
-<<<<<<< HEAD
   async processWithRetry(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, scoreModel = null) {
     let attempt = 1;
     const maxAttempts = 2;
@@ -62,8 +61,6 @@ class CombinedSearchScorer {
     }
   }
 
-=======
->>>>>>> master-repo/main
   async process(query, enableScoring = true, model = null, temperature = 0.3, context = 0.3, systemPrompt = null, systemPromptName = null, tokenLimit = null, sourceType = null, testCode = null, scoreModel = null) {
     try {
       const processStart = Date.now();
@@ -127,9 +124,7 @@ class CombinedSearchScorer {
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
       logger.error('Error in process method:', error.message);
-<<<<<<< HEAD
       throw error; // Re-throw for retry logic to handle
-=======
       return {
         query,
         response: 'Error occurred while processing the query',
@@ -137,7 +132,6 @@ class CombinedSearchScorer {
         scores: null,
         error: error.message
       };
->>>>>>> master-repo/main
     }
   }
 
@@ -208,10 +202,7 @@ class CombinedSearchScorer {
     }
   }
 
-<<<<<<< HEAD
   // eslint-disable-next-line no-unused-vars
-=======
->>>>>>> master-repo/main
   async #score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
     try {
       logger.log('Starting scoring process');
@@ -334,10 +325,7 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-<<<<<<< HEAD
   // eslint-disable-next-line no-unused-private-class-members
-=======
->>>>>>> master-repo/main
   #extract(line) {
     const m = line.match(/\b([0-3])\b/);
     return m ? Number(m[1]) : null;
@@ -359,10 +347,7 @@ Respond with only three numbers, one per line.`;
           this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
           return this.cachedPcCode;
         }
-<<<<<<< HEAD
       // eslint-disable-next-line no-unused-vars
-=======
->>>>>>> master-repo/main
       } catch (e) {
         // Continue to system_profiler fallback
       }
@@ -376,10 +361,7 @@ Respond with only three numbers, one per line.`;
           this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
           return this.cachedPcCode;
         }
-<<<<<<< HEAD
       // eslint-disable-next-line no-unused-vars
-=======
->>>>>>> master-repo/main
       } catch (e) {
         // Continue to hostname fallback
       }

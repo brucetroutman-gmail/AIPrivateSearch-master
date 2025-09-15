@@ -75,15 +75,12 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       // Create enhanced prompt with document context
       const enhancedQuery = `Based on the following documents, please answer this question: ${query}\n\nRelevant documents:\n${documentContext}`;
       
-<<<<<<< HEAD
       // Process through AI model using retry logic for tests
       const result = testCode ? 
         await scorer.processWithRetry(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
         await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
-=======
       // Process through AI model using existing scorer
       const result = await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
->>>>>>> master-repo/main
       
       // Add collection info to result
       result.collection = collection;
@@ -92,15 +89,12 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       return res.json(result);
     }
     
-<<<<<<< HEAD
     // Use existing internet search for non-collection queries with retry logic for tests
     const result = testCode ? 
       await scorer.processWithRetry(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
       await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
-=======
     // Use existing internet search for non-collection queries
     const result = await scorer.process(query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
->>>>>>> master-repo/main
     
     logger.log('Sending response with keys:', Object.keys(result));
     res.json(result);
