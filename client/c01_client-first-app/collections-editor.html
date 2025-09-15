@@ -401,9 +401,17 @@
         const hasMd = !!group.mdFile;
         
         // Create MD link or status
-        const mdContent = hasMd ? 
-          `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>` :
-          `<span class="status-badge status-no">○</span>`;
+        let mdContent;
+        if (hasMd) {
+          // Check if this is a collection file (xxx-xxx_collections.md pattern)
+          if (group.mdFile && group.mdFile.match(/.*-.*_collections\.md$/)) {
+            mdContent = '-';
+          } else {
+            mdContent = `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>`;
+          }
+        } else {
+          mdContent = `<span class="status-badge status-no">○</span>`;
+        }
         
         // Create Meta link or status
         const hasMeta = !!group.metaFile;
