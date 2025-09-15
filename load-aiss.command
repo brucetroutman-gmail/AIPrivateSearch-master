@@ -219,7 +219,7 @@ fi
 
 # Download fresh copy using curl with cache-busting
 echo "📥 Downloading latest version from GitHub..."
-curl -L -H "Cache-Control: no-cache" --retry 3 -o aisearchscore.zip "https://github.com/brucetroutman-gmail/aisearchscore-master/archive/refs/heads/main.zip?$(date +%s)"
+curl -L -H "Cache-Control: no-cache" -H "Pragma: no-cache" --retry 3 -o aisearchscore.zip "https://github.com/brucetroutman-gmail/aisearchscore-master/archive/refs/heads/main.zip?v=$(date +%s)&r=$RANDOM"
 
 if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     echo "   Extracting repository..."
