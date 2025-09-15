@@ -418,7 +418,7 @@
         let metaContent;
         if (hasMeta) {
           // Check if this is a META collection file (META_xxx-xxx_Collection.md pattern)
-          if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollections?\.md$/)) {
+          if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/)) {
             metaContent = '-';
           } else {
             metaContent = `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>`;
