@@ -225,10 +225,10 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     echo "   Extracting repository..."
     unzip -q aisearchscore.zip 2>/dev/null
     # Try different possible directory names
-    if [ -d "AISearchScore-master-main" ]; then
-        mv AISearchScore-master-main aisearchscore
-    elif [ -d "AISearchScore-master" ]; then
-        mv AISearchScore-master aisearchscore
+    if [ -d "aisearchscore-master-main" ]; then
+        mv aisearchscore-master-main aisearchscore
+    elif [ -d "aisearchscore-master" ]; then
+        mv aisearchscore-master aisearchscore
     fi
     rm -f aisearchscore.zip
     
@@ -240,10 +240,10 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
             echo "📝 Creating .env configuration file..."
             cat > "/Users/Shared/.env" << 'EOF'
 NODE_ENV=development
-DB_HOST=9.112.184.206
+DB_HOST=localhost
 DB_PORT=3306
-DB_USERNAME=nimdas
-DB_PASSWORD=FormR!1234
+DB_USERNAME=root
+DB_PASSWORD=
 DB_DATABASE=aisearchscore
 EOF
             echo "   ✅ .env file created at /Users/Shared/.env"
@@ -258,7 +258,7 @@ EOF
         ./start.sh
     else
         echo "   ❌ Failed to extract repository"
-        read -p "Press Enter to close..."lose..."
+        read -p "Press Enter to close..."
         exit 1
     fi
 else
@@ -266,74 +266,3 @@ else
     read -p "Press Enter to close..."
     exit 1
 fi
-
-echo "✅ Clone successful"
-
-# Change to project directory
-cd aisearchscore
-echo "📂 Changed to: $(pwd)"
-
-# Create shared .env file BEFORE starting the app
-echo "🔧 Creating shared .env file..."
-cat > /Users/Shared/.env << 'EOF'
-# API Keys
-API_KEY=${API_KEY:-dev-key}
-ADMIN_KEY=${ADMIN_KEY:-admin-key}
-NODE_ENV=development
-
-# Database Configuration
-DB_HOST=${DB_HOST:-localhost}
-DB_PORT=${DB_PORT:-3306}
-DB_DATABASE=${DB_DATABASE:-aisearchscore}
-DB_USERNAME=${DB_USERNAME:-user}
-DB_PASSWORD=${DB_PASSWORD:-password}
-EOF
-
-echo "✅ Shared .env file created at /Users/Shared/.env"
-
-# Start Ollama service
-echo "🚀 Starting Ollama service..."
-if ! pgrep -f "ollama serve" > /dev/null; then
-    ollama serve &
-    sleep 3
-    echo "✅ Ollama service started"
-else
-    echo "✅ Ollama service already running"
-fi
-
-# Verify Ollama is accessible
-for i in {1..5}; do
-    if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-        echo "✅ Ollama is accessible"
-        break
-    fi
-    if [ $i -eq 5 ]; then
-        echo "⚠️  Ollama not accessible, but continuing..."
-        break
-    fi
-    echo "⏳ Waiting for Ollama... (attempt $i/5)"
-    sleep 2
-done
-
-echo "✅ Ollama ready - models will be downloaded when starting the application"
-
-# Final cleanup before starting
-echo "🧹 Final cleanup of any remaining processes..."
-pkill -f "node server.mjs" 2>/dev/null || true
-pkill -f "npx serve" 2>/dev/null || true
-sleep 2
-
-echo "✅ Installation complete!"
-echo ""
-echo "🚀 Starting AISearchScore application..."
-echo ""
-
-# Execute start.sh to launch the application
-if [ -f "start.sh" ]; then
-    bash start.sh
-else
-    echo "❌ start.sh not found in current directory"
-    echo "Please run: bash start.sh manually"
-    read -p "Press Enter to close..."
-fi
-# Updated with enhanced Chrome installation and command line tools

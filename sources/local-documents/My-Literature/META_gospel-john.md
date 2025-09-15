@@ -1,23 +1,10 @@
 # gospel-john.md
 
-Title: gospel-john.md
+**Metadata for "gospel-john.md":**
 
-Summary:
-This document is a summary of the Gospel of John. It discusses the nature of God and man, as well as the significance of Jesus Christ in the context of salvation.
+- **Title:** gospel-john.md
+- **Summary:** This document excerpt from the Gospel of John begins with the creation narrative and introduces key themes of divine presence, life, and testimony.
+- **Topics:** Creation Narrative, Divine Presence, Testimony
+- **Keywords:** Word, God, Light
 
-Topics:
-- The nature of God and man
-- Salvation through faith in Jesus Christ
-- The role of the Holy Spirit in Christian life
-
-Keywords:
-- John the Baptist
-- Light of God
-- Salvation
-- Faith in Jesus Christ
-- Holy Spirit
-
-Content:
-# gospel-john
-
-*Generated: 2025-09-13T17:34:07.405Z*
+*Generated: 2025-09-15T17:22:18.265Z*

@@ -1,3 +1,19 @@
-The collection contains four documents, each with a unique topic and theme. The first document is titled "The Brothers Karamazov" and discusses the lives of three brothers in 19th-century Russia. The second document is titled "gospel-john" and discusses the nature of God and man through the life of Jesus Christ. The third document is titled "marine-poem" and explores the dual loyalties of a marine, balancing duty and personal devotion. Finally, the fourth document is titled "ransom-of-red-chief" and discusses the life of Red Chief, a soldier who sacrificed his own life for the greater good.
+### Overview
+The My-Literature collection consists of four documents, including a novel by Fyodor Dostoyevsky, an excerpt from the Gospel of John, and a marine-themed poem.
 
-The collection also contains several search keywords related to literature, such as "Fyodor Dostoyevsky," "Russian Literature," "family dynamics," "moral philosophy," "religious faith," and "sacrifice."
+### Main Themes
+1. **Family Dynamics**: Explored through the relationships within the Karamazov family.
+2. **Divine Presence and Testimony**: Highlighted in the Gospel of John's creation narrative.
+3. **Passion for Nature**: Portrayed through the love for the ocean in the poem.
+
+### Search Keywords
+1. Fyodor Pavlovitch Karamazov
+2. He Gets Rid Of His Eldest Son
+3. The Second Marriage And The Second Family
+4. Elders
+5. The Third Son, Alyosha
+6. Lowell Press
+7. New York
+8. Word
+9. God
+10. Light
