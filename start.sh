@@ -233,9 +233,11 @@ cleanup() {
     pkill -f 'node server.mjs' 2>/dev/null || true
     pkill -f 'npm start' 2>/dev/null || true
     
-    # Force exit for Apple Silicon Macs to prevent terminal lockup
+    # Disable history saving on Apple Silicon Macs to prevent terminal lockup
     if [[ $(uname -m) == "arm64" ]]; then
-        kill -9 $$ 2>/dev/null || true
+        unset HISTFILE
+        set +o history
+        exec /bin/bash --norc --noprofile -c "exit 0" < /dev/null
     fi
     exit 0
 }
