@@ -254,8 +254,8 @@
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
           <button class="btn btn-warning" onclick="convertDocuments()">Convert to MD</button>
           <button class="btn btn-info" onclick="generateMetadata()">Create Metadata</button>
-          <button class="btn btn-primary" onclick="processDocuments()">Embed All MD</button>
-          <button class="btn btn-danger" onclick="removeEmbeddings()">Remove All Embeds</button>
+          <button class="btn btn-primary" onclick="processDocuments()">Embed MDs</button>
+          <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
         </div>
@@ -843,24 +843,26 @@
     async function removeEmbeddings() {
       const selected = getSelectedDocuments();
       const selectedMD = selected.filter(file => file.endsWith('.md'));
+      const selectedMETA = selected.filter(file => file.startsWith('META_'));
+      const allEmbeddableFiles = [...selectedMD, ...selectedMETA];
       
-      if (selectedMD.length === 0) {
-        showUserMessage('Please select at least one MD file to remove embeddings from', 'error');
+      if (allEmbeddableFiles.length === 0) {
+        showUserMessage('Please select at least one MD or META file to remove embeddings from', 'error');
         return;
       }
       
       const vectorDB = 'lanceDB'; // Always use LanceDB
       
-      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} MD files in LanceDB?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${allEmbeddableFiles.length} selected files in LanceDB?`)) {
         return;
       }
       
       clearLog();
-      showLog(`Removing embeddings from ${selectedMD.length} MD files in LanceDB...`);
+      showLog(`Removing embeddings from ${allEmbeddableFiles.length} selected files in LanceDB...`);
       
-      for (let i = 0; i < selectedMD.length; i++) {
-        const filename = selectedMD[i];
-        const progress = `${i + 1}/${selectedMD.length}`;
+      for (let i = 0; i < allEmbeddableFiles.length; i++) {
+        const filename = allEmbeddableFiles[i];
+        const progress = `${i + 1}/${allEmbeddableFiles.length}`;
         
         try {
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
@@ -881,7 +883,7 @@
         }
       }
       
-      showLog(`✓ Embedding removal complete: ${selectedMD.length} files processed`, 'success');
+      showLog(`✓ Embedding removal complete: ${allEmbeddableFiles.length} files processed`, 'success');
       loadDocuments();
     }
     

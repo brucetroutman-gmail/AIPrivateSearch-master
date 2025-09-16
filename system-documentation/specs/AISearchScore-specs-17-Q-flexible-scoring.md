@@ -282,7 +282,7 @@ if (scoreTglEl.checked && !document.getElementById('scoreModel').value) {
 ---
 
 **Version**: 17.0  
-**Date**: January 2024  
+**Date**: September 2024  
 **Status**: Implemented  
 **Key Features**: Flexible scoring, enhanced security, simplified output  
 **Next Version**: Advanced model analytics and automated optimization
