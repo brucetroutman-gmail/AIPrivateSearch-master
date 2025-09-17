@@ -8,12 +8,12 @@ class CombinedSearchScorer {
   constructor() {
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.searchModel = 'qwen2:0.5b';
-    this.scoreSettings = this.#loadScoreSettings();
+    this.scoreSettings = this.loadScoreSettings();
     this.cachedSystemInfo = null;
     this.cachedPcCode = null;
   }
 
-  #loadScoreSettings() {
+  loadScoreSettings() {
     const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     const settings = {};
@@ -67,19 +67,19 @@ class CombinedSearchScorer {
       logger.log('Starting process method');
       
       // Check if Ollama is working before proceeding
-      await this.#checkOllamaHealth();
+      await this.checkOllamaHealth();
       
       const searchModel = model || this.searchModel;
       const searchStart = Date.now();
-      const searchResponse = await this.#search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
+      const searchResponse = await this.search(query, searchModel, temperature, context, systemPrompt, tokenLimit);
       logger.log(`Search completed in ${Date.now() - searchStart}ms`);
       searchResponse.systemPromptName = systemPromptName;
       searchResponse.sourceType = sourceType;
       searchResponse.tokenLimit = tokenLimit;
       
       const sysInfoStart = Date.now();
-      const systemInfo = this.#getSystemInfo();
-      const pcCode = this.#generatePcCode();
+      const systemInfo = this.getSystemInfo();
+      const pcCode = this.generatePcCode();
       logger.log(`System info collected in ${Date.now() - sysInfoStart}ms`);
       
       const result = {
@@ -89,7 +89,7 @@ class CombinedSearchScorer {
         sourceType: searchResponse.sourceType,
         tokenLimit: searchResponse.tokenLimit,
         testCode: testCode,
-        createdAt: this.#formatCreatedAt(),
+        createdAt: this.formatCreatedAt(),
         pcCode: pcCode,
         systemInfo: systemInfo,
         scores: null,
@@ -100,7 +100,7 @@ class CombinedSearchScorer {
 
       if (enableScoring) {
         const scoreStart = Date.now();
-        const scoreResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
+        const scoreResult = await this.score(query, searchResponse.response, temperature, context, scoreModel);
         logger.log(`Scoring completed in ${Date.now() - scoreStart}ms`);
         result.scores = scoreResult.scores;
         result.metrics.scoring = scoreResult.metrics;
@@ -108,7 +108,7 @@ class CombinedSearchScorer {
         // Retry once if no scores were obtained
         if (result.scores && result.scores.accuracy === null && result.scores.relevance === null && result.scores.organization === null) {
           logger.log('No scores obtained, retrying once');
-          const retryResult = await this.#score(query, searchResponse.response, temperature, context, scoreModel);
+          const retryResult = await this.score(query, searchResponse.response, temperature, context, scoreModel);
           result.scores = retryResult.scores;
           result.metrics.scoringRetry = retryResult.metrics;
           
@@ -125,18 +125,11 @@ class CombinedSearchScorer {
       // logger sanitizes all inputs to prevent log injection
       logger.error('Error in process method:', error.message);
       throw error; // Re-throw for retry logic to handle
-      return {
-        query,
-        response: 'Error occurred while processing the query',
-        timestamp: new Date().toISOString(),
-        scores: null,
-        error: error.message
-      };
     }
   }
 
   /* private */
-  async #search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null, tokenLimit = null) {
+  async search(query, model = this.searchModel, temperature = 0.3, context = 0.3, systemPrompt = null, tokenLimit = null) {
     try {
       logger.log(`Starting search with model: ${model}`);
       const finalPrompt = systemPrompt ? `${systemPrompt}\n\nUser: ${query}` : query;
@@ -203,7 +196,7 @@ class CombinedSearchScorer {
   }
 
   // eslint-disable-next-line no-unused-vars
-  async #score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
+  async score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
     try {
       logger.log('Starting scoring process');
       
@@ -240,7 +233,7 @@ Respond with only three numbers, one per line.`;
       });
 
       logger.log('Scoring model response received, parsing');
-      const scores = this.#parseScores(res.response);
+      const scores = this.parseScores(res.response);
       logger.log('Scoring completed successfully');
       
       return {
@@ -280,7 +273,7 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-  #parseScores(text) {
+  parseScores(text) {
     try {
       logger.log('Raw scoring text length:', text?.length || 0);
       
@@ -325,13 +318,13 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-  // eslint-disable-next-line no-unused-private-class-members
-  #extract(line) {
+  // eslint-disable-next-line no-unused-vars
+  extract(line) {
     const m = line.match(/\b([0-3])\b/);
     return m ? Number(m[1]) : null;
   }
 
-  #generatePcCode() {
+  generatePcCode() {
     // Cache PC code since it doesn't change
     if (this.cachedPcCode) {
       return this.cachedPcCode;
@@ -379,7 +372,7 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-  #getSystemInfo() {
+  getSystemInfo() {
     // Cache system info since it doesn't change during runtime
     if (this.cachedSystemInfo) {
       return this.cachedSystemInfo;
@@ -439,11 +432,11 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-  #formatCreatedAt() {
+  formatCreatedAt() {
     return new Date().toISOString();
   }
 
-  async #checkOllamaHealth() {
+  async checkOllamaHealth() {
     try {
       logger.log('Checking Ollama health...');
       const response = await fetch('http://localhost:11434/api/tags', {

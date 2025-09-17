@@ -3,8 +3,6 @@ import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 import { Ollama } from 'ollama';
 
-/* global process */
-
 export class DocumentProcessor {
   constructor() {
     this.supportedFormats = ['.txt', '.pdf'];

@@ -8,9 +8,20 @@ echo "🔧 Setting up Git security hooks..."
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 
-echo "🔒 Running pre-commit security checks..."
+echo "🔒 Running pre-commit checks..."
+
+# Run ESLint first
+echo "🔍 Running ESLint..."
+./lint.sh
+
+if [ $? -ne 0 ]; then
+    echo "❌ Commit blocked due to ESLint errors"
+    echo "🔧 Fix ESLint issues before committing"
+    exit 1
+fi
 
 # Run security validation
+echo "🔒 Running security checks..."
 ./security-check.sh
 
 if [ $? -ne 0 ]; then
@@ -19,14 +30,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Run linting
-./lint.sh
-
-echo "✅ Pre-commit checks passed"
+echo "✅ All pre-commit checks passed"
 EOF
 
 # Make hook executable
 chmod +x .git/hooks/pre-commit
 
 echo "✅ Git hooks installed successfully"
-echo "📖 All commits will now be validated for security compliance"
+echo "📖 All commits will now be validated for ESLint and security compliance"

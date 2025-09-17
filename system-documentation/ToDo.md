@@ -95,6 +95,8 @@ specs-3-scoring
 
 41. security (code issues) --done (using ESLint)
 
+69. ESLint for checking commits --done
+
 42. Fix Show Chunks issue --done
 
 43. Persist User Prompt  --done
@@ -141,9 +143,9 @@ specs-3-scoring
 
 64. Where is the meta_collection .md file being saved?
 
-67. Load-aiss.command is not pulling latest from github using curl
+67. Load-aiss.command is not pulling latest from github using curl --done
 
-68. analyze LanceDB vs ChromaDB
+68. analyze LanceDB vs ChromaDB stick with LanceDB --done
 
 
 

@@ -1,3 +1,5 @@
+import { logger } from './utils/logger.js';
+
 // Simple rate limiting
 let messageCallCount = 0;
 let lastMessageReset = Date.now();

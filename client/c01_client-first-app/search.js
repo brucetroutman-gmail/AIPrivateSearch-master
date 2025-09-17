@@ -1,6 +1,6 @@
 import { search } from './services/api.js';
 import { logger } from './shared/utils/logger.js';
-// Import removed - loadScoreModels is available globally from common.js
+import { loadScoreModels, exportToDatabase } from './shared/common.js';
 
 // Import showUserMessage from global scope - wait for it to be available
 let showUserMessage = function(msg, type) { logger.log(`${type}: ${msg}`); };
