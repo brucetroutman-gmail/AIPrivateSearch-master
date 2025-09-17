@@ -1,31 +1,45 @@
-Here is the collection-level summary of the individual document metadata:
+# Collection Metadata: A-Poem
 
-**Collection Metadata: A-Poem**
+## Collection Overview
+- **Collection Name:** A-Poem
+- **Total Documents:** 2
+- **Total Size:** 825 Bytes
+- **Generated:** 2025-09-17T00:00:56.201Z
 
-* Total Documents: 1
-* Date Range: [Earliest to latest dates found]
-* Document Types: [List of types found]
-* Total Estimated Words: [Sum if available]
+## Document Type Distribution
+- **general:** 2 documents
 
-* Major Themes:
-  * [Cross-cutting themes that appear across multiple documents]
-  * [Most frequent/important topics from all documents]
-  * [Key Topics Across Collection: Most frequent/important topics from all documents]
+## Main Themes
+- **** Military service** (2 documents)
 
-* Key Topics:
-  * [Most frequent/important topics from all documents]
+## Document Inventory
 
-* Important Keywords:
-  * [Comma-separated list of 8-10 key terms for search]
+| Document | Size | Type | Theme | Keywords |
+|----------|------|------|-------|----------|
+| marine-poem.md | 420 Bytes | general | ** Military service | ** marine, devotion, loyalty |
+| marine-poem.txt | 405 Bytes | general | ** Military service | ** marine, devotion, loyalty |
 
-* Document Interconnections:
-  * [How documents relate to each other, common references]
-  * [Any interesting patterns observed across the collection]
+## Detailed Document Information
+
+### marine-poem.md
+- **Size:** 420 Bytes
+- **Type:** general
+- **Theme:** ** Military service
+- **Summary:** ** This poem explores the dual devotion of a U.S. Marine, balancing his duty and responsibilities with his personal relationships, particularly highlighting the roles of his rifle and his loved one in shaping his life's journey.
+- **Keywords:** ** marine, devotion, loyalty, rifle, love, soldier, battles, relationship, sacrifice, guidance
+- **Created:** 2025-09-13T14:20:59.077Z
+- **Modified:** 2025-09-13T15:41:13.668Z
+
+### marine-poem.txt
+- **Size:** 405 Bytes
+- **Type:** general
+- **Theme:** ** Military service
+- **Summary:** ** This poem explores the dual devotion of a U.S. Marine, balancing his duty and responsibilities with his personal relationships, particularly highlighting the roles of his rifle and his loved one in shaping his life's journey.
+- **Keywords:** ** marine, devotion, loyalty, rifle, love, soldier, battles, relationship, sacrifice, guidance
+- **Created:** 2025-09-13T14:20:47.200Z
+- **Modified:** 2025-09-13T15:40:07.217Z
+
+
 
 ---
-
-This summary provides a comprehensive view of the individual document metadata from the A-Poem collection. The total number of documents is 1, and the date range spans from earliest to latest dates found. Document types are listed, with information about their categories and estimated word counts.
-
-The major themes include topics like [Cross-cutting themes that appear across multiple documents], [most frequent/important topics from all documents], and [Key Topics Across Collection: Most frequent/important topics from all documents]. The key topics also provide a summary of the most important search terms for this collection. Important keywords are listed to help with search queries.
-
-The document relationships show how documents relate to each other, common references, and any interesting patterns observed across the collection. This summary provides a clear picture of the content, categories, major themes, and key topics from the A-Poem collection.
+*Collection metadata generated: 2025-09-17T00:00:56.201Z*

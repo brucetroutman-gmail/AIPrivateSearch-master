@@ -10,6 +10,47 @@ export class DocumentProcessor {
     this.supportedFormats = ['.txt', '.pdf'];
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.metadataModel = null;
+    this.initializeDocumentTypePatterns();
+  }
+  
+  initializeDocumentTypePatterns() {
+    this.patterns = {
+      academic: {
+        keywords: ['abstract', 'methodology', 'references', 'doi', 'journal', 'peer review', 'hypothesis', 'conclusion', 'literature review', 'statistical analysis'],
+        structure: ['introduction', 'methods', 'results', 'discussion', 'bibliography'],
+        weight: 0
+      },
+      legal: {
+        keywords: ['whereas', 'herein', 'plaintiff', 'defendant', 'jurisdiction', 'statute', 'case law', 'precedent', 'court', 'legal'],
+        structure: ['parties', 'jurisdiction', 'findings', 'order', 'citation'],
+        weight: 0
+      },
+      technical: {
+        keywords: ['api', 'documentation', 'installation', 'configuration', 'troubleshooting', 'dependencies', 'version', 'endpoint'],
+        structure: ['overview', 'installation', 'usage', 'examples', 'api reference'],
+        weight: 0
+      },
+      business: {
+        keywords: ['revenue', 'profit', 'stakeholder', 'proposal', 'budget', 'quarterly', 'fiscal', 'department', 'executive'],
+        structure: ['executive summary', 'objectives', 'analysis', 'recommendations', 'appendix'],
+        weight: 0
+      },
+      medical: {
+        keywords: ['patient', 'diagnosis', 'treatment', 'symptoms', 'medical history', 'clinical', 'therapy', 'medication', 'icd'],
+        structure: ['chief complaint', 'history', 'examination', 'assessment', 'plan'],
+        weight: 0
+      },
+      insurance: {
+        keywords: ['policy', 'premium', 'deductible', 'coverage', 'beneficiary', 'claim', 'insured', 'liability', 'exclusion'],
+        structure: ['policy number', 'coverage details', 'terms', 'conditions', 'exclusions'],
+        weight: 0
+      },
+      financial: {
+        keywords: ['balance sheet', 'income statement', 'cash flow', 'assets', 'liabilities', 'equity', 'gaap', 'audit'],
+        structure: ['financial statements', 'notes', 'auditor report', 'management discussion'],
+        weight: 0
+      }
+    };
   }
   
   // Clear cached model to force re-read from config
@@ -127,17 +168,20 @@ export class DocumentProcessor {
       const batch = mdFiles.slice(i, i + batchSize);
       
       const batchPromises = batch.map(async (mdFile) => {
+        const startTime = Date.now();
         try {
           const filePath = path.join(collectionPath, mdFile);
           const content = await fs.readFile(filePath, 'utf8');
           
-          const metadata = await this.createDocumentMetadata(content, mdFile, collection);
+          const metadata = await this.createDocumentMetadata(content, mdFile, collection, startTime);
           const metadataPath = path.join(collectionPath, `META_${mdFile}`);
           
           await fs.writeFile(metadataPath, metadata, 'utf8');
-          return { file: mdFile, success: true };
+          const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+          return { file: mdFile, success: true, processingTime: `${processingTime}s` };
         } catch (error) {
-          return { file: mdFile, error: error.message, success: false };
+          const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+          return { file: mdFile, error: error.message, success: false, processingTime: `${processingTime}s` };
         }
       });
       
@@ -148,16 +192,118 @@ export class DocumentProcessor {
     return { collection, processed: results };
   }
 
-  async createDocumentMetadata(content, filename, collection) {
-    // Shorter, faster prompt
-    const prompt = `Create brief metadata for this ${collection} document:
+  determineDocumentType(content) {
+    const lowerContent = content.toLowerCase();
+    
+    // Reset weights
+    Object.keys(this.patterns).forEach(type => {
+      this.patterns[type].weight = 0;
+    });
+
+    // Score based on keywords
+    Object.entries(this.patterns).forEach(([type, pattern]) => {
+      pattern.keywords.forEach(keyword => {
+        const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'gi');
+        const matches = (lowerContent.match(regex) || []).length;
+        pattern.weight += matches * 2;
+      });
+
+      // Score based on structure
+      pattern.structure.forEach(structureElement => {
+        if (lowerContent.includes(structureElement.toLowerCase())) {
+          pattern.weight += 3;
+        }
+      });
+    });
+
+    // Find the highest scoring type
+    let bestType = 'general';
+    let highestScore = 0;
+
+    Object.entries(this.patterns).forEach(([type, pattern]) => {
+      if (pattern.weight > highestScore) {
+        highestScore = pattern.weight;
+        bestType = type;
+      }
+    });
+
+    return highestScore >= 3 ? bestType : 'general';
+  }
+  
+  generateBaseMetadata(content) {
+    const words = content.split(/\s+/).filter(word => word.length > 0);
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+
+    const wordFreq = {};
+    const nounFreq = {};
+    const verbFreq = {};
+    
+    // Common noun patterns (simplified)
+    const nounPatterns = /\b\w+(?:tion|sion|ment|ness|ity|ism|er|or|ist|ing|ure|ance|ence|ship|hood|dom|ward|ful|less|able|ible)\b/gi;
+    // Common verb patterns (simplified)
+    const verbPatterns = /\b\w+(?:ed|ing|s|es|en|ate|ize|ise|fy)\b/gi;
+    
+    words.forEach(word => {
+      const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+      if (cleanWord.length > 3) {
+        wordFreq[cleanWord] = (wordFreq[cleanWord] || 0) + 1;
+        
+        // Simple noun detection
+        if (nounPatterns.test(word) || /^[A-Z]/.test(word)) {
+          nounFreq[cleanWord] = (nounFreq[cleanWord] || 0) + 1;
+        }
+        
+        // Simple verb detection
+        if (verbPatterns.test(word)) {
+          verbFreq[cleanWord] = (verbFreq[cleanWord] || 0) + 1;
+        }
+      }
+    });
+
+    const frequentWords = Object.entries(wordFreq)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([word]) => word);
+      
+    const frequentNouns = Object.entries(nounFreq)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([word, count]) => `${word} ${count}`);
+      
+    const frequentVerbs = Object.entries(verbFreq)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([word, count]) => `${word} ${count}`);
+
+    return {
+      wordCount: words.length,
+      sentenceCount: sentences.length,
+      paragraphCount: paragraphs.length,
+      averageWordsPerSentence: Math.round(words.length / sentences.length),
+      readingTimeMinutes: Math.ceil(words.length / 200),
+      frequentWords,
+      frequentNouns,
+      frequentVerbs
+    };
+  }
+
+  async createDocumentMetadata(content, filename, collection, startTime) {
+    const documentType = this.determineDocumentType(content);
+    const baseMetadata = this.generateBaseMetadata(content);
+    
+    const prompt = `Create metadata for this ${documentType} document from ${collection}:
 
 Title: ${filename}
-Summary: [1 sentence]
-Topics: [3 key topics]
-Keywords: [5 search terms]
+Type: ${documentType}
+Summary: [1-2 sentences]
+Topics: [3-5 key topics]
+Keywords: [8-10 search terms]
 
-Content: ${content.substring(0, 800)}${content.length > 800 ? '...' : ''}`;
+Stats: ${baseMetadata.wordCount} words, ${baseMetadata.paragraphCount} paragraphs, ${baseMetadata.readingTimeMinutes}min read
+Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}
+
+Content: ${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}`;
 
     try {
       const model = await this.getMetadataModel();
@@ -166,14 +312,40 @@ Content: ${content.substring(0, 800)}${content.length > 800 ? '...' : ''}`;
         prompt,
         stream: false,
         options: { 
-          temperature: 0.1, // Lower for faster generation
-          num_predict: 200   // Much shorter output
+          temperature: 0.1,
+          num_predict: 300
         }
       });
       
-      return `# ${filename}\n\n${response.response}\n\n*Generated: ${new Date().toISOString()}*`;
+      const processingTime = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 'Unknown';
+      const metadata = `# ${filename}
+
+**Document Type:** ${documentType}
+**Word Count:** ${baseMetadata.wordCount}
+**Reading Time:** ${baseMetadata.readingTimeMinutes} minutes
+**Paragraphs:** ${baseMetadata.paragraphCount}
+**Sentences:** ${baseMetadata.sentenceCount}
+
+## AI Analysis
+
+${response.response}
+
+## Frequent Terms
+${baseMetadata.frequentWords.join(', ')}
+
+## Top 10 Frequent Nouns
+${baseMetadata.frequentNouns.join(', ')}
+
+## Top 10 Frequent Verbs
+${baseMetadata.frequentVerbs.join(', ')}
+
+*Generated: ${new Date().toISOString()}*
+*Processing Time: ${processingTime}s*`;
+      
+      return metadata;
     } catch (error) {
-      return `# ${filename}\n\nError: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+      const processingTime = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 'Unknown';
+      return `# ${filename}\n\n**Document Type:** ${documentType}\n**Error:** ${error.message}\n\n*Generated: ${new Date().toISOString()}*\n*Processing Time: ${processingTime}s*`;
     }
   }
 
@@ -192,54 +364,190 @@ Content: ${content.substring(0, 800)}${content.length > 800 ? '...' : ''}`;
   }
 
   async generateCollectionSummary(collection) {
-    this.clearModelCache();
-    
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
-    const files = await fs.readdir(collectionPath);
     
-    // Get all META files (individual document metadata)
-    const metaFiles = files.filter(f => f.startsWith('META_') && f.endsWith('.md') && !f.includes('_Collection'));
-    
-    if (metaFiles.length === 0) {
-      return { message: 'No individual metadata files found. Generate document metadata first.' };
-    }
-    
-    // Read all individual metadata
-    let allMetadata = '';
-    for (const metaFile of metaFiles) {
-      const content = await fs.readFile(path.join(collectionPath, metaFile), 'utf8');
-      allMetadata += `\n--- ${metaFile} ---\n${content}`;
-    }
-    
-    const prompt = `Summarize this ${collection} collection (${metaFiles.length} documents):
-
-Overview: [1 sentence about the collection]
-Main themes: [3 key themes]
-Search keywords: [10 important terms]
-
-Documents: ${allMetadata.substring(0, 1500)}${allMetadata.length > 1500 ? '...' : ''}`;
-
     try {
-      const model = await this.getMetadataModel();
-      const response = await this.ollama.generate({
-        model,
-        prompt,
-        stream: false,
-        options: { temperature: 0.1, num_predict: 300 }
-      });
+      const metadata = await this.buildCollectionMetadata(collection, collectionPath);
+      const content = this.generateCollectionMarkdown(metadata);
       
       const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
-      await fs.writeFile(summaryPath, response.response, 'utf8');
+      await fs.writeFile(summaryPath, content, 'utf8');
       
       return { success: true, file: `META_${collection}_Collection.md` };
     } catch (error) {
-      const errorContent = `# Collection Metadata: ${collection}\n\nError generating collection summary: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
+      const errorContent = `# Collection Metadata: ${collection}\n\nError generating collection metadata: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
       const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
       await fs.writeFile(summaryPath, errorContent, 'utf8');
       
       return { success: false, error: error.message };
     }
+  }
+  
+  async buildCollectionMetadata(collection, collectionPath) {
+    const files = await fs.readdir(collectionPath);
+    const documents = [];
+    const metaFiles = [];
+    
+    // Separate document files from META files
+    for (const file of files) {
+      const filePath = path.join(collectionPath, file);
+      const stats = await fs.stat(filePath);
+      
+      if (stats.isFile()) {
+        if (file.startsWith('META_') && file.endsWith('.md')) {
+          metaFiles.push({ fileName: file, filePath, stats });
+        } else if (!file.startsWith('META_')) {
+          documents.push({ fileName: file, filePath, stats });
+        }
+      }
+    }
+    
+    // Process documents with their META files
+    const processedDocuments = [];
+    
+    for (const doc of documents) {
+      const baseFileName = path.parse(doc.fileName).name;
+      const metaFileName = `META_${baseFileName}.md`;
+      const metaFile = metaFiles.find(meta => meta.fileName === metaFileName);
+      
+      let docMetadata = {
+        documentType: 'unknown',
+        mainTheme: 'Not analyzed',
+        summary: 'No summary available',
+        author: 'Unknown',
+        status: 'Unprocessed',
+        language: 'Unknown',
+        importance: 'Medium',
+        keywords: []
+      };
+      
+      if (metaFile) {
+        docMetadata = await this.parseMetaFile(metaFile.filePath);
+      }
+      
+      processedDocuments.push({
+        fileName: doc.fileName,
+        fileSize: doc.stats.size,
+        fileSizeFormatted: this.formatFileSize(doc.stats.size),
+        createdDate: doc.stats.birthtime.toISOString(),
+        modifiedDate: doc.stats.mtime.toISOString(),
+        ...docMetadata
+      });
+    }
+    
+    // Build collection statistics
+    const totalSize = processedDocuments.reduce((sum, doc) => sum + doc.fileSize, 0);
+    const documentTypes = {};
+    const themes = {};
+    
+    processedDocuments.forEach(doc => {
+      documentTypes[doc.documentType] = (documentTypes[doc.documentType] || 0) + 1;
+      if (doc.mainTheme && doc.mainTheme !== 'Not analyzed') {
+        themes[doc.mainTheme] = (themes[doc.mainTheme] || 0) + 1;
+      }
+    });
+    
+    return {
+      collectionName: collection,
+      totalDocuments: processedDocuments.length,
+      totalSize,
+      totalSizeFormatted: this.formatFileSize(totalSize),
+      documentTypes,
+      overallThemes: Object.entries(themes).sort(([,a], [,b]) => b - a).slice(0, 10),
+      documents: processedDocuments,
+      createdDate: new Date().toISOString()
+    };
+  }
+  
+  async parseMetaFile(metaFilePath) {
+    try {
+      const content = await fs.readFile(metaFilePath, 'utf8');
+      const metadata = {};
+      
+      // Extract document type
+      const typeMatch = content.match(/\*\*Document Type:\*\*\s*(.+)/i);
+      if (typeMatch) metadata.documentType = typeMatch[1].trim();
+      
+      // Extract word count
+      const wordMatch = content.match(/\*\*Word Count:\*\*\s*(\d+)/i);
+      if (wordMatch) metadata.wordCount = parseInt(wordMatch[1]);
+      
+      // Extract AI analysis section for summary and themes
+      const analysisMatch = content.match(/## AI Analysis\s*\n\n([\s\S]*?)\n\n##/i);
+      if (analysisMatch) {
+        const analysis = analysisMatch[1];
+        const summaryMatch = analysis.match(/Summary:\s*(.+)/i);
+        if (summaryMatch) metadata.summary = summaryMatch[1].trim();
+        
+        const topicsMatch = analysis.match(/Topics:\s*(.+)/i);
+        if (topicsMatch) {
+          const topics = topicsMatch[1].split(',').map(t => t.trim());
+          metadata.mainTheme = topics[0] || 'Not specified';
+        }
+        
+        const keywordsMatch = analysis.match(/Keywords:\s*(.+)/i);
+        if (keywordsMatch) {
+          metadata.keywords = keywordsMatch[1].split(',').map(k => k.trim());
+        }
+      }
+      
+      return metadata;
+    } catch (error) {
+      return {};
+    }
+  }
+  
+  formatFileSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+  }
+  
+  generateCollectionMarkdown(metadata) {
+    return `# Collection Metadata: ${metadata.collectionName}
+
+## Collection Overview
+- **Collection Name:** ${metadata.collectionName}
+- **Total Documents:** ${metadata.totalDocuments}
+- **Total Size:** ${metadata.totalSizeFormatted}
+- **Generated:** ${metadata.createdDate}
+
+## Document Type Distribution
+${Object.entries(metadata.documentTypes)
+  .map(([type, count]) => `- **${type}:** ${count} documents`)
+  .join('\n')}
+
+## Main Themes
+${metadata.overallThemes
+  .map(([theme, count]) => `- **${theme}** (${count} documents)`)
+  .join('\n')}
+
+## Document Inventory
+
+| Document | Size | Type | Theme | Keywords |
+|----------|------|------|-------|----------|
+${metadata.documents
+  .map(doc => `| ${doc.fileName} | ${doc.fileSizeFormatted} | ${doc.documentType} | ${doc.mainTheme} | ${Array.isArray(doc.keywords) ? doc.keywords.slice(0, 3).join(', ') : 'N/A'} |`)
+  .join('\n')}
+
+## Detailed Document Information
+
+${metadata.documents.map(doc => `### ${doc.fileName}
+- **Size:** ${doc.fileSizeFormatted}
+- **Type:** ${doc.documentType}
+- **Theme:** ${doc.mainTheme}
+- **Summary:** ${doc.summary}
+- **Keywords:** ${Array.isArray(doc.keywords) ? doc.keywords.join(', ') : 'N/A'}
+- **Created:** ${doc.createdDate}
+- **Modified:** ${doc.modifiedDate}
+
+`).join('')}
+
+---
+*Collection metadata generated: ${new Date().toISOString()}*
+`;
   }
 
 }

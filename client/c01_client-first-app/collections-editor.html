@@ -330,6 +330,9 @@
       const tbody = document.getElementById('documentTableBody');
       tbody.innerHTML = '';
       
+      // Load saved selections
+      const savedSelections = JSON.parse(sessionStorage.getItem(`selections_${currentCollection}`) || '[]');
+      
       // Group documents by base name
       const docGroups = new Map();
       
@@ -428,9 +431,10 @@
         if (hasMd) selectableFiles.push(group.mdFile);
         if (hasMeta) selectableFiles.push(group.metaFile);
         
+        const isSelected = savedSelections.includes(selectableFiles.join(','));
         row.innerHTML = `
           <td>
-            <input type="checkbox" class="document-checkbox" value="${selectableFiles.join(',')}" data-basename="${group.baseName}">
+            <input type="checkbox" class="document-checkbox" value="${selectableFiles.join(',')}" data-basename="${group.baseName}" ${isSelected ? 'checked' : ''}>
           </td>
           <td>
             <a href="#" onclick="openFile('${group.mdFile || group.sourceFiles[0]?.fileName}')" class="filename-link">
@@ -467,6 +471,7 @@
       
       selectAll.addEventListener('change', function() {
         checkboxes.forEach(cb => cb.checked = this.checked);
+        saveSelections();
       });
       
       checkboxes.forEach(cb => {
@@ -475,8 +480,18 @@
           const noneChecked = Array.from(checkboxes).every(checkbox => !checkbox.checked);
           selectAll.checked = allChecked;
           selectAll.indeterminate = !allChecked && !noneChecked;
+          saveSelections();
         });
       });
+    }
+    
+    function saveSelections() {
+      const selected = Array.from(document.querySelectorAll('.document-checkbox:checked')).map(cb => cb.value);
+      sessionStorage.setItem(`selections_${currentCollection}`, JSON.stringify(selected));
+    }
+    
+    function clearSelections() {
+      sessionStorage.removeItem(`selections_${currentCollection}`);
     }
     
     function getSelectedDocuments() {
@@ -691,13 +706,13 @@
           const successCount = docMetaResult.result.processed.filter(p => p.success).length;
           const totalCount = docMetaResult.result.processed.length;
           const docElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-          showLog(`✓ Individual metadata: ${successCount}/${totalCount} documents (${docElapsed}s)`, 'success');
+          showLog(`✓ Individual metadata: ${successCount}/${totalCount} documents`, 'success');
           
           docMetaResult.result.processed.forEach(item => {
             if (item.success) {
-              showLog(`  • META_${item.file}`);
+              showLog(`  • META_${item.file} (${item.processingTime || 'unknown'})`);
             } else {
-              showLog(`  • META_${item.file} - Failed: ${item.error}`, 'error');
+              showLog(`  • META_${item.file} - Failed: ${item.error} (${item.processingTime || 'unknown'})`, 'error');
             }
           });
         } else {
@@ -706,6 +721,7 @@
         
         // Then generate collection-level metadata
         showLog(`\nStep 2: Generating collection-level metadata...`);
+        const step2StartTime = Date.now();
         const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/generate-metadata`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
@@ -714,13 +730,18 @@
         const result = await response.json();
         
         if (result.success) {
+          const step2Time = ((Date.now() - step2StartTime) / 1000).toFixed(1);
           const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-          showLog(`✓ Collection metadata complete (${totalElapsed}s)`, 'success');
-          showLog(`  • ${result.result.collection}: ${result.result.documentsProcessed} documents`);
-          showLog(`  • META_${result.result.collection}_Collection.md - Created`);
+          showLog(`✓ Collection metadata complete`, 'success');
+          showLog(`  • META_${result.result.collection}_Collection.md (${step2Time}s)`);
+          showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
           loadDocuments(); // Refresh to show new metadata files
         } else {
+          const step2Time = ((Date.now() - step2StartTime) / 1000).toFixed(1);
+          const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
           showLog(`✗ Collection metadata failed: ${result.error}`, 'error');
+          showLog(`  • META_${result.result.collection}_Collection.md (${step2Time}s)`);
+          showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
         }
       } catch (error) {
         showLog(`✗ Error generating metadata: ${error.message}`, 'error');
