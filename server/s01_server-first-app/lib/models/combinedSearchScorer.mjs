@@ -318,7 +318,7 @@ Respond with only three numbers, one per line.`;
     }
   }
 
-  // eslint-disable-next-line no-unused-vars
+   
   extract(line) {
     const m = line.match(/\b([0-3])\b/);
     return m ? Number(m[1]) : null;

@@ -7,7 +7,13 @@ export function validatePath(userPath, allowedDir) {
   }
   
   // Remove null bytes and other dangerous characters
-  const cleanPath = userPath.replace(/[\0]/g, '').replace(/[\x01-\x1F\x7F-\x9F]/g, '');
+  let cleanPath = userPath.replace(/\0/g, '');
+  for (let i = 1; i <= 31; i++) {
+    cleanPath = cleanPath.replace(new RegExp(String.fromCharCode(i), 'g'), '');
+  }
+  for (let i = 127; i <= 159; i++) {
+    cleanPath = cleanPath.replace(new RegExp(String.fromCharCode(i), 'g'), '');
+  }
   const normalizedPath = path.normalize(cleanPath);
   
   // Prevent path traversal attempts
@@ -38,7 +44,13 @@ export function validateFilename(filename) {
   }
   
   // Remove dangerous characters
-  const cleanFilename = filename.replace(/[\0]/g, '').replace(/[\x01-\x1F\x7F-\x9F]/g, '');
+  let cleanFilename = filename.replace(/\0/g, '');
+  for (let i = 1; i <= 31; i++) {
+    cleanFilename = cleanFilename.replace(new RegExp(String.fromCharCode(i), 'g'), '');
+  }
+  for (let i = 127; i <= 159; i++) {
+    cleanFilename = cleanFilename.replace(new RegExp(String.fromCharCode(i), 'g'), '');
+  }
   
   // Allow alphanumeric, dots, hyphens, underscores, spaces
   if (!/^[a-zA-Z0-9._\s-]+$/.test(cleanFilename) || 
