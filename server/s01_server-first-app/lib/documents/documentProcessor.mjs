@@ -292,18 +292,17 @@ export class DocumentProcessor {
     const documentType = this.determineDocumentType(content);
     const baseMetadata = this.generateBaseMetadata(content);
     
-    const prompt = `Create metadata for this ${documentType} document from ${collection}:
-
-Title: ${filename}
-Type: ${documentType}
-Summary: [1-2 sentences]
-Topics: [3-5 key topics]
-Keywords: [8-10 search terms]
-
-Stats: ${baseMetadata.wordCount} words, ${baseMetadata.paragraphCount} paragraphs, ${baseMetadata.readingTimeMinutes}min read
-Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}
-
-Content: ${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}`;
+    // Load existing metadata context for enhanced processing
+    const metadataContext = await this.loadMetadataContext(collection, filename);
+    
+    const prompt = this.buildMetadataPrompt({
+      filename,
+      documentType,
+      collection,
+      baseMetadata,
+      content: content.substring(0, 1000) + (content.length > 1000 ? '...' : ''),
+      context: metadataContext
+    });
 
     try {
       const model = await this.getMetadataModel();
@@ -347,6 +346,127 @@ ${baseMetadata.frequentVerbs.join(', ')}
       const processingTime = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 'Unknown';
       return `# ${filename}\n\n**Document Type:** ${documentType}\n**Error:** ${error.message}\n\n*Generated: ${new Date().toISOString()}*\n*Processing Time: ${processingTime}s*`;
     }
+  }
+  
+  async loadMetadataContext(collection, currentFilename) {
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(collection, baseDir);
+    
+    try {
+      const files = await fs.readdir(collectionPath);
+      const context = {
+        collectionInfo: null,
+        existingDocuments: [],
+        relatedThemes: new Set(),
+        documentTypes: new Set()
+      };
+      
+      // Load collection metadata if exists
+      const collectionMeta = files.find(f => f.startsWith('META_') && f.includes('_Collection.md'));
+      if (collectionMeta) {
+        const collectionContent = await fs.readFile(path.join(collectionPath, collectionMeta), 'utf8');
+        context.collectionInfo = this.parseCollectionContext(collectionContent);
+      }
+      
+      // Load existing document metadata for context
+      const metaFiles = files.filter(f => f.startsWith('META_') && f.endsWith('.md') && !f.includes('_Collection'));
+      
+      for (const metaFile of metaFiles.slice(0, 5)) { // Limit to 5 for context
+        const docName = metaFile.replace('META_', '').replace('.md', '');
+        if (docName !== currentFilename.replace('.md', '')) {
+          const metaContent = await fs.readFile(path.join(collectionPath, metaFile), 'utf8');
+          const docMeta = this.parseDocumentContext(metaContent);
+          context.existingDocuments.push({ name: docName, ...docMeta });
+          if (docMeta.mainTheme) context.relatedThemes.add(docMeta.mainTheme);
+          if (docMeta.documentType) context.documentTypes.add(docMeta.documentType);
+        }
+      }
+      
+      return context;
+    } catch (error) {
+      return { collectionInfo: null, existingDocuments: [], relatedThemes: new Set(), documentTypes: new Set() };
+    }
+  }
+  
+  parseCollectionContext(content) {
+    const context = {};
+    const lines = content.split('\n');
+    
+    for (const line of lines) {
+      if (line.includes('**Total Documents:**')) {
+        context.totalDocuments = line.match(/\d+/)?.[0];
+      } else if (line.includes('**Collection Name:**')) {
+        context.name = line.split('**Collection Name:**')[1]?.trim();
+      }
+    }
+    
+    // Extract main themes
+    const themesSection = content.match(/## Main Themes([\s\S]*?)##/)?.[1];
+    if (themesSection) {
+      context.mainThemes = themesSection.match(/\*\*([^*]+)\*\*/g)?.map(t => t.replace(/\*\*/g, '')) || [];
+    }
+    
+    return context;
+  }
+  
+  parseDocumentContext(content) {
+    const context = {};
+    
+    const typeMatch = content.match(/\*\*Document Type:\*\*\s*(.+)/i);
+    if (typeMatch) context.documentType = typeMatch[1].trim();
+    
+    const analysisMatch = content.match(/## AI Analysis\s*\n\n([\s\S]*?)\n\n##/i);
+    if (analysisMatch) {
+      const analysis = analysisMatch[1];
+      const topicsMatch = analysis.match(/Topics:\s*(.+)/i);
+      if (topicsMatch) {
+        const topics = topicsMatch[1].split(',').map(t => t.trim());
+        context.mainTheme = topics[0] || 'Unknown';
+      }
+    }
+    
+    return context;
+  }
+  
+  buildMetadataPrompt({ filename, documentType, collection, baseMetadata, content, context }) {
+    let prompt = `Create metadata for this ${documentType} document from ${collection}:
+
+Title: ${filename}
+Type: ${documentType}
+Summary: [1-2 sentences]
+Topics: [3-5 key topics]
+Keywords: [8-10 search terms]
+
+Stats: ${baseMetadata.wordCount} words, ${baseMetadata.paragraphCount} paragraphs, ${baseMetadata.readingTimeMinutes}min read
+Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
+    
+    // Add collection context if available
+    if (context.collectionInfo) {
+      prompt += `\n\nCollection Context:
+- Collection: ${context.collectionInfo.name || collection}
+- Total Documents: ${context.collectionInfo.totalDocuments || 'Unknown'}`;
+      
+      if (context.collectionInfo.mainThemes?.length > 0) {
+        prompt += `\n- Main Collection Themes: ${context.collectionInfo.mainThemes.slice(0, 3).join(', ')}`;
+      }
+    }
+    
+    // Add related document context
+    if (context.existingDocuments.length > 0) {
+      prompt += `\n\nRelated Documents in Collection:`;
+      context.existingDocuments.slice(0, 3).forEach(doc => {
+        prompt += `\n- ${doc.name}: ${doc.documentType || 'Unknown type'} (Theme: ${doc.mainTheme || 'Unknown'})`;
+      });
+    }
+    
+    // Add document type context
+    if (context.documentTypes.size > 0) {
+      prompt += `\n\nDocument Types in Collection: ${Array.from(context.documentTypes).join(', ')}`;
+    }
+    
+    prompt += `\n\nContent: ${content}`;
+    
+    return prompt;
   }
 
   async generateCollectionMetadata(collection) {

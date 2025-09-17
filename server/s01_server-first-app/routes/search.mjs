@@ -67,22 +67,20 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         return res.json(result);
       }
       
-      // Create document context from search results
-      const documentContext = searchResults.map((result, i) => 
-        `Document ${i + 1} (${result.filename}):\n${result.content}`
-      ).join('\n\n');
-      
-      // Create enhanced prompt with document context
-      const enhancedQuery = `Based on the following documents, please answer this question: ${query}\n\nRelevant documents:\n${documentContext}`;
+      // Create metadata-first prompt that instructs AI to read META chunks first
+      const enhancedQuery = documentSearch.buildMetadataFirstPrompt(query, searchResults);
       
       // Process through AI model using retry logic for tests
       const result = testCode ? 
         await scorer.processWithRetry(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
         await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
       
-      // Add collection info to result
+      // Add collection info and metadata context to result
       result.collection = collection;
       result.documentSources = searchResults.map(r => ({ filename: r.filename, similarity: r.similarity }));
+      result.metadataFirst = true;
+      result.metaChunks = searchResults.filter(r => r.filename.startsWith('META_')).length;
+      result.sourceChunks = searchResults.filter(r => !r.filename.startsWith('META_')).length;
       
       return res.json(result);
     }

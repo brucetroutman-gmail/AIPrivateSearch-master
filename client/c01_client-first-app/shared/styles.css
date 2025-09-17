@@ -195,9 +195,29 @@ body {
   color: white;
 }
 
+[data-theme="dark"] .footer-links a {
+  color: white;
+}
+
+[data-theme="dark"] .footer-links a:hover {
+  color: white;
+}
+
 .copyright {
   font-size: 0.9rem;
   color: #bdc3c7;
+}
+
+[data-theme="dark"] .copyright {
+  color: white;
+}
+
+[data-theme="dark"] .copyright a {
+  color: #87ceeb;
+}
+
+[data-theme="dark"] .copyright a:hover {
+  color: #87ceeb;
 }
 
 /* Main content wrapper */
