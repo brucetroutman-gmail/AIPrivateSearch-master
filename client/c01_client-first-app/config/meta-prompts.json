@@ -1,0 +1,9 @@
+{
+  "metaPrompts": {
+    "USA-History": {
+      "prompt": "You are searching within the \"USA-History\" collection containing 6 documents. This collection focuses on: **. Document types include: legal. When answering questions about this collection, consider the context and themes of these documents to provide more relevant and accurate responses.",
+      "createdAt": "2025-09-18T00:12:23.826Z",
+      "updatedAt": "2025-09-18T00:12:23.826Z"
+    }
+  }
+}

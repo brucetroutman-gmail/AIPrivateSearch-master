@@ -1,9 +1,13 @@
+---
+DocID: usa_124053
+---
+
 # Declaration of Independence.md
 
 **Document Type:** legal
-**Word Count:** 1339
+**Word Count:** 1343
 **Reading Time:** 7 minutes
-**Paragraphs:** 2
+**Paragraphs:** 3
 **Sentences:** 37
 
 ## AI Analysis
@@ -14,28 +18,54 @@
 
 **Type:** Legal
 
-**Summary:** The Declaration of Independence, adopted by the Continental Congress on July 4, 1776, formally declared the thirteen American colonies independent from British rule. It outlines the philosophical and political reasoning behind this separation, emphasizing natural rights and the consent of the governed.
+**Summary:** The Declaration of Independence, adopted on July 4, 1776, formally declared the thirteen American colonies' separation from British rule and outlined the principles of natural rights and governance that would guide the newly independent United States.
 
 **Topics:**
-1. Natural Rights
-2. Separation from Britain
-3. Consent of the Governed
-4. Self-Evident Truths
-5. Government's Purpose
+1. Separation from British Rule
+2. Natural Rights and Governance Principles
+3. Government's Just Powers
+4. Consent of the Governed
+5. Self-Evident Truths
 
-**Keywords:**
+**Keywords:** 
 1. Declaration of Independence
 2. July 4, 1776
-3. Thirteen Colonies
+3. Thirteen American Colonies
 4. British Rule
 5. Natural Rights
-6. Self-Evident Truths
+6. Governance Principles
 7. Consent of the Governed
-8. Separation
-9. Government's Purpose
-10. American Revolution
+8. Self-Evident Truths
+9. Separation from Britain
+10. United States Independence
+
+**Stats:**
+- 1,343 words
+- 3 paragraphs
+- 7-minute read
+
+**Collection Context:**
+- **Collection:** USA-History
+- **Total Documents:** Unknown
+- **Main Collection Themes:** 
+  - Separation from British Rule
+  - Natural Rights and Governance Principles
+  - Legal Frameworks for Government
+
+**Related Documents in Collection:**
+- The Articles of Confederation (Theme: Early American Governance)
+- The US Constitution (Theme: Foundational Legal Document)
+
+**Document Types
 
 ## Frequent Terms
 their, them, these, that, have, people, which, with, laws, states
 
-*Generated: 2025-09-16T23:14:47.902Z*
+## Top 10 Frequent Nouns
+states 8, laws 8, government 6, colonies 4, assent 4, declaration 3, governments 3, people 3, abolishing 3, other 3
+
+## Top 10 Frequent Verbs
+states 8, laws 6, powers 5, been 4, rights 3, colonies 3, this 3, refused 3, congress 2, causes 2
+
+*Generated: 2025-09-18T00:09:57.564Z*
+*Processing Time: 73.5s*

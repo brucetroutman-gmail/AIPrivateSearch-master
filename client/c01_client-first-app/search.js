@@ -30,6 +30,7 @@ const collectionEl = document.getElementById('collection');
 const collectionSection = document.getElementById('collectionSection');
 const vectorDBEl = document.getElementById('vectorDB');
 const vectorDBSection = document.getElementById('vectorDBSection');
+const addMetaPromptEl = document.getElementById('addMetaPrompt');
 
 let systemPrompts = [];
 
@@ -346,6 +347,11 @@ collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
 });
 
+// Save meta prompt checkbox state
+addMetaPromptEl.addEventListener('change', () => {
+  localStorage.setItem('addMetaPrompt', addMetaPromptEl.checked);
+});
+
 // Save vectorDB selection
 if (vectorDBEl) {
   vectorDBEl.addEventListener('change', () => {
@@ -378,6 +384,12 @@ const generateScoresSetting = localStorage.getItem('generateScores');
 if (generateScoresSetting === 'true') {
   scoreTglEl.checked = true;
   document.getElementById('scoringSection').style.display = 'block';
+}
+
+// Restore meta prompt setting
+const addMetaPromptSetting = localStorage.getItem('addMetaPrompt');
+if (addMetaPromptSetting === 'true') {
+  addMetaPromptEl.checked = true;
 }
 
 // Restore prompt text after page loads
@@ -765,6 +777,7 @@ form.addEventListener('submit', async (e) => {
     const collection = (sourceTypeEl.value.includes('Docu')) ? collectionEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
+    const addMetaPrompt = addMetaPromptEl.checked;
     // VectorDB removed - using LanceDB only
     
     // Validate collection selection for local documents
@@ -774,7 +787,7 @@ form.addEventListener('submit', async (e) => {
     }
     
     updateProgress('Searching');
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt);
     
     // Show scoring phase if scores were generated
     if (result.scores) {

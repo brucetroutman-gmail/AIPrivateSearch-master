@@ -488,9 +488,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
   }
 }
 
-// Make showUserMessage globally available
+// Make functions globally available
 if (typeof window !== 'undefined') {
   window.showUserMessage = showUserMessage;
+  window.securePrompt = securePrompt;
+  window.secureConfirm = secureConfirm;
 }
 
 // Initialize on page load

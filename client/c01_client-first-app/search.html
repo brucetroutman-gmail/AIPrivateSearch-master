@@ -5,7 +5,7 @@
   <title>Search-n-Score – Demo</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
-  <script src="shared/common.js"></script>
+  <script type="module" src="shared/common.js"></script>
   <style>
     h1 { margin-top: 0; }
     
@@ -296,7 +296,13 @@
             </div>
             
             <div class="field">
-              <label for="userPrompts">User Prompts</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label for="userPrompts">User Prompts</label>
+                <label class="checkbox-label" style="margin: 0; font-size: 0.9rem;">
+                  <input type="checkbox" id="addMetaPrompt" style="margin-right: 0.3rem;" />
+                  Add Meta Prompt
+                </label>
+              </div>
               <select id="userPrompts">
                 <option value="">Loading...</option>
               </select>

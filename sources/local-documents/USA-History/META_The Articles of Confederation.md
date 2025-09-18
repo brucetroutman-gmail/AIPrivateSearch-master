@@ -1,9 +1,13 @@
+---
+DocID: usa_124054
+---
+
 # The Articles of Confederation.md
 
 **Document Type:** legal
-**Word Count:** 3457
+**Word Count:** 3461
 **Reading Time:** 18 minutes
-**Paragraphs:** 30
+**Paragraphs:** 31
 **Sentences:** 67
 
 ## AI Analysis
@@ -12,30 +16,62 @@
 
 **Title:** The Articles of Confederation
 
-**Type:** Legal Document
+**Type:** Legal
 
-**Summary:** The Articles of Confederation established the first governing document of the United States after gaining independence from Great Britain. It outlined a loose confederation among the states, granting them significant autonomy while establishing a central Congress with limited powers.
+**Summary:** 
+The Articles of Confederation established the first governing document of the United States after gaining independence from Britain. It outlined a loose confederation among the states, granting them significant autonomy while establishing a weak central government.
 
 **Topics:**
-1. Sovereignty and Independence
-2. Central Government Structure
-3. State Rights
-4. Mutual Defense and Friendship
-5. Interstate Relations
+1. Federalism
+2. State Sovereignty
+3. Central Government Authority
+4. Interstate Relations
+5. National Defense
 
 **Keywords:**
 1. Articles of Confederation
 2. United States
-3. Sovereignty
-4. Independence
-5. Congress
-6. States' Rights
-7. League of Friendship
-8. Mutual Defense
-9. Central Government
-10. Autonomy
+3. State Sovereignty
+4. Congress
+5. Independence
+6. Confederation
+7. Federalism
+8. Central Government
+9. Interstate Relations
+10. National Defense
+
+**Stats:** 
+- 3,461 words
+- 31 paragraphs
+- 18 min read
+
+**Frequent Terms:**
+- shall
+- states
+- congress
+- united
+- state
+
+**Collection Context:**
+- **Collection:** USA-History
+- **Total Documents:** Unknown
+- **Main Collection Themes:** Separation from British Rule, Natural Rights and Governance Principles, Legal Frameworks for Government
+
+**Related Documents in Collection:**
+- Declaration of Independence: legal (Theme: Separation from British Rule)
+- The US Constitution: legal (Theme: Legal Frameworks for Government)
+
+**Document Types in Collection:**
+- Legal
 
 ## Frequent Terms
 shall, states, congress, united, state, such, assembled, that, each, confederation
 
-*Generated: 2025-09-16T23:15:27.253Z*
+## Top 10 Frequent Nouns
+states 82, congress 57, united 56, state 55, confederation 19, articles 14, article 13, other 11, number 11, manner 9
+
+## Top 10 Frequent Verbs
+state 53, states 41, united 39, congress 33, articles 14, assembled 12, forces 9, provided 7, appointed 7, officers 7
+
+*Generated: 2025-09-18T00:11:10.995Z*
+*Processing Time: 146.9s*

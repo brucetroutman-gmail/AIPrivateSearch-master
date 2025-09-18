@@ -8,6 +8,7 @@ export class DocumentProcessor {
     this.supportedFormats = ['.txt', '.pdf'];
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.metadataModel = null;
+    this.docIdCounter = 1;
     this.initializeDocumentTypePatterns();
   }
   
@@ -54,6 +55,26 @@ export class DocumentProcessor {
   // Clear cached model to force re-read from config
   clearModelCache() {
     this.metadataModel = null;
+  }
+
+  generateDocId(collection) {
+    const timestamp = Date.now().toString().slice(-6);
+    const collectionPrefix = collection.substring(0, 3).toLowerCase();
+    return `${collectionPrefix}_${timestamp}`;
+  }
+
+  async addDocIdToFile(filePath, docId) {
+    const content = await fs.readFile(filePath, 'utf8');
+    const docIdHeader = `---\nDocID: ${docId}\n---\n\n`;
+    
+    // Check if file already has docid
+    if (content.includes('DocID:')) {
+      return docId; // Already has docid
+    }
+    
+    const updatedContent = docIdHeader + content;
+    await fs.writeFile(filePath, updatedContent, 'utf8');
+    return docId;
   }
   
   async getMetadataModel() {
@@ -171,12 +192,16 @@ export class DocumentProcessor {
           const filePath = path.join(collectionPath, mdFile);
           const content = await fs.readFile(filePath, 'utf8');
           
-          const metadata = await this.createDocumentMetadata(content, mdFile, collection, startTime);
+          // Generate and add docid to source file
+          const docId = this.generateDocId(collection);
+          await this.addDocIdToFile(filePath, docId);
+          
+          const metadata = await this.createDocumentMetadata(content, mdFile, collection, startTime, docId);
           const metadataPath = path.join(collectionPath, `META_${mdFile}`);
           
           await fs.writeFile(metadataPath, metadata, 'utf8');
           const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
-          return { file: mdFile, success: true, processingTime: `${processingTime}s` };
+          return { file: mdFile, success: true, processingTime: `${processingTime}s`, docId };
         } catch (error) {
           const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
           return { file: mdFile, error: error.message, success: false, processingTime: `${processingTime}s` };
@@ -286,7 +311,7 @@ export class DocumentProcessor {
     };
   }
 
-  async createDocumentMetadata(content, filename, collection, startTime) {
+  async createDocumentMetadata(content, filename, collection, startTime, docId) {
     const documentType = this.determineDocumentType(content);
     const baseMetadata = this.generateBaseMetadata(content);
     
@@ -315,7 +340,11 @@ export class DocumentProcessor {
       });
       
       const processingTime = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 'Unknown';
-      const metadata = `# ${filename}
+      const metadata = `---
+DocID: ${docId}
+---
+
+# ${filename}
 
 **Document Type:** ${documentType}
 **Word Count:** ${baseMetadata.wordCount}
@@ -342,7 +371,7 @@ ${baseMetadata.frequentVerbs.join(', ')}
       return metadata;
     } catch (error) {
       const processingTime = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 'Unknown';
-      return `# ${filename}\n\n**Document Type:** ${documentType}\n**Error:** ${error.message}\n\n*Generated: ${new Date().toISOString()}*\n*Processing Time: ${processingTime}s*`;
+      return `---\nDocID: ${docId}\n---\n\n# ${filename}\n\n**Document Type:** ${documentType}\n**Error:** ${error.message}\n\n*Generated: ${new Date().toISOString()}*\n*Processing Time: ${processingTime}s*`;
     }
   }
   
@@ -474,10 +503,13 @@ Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
     // Generate collection-level summary using the new META_ approach
     await this.generateCollectionSummary(collection);
     
+    // Generate and store meta-prompt for the collection
+    await this.generateMetaPrompt(collection);
+    
     return {
       collection,
       documentsProcessed: docResult.processed.length,
-      metadataGenerated: ['META_document_files', 'META_collection_summary']
+      metadataGenerated: ['META_document_files', 'META_collection_summary', 'meta_prompt']
     };
   }
 
@@ -666,6 +698,69 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
 ---
 *Collection metadata generated: ${new Date().toISOString()}*
 `;
+  }
+
+  async generateMetaPrompt(collection) {
+    try {
+      const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+      const collectionPath = validatePath(collection, baseDir);
+      const metadata = await this.buildCollectionMetadata(collection, collectionPath);
+      
+      const metaPrompt = this.buildMetaPromptFromMetadata(metadata);
+      await this.saveMetaPrompt(collection, metaPrompt);
+      
+      return { success: true, collection, metaPrompt };
+    } catch (error) {
+      console.error(`Error generating meta-prompt for ${collection}:`, error);
+      return { success: false, collection, error: error.message };
+    }
+  }
+
+  buildMetaPromptFromMetadata(metadata) {
+    const themes = metadata.overallThemes.slice(0, 5).map(([theme]) => theme).join(', ');
+    const docTypes = Object.keys(metadata.documentTypes).join(', ');
+    const totalDocs = metadata.totalDocuments;
+    
+    return `You are searching within the "${metadata.collectionName}" collection containing ${totalDocs} documents. This collection focuses on: ${themes}. Document types include: ${docTypes}. When answering questions about this collection, consider the context and themes of these documents to provide more relevant and accurate responses.`;
+  }
+
+  async saveMetaPrompt(collection, metaPrompt) {
+    const metaPromptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/meta-prompts.json');
+    
+    let metaPrompts = { metaPrompts: {} };
+    
+    try {
+      const existing = await fs.readFile(metaPromptsPath, 'utf8');
+      metaPrompts = JSON.parse(existing);
+    } catch (error) {
+      // File doesn't exist or is invalid, use default structure
+    }
+    
+    // Delete existing meta-prompt for this collection if it exists
+    if (metaPrompts.metaPrompts[collection]) {
+      delete metaPrompts.metaPrompts[collection];
+    }
+    
+    // Add new meta-prompt
+    metaPrompts.metaPrompts[collection] = {
+      prompt: metaPrompt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    await fs.writeFile(metaPromptsPath, JSON.stringify(metaPrompts, null, 2), 'utf8');
+  }
+
+  async getMetaPrompt(collection) {
+    try {
+      const metaPromptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/meta-prompts.json');
+      const content = await fs.readFile(metaPromptsPath, 'utf8');
+      const metaPrompts = JSON.parse(content);
+      
+      return metaPrompts.metaPrompts[collection]?.prompt || null;
+    } catch (error) {
+      return null;
+    }
   }
 
 }

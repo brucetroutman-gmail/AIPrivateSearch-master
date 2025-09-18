@@ -6,7 +6,7 @@
   <title>Edit Collection - AISearch-n-Score</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
-  <script src="shared/common.js"></script>
+  <script type="module" src="shared/common.js"></script>
   <style>
     .editor-container {
       max-width: 1200px;
@@ -238,8 +238,8 @@
                 <th>Filename</th>
                 <th>Source</th>
                 <th>Converted</th>
+                <th>Embedded</th>
                 <th>MetaData</th>
-                <th>Embed</th>
               </tr>
             </thead>
             <tbody id="documentTableBody">
@@ -254,7 +254,7 @@
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
           <button class="btn btn-warning" onclick="convertDocuments()">Convert to MD</button>
           <button class="btn btn-info" onclick="generateMetadata()">Create Metadata</button>
-          <button class="btn btn-primary" onclick="processDocuments()">Embed MDs</button>
+          <button class="btn btn-primary" onclick="processDocuments()">Embed Source MDs</button>
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
@@ -389,10 +389,9 @@
       allGroups.forEach(group => {
         const row = document.createElement('tr');
         
-        // Find if this document or its META file is embedded
+        // Find if this document's source MD file is embedded (exclude META files)
         const isEmbedded = indexedDocuments.some(doc => 
-          (doc.filename === group.mdFile && doc.inLanceDB) ||
-          (doc.filename === group.metaFile && doc.inLanceDB)
+          doc.filename === group.mdFile && doc.inLanceDB
         );
         
         // Create source extension links (exclude .md files)
@@ -425,6 +424,9 @@
           `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>` :
           `<span class="status-badge status-no">○</span>`;
         
+        // Check if this is a collection meta file to show dash in Embedded column
+        const isCollectionMeta = group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/);
+        
         // Determine which files to include in selection
         const selectableFiles = [];
         if (hasSource) selectableFiles.push(...group.sourceFiles.map(f => f.fileName));
@@ -448,12 +450,10 @@
             ${mdContent}
           </td>
           <td>
-            ${metaContent}
+            ${isCollectionMeta ? '-' : `<span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">${isEmbedded ? '✓' : '○'}</span>`}
           </td>
           <td>
-            <span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">
-              ${isEmbedded ? '✓' : '○'}
-            </span>
+            ${metaContent}
           </td>
         `;
         
@@ -586,10 +586,10 @@
     
     async function processDocuments() {
       const selected = getSelectedDocuments();
-      const selectedMD = selected.filter(file => file.endsWith('.md'));
+      const selectedMD = selected.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
       
       if (selectedMD.length === 0) {
-        showUserMessage('Please select at least one MD file to process', 'error');
+        showUserMessage('Please select at least one source MD file to embed (META files are excluded)', 'error');
         return;
       }
       
@@ -597,7 +597,7 @@
       const vectorDB = 'lanceDB'; // Always use LanceDB
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Processing ${selectedMD.length} selected MD files to LanceDB...`, 'processing');
+      showLog(`Processing ${selectedMD.length} selected source MD files to LanceDB (META files excluded)...`, 'processing');
       
       try {
       
@@ -863,27 +863,25 @@
     
     async function removeEmbeddings() {
       const selected = getSelectedDocuments();
-      const selectedMD = selected.filter(file => file.endsWith('.md'));
-      const selectedMETA = selected.filter(file => file.startsWith('META_'));
-      const allEmbeddableFiles = [...selectedMD, ...selectedMETA];
+      const selectedMD = selected.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
       
-      if (allEmbeddableFiles.length === 0) {
-        showUserMessage('Please select at least one MD or META file to remove embeddings from', 'error');
+      if (selectedMD.length === 0) {
+        showUserMessage('Please select at least one source MD file to remove embeddings from (META files are not embedded)', 'error');
         return;
       }
       
       const vectorDB = 'lanceDB'; // Always use LanceDB
       
-      if (!await secureConfirm(`Remove embeddings from ${allEmbeddableFiles.length} selected files in LanceDB?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files in LanceDB?`)) {
         return;
       }
       
       clearLog();
-      showLog(`Removing embeddings from ${allEmbeddableFiles.length} selected files in LanceDB...`);
+      showLog(`Removing embeddings from ${selectedMD.length} selected source files in LanceDB...`);
       
-      for (let i = 0; i < allEmbeddableFiles.length; i++) {
-        const filename = allEmbeddableFiles[i];
-        const progress = `${i + 1}/${allEmbeddableFiles.length}`;
+      for (let i = 0; i < selectedMD.length; i++) {
+        const filename = selectedMD[i];
+        const progress = `${i + 1}/${selectedMD.length}`;
         
         try {
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
@@ -904,7 +902,7 @@
         }
       }
       
-      showLog(`✓ Embedding removal complete: ${allEmbeddableFiles.length} files processed`, 'success');
+      showLog(`✓ Embedding removal complete: ${selectedMD.length} files processed`, 'success');
       loadDocuments();
     }
     

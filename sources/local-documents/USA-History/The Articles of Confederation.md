@@ -1,3 +1,7 @@
+---
+DocID: usa_902337
+---
+
 # The Articles of Confederation
 
 The Articles of Confederation

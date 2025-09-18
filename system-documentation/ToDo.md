@@ -147,6 +147,22 @@ specs-3-scoring
 
 68. analyze LanceDB vs ChromaDB stick with LanceDB --done
 
+70. Add docid field to source and meta files for model correlation --done
+
+71. Update collections-editor UI: move Embed column, exclude META files from embedding --done
+
+72. Add "Add Meta Prompt" checkbox to search page --done
+
+73. Create meta-prompt.json file for collection meta-prompts --done
+
+74. Fix module import error for header/footer loading --done
+
+75. Fix collections-editor Create Metadata and Remove Embeds buttons --done
+
+76. Move meta-prompts.json to config directory --done
+
+77. Replace unchecked embed badge with dash for collection meta files --done
+
 
 
 
