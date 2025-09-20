@@ -495,6 +495,9 @@ if (typeof window !== 'undefined') {
   window.secureConfirm = secureConfirm;
 }
 
+// Export functions for module imports
+export { loadScoreModels, exportToDatabase };
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
   loadTheme();

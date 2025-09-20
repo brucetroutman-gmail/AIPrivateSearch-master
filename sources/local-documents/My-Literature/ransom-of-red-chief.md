@@ -1,3 +1,7 @@
+---
+DocID: my-_984333
+---
+
 # ransom-of-red-chief
 
 THE RANSOM OF RED CHIEF

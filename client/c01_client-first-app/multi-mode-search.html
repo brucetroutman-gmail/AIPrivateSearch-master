@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Mode Search - AISearchScore</title>
+    <link rel="stylesheet" href="shared/styles.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1>Multi-Mode Search</h1>
+        <p>Compare different search methods side by side</p>
+
+        <!-- Search Input -->
+        <div class="search-section">
+            <div class="search-input-container">
+                <input type="text" id="searchQuery" placeholder="Enter your search query..." class="search-input">
+                <button id="searchAllBtn" class="search-button">Search All Methods</button>
+            </div>
+        </div>
+
+        <!-- Method Tabs -->
+        <div class="method-tabs">
+            <button class="tab-button active" data-method="fuzzy">Fuzzy Search</button>
+            <button class="tab-button" data-method="exact">Exact Match</button>
+            <button class="tab-button" data-method="semantic">AI Semantic</button>
+            <button class="tab-button" data-method="hybrid">Hybrid</button>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="results-grid">
+            <div class="result-column" id="fuzzy-results">
+                <h3>Fuzzy Search Results</h3>
+                <div class="method-description">Fast text matching with flexible keyword search</div>
+                <div class="results-container" id="fuzzy-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="exact-results">
+                <h3>Exact Match Results</h3>
+                <div class="method-description">Precise string matching for specific queries</div>
+                <div class="results-container" id="exact-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="semantic-results">
+                <h3>AI Semantic Results</h3>
+                <div class="method-description">AI-powered contextual understanding</div>
+                <div class="results-container" id="semantic-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="hybrid-results">
+                <h3>Hybrid Results</h3>
+                <div class="method-description">Combined approach with weighted scoring</div>
+                <div class="results-container" id="hybrid-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Comparison -->
+        <div class="performance-section" id="performanceSection" style="display: none;">
+            <h3>Performance Comparison</h3>
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Results</th>
+                        <th>Time (ms)</th>
+                        <th>Relevance Score</th>
+                    </tr>
+                </thead>
+                <tbody id="performanceTableBody">
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script type="module" src="multi-mode-search.js"></script>
+</body>
+</html>

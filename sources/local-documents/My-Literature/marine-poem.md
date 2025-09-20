@@ -1,3 +1,7 @@
+---
+DocID: my-_984333
+---
+
 # US marine-poem
 
 # United States Marine's Devotion

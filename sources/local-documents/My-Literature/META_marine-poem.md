@@ -1,10 +1,24 @@
+---
+DocID: my-_984333
+---
+
 # marine-poem.md
 
-# Marine's Devotion
+**Document Type:** general
+**Word Count:** 76
+**Reading Time:** 1 minutes
+**Paragraphs:** 5
+**Sentences:** 3
 
-## Title: marine-poem.md
+## AI Analysis
 
-## Summary:
-This document is a poem about two people who share the same passion for the ocean and its beauty. The poem describes how their lives are intertwined, with one carrying the rifle of his devotion while the other waits patiently for him to return.
+### Metadata
 
-*Generated: 2025-09-15T17:22:19.966Z*
+- **Title:** marine-poem.md
+- **Type:** general
+- **Summary:** This document is a poetic exploration of the dual devotion of an American Marine, balancing his duty with personal relationships.
+- **Topics:** Marines, Devotion, Military Service, Personal Relationships, Loyalty
+- **Keywords:** US Marine, Poem, Duty and Love, Battlefield, Homefront, Rifle, Patient Heart, Twin Stars, Loyalty
+
+*Generated: 2025-09-18T16:02:22.808Z*
+*Processing Time: 22.7s*

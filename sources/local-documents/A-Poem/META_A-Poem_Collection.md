@@ -3,43 +3,43 @@
 ## Collection Overview
 - **Collection Name:** A-Poem
 - **Total Documents:** 2
-- **Total Size:** 825 Bytes
-- **Generated:** 2025-09-17T00:00:56.201Z
+- **Total Size:** 852 Bytes
+- **Generated:** 2025-09-18T13:54:35.599Z
 
 ## Document Type Distribution
 - **general:** 2 documents
 
 ## Main Themes
-- **** Military service** (2 documents)
+- ****** (2 documents)
 
 ## Document Inventory
 
 | Document | Size | Type | Theme | Keywords |
 |----------|------|------|-------|----------|
-| marine-poem.md | 420 Bytes | general | ** Military service | ** marine, devotion, loyalty |
-| marine-poem.txt | 405 Bytes | general | ** Military service | ** marine, devotion, loyalty |
+| marine-poem.md | 447 Bytes | general | ** | ** loves, through, with |
+| marine-poem.txt | 405 Bytes | general | ** | ** loves, through, with |
 
 ## Detailed Document Information
 
 ### marine-poem.md
-- **Size:** 420 Bytes
+- **Size:** 447 Bytes
 - **Type:** general
-- **Theme:** ** Military service
-- **Summary:** ** This poem explores the dual devotion of a U.S. Marine, balancing his duty and responsibilities with his personal relationships, particularly highlighting the roles of his rifle and his loved one in shaping his life's journey.
-- **Keywords:** ** marine, devotion, loyalty, rifle, love, soldier, battles, relationship, sacrifice, guidance
+- **Theme:** **
+- **Summary:** ** This poem explores the dual devotion of a US Marine towards his rifle and his loved one, highlighting themes of loyalty, sacrifice, and the balance between duty and personal life.
+- **Keywords:** ** loves, through, with, guards, US Marine, rifle, battles, soul, patient heart, twin stars, devotion, sacrifice
 - **Created:** 2025-09-13T14:20:59.077Z
-- **Modified:** 2025-09-13T15:41:13.668Z
+- **Modified:** 2025-09-18T13:49:42.270Z
 
 ### marine-poem.txt
 - **Size:** 405 Bytes
 - **Type:** general
-- **Theme:** ** Military service
-- **Summary:** ** This poem explores the dual devotion of a U.S. Marine, balancing his duty and responsibilities with his personal relationships, particularly highlighting the roles of his rifle and his loved one in shaping his life's journey.
-- **Keywords:** ** marine, devotion, loyalty, rifle, love, soldier, battles, relationship, sacrifice, guidance
+- **Theme:** **
+- **Summary:** ** This poem explores the dual devotion of a US Marine towards his rifle and his loved one, highlighting themes of loyalty, sacrifice, and the balance between duty and personal life.
+- **Keywords:** ** loves, through, with, guards, US Marine, rifle, battles, soul, patient heart, twin stars, devotion, sacrifice
 - **Created:** 2025-09-13T14:20:47.200Z
 - **Modified:** 2025-09-13T15:40:07.217Z
 
 
 
 ---
-*Collection metadata generated: 2025-09-17T00:00:56.201Z*
+*Collection metadata generated: 2025-09-18T13:54:35.599Z*

@@ -192,9 +192,15 @@ export class DocumentProcessor {
           const filePath = path.join(collectionPath, mdFile);
           const content = await fs.readFile(filePath, 'utf8');
           
-          // Generate and add docid to source file
-          const docId = this.generateDocId(collection);
-          await this.addDocIdToFile(filePath, docId);
+          // Extract existing DocID or generate new one
+          let docId;
+          const existingDocIdMatch = content.match(/^---\s*\nDocID:\s*(.+)\s*\n---/m);
+          if (existingDocIdMatch) {
+            docId = existingDocIdMatch[1].trim();
+          } else {
+            docId = this.generateDocId(collection);
+            await this.addDocIdToFile(filePath, docId);
+          }
           
           const metadata = await this.createDocumentMetadata(content, mdFile, collection, startTime, docId);
           const metadataPath = path.join(collectionPath, `META_${mdFile}`);
@@ -356,15 +362,6 @@ DocID: ${docId}
 
 ${response.response}
 
-## Frequent Terms
-${baseMetadata.frequentWords.join(', ')}
-
-## Top 10 Frequent Nouns
-${baseMetadata.frequentNouns.join(', ')}
-
-## Top 10 Frequent Verbs
-${baseMetadata.frequentVerbs.join(', ')}
-
 *Generated: ${new Date().toISOString()}*
 *Processing Time: ${processingTime}s*`;
       
@@ -456,7 +453,7 @@ ${baseMetadata.frequentVerbs.join(', ')}
   }
   
   buildMetadataPrompt({ filename, documentType, collection, baseMetadata, content, context }) {
-    let prompt = `Create metadata for this ${documentType} document from ${collection}:
+    const prompt = `Create metadata for this ${documentType} document:
 
 Title: ${filename}
 Type: ${documentType}
@@ -464,34 +461,7 @@ Summary: [1-2 sentences]
 Topics: [3-5 key topics]
 Keywords: [8-10 search terms]
 
-Stats: ${baseMetadata.wordCount} words, ${baseMetadata.paragraphCount} paragraphs, ${baseMetadata.readingTimeMinutes}min read
-Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
-    
-    // Add collection context if available
-    if (context.collectionInfo) {
-      prompt += `\n\nCollection Context:
-- Collection: ${context.collectionInfo.name || collection}
-- Total Documents: ${context.collectionInfo.totalDocuments || 'Unknown'}`;
-      
-      if (context.collectionInfo.mainThemes?.length > 0) {
-        prompt += `\n- Main Collection Themes: ${context.collectionInfo.mainThemes.slice(0, 3).join(', ')}`;
-      }
-    }
-    
-    // Add related document context
-    if (context.existingDocuments.length > 0) {
-      prompt += `\n\nRelated Documents in Collection:`;
-      context.existingDocuments.slice(0, 3).forEach(doc => {
-        prompt += `\n- ${doc.name}: ${doc.documentType || 'Unknown type'} (Theme: ${doc.mainTheme || 'Unknown'})`;
-      });
-    }
-    
-    // Add document type context
-    if (context.documentTypes.size > 0) {
-      prompt += `\n\nDocument Types in Collection: ${Array.from(context.documentTypes).join(', ')}`;
-    }
-    
-    prompt += `\n\nContent: ${content}`;
+Content: ${content}`;
     
     return prompt;
   }
@@ -503,8 +473,8 @@ Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
     // Generate collection-level summary using the new META_ approach
     await this.generateCollectionSummary(collection);
     
-    // Generate and store meta-prompt for the collection
-    await this.generateMetaPrompt(collection);
+    // Concatenate all META files and store as meta-prompt
+    await this.concatenateMetaFiles(collection);
     
     return {
       collection,
@@ -536,30 +506,22 @@ Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
   
   async buildCollectionMetadata(collection, collectionPath) {
     const files = await fs.readdir(collectionPath);
-    const documents = [];
-    const metaFiles = [];
     
-    // Separate document files from META files
-    for (const file of files) {
-      const filePath = path.join(collectionPath, file);
-      const stats = await fs.stat(filePath);
-      
-      if (stats.isFile()) {
-        if (file.startsWith('META_') && file.endsWith('.md')) {
-          metaFiles.push({ fileName: file, filePath, stats });
-        } else if (!file.startsWith('META_')) {
-          documents.push({ fileName: file, filePath, stats });
-        }
-      }
-    }
+    // Only process META files for source documents (exclude collection META files)
+    const metaFiles = files.filter(file => 
+      file.startsWith('META_') && 
+      file.endsWith('.md') && 
+      !file.includes('_Collection.md')
+    );
     
-    // Process documents with their META files
     const processedDocuments = [];
     
-    for (const doc of documents) {
-      const baseFileName = path.parse(doc.fileName).name;
-      const metaFileName = `META_${baseFileName}.md`;
-      const metaFile = metaFiles.find(meta => meta.fileName === metaFileName);
+    for (const metaFile of metaFiles) {
+      const filePath = path.join(collectionPath, metaFile);
+      const stats = await fs.stat(filePath);
+      
+      // Extract source filename from META filename
+      const sourceFileName = metaFile.replace('META_', '').replace('.md', '') + '.md';
       
       let docMetadata = {
         documentType: 'unknown',
@@ -569,19 +531,19 @@ Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
         status: 'Unprocessed',
         language: 'Unknown',
         importance: 'Medium',
-        keywords: []
+        keywords: [],
+        docId: 'Unknown'
       };
       
-      if (metaFile) {
-        docMetadata = await this.parseMetaFile(metaFile.filePath);
-      }
+      docMetadata = await this.parseMetaFile(filePath);
       
       processedDocuments.push({
-        fileName: doc.fileName,
-        fileSize: doc.stats.size,
-        fileSizeFormatted: this.formatFileSize(doc.stats.size),
-        createdDate: doc.stats.birthtime.toISOString(),
-        modifiedDate: doc.stats.mtime.toISOString(),
+        fileName: sourceFileName,
+        metaFileName: metaFile,
+        fileSize: stats.size,
+        fileSizeFormatted: this.formatFileSize(stats.size),
+        createdDate: stats.birthtime.toISOString(),
+        modifiedDate: stats.mtime.toISOString(),
         ...docMetadata
       });
     }
@@ -614,6 +576,10 @@ Frequent terms: ${baseMetadata.frequentWords.slice(0, 5).join(', ')}`;
     try {
       const content = await fs.readFile(metaFilePath, 'utf8');
       const metadata = {};
+      
+      // Extract DocID
+      const docIdMatch = content.match(/^---\s*\nDocID:\s*(.+)\s*\n---/m);
+      if (docIdMatch) metadata.docId = docIdMatch[1].trim();
       
       // Extract document type
       const typeMatch = content.match(/\*\*Document Type:\*\*\s*(.+)/i);
@@ -676,15 +642,16 @@ ${metadata.overallThemes
 
 ## Document Inventory
 
-| Document | Size | Type | Theme | Keywords |
-|----------|------|------|-------|----------|
+| Document | DocID | Size | Type | Theme | Keywords |
+|----------|-------|------|------|-------|----------|
 ${metadata.documents
-  .map(doc => `| ${doc.fileName} | ${doc.fileSizeFormatted} | ${doc.documentType} | ${doc.mainTheme} | ${Array.isArray(doc.keywords) ? doc.keywords.slice(0, 3).join(', ') : 'N/A'} |`)
+  .map(doc => `| ${doc.fileName} | ${doc.docId || 'N/A'} | ${doc.fileSizeFormatted} | ${doc.documentType} | ${doc.mainTheme} | ${Array.isArray(doc.keywords) ? doc.keywords.slice(0, 3).join(', ') : 'N/A'} |`)
   .join('\n')}
 
 ## Detailed Document Information
 
 ${metadata.documents.map(doc => `### ${doc.fileName}
+- **DocID:** ${doc.docId || 'N/A'}
 - **Size:** ${doc.fileSizeFormatted}
 - **Type:** ${doc.documentType}
 - **Theme:** ${doc.mainTheme}
@@ -700,28 +667,28 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
 `;
   }
 
-  async generateMetaPrompt(collection) {
-    try {
-      const baseDir = path.join(process.cwd(), '../../sources/local-documents');
-      const collectionPath = validatePath(collection, baseDir);
-      const metadata = await this.buildCollectionMetadata(collection, collectionPath);
-      
-      const metaPrompt = this.buildMetaPromptFromMetadata(metadata);
-      await this.saveMetaPrompt(collection, metaPrompt);
-      
-      return { success: true, collection, metaPrompt };
-    } catch (error) {
-      console.error(`Error generating meta-prompt for ${collection}:`, error);
-      return { success: false, collection, error: error.message };
-    }
-  }
 
-  buildMetaPromptFromMetadata(metadata) {
-    const themes = metadata.overallThemes.slice(0, 5).map(([theme]) => theme).join(', ');
-    const docTypes = Object.keys(metadata.documentTypes).join(', ');
-    const totalDocs = metadata.totalDocuments;
+
+  async concatenateMetaFiles(collection) {
+    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = validatePath(collection, baseDir);
+    const files = await fs.readdir(collectionPath);
     
-    return `You are searching within the "${metadata.collectionName}" collection containing ${totalDocs} documents. This collection focuses on: ${themes}. Document types include: ${docTypes}. When answering questions about this collection, consider the context and themes of these documents to provide more relevant and accurate responses.`;
+    const metaFiles = files.filter(file => 
+      file.startsWith('META_') && 
+      file.endsWith('.md') && 
+      !file.includes('_Collection.md')
+    );
+    
+    let concatenatedContent = `Collection: ${collection}\n\n`;
+    
+    for (const metaFile of metaFiles) {
+      const filePath = path.join(collectionPath, metaFile);
+      const content = await fs.readFile(filePath, 'utf8');
+      concatenatedContent += content + '\n\n---\n\n';
+    }
+    
+    await this.saveMetaPrompt(collection, concatenatedContent.trim());
   }
 
   async saveMetaPrompt(collection, metaPrompt) {

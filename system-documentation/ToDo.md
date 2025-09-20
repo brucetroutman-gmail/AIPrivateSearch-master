@@ -163,6 +163,13 @@ specs-3-scoring
 
 77. Replace unchecked embed badge with dash for collection meta files --done
 
+78. colection meta file must grab certian stuff from other meta files. --done
+
+79. Meta-prompt should be concatination of all meta files --done
+
+80. In create metadata the docid for source does not equal docid for meta --done 
+
+81. Review processing time for create Metadata
 
 
 
