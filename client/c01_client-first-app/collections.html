@@ -141,9 +141,7 @@
     async function loadCollections() {
       console.log('loadCollections called');
       try {
-        const response = await fetch('http://localhost:3001/api/documents/collections?t=' + Date.now());
-        const data = await response.json();
-        collections = data.collections;
+        collections = await window.collectionsUtils.loadCollections();
         console.log('Loaded collections:', collections);
         renderCollections();
       } catch (error) {

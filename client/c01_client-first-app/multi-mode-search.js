@@ -46,22 +46,30 @@ const searchMethods = {
     }
 };
 
-// Mock search functions for all 7 methods
-async function performTraditionalSearch() {
+// Real API search functions
+async function performTraditionalSearch(query, collection = null) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 100));
     
-    const results = [
-        {
-            id: 1,
-            title: 'france-facts.txt',
-            excerpt: 'Line 15: The capital of France is Paris.',
-            score: 1.0,
-            source: 'france-facts.txt:15'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'traditional' };
+    try {
+        const options = { query };
+        if (collection) options.collection = collection;
+        
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/search/traditional', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'traditional' 
+        };
+    } catch (error) {
+        console.error('Traditional search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'traditional' };
+    }
 }
 
 async function performAIDirectSearch() {
@@ -144,28 +152,29 @@ async function performHybridSearch() {
     return { results: combinedResults, time: Date.now() - startTime, method: 'hybrid' };
 }
 
-async function performMetadataSearch() {
+async function performMetadataSearch(query, collection = null) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 200));
     
-    const results = [
-        {
-            id: 1,
-            title: 'Document: France Overview',
-            excerpt: 'Category: Geography, Tags: ["europe", "capital", "france"], Author: Encyclopedia',
-            score: 0.95,
-            source: 'META_france-overview.md'
-        },
-        {
-            id: 2,
-            title: 'Document: European Capitals',
-            excerpt: 'Category: Reference, Tags: ["capitals", "cities", "europe"], Modified: 2024-01-15',
-            score: 0.82,
-            source: 'META_european-capitals.md'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'metadata' };
+    try {
+        const options = { query };
+        if (collection) options.collection = collection;
+        
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/search/metadata', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'metadata' 
+        };
+    } catch (error) {
+        console.error('Metadata search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'metadata' };
+    }
 }
 
 async function performFullTextSearch() {
@@ -247,9 +256,15 @@ function updatePerformanceTable(results) {
 // Main search function
 async function performAllSearches() {
     const query = searchQueryEl.value.trim();
+    const collection = document.getElementById('collectionSelect').value;
     
     if (!query) {
         alert('Please enter a search query');
+        return;
+    }
+    
+    if (!collection) {
+        alert('Please select a collection');
         return;
     }
     
@@ -270,13 +285,13 @@ async function performAllSearches() {
     try {
         // Perform all searches
         const [traditionalResult, aiDirectResult, ragResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
-            performTraditionalSearch(),
-            performAIDirectSearch(),
-            performRAGSearch(),
-            performVectorSearch(),
-            performHybridSearch(),
-            performMetadataSearch(),
-            performFullTextSearch()
+            performTraditionalSearch(query, collection),
+            performAIDirectSearch(query),
+            performRAGSearch(query),
+            performVectorSearch(query),
+            performHybridSearch(query),
+            performMetadataSearch(query, collection),
+            performFullTextSearch(query)
         ]);
         
         // Render results
@@ -334,10 +349,18 @@ searchQueryEl.addEventListener('keypress', (e) => {
     }
 });
 
+// Load available collections using common utility
+function loadCollections() {
+    window.collectionsUtils.populateCollectionSelect('collectionSelect', false);
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     // Show all columns by default
     document.querySelectorAll('.result-column').forEach(col => {
         col.style.display = 'block';
     });
+    
+    // Load collections
+    loadCollections();
 });

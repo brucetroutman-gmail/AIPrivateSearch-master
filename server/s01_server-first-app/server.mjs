@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import searchRouter from './routes/search.mjs';
+import multiSearchRouter from './routes/multiSearch.mjs';
 import modelsRouter from './routes/models.mjs';
 import databaseRouter from './routes/database.mjs';
 import documentsRouter from './routes/documents.mjs';
@@ -35,6 +36,7 @@ app.use('/api', validateCSRFToken);
 
 // Use the routers
 app.use('/api/search', searchRouter);
+app.use('/api/multi-search', multiSearchRouter);
 app.use('/api/models', modelsRouter);
 app.use('/api/database', databaseRouter);
 app.use('/api/documents', documentsRouter);

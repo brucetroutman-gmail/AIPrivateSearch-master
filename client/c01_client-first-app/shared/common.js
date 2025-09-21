@@ -488,6 +488,56 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
   }
 }
 
+// Collections utility functions
+const collectionsUtils = {
+  async loadCollections() {
+    try {
+      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/collections');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      return data.collections || [];
+    } catch (error) {
+      console.error('Failed to load collections:', error);
+      return [];
+    }
+  },
+
+  async populateCollectionSelect(selectId, includeAllOption = false) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    try {
+      const collections = await this.loadCollections();
+      select.innerHTML = '';
+      
+      if (includeAllOption) {
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = 'All Collections';
+        select.appendChild(allOption);
+      } else {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Collection';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        select.appendChild(defaultOption);
+      }
+      
+      collections.forEach(collection => {
+        const option = document.createElement('option');
+        option.value = collection;
+        option.textContent = collection;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Failed to populate collection select:', error);
+    }
+  }
+};
+
 // Make functions globally available
 if (typeof window !== 'undefined') {
   window.showUserMessage = showUserMessage;
@@ -496,6 +546,7 @@ if (typeof window !== 'undefined') {
   window.toggleDarkMode = toggleDarkMode;
   window.toggleDeveloperMode = toggleDeveloperMode;
   window.toggleMenu = toggleMenu;
+  window.collectionsUtils = collectionsUtils;
 }
 
 // Export functions for module imports
