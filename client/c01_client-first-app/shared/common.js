@@ -493,6 +493,9 @@ if (typeof window !== 'undefined') {
   window.showUserMessage = showUserMessage;
   window.securePrompt = securePrompt;
   window.secureConfirm = secureConfirm;
+  window.toggleDarkMode = toggleDarkMode;
+  window.toggleDeveloperMode = toggleDeveloperMode;
+  window.toggleMenu = toggleMenu;
 }
 
 // Export functions for module imports

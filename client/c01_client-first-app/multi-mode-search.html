@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Mode Search - AISearchScore</title>
     <link rel="stylesheet" href="shared/styles.css">
+    <script type="module" src="shared/common.js"></script>
 </head>
 <body>
     <div id="header-placeholder"></div>
@@ -23,42 +24,69 @@
 
         <!-- Method Tabs -->
         <div class="method-tabs">
-            <button class="tab-button active" data-method="fuzzy">Fuzzy Search</button>
-            <button class="tab-button" data-method="exact">Exact Match</button>
-            <button class="tab-button" data-method="semantic">AI Semantic</button>
+            <button class="tab-button active" data-method="traditional">Traditional Text</button>
+            <button class="tab-button" data-method="ai-direct">AI Direct</button>
+            <button class="tab-button" data-method="rag">RAG Search</button>
+            <button class="tab-button" data-method="vector">Vector DB</button>
             <button class="tab-button" data-method="hybrid">Hybrid</button>
+            <button class="tab-button" data-method="metadata">Metadata</button>
+            <button class="tab-button" data-method="fulltext">Full-Text</button>
         </div>
 
         <!-- Results Grid -->
         <div class="results-grid">
-            <div class="result-column" id="fuzzy-results">
-                <h3>Fuzzy Search Results</h3>
-                <div class="method-description">Fast text matching with flexible keyword search</div>
-                <div class="results-container" id="fuzzy-container">
+            <div class="result-column" id="traditional-results">
+                <h3>Traditional Text Search</h3>
+                <div class="method-description">File-based grep-like search for exact matches</div>
+                <div class="results-container" id="traditional-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>
 
-            <div class="result-column" id="exact-results">
-                <h3>Exact Match Results</h3>
-                <div class="method-description">Precise string matching for specific queries</div>
-                <div class="results-container" id="exact-container">
+            <div class="result-column" id="ai-direct-results">
+                <h3>AI Direct Search</h3>
+                <div class="method-description">Question-answering models for contextual understanding</div>
+                <div class="results-container" id="ai-direct-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>
 
-            <div class="result-column" id="semantic-results">
-                <h3>AI Semantic Results</h3>
-                <div class="method-description">AI-powered contextual understanding</div>
-                <div class="results-container" id="semantic-container">
+            <div class="result-column" id="rag-results">
+                <h3>RAG Search</h3>
+                <div class="method-description">Chunked documents with AI retrieval</div>
+                <div class="results-container" id="rag-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="vector-results">
+                <h3>Vector Database</h3>
+                <div class="method-description">Semantic similarity using embeddings</div>
+                <div class="results-container" id="vector-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>
 
             <div class="result-column" id="hybrid-results">
-                <h3>Hybrid Results</h3>
-                <div class="method-description">Combined approach with weighted scoring</div>
+                <h3>Hybrid Search</h3>
+                <div class="method-description">Combined traditional and vector methods</div>
                 <div class="results-container" id="hybrid-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="metadata-results">
+                <h3>Metadata Search</h3>
+                <div class="method-description">Structured queries using document metadata</div>
+                <div class="results-container" id="metadata-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="fulltext-results">
+                <h3>Full-Text Engine</h3>
+                <div class="method-description">Indexed search with ranking and stemming</div>
+                <div class="results-container" id="fulltext-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>

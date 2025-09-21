@@ -9,144 +9,187 @@ const performanceTableBody = document.getElementById('performanceTableBody');
 
 // Search methods configuration
 const searchMethods = {
-    fuzzy: {
-        name: 'Fuzzy Search',
-        endpoint: '/api/search/fuzzy',
-        description: 'Fast text matching with flexible keyword search'
+    traditional: {
+        name: 'Traditional Text',
+        endpoint: '/api/search/traditional',
+        description: 'File-based grep-like search for exact matches'
     },
-    exact: {
-        name: 'Exact Match', 
-        endpoint: '/api/search/exact',
-        description: 'Precise string matching for specific queries'
+    'ai-direct': {
+        name: 'AI Direct',
+        endpoint: '/api/search/ai-direct',
+        description: 'Question-answering models for contextual understanding'
     },
-    semantic: {
-        name: 'AI Semantic',
-        endpoint: '/api/search/semantic', 
-        description: 'AI-powered contextual understanding'
+    rag: {
+        name: 'RAG Search',
+        endpoint: '/api/search/rag',
+        description: 'Chunked documents with AI retrieval'
+    },
+    vector: {
+        name: 'Vector Database',
+        endpoint: '/api/search/vector',
+        description: 'Semantic similarity using embeddings'
     },
     hybrid: {
         name: 'Hybrid',
         endpoint: '/api/search/hybrid',
-        description: 'Combined approach with weighted scoring'
+        description: 'Combined traditional and vector methods'
+    },
+    metadata: {
+        name: 'Metadata',
+        endpoint: '/api/search/metadata',
+        description: 'Structured queries using document metadata'
+    },
+    fulltext: {
+        name: 'Full-Text',
+        endpoint: '/api/search/fulltext',
+        description: 'Indexed search with ranking and stemming'
     }
 };
 
-// Mock search functions for demonstration
-async function performFuzzySearch() {
+// Mock search functions for all 7 methods
+async function performTraditionalSearch() {
+    const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    const results = [
+        {
+            id: 1,
+            title: 'france-facts.txt',
+            excerpt: 'Line 15: The capital of France is Paris.',
+            score: 1.0,
+            source: 'france-facts.txt:15'
+        }
+    ];
+    
+    return { results, time: Date.now() - startTime, method: 'traditional' };
+}
+
+async function performAIDirectSearch() {
+    const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    const results = [
+        {
+            id: 1,
+            title: 'AI Answer',
+            excerpt: 'Based on the document content, Paris is the capital of France. It is located in the north-central part of the country.',
+            score: 0.94,
+            source: 'AI Model Response'
+        }
+    ];
+    
+    return { results, time: Date.now() - startTime, method: 'ai-direct' };
+}
+
+async function performRAGSearch() {
+    const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 900));
+    
+    const results = [
+        {
+            id: 1,
+            title: 'Chunk: French Geography',
+            excerpt: 'Paris, the capital city of France, is situated on the Seine River in northern France.',
+            score: 0.89,
+            source: 'geography.md (chunk 3)'
+        },
+        {
+            id: 2,
+            title: 'Chunk: Political Centers',
+            excerpt: 'As the capital, Paris houses the French government and major political institutions.',
+            score: 0.76,
+            source: 'politics.md (chunk 1)'
+        }
+    ];
+    
+    return { results, time: Date.now() - startTime, method: 'rag' };
+}
+
+async function performVectorSearch() {
+    const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    const results = [
+        {
+            id: 1,
+            title: 'Similar: Capital Cities',
+            excerpt: 'Paris serves as the capital and largest city of France, similar to how London serves the UK.',
+            score: 0.87,
+            source: 'capitals-comparison.md'
+        },
+        {
+            id: 2,
+            title: 'Similar: European Centers',
+            excerpt: 'Major European capitals like Paris, Berlin, and Rome serve as political and cultural hubs.',
+            score: 0.73,
+            source: 'european-cities.md'
+        }
+    ];
+    
+    return { results, time: Date.now() - startTime, method: 'vector' };
+}
+
+async function performHybridSearch() {
     const startTime = Date.now();
     
-    // Simulate API delay
+    // Simulate combining multiple methods
+    const traditionalResults = await performTraditionalSearch();
+    const vectorResults = await performVectorSearch();
+    
+    const combinedResults = [
+        ...traditionalResults.results.map(r => ({...r, score: r.score * 0.8, method: 'traditional'})),
+        ...vectorResults.results.map(r => ({...r, score: r.score * 0.6, method: 'vector'}))
+    ].sort((a, b) => b.score - a.score);
+    
+    return { results: combinedResults, time: Date.now() - startTime, method: 'hybrid' };
+}
+
+async function performMetadataSearch() {
+    const startTime = Date.now();
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    const mockResults = [
+    const results = [
         {
             id: 1,
-            title: 'France Geography',
-            excerpt: 'France is located in Western Europe. Paris is the capital city.',
-            score: 0.85,
-            source: 'geography.md'
+            title: 'Document: France Overview',
+            excerpt: 'Category: Geography, Tags: ["europe", "capital", "france"], Author: Encyclopedia',
+            score: 0.95,
+            source: 'META_france-overview.md'
         },
         {
             id: 2,
-            title: 'European Capitals',
-            excerpt: 'Major European capitals include Paris, London, Berlin, and Rome.',
-            score: 0.72,
-            source: 'capitals.md'
+            title: 'Document: European Capitals',
+            excerpt: 'Category: Reference, Tags: ["capitals", "cities", "europe"], Modified: 2024-01-15',
+            score: 0.82,
+            source: 'META_european-capitals.md'
         }
     ];
     
-    // Return all mock results for fuzzy search
-    const results = mockResults;
-    
-    return {
-        results,
-        time: Date.now() - startTime,
-        method: 'fuzzy'
-    };
+    return { results, time: Date.now() - startTime, method: 'metadata' };
 }
 
-async function performExactSearch() {
+async function performFullTextSearch() {
     const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
-    const mockResults = [
+    const results = [
         {
             id: 1,
-            title: 'France Information',
-            excerpt: 'The capital of France is Paris.',
-            score: 1.0,
-            source: 'france-facts.md'
-        }
-    ];
-    
-    const results = mockResults.filter(r => 
-        r.excerpt.toLowerCase().includes('capital')
-    );
-    
-    return {
-        results,
-        time: Date.now() - startTime,
-        method: 'exact'
-    };
-}
-
-async function performSemanticSearch() {
-    const startTime = Date.now();
-    
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const mockResults = [
-        {
-            id: 1,
-            title: 'French Culture and History',
-            excerpt: 'Paris, the City of Light, serves as the political and cultural center of France.',
-            score: 0.92,
-            source: 'french-culture.md'
+            title: 'Indexed: France Capital',
+            excerpt: 'Paris (capital) - The capital and most populous city of France, located in the north-central part.',
+            score: 0.91,
+            source: 'search-index (rank: 1)'
         },
         {
             id: 2,
-            title: 'European Union Overview',
-            excerpt: 'France plays a central role in the EU, with Paris hosting many international organizations.',
-            score: 0.78,
-            source: 'eu-overview.md'
+            title: 'Indexed: French Cities',
+            excerpt: 'Major French cities include Paris (capital), Lyon, Marseille, and Toulouse.',
+            score: 0.79,
+            source: 'search-index (rank: 2)'
         }
     ];
     
-    const results = mockResults;
-    
-    return {
-        results,
-        time: Date.now() - startTime,
-        method: 'semantic'
-    };
-}
-
-async function performHybridSearch(query) {
-    const startTime = Date.now();
-    
-    // Simulate combining results from multiple methods
-    const fuzzyResults = await performFuzzySearch();
-    const semanticResults = await performSemanticSearch(query);
-    
-    // Combine and re-score results
-    const combinedResults = [
-        ...fuzzyResults.results.map(r => ({...r, score: r.score * 0.7})),
-        ...semanticResults.results.map(r => ({...r, score: r.score * 0.9}))
-    ];
-    
-    // Remove duplicates and sort by score
-    const uniqueResults = combinedResults
-        .filter((result, index, self) => 
-            index === self.findIndex(r => r.id === result.id)
-        )
-        .sort((a, b) => b.score - a.score);
-    
-    return {
-        results: uniqueResults,
-        time: Date.now() - startTime,
-        method: 'hybrid'
-    };
+    return { results, time: Date.now() - startTime, method: 'fulltext' };
 }
 
 // Render results for a specific method
@@ -215,7 +258,7 @@ async function performAllSearches() {
     searchAllBtn.disabled = true;
     
     // Clear previous results
-    ['fuzzy-container', 'exact-container', 'semantic-container', 'hybrid-container'].forEach(id => {
+    ['traditional-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading';
@@ -226,25 +269,34 @@ async function performAllSearches() {
     
     try {
         // Perform all searches
-        const [fuzzyResult, exactResult, semanticResult, hybridResult] = await Promise.all([
-            performFuzzySearch(),
-            performExactSearch(),
-            performSemanticSearch(),
-            performHybridSearch(query)
+        const [traditionalResult, aiDirectResult, ragResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
+            performTraditionalSearch(),
+            performAIDirectSearch(),
+            performRAGSearch(),
+            performVectorSearch(),
+            performHybridSearch(),
+            performMetadataSearch(),
+            performFullTextSearch()
         ]);
         
         // Render results
-        renderResults('fuzzy-container', fuzzyResult);
-        renderResults('exact-container', exactResult);
-        renderResults('semantic-container', semanticResult);
+        renderResults('traditional-container', traditionalResult);
+        renderResults('ai-direct-container', aiDirectResult);
+        renderResults('rag-container', ragResult);
+        renderResults('vector-container', vectorResult);
         renderResults('hybrid-container', hybridResult);
+        renderResults('metadata-container', metadataResult);
+        renderResults('fulltext-container', fulltextResult);
         
         // Update performance comparison
         updatePerformanceTable({
-            fuzzy: fuzzyResult,
-            exact: exactResult,
-            semantic: semanticResult,
-            hybrid: hybridResult
+            traditional: traditionalResult,
+            'ai-direct': aiDirectResult,
+            rag: ragResult,
+            vector: vectorResult,
+            hybrid: hybridResult,
+            metadata: metadataResult,
+            fulltext: fulltextResult
         });
         
     } catch {
