@@ -2,10 +2,11 @@ import path from 'path';
 import { TraditionalSearch } from './TraditionalSearch.mjs';
 import { MetadataSearch } from './MetadataSearch.mjs';
 import { FullTextSearch } from './FullTextSearch.mjs';
-import { VectorSearch } from './VectorSearch.mjs';
+import { VectorSearchSimple } from './VectorSearchSimple.mjs';
 import { HybridSearch } from './HybridSearch.mjs';
 import { AIDirectSearch } from './AIDirectSearch.mjs';
 import { RAGSearch } from './RAGSearch.mjs';
+import { RAGSearchSimple } from './RAGSearchSimple.mjs';
 
 export class SearchOrchestrator {
   constructor() {
@@ -13,10 +14,11 @@ export class SearchOrchestrator {
       traditional: new TraditionalSearch(),
       metadata: new MetadataSearch(),
       fulltext: new FullTextSearch(),
-      vector: new VectorSearch(),
+      vector: new VectorSearchSimple(),
       hybrid: new HybridSearch(),
       'ai-direct': new AIDirectSearch(),
-      rag: new RAGSearch()
+      rag: new RAGSearch(),
+      'rag-simple': new RAGSearchSimple()
     };
   }
 

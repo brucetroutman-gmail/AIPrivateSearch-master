@@ -1,40 +1,65 @@
 import fs from 'fs/promises';
 import path from 'path';
+import Database from 'better-sqlite3';
+import mime from 'mime-types';
 
 export class MetadataSearch {
   constructor() {
     this.name = 'Metadata Search';
     this.description = 'Structured queries using document metadata';
+    this.db = new Database('./metadata.db');
+    this.setupDatabase();
+  }
+
+  setupDatabase() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS document_metadata (
+        id TEXT PRIMARY KEY,
+        filename TEXT,
+        file_type TEXT,
+        file_size INTEGER,
+        created_date TEXT,
+        collection TEXT,
+        word_count INTEGER,
+        doc_id TEXT,
+        category TEXT
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_collection ON document_metadata(collection);
+      CREATE INDEX IF NOT EXISTS idx_file_type ON document_metadata(file_type);
+      CREATE INDEX IF NOT EXISTS idx_category ON document_metadata(category);
+    `);
   }
 
   async search(query, options = {}) {
     const { collection = null } = options;
-    const results = [];
     
     try {
-      const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
-      let metadataFiles = await this.getMetadataFiles(documentsPath);
+      console.log(`Metadata search for: "${query}" in ${collection}`);
       
-      if (collection) {
-        metadataFiles = metadataFiles.filter(f => f.collection === collection);
-      }
+      await this.ensureMetadataIndexed(collection);
       
-      for (const metaFile of metadataFiles) {
-        const metadata = await this.parseMetadataFile(metaFile.path);
-        if (this.matchesMetadata(metadata, query, options)) {
-          results.push({
-            id: metaFile.name,
-            title: `Document: ${metadata.title || metaFile.name}`,
-            excerpt: this.formatMetadataExcerpt(metadata),
-            score: this.calculateMetadataScore(metadata, query),
-            source: metaFile.name,
-            metadata
-          });
-        }
-      }
+      // Parse query for metadata criteria
+      const criteria = this.parseQuery(query);
+      criteria.collection = collection;
+      
+      const results = this.searchByMetadata(criteria);
       
       return {
-        results: results.sort((a, b) => b.score - a.score),
+        results: results.map(doc => ({
+          id: doc.id,
+          title: doc.filename,
+          excerpt: `Type: ${doc.file_type} | Size: ${doc.file_size} bytes | Words: ${doc.word_count} | Category: ${doc.category}`,
+          score: this.calculateMetadataScore(doc, query),
+          source: doc.filename,
+          metadata: {
+            fileType: doc.file_type,
+            fileSize: doc.file_size,
+            wordCount: doc.word_count,
+            category: doc.category,
+            docId: doc.doc_id
+          }
+        })),
         method: 'metadata',
         total: results.length
       };
@@ -43,101 +68,162 @@ export class MetadataSearch {
     }
   }
 
-  async getMetadataFiles(documentsPath) {
-    const metadataFiles = [];
-    const entries = await fs.readdir(documentsPath, { withFileTypes: true });
+  async ensureMetadataIndexed(collection) {
+    const stmt = this.db.prepare('SELECT COUNT(*) as count FROM document_metadata WHERE collection = ?');
+    const result = stmt.get(collection);
     
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const collectionPath = path.join(documentsPath, entry.name);
-        const files = await fs.readdir(collectionPath);
-        const metaFiles = files.filter(file => file.startsWith('META_'));
-        
-        for (const metaFile of metaFiles) {
-          metadataFiles.push({
-            name: metaFile,
-            path: path.join(collectionPath, metaFile),
-            collection: entry.name
-          });
-        }
-      }
+    if (result.count === 0) {
+      await this.indexCollection(collection);
     }
-    
-    return metadataFiles;
   }
 
-  async parseMetadataFile(filePath) {
+  async indexCollection(collection) {
+    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = path.join(documentsPath, collection);
+    
+    const files = await fs.readdir(collectionPath);
+    const documentFiles = files.filter(file => file.endsWith('.md'));
+    
+    console.log(`Indexing metadata for ${documentFiles.length} documents in ${collection}`);
+    
+    for (const filename of documentFiles) {
+      const filePath = path.join(collectionPath, filename);
+      await this.extractAndStoreMetadata(filePath, filename, collection);
+    }
+  }
+
+  async extractAndStoreMetadata(filePath, filename, collection) {
     const content = await fs.readFile(filePath, 'utf-8');
-    const metadata = {};
+    const stats = await fs.stat(filePath);
     
-    // Parse markdown-style metadata
-    const lines = content.split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('**') && trimmed.includes(':**')) {
-        const [key, ...valueParts] = trimmed.replace(/\*\*/g, '').split(':');
-        metadata[key.toLowerCase().trim()] = valueParts.join(':').trim();
-      }
+    // Extract DocID from content
+    const docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
+    const docId = docIdMatch ? docIdMatch[1] : null;
+    
+    // Determine category
+    let category = 'document';
+    if (filename.startsWith('META_')) {
+      category = 'metadata';
+    } else if (filename.includes('Constitution')) {
+      category = 'legal';
+    } else if (filename.includes('Declaration')) {
+      category = 'legal';
+    } else if (filename.includes('Articles')) {
+      category = 'legal';
     }
     
-    return metadata;
+    const metadata = {
+      id: `${collection}_${filename}`,
+      filename,
+      fileType: mime.lookup(filename) || 'text/markdown',
+      fileSize: stats.size,
+      createdDate: stats.birthtime.toISOString(),
+      collection,
+      wordCount: content.split(/\s+/).length,
+      docId,
+      category
+    };
+    
+    this.addDocumentMetadata(metadata);
   }
 
-  matchesMetadata(metadata, query, options = {}) {
-    const queryLower = query.toLowerCase();
+  addDocumentMetadata(metadata) {
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO document_metadata 
+      (id, filename, file_type, file_size, created_date, collection, word_count, doc_id, category)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
     
-    // Search in all metadata fields
-    for (const [key, value] of Object.entries(metadata)) {
-      if (typeof value === 'string' && value.toLowerCase().includes(queryLower)) {
-        return true;
-      }
-    }
-    
-    return false;
+    stmt.run(
+      metadata.id,
+      metadata.filename,
+      metadata.fileType,
+      metadata.fileSize,
+      metadata.createdDate,
+      metadata.collection,
+      metadata.wordCount,
+      metadata.docId,
+      metadata.category
+    );
   }
 
-  calculateMetadataScore(metadata, query) {
+  parseQuery(query) {
+    const criteria = {};
     const queryLower = query.toLowerCase();
-    let score = 0;
-    let matches = 0;
     
-    // Higher weight for title matches
-    if (metadata.title && metadata.title.toLowerCase().includes(queryLower)) {
-      score += 0.4;
-      matches++;
+    // File type queries
+    if (queryLower.includes('markdown') || queryLower.includes('.md')) {
+      criteria.fileType = 'text/markdown';
+    }
+    if (queryLower.includes('pdf')) {
+      criteria.fileType = 'application/pdf';
     }
     
-    // Medium weight for tags/categories
-    if (metadata.tags && metadata.tags.toLowerCase().includes(queryLower)) {
+    // Category queries
+    if (queryLower.includes('legal') || queryLower.includes('constitution') || queryLower.includes('law')) {
+      criteria.category = 'legal';
+    }
+    if (queryLower.includes('metadata') || queryLower.includes('meta')) {
+      criteria.category = 'metadata';
+    }
+    
+    // Size queries
+    if (queryLower.includes('large') || queryLower.includes('big')) {
+      criteria.minSize = 10000; // 10KB+
+    }
+    if (queryLower.includes('small')) {
+      criteria.maxSize = 5000; // Under 5KB
+    }
+    
+    return criteria;
+  }
+
+  searchByMetadata(criteria) {
+    let query = 'SELECT * FROM document_metadata WHERE collection = ?';
+    const params = [criteria.collection];
+
+    if (criteria.fileType) {
+      query += ' AND file_type = ?';
+      params.push(criteria.fileType);
+    }
+
+    if (criteria.category) {
+      query += ' AND category = ?';
+      params.push(criteria.category);
+    }
+
+    if (criteria.minSize) {
+      query += ' AND file_size >= ?';
+      params.push(criteria.minSize);
+    }
+
+    if (criteria.maxSize) {
+      query += ' AND file_size <= ?';
+      params.push(criteria.maxSize);
+    }
+
+    query += ' ORDER BY file_size DESC';
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(params);
+  }
+
+  calculateMetadataScore(doc, query) {
+    let score = 0.5; // Base score
+    
+    const queryLower = query.toLowerCase();
+    const filenameLower = doc.filename.toLowerCase();
+    
+    // Filename relevance
+    if (filenameLower.includes(queryLower)) {
       score += 0.3;
-      matches++;
     }
     
-    if (metadata.category && metadata.category.toLowerCase().includes(queryLower)) {
-      score += 0.3;
-      matches++;
-    }
-    
-    // Lower weight for other fields
-    const otherFields = ['author', 'description', 'summary'];
-    for (const field of otherFields) {
-      if (metadata[field] && metadata[field].toLowerCase().includes(queryLower)) {
-        score += 0.1;
-        matches++;
-      }
+    // Category relevance
+    if (queryLower.includes(doc.category)) {
+      score += 0.2;
     }
     
     return Math.min(score, 1.0);
-  }
-
-  formatMetadataExcerpt(metadata) {
-    const parts = [];
-    
-    if (metadata.category) parts.push(`Category: ${metadata.category}`);
-    if (metadata.tags) parts.push(`Tags: ${metadata.tags}`);
-    if (metadata.author) parts.push(`Author: ${metadata.author}`);
-    if (metadata['last modified']) parts.push(`Modified: ${metadata['last modified']}`);
-    
-    return parts.join(', ');
   }
 }

@@ -24,6 +24,11 @@ const searchMethods = {
         endpoint: '/api/search/rag',
         description: 'Chunked documents with AI retrieval'
     },
+    'rag-simple': {
+        name: 'RAG Simple',
+        endpoint: '/api/search/rag-simple',
+        description: 'Chunked documents with text similarity (no embeddings)'
+    },
     vector: {
         name: 'Vector Database',
         endpoint: '/api/search/vector',
@@ -94,67 +99,92 @@ async function performAIDirectSearch(query, collection, model) {
     }
 }
 
-async function performRAGSearch() {
+async function performRAGSearch(query, collection, model) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 900));
     
-    const results = [
-        {
-            id: 1,
-            title: 'Chunk: French Geography',
-            excerpt: 'Paris, the capital city of France, is situated on the Seine River in northern France.',
-            score: 0.89,
-            source: 'geography.md (chunk 3)'
-        },
-        {
-            id: 2,
-            title: 'Chunk: Political Centers',
-            excerpt: 'As the capital, Paris houses the French government and major political institutions.',
-            score: 0.76,
-            source: 'politics.md (chunk 1)'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'rag' };
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection, model, topK: 3 } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'rag' 
+        };
+    } catch (error) {
+        console.error('RAG search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'rag' };
+    }
 }
 
-async function performVectorSearch() {
+async function performRAGSimpleSearch(query, collection, model) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 400));
     
-    const results = [
-        {
-            id: 1,
-            title: 'Similar: Capital Cities',
-            excerpt: 'Paris serves as the capital and largest city of France, similar to how London serves the UK.',
-            score: 0.87,
-            source: 'capitals-comparison.md'
-        },
-        {
-            id: 2,
-            title: 'Similar: European Centers',
-            excerpt: 'Major European capitals like Paris, Berlin, and Rome serve as political and cultural hubs.',
-            score: 0.73,
-            source: 'european-cities.md'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'vector' };
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag-simple', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection, model, topK: 3 } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'rag-simple' 
+        };
+    } catch (error) {
+        console.error('RAG Simple search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'rag-simple' };
+    }
 }
 
-async function performHybridSearch() {
+async function performVectorSearch(query, collection) {
     const startTime = Date.now();
     
-    // Simulate combining multiple methods
-    const traditionalResults = await performTraditionalSearch();
-    const vectorResults = await performVectorSearch();
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/vector', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection, topK: 5 } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'vector' 
+        };
+    } catch (error) {
+        console.error('Vector search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'vector' };
+    }
+}
+
+async function performHybridSearch(query, collection) {
+    const startTime = Date.now();
     
-    const combinedResults = [
-        ...traditionalResults.results.map(r => ({...r, score: r.score * 0.8, method: 'traditional'})),
-        ...vectorResults.results.map(r => ({...r, score: r.score * 0.6, method: 'vector'}))
-    ].sort((a, b) => b.score - a.score);
-    
-    return { results: combinedResults, time: Date.now() - startTime, method: 'hybrid' };
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/hybrid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'hybrid' 
+        };
+    } catch (error) {
+        console.error('Hybrid search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'hybrid' };
+    }
 }
 
 async function performMetadataSearch(query, collection = null) {
@@ -282,7 +312,7 @@ async function performAllSearches() {
     searchAllBtn.disabled = true;
     
     // Clear previous results
-    ['traditional-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
+    ['traditional-container', 'ai-direct-container', 'rag-container', 'rag-simple-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading';
@@ -293,12 +323,13 @@ async function performAllSearches() {
     
     try {
         // Perform all searches
-        const [traditionalResult, aiDirectResult, ragResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
+        const [traditionalResult, aiDirectResult, ragResult, ragSimpleResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
             performTraditionalSearch(query, collection),
             performAIDirectSearch(query, collection, model),
-            performRAGSearch(query),
-            performVectorSearch(query),
-            performHybridSearch(query),
+            performRAGSearch(query, collection, model),
+            performRAGSimpleSearch(query, collection, model),
+            performVectorSearch(query, collection),
+            performHybridSearch(query, collection),
             performMetadataSearch(query, collection),
             performFullTextSearch(query, collection)
         ]);
@@ -307,6 +338,7 @@ async function performAllSearches() {
         renderResults('traditional-container', traditionalResult);
         renderResults('ai-direct-container', aiDirectResult);
         renderResults('rag-container', ragResult);
+        renderResults('rag-simple-container', ragSimpleResult);
         renderResults('vector-container', vectorResult);
         renderResults('hybrid-container', hybridResult);
         renderResults('metadata-container', metadataResult);
@@ -317,6 +349,7 @@ async function performAllSearches() {
             traditional: traditionalResult,
             'ai-direct': aiDirectResult,
             rag: ragResult,
+            'rag-simple': ragSimpleResult,
             vector: vectorResult,
             hybrid: hybridResult,
             metadata: metadataResult,

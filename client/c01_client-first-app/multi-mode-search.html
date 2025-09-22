@@ -34,6 +34,7 @@
             <button class="tab-button active" data-method="traditional">Traditional Text</button>
             <button class="tab-button" data-method="ai-direct">AI Direct</button>
             <button class="tab-button" data-method="rag">RAG Search</button>
+            <button class="tab-button" data-method="rag-simple">RAG Simple</button>
             <button class="tab-button" data-method="vector">Vector DB</button>
             <button class="tab-button" data-method="hybrid">Hybrid</button>
             <button class="tab-button" data-method="metadata">Metadata</button>
@@ -63,6 +64,14 @@
                 <h3>RAG Search</h3>
                 <div class="method-description">Chunked documents with AI retrieval</div>
                 <div class="results-container" id="rag-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="rag-simple-results">
+                <h3>RAG Simple</h3>
+                <div class="method-description">Chunked documents with text similarity (no embeddings)</div>
+                <div class="results-container" id="rag-simple-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>

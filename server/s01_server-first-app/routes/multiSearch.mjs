@@ -103,6 +103,16 @@ router.post('/rag', async (req, res) => {
   }
 });
 
+router.post('/rag-simple', async (req, res) => {
+  try {
+    const { query, options = {} } = req.body;
+    const result = await searchOrchestrator.search(query, ['rag-simple'], options);
+    res.json(result.results['rag-simple']);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get available methods
 router.get('/methods', (req, res) => {
   res.json({
@@ -114,7 +124,8 @@ router.get('/methods', (req, res) => {
       vector: 'Semantic similarity using embeddings',
       hybrid: 'Combined traditional and vector methods',
       'ai-direct': 'Question-answering models for contextual understanding',
-      rag: 'Chunked documents with AI retrieval'
+      rag: 'Chunked documents with AI retrieval',
+      'rag-simple': 'Chunked documents with text similarity (no embeddings)'
     }
   });
 });

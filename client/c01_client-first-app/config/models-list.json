@@ -69,6 +69,11 @@
       "category": "search",
       "modelName": "phi3:3.8b",
       "size": "2.2 GB"
+    },
+    {
+      "category": "embed",
+      "modelName": "all-minilm",
+      "size": "45 MB"
     }
   ]
 }
