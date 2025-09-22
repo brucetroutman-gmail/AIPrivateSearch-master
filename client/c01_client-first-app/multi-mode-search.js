@@ -54,10 +54,10 @@ async function performTraditionalSearch(query, collection = null) {
         const options = { query };
         if (collection) options.collection = collection;
         
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/search/traditional', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/traditional', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options })
+            body: JSON.stringify({ query, options: { collection } })
         });
         
         const data = await response.json();
@@ -72,21 +72,26 @@ async function performTraditionalSearch(query, collection = null) {
     }
 }
 
-async function performAIDirectSearch() {
+async function performAIDirectSearch(query, collection, model) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    const results = [
-        {
-            id: 1,
-            title: 'AI Answer',
-            excerpt: 'Based on the document content, Paris is the capital of France. It is located in the north-central part of the country.',
-            score: 0.94,
-            source: 'AI Model Response'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'ai-direct' };
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-direct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection, model } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'ai-direct' 
+        };
+    } catch (error) {
+        console.error('AI Direct search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'ai-direct' };
+    }
 }
 
 async function performRAGSearch() {
@@ -159,10 +164,10 @@ async function performMetadataSearch(query, collection = null) {
         const options = { query };
         if (collection) options.collection = collection;
         
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/search/metadata', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/metadata', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options })
+            body: JSON.stringify({ query, options: { collection } })
         });
         
         const data = await response.json();
@@ -242,7 +247,7 @@ function updatePerformanceTable(results) {
             <tr>
                 <td>${searchMethods[method].name}</td>
                 <td>${data.results.length}</td>
-                <td>${data.time}ms</td>
+                <td>${(data.time / 1000).toFixed(2)}s</td>
                 <td>${avgScore}</td>
             </tr>
         `;
@@ -257,14 +262,20 @@ function updatePerformanceTable(results) {
 async function performAllSearches() {
     const query = searchQueryEl.value.trim();
     const collection = document.getElementById('collectionSelect').value;
+    const model = document.getElementById('modelSelect').value;
     
     if (!query) {
-        alert('Please enter a search query');
+        window.showUserMessage('Please enter a search query', 'error');
         return;
     }
     
     if (!collection) {
-        alert('Please select a collection');
+        window.showUserMessage('Please select a collection', 'error');
+        return;
+    }
+    
+    if (!model) {
+        window.showUserMessage('Please select a model', 'error');
         return;
     }
     
@@ -286,7 +297,7 @@ async function performAllSearches() {
         // Perform all searches
         const [traditionalResult, aiDirectResult, ragResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
             performTraditionalSearch(query, collection),
-            performAIDirectSearch(query),
+            performAIDirectSearch(query, collection, model),
             performRAGSearch(query),
             performVectorSearch(query),
             performHybridSearch(query),
@@ -316,7 +327,7 @@ async function performAllSearches() {
         
     } catch {
         // Log error silently
-        alert('Search failed. Please try again.');
+        window.showUserMessage('Search failed. Please try again.', 'error');
     } finally {
         searchAllBtn.textContent = 'Search All Methods';
         searchAllBtn.disabled = false;
@@ -334,9 +345,18 @@ tabButtons.forEach(button => {
         
         // Show/hide corresponding result column
         const method = button.dataset.method;
-        document.querySelectorAll('.result-column').forEach(col => {
-            col.style.display = col.id === `${method}-results` ? 'block' : 'none';
-        });
+        
+        if (method === 'all') {
+            // Show all columns
+            document.querySelectorAll('.result-column').forEach(col => {
+                col.style.display = 'block';
+            });
+        } else {
+            // Show only selected method
+            document.querySelectorAll('.result-column').forEach(col => {
+                col.style.display = col.id === `${method}-results` ? 'block' : 'none';
+            });
+        }
     });
 });
 
@@ -349,9 +369,36 @@ searchQueryEl.addEventListener('keypress', (e) => {
     }
 });
 
-// Load available collections using common utility
+// Load available collections and models
 function loadCollections() {
     window.collectionsUtils.populateCollectionSelect('collectionSelect', false);
+}
+
+async function loadModels() {
+    try {
+        const response = await fetch('http://localhost:3001/config/models-list.json');
+        const data = await response.json();
+        const select = document.getElementById('modelSelect');
+        
+        const models = data.models.filter(m => m.category === 'search').map(m => m.modelName);
+        const savedModel = localStorage.getItem('selectedSearchModel');
+        
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            if (model === savedModel) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+        
+        select.addEventListener('change', function() {
+            localStorage.setItem('selectedSearchModel', this.value);
+        });
+    } catch (error) {
+        console.error('Failed to load models:', error);
+    }
 }
 
 // Initialize page
@@ -361,6 +408,11 @@ document.addEventListener('DOMContentLoaded', () => {
         col.style.display = 'block';
     });
     
-    // Load collections
+    // Set Show All as active by default
+    tabButtons.forEach(tab => tab.classList.remove('active'));
+    document.getElementById('showAllBtn').classList.add('active');
+    
+    // Load collections and models
     loadCollections();
+    loadModels();
 });

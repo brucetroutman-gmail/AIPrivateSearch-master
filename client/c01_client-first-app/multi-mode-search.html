@@ -22,6 +22,9 @@
                 <select id="collectionSelect" class="collection-select" required>
                     <option value="" disabled selected>Select Collection</option>
                 </select>
+                <select id="modelSelect" class="model-select" required>
+                    <option value="" disabled selected>Select Model</option>
+                </select>
                 <button id="searchAllBtn" class="search-button">Search All Methods</button>
             </div>
         </div>
@@ -35,6 +38,7 @@
             <button class="tab-button" data-method="hybrid">Hybrid</button>
             <button class="tab-button" data-method="metadata">Metadata</button>
             <button class="tab-button" data-method="fulltext">Full-Text</button>
+            <button class="tab-button" data-method="all" id="showAllBtn">Show All</button>
         </div>
 
         <!-- Results Grid -->
@@ -104,7 +108,7 @@
                     <tr>
                         <th>Method</th>
                         <th>Results</th>
-                        <th>Time (ms)</th>
+                        <th>Time (s)</th>
                         <th>Relevance Score</th>
                     </tr>
                 </thead>

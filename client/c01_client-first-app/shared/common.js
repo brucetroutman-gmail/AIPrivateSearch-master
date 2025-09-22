@@ -526,11 +526,19 @@ const collectionsUtils = {
         select.appendChild(defaultOption);
       }
       
+      const savedCollection = localStorage.getItem('selectedCollection');
       collections.forEach(collection => {
         const option = document.createElement('option');
         option.value = collection;
         option.textContent = collection;
+        if (collection === savedCollection) {
+          option.selected = true;
+        }
         select.appendChild(option);
+      });
+      
+      select.addEventListener('change', function() {
+        localStorage.setItem('selectedCollection', this.value);
       });
     } catch (error) {
       console.error('Failed to populate collection select:', error);

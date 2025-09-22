@@ -46,7 +46,7 @@ export class TraditionalSearch {
         const files = await fs.readdir(collectionPath);
         const documentFiles = files.filter(file => 
           !file.startsWith('META_') && 
-          (file.endsWith('.md') || file.endsWith('.txt'))
+          file.endsWith('.md')
         );
         
         collections.push({
