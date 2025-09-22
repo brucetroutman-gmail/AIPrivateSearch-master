@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Collections - AISearch-n-Score</title>
-  <link rel="stylesheet" href="default.css">
+
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
@@ -141,13 +141,24 @@
     async function loadCollections() {
       console.log('loadCollections called');
       try {
-        collections = await window.collectionsUtils.loadCollections();
+        if (window.collectionsUtils && window.collectionsUtils.loadCollections) {
+          collections = await window.collectionsUtils.loadCollections();
+        } else {
+          // Fallback to direct API call
+          const response = await fetch('http://localhost:3001/api/multi-search/collections');
+          const data = await response.json();
+          collections = data.collections || [];
+        }
         console.log('Loaded collections:', collections);
         renderCollections();
       } catch (error) {
         console.error('Error loading collections:', error);
-        showUserMessage('Failed to load collections: ' + error.message, 'error');
+        showMessage('Failed to load collections: ' + error.message, 'error');
       }
+    }
+    
+    function showUserMessage(message, type) {
+      showMessage(message, type);
     }
     
     async function renderCollections() {

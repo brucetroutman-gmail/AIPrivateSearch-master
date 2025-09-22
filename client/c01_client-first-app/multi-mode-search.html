@@ -5,6 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Mode Search - AISearchScore</title>
     <link rel="stylesheet" href="shared/styles.css">
+    <style>
+        .method-selection {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .method-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .method-checkboxes label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #333;
+        }
+        .method-checkboxes input[type="checkbox"] {
+            margin: 0;
+        }
+        #selectAll {
+            font-weight: bold;
+        }
+        
+        /* Dark mode styles */
+        [data-theme="dark"] .method-selection {
+            background-color: #2a2a2a;
+            border-color: #555;
+        }
+        [data-theme="dark"] .method-checkboxes label {
+            color: #e0e0e0;
+        }
+        [data-theme="dark"] .method-selection h3 {
+            color: #e0e0e0;
+        }
+    </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
 </head>
@@ -25,7 +65,23 @@
                 <select id="modelSelect" class="model-select" required>
                     <option value="" disabled selected>Select Model</option>
                 </select>
-                <button id="searchAllBtn" class="search-button">Search All Methods</button>
+                <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
+            </div>
+        </div>
+
+        <!-- Method Selection -->
+        <div class="method-selection">
+            <h3>Select Search Methods:</h3>
+            <div class="method-checkboxes">
+                <label><input type="checkbox" id="selectAll"> Select All</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="traditional"> Traditional Text</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="rag"> RAG Search</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="rag-simple"> RAG Simple</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="vector"> Vector DB</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Full-Text</label>
             </div>
         </div>
 

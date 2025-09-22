@@ -6,6 +6,8 @@ const searchAllBtn = document.getElementById('searchAllBtn');
 const tabButtons = document.querySelectorAll('.tab-button');
 const performanceSection = document.getElementById('performanceSection');
 const performanceTableBody = document.getElementById('performanceTableBody');
+const selectAllCheckbox = document.getElementById('selectAll');
+const methodCheckboxes = document.querySelectorAll('.method-checkbox');
 
 // Search methods configuration
 const searchMethods = {
@@ -311,9 +313,23 @@ async function performAllSearches() {
     searchAllBtn.textContent = 'Searching...';
     searchAllBtn.disabled = true;
     
-    // Clear previous results
+    // Get selected methods
+    const selectedMethods = getSelectedMethods();
+    
+    if (selectedMethods.length === 0) {
+        window.showUserMessage('Please select at least one search method', 'error');
+        return;
+    }
+    
+    // Clear previous results for all containers
     ['traditional-container', 'ai-direct-container', 'rag-container', 'rag-simple-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
+        container.innerHTML = '<div class="no-results">Not selected</div>';
+    });
+    
+    // Show loading for selected methods only
+    selectedMethods.forEach(method => {
+        const container = document.getElementById(`${method}-container`);
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading';
         loadingDiv.textContent = 'Searching...';
@@ -322,48 +338,93 @@ async function performAllSearches() {
     });
     
     try {
-        // Perform all searches
-        const [traditionalResult, aiDirectResult, ragResult, ragSimpleResult, vectorResult, hybridResult, metadataResult, fulltextResult] = await Promise.all([
-            performTraditionalSearch(query, collection),
-            performAIDirectSearch(query, collection, model),
-            performRAGSearch(query, collection, model),
-            performRAGSimpleSearch(query, collection, model),
-            performVectorSearch(query, collection),
-            performHybridSearch(query, collection),
-            performMetadataSearch(query, collection),
-            performFullTextSearch(query, collection)
-        ]);
+        // Perform only selected searches
+        const searchPromises = [];
+        const methodMap = {};
         
-        // Render results
-        renderResults('traditional-container', traditionalResult);
-        renderResults('ai-direct-container', aiDirectResult);
-        renderResults('rag-container', ragResult);
-        renderResults('rag-simple-container', ragSimpleResult);
-        renderResults('vector-container', vectorResult);
-        renderResults('hybrid-container', hybridResult);
-        renderResults('metadata-container', metadataResult);
-        renderResults('fulltext-container', fulltextResult);
+        if (selectedMethods.includes('traditional')) {
+            searchPromises.push(performTraditionalSearch(query, collection));
+            methodMap['traditional'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('ai-direct')) {
+            searchPromises.push(performAIDirectSearch(query, collection, model));
+            methodMap['ai-direct'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('rag')) {
+            searchPromises.push(performRAGSearch(query, collection, model));
+            methodMap['rag'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('rag-simple')) {
+            searchPromises.push(performRAGSimpleSearch(query, collection, model));
+            methodMap['rag-simple'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('vector')) {
+            searchPromises.push(performVectorSearch(query, collection));
+            methodMap['vector'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('hybrid')) {
+            searchPromises.push(performHybridSearch(query, collection));
+            methodMap['hybrid'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('metadata')) {
+            searchPromises.push(performMetadataSearch(query, collection));
+            methodMap['metadata'] = searchPromises.length - 1;
+        }
+        if (selectedMethods.includes('fulltext')) {
+            searchPromises.push(performFullTextSearch(query, collection));
+            methodMap['fulltext'] = searchPromises.length - 1;
+        }
+        
+        const results = await Promise.all(searchPromises);
+        
+        // Render results for selected methods
+        const performanceData = {};
+        Object.entries(methodMap).forEach(([method, index]) => {
+            renderResults(`${method}-container`, results[index]);
+            performanceData[method] = results[index];
+        });
         
         // Update performance comparison
-        updatePerformanceTable({
-            traditional: traditionalResult,
-            'ai-direct': aiDirectResult,
-            rag: ragResult,
-            'rag-simple': ragSimpleResult,
-            vector: vectorResult,
-            hybrid: hybridResult,
-            metadata: metadataResult,
-            fulltext: fulltextResult
-        });
+        updatePerformanceTable(performanceData);
         
     } catch {
         // Log error silently
         window.showUserMessage('Search failed. Please try again.', 'error');
     } finally {
-        searchAllBtn.textContent = 'Search All Methods';
+        searchAllBtn.textContent = 'Search Selected Methods';
         searchAllBtn.disabled = false;
     }
 }
+
+// Get selected search methods
+function getSelectedMethods() {
+    const selected = [];
+    methodCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            selected.push(checkbox.dataset.method);
+        }
+    });
+    return selected;
+}
+
+// Select All functionality
+selectAllCheckbox.addEventListener('change', function() {
+    methodCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Individual checkbox change handler
+methodCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        // Update Select All checkbox state
+        const allChecked = Array.from(methodCheckboxes).every(cb => cb.checked);
+        const noneChecked = Array.from(methodCheckboxes).every(cb => !cb.checked);
+        
+        selectAllCheckbox.checked = allChecked;
+        selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+    });
+});
 
 // Tab switching functionality
 tabButtons.forEach(button => {
@@ -398,6 +459,11 @@ searchQueryEl.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         performAllSearches();
     }
+});
+
+// Save query as user types
+searchQueryEl.addEventListener('input', (e) => {
+    localStorage.setItem('multiModeSearchQuery', e.target.value);
 });
 
 // Load available collections and models
@@ -442,6 +508,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set Show All as active by default
     tabButtons.forEach(tab => tab.classList.remove('active'));
     document.getElementById('showAllBtn').classList.add('active');
+    
+    // Load saved query
+    const savedQuery = localStorage.getItem('multiModeSearchQuery');
+    if (savedQuery) {
+        searchQueryEl.value = savedQuery;
+    }
     
     // Load collections and models
     loadCollections();

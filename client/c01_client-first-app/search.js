@@ -39,12 +39,19 @@ function formatCreatedAt(timestamp) {
   return timestamp ? new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ') : null;
 }
 
-// Load collections from API
+// Load collections using same method as multi-mode page
 async function loadCollections() {
   try {
-    const response = await fetch('http://localhost:3001/api/documents/collections');
-    if (!response.ok) throw new Error('Failed to fetch collections');
-    const data = await response.json();
+    let collections = [];
+    
+    if (window.collectionsUtils && window.collectionsUtils.loadCollections) {
+      collections = await window.collectionsUtils.loadCollections();
+    } else {
+      // Fallback to direct API call
+      const response = await fetch('http://localhost:3001/api/multi-search/collections');
+      const data = await response.json();
+      collections = data.collections || [];
+    }
     
     collectionEl.innerHTML = '';
     const defaultOption = document.createElement('option');
@@ -52,7 +59,7 @@ async function loadCollections() {
     defaultOption.textContent = 'Select a collection...';
     collectionEl.appendChild(defaultOption);
     
-    data.collections.forEach(collection => {
+    collections.forEach(collection => {
       const option = document.createElement('option');
       option.value = collection;
       option.textContent = collection;
@@ -61,7 +68,7 @@ async function loadCollections() {
     
     // Restore last used collection
     const lastUsed = localStorage.getItem('lastCollection');
-    if (lastUsed && data.collections.includes(lastUsed)) {
+    if (lastUsed && collections.includes(lastUsed)) {
       collectionEl.value = lastUsed;
     }
   } catch (error) {
