@@ -87,7 +87,7 @@ export class TraditionalSearch {
         results.push({
           id: `${path.basename(filePath)}_${lineNumber}`,
           title: path.basename(filePath),
-          excerpt: line.trim(),
+          excerpt: this.extractExcerpt(line.trim(), query),
           score: this.calculateRelevanceScore(line, query),
           source: `${path.basename(filePath)}:${lineNumber}`,
           lineNumber
@@ -127,6 +127,29 @@ export class TraditionalSearch {
     }
     
     return maxScore;
+  }
+
+  extractExcerpt(text, query, maxLength = 200) {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    
+    const queryLower = query.toLowerCase();
+    const textLower = text.toLowerCase();
+    const queryIndex = textLower.indexOf(queryLower);
+    
+    if (queryIndex === -1) {
+      return text.substring(0, maxLength) + '...';
+    }
+    
+    const start = Math.max(0, queryIndex - 50);
+    const end = Math.min(text.length, queryIndex + maxLength - 50);
+    
+    let excerpt = text.substring(start, end);
+    if (start > 0) excerpt = '...' + excerpt;
+    if (end < text.length) excerpt = excerpt + '...';
+    
+    return excerpt;
   }
 
   escapeRegex(string) {

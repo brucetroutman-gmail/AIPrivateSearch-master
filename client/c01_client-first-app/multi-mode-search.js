@@ -182,28 +182,26 @@ async function performMetadataSearch(query, collection = null) {
     }
 }
 
-async function performFullTextSearch() {
+async function performFullTextSearch(query, collection) {
     const startTime = Date.now();
-    await new Promise(resolve => setTimeout(resolve, 300));
     
-    const results = [
-        {
-            id: 1,
-            title: 'Indexed: France Capital',
-            excerpt: 'Paris (capital) - The capital and most populous city of France, located in the north-central part.',
-            score: 0.91,
-            source: 'search-index (rank: 1)'
-        },
-        {
-            id: 2,
-            title: 'Indexed: French Cities',
-            excerpt: 'Major French cities include Paris (capital), Lyon, Marseille, and Toulouse.',
-            score: 0.79,
-            source: 'search-index (rank: 2)'
-        }
-    ];
-    
-    return { results, time: Date.now() - startTime, method: 'fulltext' };
+    try {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/fulltext', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, options: { collection } })
+        });
+        
+        const data = await response.json();
+        return { 
+            results: data.results || [], 
+            time: Date.now() - startTime, 
+            method: 'fulltext' 
+        };
+    } catch (error) {
+        console.error('Full-text search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'fulltext' };
+    }
 }
 
 // Render results for a specific method
@@ -302,7 +300,7 @@ async function performAllSearches() {
             performVectorSearch(query),
             performHybridSearch(query),
             performMetadataSearch(query, collection),
-            performFullTextSearch(query)
+            performFullTextSearch(query, collection)
         ]);
         
         // Render results
