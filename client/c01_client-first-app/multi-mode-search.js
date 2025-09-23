@@ -416,6 +416,7 @@ selectAllCheckbox.addEventListener('change', function() {
     methodCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });
+    updateResultColumnVisibility();
 });
 
 // Individual checkbox change handler
@@ -427,34 +428,29 @@ methodCheckboxes.forEach(checkbox => {
         
         selectAllCheckbox.checked = allChecked;
         selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+        
+        // Update column visibility
+        updateResultColumnVisibility();
     });
 });
 
-// Tab switching functionality
-tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        // Remove active class from all tabs
-        tabButtons.forEach(tab => tab.classList.remove('active'));
-        
-        // Add active class to clicked tab
-        button.classList.add('active');
-        
-        // Show/hide corresponding result column
-        const method = button.dataset.method;
-        
-        if (method === 'all') {
-            // Show all columns
-            document.querySelectorAll('.result-column').forEach(col => {
-                col.style.display = 'block';
-            });
-        } else {
-            // Show only selected method
-            document.querySelectorAll('.result-column').forEach(col => {
-                col.style.display = col.id === `${method}-results` ? 'block' : 'none';
-            });
+// Update result column visibility based on selected methods
+function updateResultColumnVisibility() {
+    const selectedMethods = getSelectedMethods();
+    
+    // Hide all columns first
+    document.querySelectorAll('.result-column').forEach(col => {
+        col.style.display = 'none';
+    });
+    
+    // Show only selected method columns
+    selectedMethods.forEach(method => {
+        const column = document.getElementById(`${method}-results`);
+        if (column) {
+            column.style.display = 'block';
         }
     });
-});
+}
 
 // Event listeners
 searchAllBtn.addEventListener('click', performAllSearches);
@@ -504,14 +500,8 @@ async function loadModels() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-    // Show all columns by default
-    document.querySelectorAll('.result-column').forEach(col => {
-        col.style.display = 'block';
-    });
-    
-    // Set Show All as active by default
-    tabButtons.forEach(tab => tab.classList.remove('active'));
-    document.getElementById('showAllBtn').classList.add('active');
+    // Hide all columns initially (show only when methods are selected)
+    updateResultColumnVisibility();
     
     // Load saved query
     const savedQuery = localStorage.getItem('multiModeSearchQuery');

@@ -171,6 +171,13 @@ specs-3-scoring
 
 81. Review processing time for create Metadata
 
+82. Test multi-mode-search 
+
+83. Document each mode
+
+83. eval uate the best techniques for a user.
+
+
 
 
 
