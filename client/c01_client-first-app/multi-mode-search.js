@@ -324,7 +324,11 @@ async function performAllSearches() {
     // Clear previous results for all containers
     ['traditional-container', 'ai-direct-container', 'rag-container', 'rag-simple-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
-        container.innerHTML = '<div class="no-results">Not selected</div>';
+        const notSelectedDiv = document.createElement('div');
+        notSelectedDiv.className = 'no-results';
+        notSelectedDiv.textContent = 'Not selected';
+        container.innerHTML = '';
+        container.appendChild(notSelectedDiv);
     });
     
     // Show loading for selected methods only
