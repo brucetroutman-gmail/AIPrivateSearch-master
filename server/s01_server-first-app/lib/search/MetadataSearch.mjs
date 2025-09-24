@@ -13,36 +13,55 @@ export class MetadataSearch {
   }
 
   setupDatabase() {
-    // Create base table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS document_metadata (
         id TEXT PRIMARY KEY,
+        doc_id TEXT,
+        collection TEXT,
+        our_comments TEXT,
         filename TEXT,
         file_type TEXT,
         file_size INTEGER,
+        file_path TEXT,
         created_date TEXT,
-        collection TEXT,
+        last_modified_date TEXT,
+        author TEXT,
+        language TEXT,
+        source TEXT,
+        version TEXT,
         word_count INTEGER,
-        doc_id TEXT,
-        category TEXT
+        access_level TEXT,
+        license TEXT,
+        title TEXT,
+        summary TEXT,
+        topics TEXT,
+        keywords TEXT,
+        key_phrases TEXT,
+        category TEXT,
+        sentiment TEXT,
+        entities TEXT,
+        complexity_score INTEGER,
+        readability_score TEXT,
+        reading_time INTEGER,
+        paragraphs INTEGER,
+        sentences INTEGER,
+        character_count INTEGER,
+        unique_word_count INTEGER,
+        average_sentence_length INTEGER,
+        links_count INTEGER,
+        image_count INTEGER,
+        generated_date TEXT,
+        metadata_version TEXT,
+        tags TEXT,
+        geolocation TEXT
       );
-    `);
-    
-    // Add new columns if they don't exist
-    const columns = ['title', 'summary', 'topics', 'keywords', 'reading_time', 'paragraphs', 'sentences', 'generated_date'];
-    columns.forEach(col => {
-      try {
-        this.db.exec(`ALTER TABLE document_metadata ADD COLUMN ${col} TEXT`);
-      } catch (e) {
-        // Column already exists
-      }
-    });
-    
-    // Create indexes
-    this.db.exec(`
+      
       CREATE INDEX IF NOT EXISTS idx_collection ON document_metadata(collection);
       CREATE INDEX IF NOT EXISTS idx_file_type ON document_metadata(file_type);
       CREATE INDEX IF NOT EXISTS idx_category ON document_metadata(category);
+      CREATE INDEX IF NOT EXISTS idx_author ON document_metadata(author);
+      CREATE INDEX IF NOT EXISTS idx_language ON document_metadata(language);
+      CREATE INDEX IF NOT EXISTS idx_tags ON document_metadata(tags);
     `);
   }
 
@@ -71,6 +90,8 @@ export class MetadataSearch {
             excerpt = `Topics: ${doc.topics || 'N/A'}`;
           } else if (criteria.showTypes) {
             excerpt = `Type: ${doc.category || 'N/A'}`;
+          } else if (criteria.showComments) {
+            excerpt = `Comments: ${doc.our_comments || 'N/A'}`;
           }
           
           return {
@@ -123,10 +144,70 @@ export class MetadataSearch {
     
     console.log(`Indexing metadata for ${documentFiles.length} documents in ${collection}`);
     
+    let processedCount = 0;
     for (const filename of documentFiles) {
       const filePath = path.join(collectionPath, filename);
       await this.extractAndStoreMetadata(filePath, filename, collection);
+      processedCount++;
     }
+    
+    return { documentsProcessed: processedCount };
+  }
+
+  async cleanupMetaFiles(collection) {
+    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const collectionPath = path.join(documentsPath, collection);
+    
+    const files = await fs.readdir(collectionPath);
+    const metaFiles = files.filter(file => file.startsWith('META_'));
+    
+    let deletedCount = 0;
+    for (const filename of metaFiles) {
+      const filePath = path.join(collectionPath, filename);
+      await fs.unlink(filePath);
+      deletedCount++;
+      console.log(`Deleted META file: ${filename}`);
+    }
+    
+    return { filesDeleted: deletedCount };
+  }
+
+  getDocumentMetadata(collection, filename) {
+    const stmt = this.db.prepare('SELECT * FROM document_metadata WHERE collection = ? AND filename = ?');
+    return stmt.get(collection, filename);
+  }
+
+  updateMetadataComments(id, comments) {
+    const stmt = this.db.prepare('UPDATE document_metadata SET our_comments = ? WHERE id = ?');
+    const result = stmt.run(comments, id);
+    return { updated: result.changes > 0 };
+  }
+
+  getMetadataStatus(collection) {
+    const stmt = this.db.prepare('SELECT filename FROM document_metadata WHERE collection = ?');
+    return stmt.all(collection);
+  }
+
+  updateAllMetadata(metadata) {
+    const stmt = this.db.prepare(`
+      UPDATE document_metadata SET 
+        file_path = ?, title = ?, author = ?, language = ?, source = ?, version = ?,
+        access_level = ?, license = ?, category = ?, metadata_version = ?, summary = ?, 
+        topics = ?, keywords = ?, key_phrases = ?, sentiment = ?, entities = ?, 
+        tags = ?, geolocation = ?, complexity_score = ?, readability_score = ?, our_comments = ?
+      WHERE id = ?
+    `);
+    
+    const result = stmt.run(
+      metadata.file_path, metadata.title, metadata.author, metadata.language, 
+      metadata.source, metadata.version, metadata.access_level, metadata.license, 
+      metadata.category, metadata.metadata_version, metadata.summary, metadata.topics, 
+      metadata.keywords, metadata.key_phrases, metadata.sentiment, metadata.entities, 
+      metadata.tags, metadata.geolocation, metadata.complexity_score, 
+      metadata.readability_score, metadata.our_comments, metadata.id
+    );
+    
+    return { updated: result.changes > 0 };
   }
 
   async extractAndStoreMetadata(filePath, filename, collection) {
@@ -138,9 +219,20 @@ export class MetadataSearch {
       return;
     }
     
-    // Extract DocID from content
-    const docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
-    const docId = docIdMatch ? docIdMatch[1] : `${collection}_${Date.now()}`;
+    // Extract or generate DocID
+    let docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
+    let docId = docIdMatch ? docIdMatch[1] : null;
+    
+    // Generate DocID if missing
+    if (!docId) {
+      docId = `${collection.substring(0, 3)}_${Math.floor(Math.random() * 900000) + 100000}`;
+      
+      // Add DocID to source file if missing
+      const docIdHeader = `---\nDocID: ${docId}\n---\n\n`;
+      const updatedContent = docIdHeader + content;
+      await fs.writeFile(filePath, updatedContent, 'utf-8');
+      console.log(`Added DocID ${docId} to ${filename}`);
+    }
     
     // Basic text analysis
     const words = content.split(/\s+/).filter(word => word.length > 0);
@@ -156,22 +248,44 @@ export class MetadataSearch {
     
     const metadata = {
       id: `${collection}_${filename}`,
+      docId,
+      collection,
+      ourComments: '',
       filename,
       fileType: mime.lookup(filename) || 'text/markdown',
       fileSize: stats.size,
+      filePath: filePath,
       createdDate: stats.birthtime.toISOString(),
-      collection,
+      lastModifiedDate: stats.mtime.toISOString(),
+      author: aiMetadata.author || '',
+      language: aiMetadata.language || 'en',
+      source: '',
+      version: '1.0',
       wordCount: words.length,
-      docId,
-      category,
+      accessLevel: 'public',
+      license: '',
       title: aiMetadata.title || filename.replace(/\.[^/.]+$/, ''),
       summary: aiMetadata.summary || '',
       topics: aiMetadata.topics ? aiMetadata.topics.join(',') : '',
       keywords: aiMetadata.keywords ? aiMetadata.keywords.join(',') : '',
+      keyPhrases: aiMetadata.keyPhrases ? aiMetadata.keyPhrases.join(',') : '',
+      category: aiMetadata.documentType || category,
+      sentiment: aiMetadata.sentiment || '',
+      entities: aiMetadata.entities ? aiMetadata.entities.join(',') : '',
+      complexityScore: aiMetadata.complexityScore || 50,
+      readabilityScore: aiMetadata.readabilityScore || '',
       readingTime,
       paragraphs: paragraphs.length,
       sentences: sentences.length,
-      generatedDate: new Date().toISOString()
+      characterCount: content.length,
+      uniqueWordCount: [...new Set(words.map(w => w.toLowerCase()))].length,
+      averageSentenceLength: Math.round(words.length / sentences.length),
+      linksCount: (content.match(/https?:\/\/[^\s]+/g) || []).length,
+      imageCount: (content.match(/!\[[^\]]*\]\([^)]+\)/g) || []).length,
+      generatedDate: new Date().toISOString(),
+      metadataVersion: '1.0',
+      tags: aiMetadata.tags ? aiMetadata.tags.join(',') : '',
+      geolocation: aiMetadata.geolocation || ''
     };
     
     this.addDocumentMetadata(metadata);
@@ -180,29 +294,27 @@ export class MetadataSearch {
   addDocumentMetadata(metadata) {
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO document_metadata 
-      (id, filename, file_type, file_size, created_date, collection, word_count, doc_id, category,
-       title, summary, topics, keywords, reading_time, paragraphs, sentences, generated_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (id, doc_id, collection, our_comments, filename, file_type, file_size, file_path,
+       created_date, last_modified_date, author, language, source, version, word_count,
+       access_level, license, title, summary, topics, keywords, key_phrases, category,
+       sentiment, entities, complexity_score, readability_score, reading_time, paragraphs,
+       sentences, character_count, unique_word_count, average_sentence_length, links_count,
+       image_count, generated_date, metadata_version, tags, geolocation)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     stmt.run(
-      metadata.id,
-      metadata.filename,
-      metadata.fileType,
-      metadata.fileSize,
-      metadata.createdDate,
-      metadata.collection,
-      metadata.wordCount,
-      metadata.docId,
-      metadata.category,
-      metadata.title,
-      metadata.summary,
-      metadata.topics,
-      metadata.keywords,
-      metadata.readingTime,
-      metadata.paragraphs,
-      metadata.sentences,
-      metadata.generatedDate
+      metadata.id, metadata.docId, metadata.collection, metadata.ourComments,
+      metadata.filename, metadata.fileType, metadata.fileSize, metadata.filePath,
+      metadata.createdDate, metadata.lastModifiedDate, metadata.author, metadata.language,
+      metadata.source, metadata.version, metadata.wordCount, metadata.accessLevel,
+      metadata.license, metadata.title, metadata.summary, metadata.topics,
+      metadata.keywords, metadata.keyPhrases, metadata.category, metadata.sentiment,
+      metadata.entities, metadata.complexityScore, metadata.readabilityScore,
+      metadata.readingTime, metadata.paragraphs, metadata.sentences,
+      metadata.characterCount, metadata.uniqueWordCount, metadata.averageSentenceLength,
+      metadata.linksCount, metadata.imageCount, metadata.generatedDate,
+      metadata.metadataVersion, metadata.tags, metadata.geolocation
     );
   }
 
@@ -287,10 +399,21 @@ export class MetadataSearch {
       }
     }
     
+    // Comments queries
+    if (queryLower.includes('comment')) {
+      const searchTerm = query.replace(/comments?/gi, '').trim();
+      if (searchTerm) {
+        criteria.commentsSearch = searchTerm;
+      } else {
+        criteria.showComments = true;
+      }
+    }
+    
     // If no specific metadata criteria, treat as text search
     if (!criteria.fileType && !criteria.category && !criteria.minSize && !criteria.maxSize && 
         !criteria.docIdSearch && !criteria.topicSearch && !criteria.typeSearch &&
-        !criteria.showDocIds && !criteria.showTopics && !criteria.showTypes) {
+        !criteria.commentsSearch && !criteria.showDocIds && !criteria.showTopics && 
+        !criteria.showTypes && !criteria.showComments) {
       criteria.textSearch = query;
     }
     
@@ -349,11 +472,17 @@ export class MetadataSearch {
       params.push(`%${criteria.typeSearch}%`);
     }
     
+    // Comments search
+    if (criteria.commentsSearch) {
+      query += ' AND our_comments LIKE ?';
+      params.push(`%${criteria.commentsSearch}%`);
+    }
+    
     // Add text search across rich metadata fields
     if (criteria.textSearch) {
-      query += ' AND (title LIKE ? OR summary LIKE ? OR topics LIKE ? OR keywords LIKE ?)';
+      query += ' AND (title LIKE ? OR summary LIKE ? OR topics LIKE ? OR keywords LIKE ? OR our_comments LIKE ?)';
       const searchTerm = `%${criteria.textSearch}%`;
-      params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+      params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
     }
 
     query += ' ORDER BY word_count DESC';
@@ -388,7 +517,7 @@ export class MetadataSearch {
 
   async generateAIMetadata(content, filename) {
     try {
-      const prompt = `Analyze this document and provide metadata in JSON format:
+      const prompt = `Analyze this document and provide comprehensive metadata in JSON format:
 
 ${content.substring(0, 2000)}...
 
@@ -397,18 +526,18 @@ Provide:
   "title": "Clear document title",
   "summary": "2-3 sentence summary",
   "topics": ["topic1", "topic2", "topic3"],
-  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
-  "documentType": "legal|literature|poetry|financial|technical|academic|general"
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "keyPhrases": ["key phrase 1", "key phrase 2"],
+  "documentType": "legal|literature|poetry|financial|technical|academic|general",
+  "author": "Author name if identifiable",
+  "language": "en|es|fr|de|etc",
+  "sentiment": "positive|negative|neutral",
+  "entities": ["Person", "Organization", "Location"],
+  "complexityScore": 75,
+  "readabilityScore": "Grade level or Flesch score",
+  "tags": ["tag1", "tag2"],
+  "geolocation": "Country or region if mentioned"
 }
-
-Document types:
-- legal: Laws, constitutions, legal documents
-- literature: Novels, stories, books
-- poetry: Poems, verses
-- financial: Insurance, banking, investment documents
-- technical: Code, manuals, specifications
-- academic: Research, educational content
-- general: Other documents
 
 Respond only with valid JSON:`;
 
@@ -422,7 +551,16 @@ Respond only with valid JSON:`;
         summary: `Document containing ${content.split(/\s+/).length} words`,
         topics: ['document', 'text'],
         keywords: [filename.replace(/\.[^/.]+$/, ''), 'document'],
-        documentType: 'general'
+        keyPhrases: ['document content'],
+        documentType: 'general',
+        author: '',
+        language: 'en',
+        sentiment: 'neutral',
+        entities: [],
+        complexityScore: 50,
+        readabilityScore: 'Unknown',
+        tags: [],
+        geolocation: ''
       };
     }
   }

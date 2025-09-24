@@ -58,4 +58,28 @@ export class SearchOrchestrator {
       path.join(process.cwd(), '../../sources/local-documents')
     ).then(collections => collections.map(c => c.name));
   }
+
+  async indexCollectionMetadata(collection) {
+    return await this.searchMethods.metadata.indexCollection(collection);
+  }
+
+  async cleanupMetaFiles(collection) {
+    return await this.searchMethods.metadata.cleanupMetaFiles(collection);
+  }
+
+  async getDocumentMetadata(collection, filename) {
+    return await this.searchMethods.metadata.getDocumentMetadata(collection, filename);
+  }
+
+  async updateMetadataComments(id, comments) {
+    return await this.searchMethods.metadata.updateMetadataComments(id, comments);
+  }
+
+  async getMetadataStatus(collection) {
+    return await this.searchMethods.metadata.getMetadataStatus(collection);
+  }
+
+  async updateAllMetadata(metadata) {
+    return await this.searchMethods.metadata.updateAllMetadata(metadata);
+  }
 }

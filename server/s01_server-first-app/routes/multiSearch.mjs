@@ -140,4 +140,144 @@ router.get('/collections', async (req, res) => {
   }
 });
 
+// Index collection metadata into SQLite database
+router.post('/metadata-index', async (req, res) => {
+  try {
+    const { collection } = req.body;
+    
+    if (!collection) {
+      return res.status(400).json({ error: 'Collection parameter is required' });
+    }
+    
+    const result = await searchOrchestrator.indexCollectionMetadata(collection);
+    res.json({
+      success: true,
+      collection,
+      documentsProcessed: result.documentsProcessed
+    });
+  } catch (error) {
+    console.error('Metadata indexing error:', error);
+    res.status(500).json({ 
+      error: 'Metadata indexing failed', 
+      message: error.message 
+    });
+  }
+});
+
+// Cleanup META_ files
+router.post('/cleanup-meta-files', async (req, res) => {
+  try {
+    const { collection } = req.body;
+    
+    if (!collection) {
+      return res.status(400).json({ error: 'Collection parameter is required' });
+    }
+    
+    const result = await searchOrchestrator.cleanupMetaFiles(collection);
+    res.json({
+      success: true,
+      collection,
+      filesDeleted: result.filesDeleted
+    });
+  } catch (error) {
+    console.error('META file cleanup error:', error);
+    res.status(500).json({ 
+      error: 'META file cleanup failed', 
+      message: error.message 
+    });
+  }
+});
+
+// View metadata for a specific document
+router.post('/metadata-view', async (req, res) => {
+  try {
+    const { collection, filename } = req.body;
+    
+    if (!collection || !filename) {
+      return res.status(400).json({ error: 'Collection and filename parameters are required' });
+    }
+    
+    const result = await searchOrchestrator.getDocumentMetadata(collection, filename);
+    res.json({
+      success: true,
+      metadata: result
+    });
+  } catch (error) {
+    console.error('Metadata view error:', error);
+    res.status(500).json({ 
+      error: 'Failed to load metadata', 
+      message: error.message 
+    });
+  }
+});
+
+// Update metadata comments
+router.post('/metadata-update', async (req, res) => {
+  try {
+    const { id, comments } = req.body;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'Metadata ID is required' });
+    }
+    
+    const result = await searchOrchestrator.updateMetadataComments(id, comments);
+    res.json({
+      success: true,
+      updated: result.updated
+    });
+  } catch (error) {
+    console.error('Metadata update error:', error);
+    res.status(500).json({ 
+      error: 'Failed to update metadata', 
+      message: error.message 
+    });
+  }
+});
+
+// Update all metadata fields
+router.post('/metadata-update-all', async (req, res) => {
+  try {
+    const metadata = req.body;
+    
+    if (!metadata.id) {
+      return res.status(400).json({ error: 'Metadata ID is required' });
+    }
+    
+    const result = await searchOrchestrator.updateAllMetadata(metadata);
+    res.json({
+      success: true,
+      updated: result.updated
+    });
+  } catch (error) {
+    console.error('Metadata update all error:', error);
+    res.status(500).json({ 
+      error: 'Failed to update metadata', 
+      message: error.message 
+    });
+  }
+});
+
+// Get metadata status for collection
+router.post('/metadata-status', async (req, res) => {
+  try {
+    const { collection } = req.body;
+    
+    if (!collection) {
+      return res.status(400).json({ error: 'Collection parameter is required' });
+    }
+    
+    const result = await searchOrchestrator.getMetadataStatus(collection);
+    res.json({
+      success: true,
+      documents: result
+    });
+  } catch (error) {
+    console.error('Metadata status error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get metadata status', 
+      message: error.message 
+    });
+  }
+});
+
 export default router;

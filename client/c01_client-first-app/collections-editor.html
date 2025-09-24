@@ -271,6 +271,7 @@
     let currentCollection = '';
     let documents = [];
     let indexedDocuments = [];
+    let metadataDocuments = [];
     let isProcessing = false;
     
     // Global processing state management
@@ -309,16 +310,23 @@
     
     async function loadDocuments() {
       try {
-        const [filesResponse, indexedResponse] = await Promise.all([
+        const [filesResponse, indexedResponse, metadataResponse] = await Promise.all([
           fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files?t=${Date.now()}`),
-          fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/indexed`)
+          fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/indexed`),
+          fetch(`http://localhost:3001/api/multi-search/metadata-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ collection: currentCollection })
+          })
         ]);
         
         const filesData = await filesResponse.json();
         const indexedData = await indexedResponse.json();
+        const metadataData = await metadataResponse.json();
         
         documents = filesData.files || [];
         indexedDocuments = indexedData.documents || [];
+        metadataDocuments = metadataData.documents || [];
         renderDocuments();
       } catch (error) {
         console.error('Error loading documents:', error);
@@ -418,20 +426,19 @@
           mdContent = `<span class="status-badge status-no">○</span>`;
         }
         
-        // Create Meta link or status
-        const hasMeta = !!group.metaFile;
-        const metaContent = hasMeta ? 
-          `<a href="#" onclick="openFile('${group.metaFile}')" class="ext-badge">META</a>` :
+        // Create Meta link or status (based on SQLite database)
+        const hasMetadata = group.mdFile && metadataDocuments.some(doc => doc.filename === group.mdFile);
+        const metaContent = hasMetadata ? 
+          `<a href="#" onclick="viewMetadata('${group.mdFile}')" class="ext-badge">META</a>` :
           `<span class="status-badge status-no">○</span>`;
         
         // Check if this is a collection meta file to show dash in Embedded column
         const isCollectionMeta = group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/);
         
-        // Determine which files to include in selection
+        // Determine which files to include in selection (exclude META files since they're in database)
         const selectableFiles = [];
         if (hasSource) selectableFiles.push(...group.sourceFiles.map(f => f.fileName));
         if (hasMd) selectableFiles.push(group.mdFile);
-        if (hasMeta) selectableFiles.push(group.metaFile);
         
         const isSelected = savedSelections.includes(selectableFiles.join(','));
         row.innerHTML = `
@@ -683,7 +690,7 @@
     }
     
     async function generateMetadata() {
-      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will create:\n• Individual document metadata (META_filename.md)\n• Collection summary\n• Document index\n• Topic map\n\nExisting metadata files will be overwritten.`)) {
+      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will:\n• Create SQLite database entries with comprehensive metadata\n• Delete existing META_ files (no longer needed)\n• Add DocIDs to source documents if missing`)) {
         return;
       }
       
@@ -693,56 +700,47 @@
       showLog(`Generating AI metadata for collection: ${currentCollection}...`, 'processing');
       
       try {
-        // First generate individual document metadata
-        showLog(`Step 1: Generating individual document metadata...`);
-        const docMetaResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/generate-document-metadata`, {
+        // Step 1: Delete existing META_ files
+        showLog(`Step 1: Removing existing META_ files...`);
+        const cleanupStartTime = Date.now();
+        
+        const cleanupResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/cleanup-meta-files`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: currentCollection })
         });
         
-        const docMetaResult = await docMetaResponse.json();
+        const cleanupResult = await cleanupResponse.json();
+        const cleanupElapsed = ((Date.now() - cleanupStartTime) / 1000).toFixed(1);
         
-        if (docMetaResult.success) {
-          const successCount = docMetaResult.result.processed.filter(p => p.success).length;
-          const totalCount = docMetaResult.result.processed.length;
-          const docElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-          showLog(`✓ Individual metadata: ${successCount}/${totalCount} documents`, 'success');
-          
-          docMetaResult.result.processed.forEach(item => {
-            if (item.success) {
-              showLog(`  • META_${item.file} (${item.processingTime || 'unknown'})`);
-            } else {
-              showLog(`  • META_${item.file} - Failed: ${item.error} (${item.processingTime || 'unknown'})`, 'error');
-            }
-          });
+        if (cleanupResult.success) {
+          showLog(`✓ Removed ${cleanupResult.filesDeleted} META_ files (${cleanupElapsed}s)`, 'success');
         } else {
-          showLog(`✗ Individual metadata failed: ${docMetaResult.error}`, 'error');
+          showLog(`✗ Cleanup failed: ${cleanupResult.error} (${cleanupElapsed}s)`, 'error');
         }
         
-        // Then generate collection-level metadata
-        showLog(`\nStep 2: Generating collection-level metadata...`);
-        const step2StartTime = Date.now();
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/generate-metadata`, {
+        // Step 2: Generate SQLite metadata database
+        showLog(`\nStep 2: Generating SQLite metadata database...`);
+        const dbStartTime = Date.now();
+        
+        const dbResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/metadata-index`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: currentCollection })
         });
         
-        const result = await response.json();
+        const dbResult = await dbResponse.json();
+        const dbElapsed = ((Date.now() - dbStartTime) / 1000).toFixed(1);
+        const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
         
-        if (result.success) {
-          const step2Time = ((Date.now() - step2StartTime) / 1000).toFixed(1);
-          const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-          showLog(`✓ Collection metadata complete`, 'success');
-          showLog(`  • META_${result.result.collection}_Collection.md (${step2Time}s)`);
-          showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
-          loadDocuments(); // Refresh to show new metadata files
+        if (dbResult.success) {
+          showLog(`✓ SQLite database: ${dbResult.documentsProcessed} documents indexed (${dbElapsed}s)`, 'success');
         } else {
-          const step2Time = ((Date.now() - step2StartTime) / 1000).toFixed(1);
-          const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-          showLog(`✗ Collection metadata failed: ${result.error}`, 'error');
-          showLog(`  • META_${result.result.collection}_Collection.md (${step2Time}s)`);
-          showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
+          showLog(`✗ SQLite database failed: ${dbResult.error} (${dbElapsed}s)`, 'error');
         }
+        
+        showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
+        loadDocuments(); // Refresh to show updated document list
       } catch (error) {
         showLog(`✗ Error generating metadata: ${error.message}`, 'error');
       } finally {
@@ -956,6 +954,160 @@
       
       showLog(`✓ Deletion complete: ${selected.length} documents processed`);
       loadDocuments(); // Refresh the document list
+    }
+    
+    async function viewMetadata(filename) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/multi-search/metadata-view`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: currentCollection, filename })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.metadata) {
+          showMetadataEditor(result.metadata);
+        } else {
+          showLog(`✗ No metadata found for ${filename}`, 'error');
+        }
+      } catch (error) {
+        showLog(`✗ Error loading metadata: ${error.message}`, 'error');
+      }
+    }
+    
+    function showMetadataEditor(metadata) {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+      
+      const editor = document.createElement('div');
+      editor.style.cssText = 'background: var(--card-bg); padding: 2rem; border-radius: 8px; max-width: 1200px; max-height: 95vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);';
+      
+      const inputStyle = 'width: 100%; padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color);';
+      const textareaStyle = 'width: 100%; height: 60px; padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); resize: vertical;';
+      
+      const fields = [
+        ['DocID', metadata.doc_id, 'text', true],
+        ['Collection', metadata.collection, 'text', true],
+        ['Filename', metadata.filename, 'text', true],
+        ['File Type', metadata.file_type, 'text', true],
+        ['File Size', metadata.file_size, 'number', true],
+        ['File Path', metadata.file_path, 'text', false, 'metaFilePath'],
+        ['Title', metadata.title, 'text', false, 'metaTitle'],
+        ['Author', metadata.author, 'text', false, 'metaAuthor'],
+        ['Language', metadata.language, 'text', false, 'metaLanguage'],
+        ['Source', metadata.source, 'text', false, 'metaSource'],
+        ['Version', metadata.version, 'text', false, 'metaVersion'],
+        ['Access Level', metadata.access_level, 'text', false, 'metaAccessLevel'],
+        ['License', metadata.license, 'text', false, 'metaLicense'],
+        ['Category', metadata.category, 'text', false, 'metaCategory'],
+        ['Metadata Version', metadata.metadata_version, 'text', false, 'metaMetadataVersion'],
+        ['Topics', metadata.topics, 'text', false, 'metaTopics'],
+        ['Keywords', metadata.keywords, 'text', false, 'metaKeywords'],
+        ['Key Phrases', metadata.key_phrases, 'text', false, 'metaKeyPhrases'],
+        ['Sentiment', metadata.sentiment, 'text', false, 'metaSentiment'],
+        ['Entities', metadata.entities, 'text', false, 'metaEntities'],
+        ['Tags', metadata.tags, 'text', false, 'metaTags'],
+        ['Geolocation', metadata.geolocation, 'text', false, 'metaGeolocation'],
+        ['Complexity Score', metadata.complexity_score, 'number', false, 'metaComplexityScore'],
+        ['Readability Score', metadata.readability_score, 'text', false, 'metaReadabilityScore'],
+        ['Word Count', metadata.word_count, 'number', true],
+        ['Reading Time', metadata.reading_time, 'number', true],
+        ['Paragraphs', metadata.paragraphs, 'number', true],
+        ['Sentences', metadata.sentences, 'number', true],
+        ['Character Count', metadata.character_count, 'number', true],
+        ['Unique Words', metadata.unique_word_count, 'number', true],
+        ['Avg Sentence Length', metadata.average_sentence_length, 'number', true],
+        ['Links Count', metadata.links_count, 'number', true],
+        ['Image Count', metadata.image_count, 'number', true],
+        ['Created Date', metadata.created_date, 'text', true],
+        ['Modified Date', metadata.last_modified_date, 'text', true],
+        ['Generated Date', metadata.generated_date, 'text', true]
+      ];
+      
+      let html = '<h3>All 39 Metadata Fields: ' + (metadata.filename || 'Unknown') + '</h3>';
+      html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin: 1rem 0; font-size: 0.9rem;">';
+      
+      fields.forEach(function(field) {
+        const label = field[0];
+        const value = field[1] || '';
+        const type = field[2];
+        const readonly = field[3];
+        const id = field[4] || '';
+        const readonlyAttr = readonly ? ' readonly' : '';
+        const idAttr = id ? ' id="' + id + '"' : '';
+        
+        html += '<div><label><strong>' + label + ':</strong></label><br>';
+        html += '<input type="' + type + '" value="' + value + '" style="' + inputStyle + '"' + readonlyAttr + idAttr + '></div>';
+      });
+      
+      html += '</div>';
+      html += '<div><label><strong>Summary:</strong></label><br><textarea id="metaSummary" style="' + textareaStyle + '">' + (metadata.summary || '') + '</textarea></div>';
+      html += '<div><label><strong>Comments:</strong></label><br><textarea id="metaComments" style="' + textareaStyle + '">' + (metadata.our_comments || '') + '</textarea></div>';
+      html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">';
+      html += '<button type="button" onclick="saveAllMetadata(\'' + metadata.id + '\')" class="btn btn-primary">Save All</button>';
+      html += '<button type="button" onclick="closeMetadataEditor()" class="btn btn-secondary">Close</button>';
+      html += '</div>';
+      
+      editor.innerHTML = html;
+      
+      modal.appendChild(editor);
+      document.body.appendChild(modal);
+      
+      window.currentMetadataModal = modal;
+    }
+    
+    async function saveAllMetadata(metadataId) {
+      const updatedMetadata = {
+        id: metadataId,
+        file_path: document.getElementById('metaFilePath') ? document.getElementById('metaFilePath').value : '',
+        title: document.getElementById('metaTitle') ? document.getElementById('metaTitle').value : '',
+        author: document.getElementById('metaAuthor') ? document.getElementById('metaAuthor').value : '',
+        language: document.getElementById('metaLanguage') ? document.getElementById('metaLanguage').value : '',
+        source: document.getElementById('metaSource') ? document.getElementById('metaSource').value : '',
+        version: document.getElementById('metaVersion') ? document.getElementById('metaVersion').value : '',
+        access_level: document.getElementById('metaAccessLevel') ? document.getElementById('metaAccessLevel').value : '',
+        license: document.getElementById('metaLicense') ? document.getElementById('metaLicense').value : '',
+        category: document.getElementById('metaCategory') ? document.getElementById('metaCategory').value : '',
+        metadata_version: document.getElementById('metaMetadataVersion') ? document.getElementById('metaMetadataVersion').value : '',
+        summary: document.getElementById('metaSummary') ? document.getElementById('metaSummary').value : '',
+        topics: document.getElementById('metaTopics') ? document.getElementById('metaTopics').value : '',
+        keywords: document.getElementById('metaKeywords') ? document.getElementById('metaKeywords').value : '',
+        key_phrases: document.getElementById('metaKeyPhrases') ? document.getElementById('metaKeyPhrases').value : '',
+        sentiment: document.getElementById('metaSentiment') ? document.getElementById('metaSentiment').value : '',
+        entities: document.getElementById('metaEntities') ? document.getElementById('metaEntities').value : '',
+        tags: document.getElementById('metaTags') ? document.getElementById('metaTags').value : '',
+        geolocation: document.getElementById('metaGeolocation') ? document.getElementById('metaGeolocation').value : '',
+        complexity_score: document.getElementById('metaComplexityScore') ? document.getElementById('metaComplexityScore').value : '',
+        readability_score: document.getElementById('metaReadabilityScore') ? document.getElementById('metaReadabilityScore').value : '',
+        our_comments: document.getElementById('metaComments') ? document.getElementById('metaComments').value : ''
+      };
+      
+      try {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/metadata-update-all`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedMetadata)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showLog(`✓ Metadata saved successfully`, 'success');
+          closeMetadataEditor();
+        } else {
+          showLog(`✗ Failed to save metadata: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showLog(`✗ Error saving metadata: ${error.message}`, 'error');
+      }
+    }
+    
+    function closeMetadataEditor() {
+      if (window.currentMetadataModal) {
+        document.body.removeChild(window.currentMetadataModal);
+        window.currentMetadataModal = null;
+      }
     }
   </script>
 </body>
