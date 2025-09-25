@@ -44,7 +44,7 @@ done
 # 2. Run ESLint security rules
 echo ""
 echo "📋 Running ESLint security scan..."
-npx eslint "client/c01_client-first-app/**/*.{js,mjs}" --rule 'no-eval: error' --rule 'no-implied-eval: error' --rule 'no-new-func: error'
+npx eslint "client/c01_client-first-app/**/*.{js,mjs}" --config ./security/eslint.security.config.mjs --rule 'no-eval: error' --rule 'no-implied-eval: error' --rule 'no-new-func: error'
 
 # 3. Check for hardcoded secrets
 echo ""
