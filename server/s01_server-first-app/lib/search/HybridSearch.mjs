@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
@@ -68,7 +68,7 @@ export class HybridSearch {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     const documentFiles = files.filter(file => 
       file.endsWith('.md') && !file.startsWith('META_')
     );
@@ -77,7 +77,7 @@ export class HybridSearch {
     
     for (const filename of documentFiles) {
       const filePath = path.join(collectionPath, filename);
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await secureFs.readFile(filePath, 'utf-8');
       
       const documentId = `${collection}_${filename}`;
       this.documents.set(documentId, {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import fs from 'fs-extra';
+import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import path from 'path';
 import { EmbeddingService } from '../lib/documents/embeddingService.mjs';
 import { VectorStore } from '../lib/documents/vectorStore.mjs';
@@ -15,24 +15,24 @@ async function reembedAllCollections(vectorDB = 'both') {
   const embeddingService = new EmbeddingService();
   
   try {
-    const collections = await fs.readdir(documentsPath);
+    const collections = await secureFs.readdir(documentsPath);
     logger.log(`Found ${collections.length} collections to process`);
     
     for (const collection of collections) {
       const collectionPath = path.join(documentsPath, collection);
-      const stat = await fs.stat(collectionPath);
+      const stat = await secureFs.stat(collectionPath);
       
       if (!stat.isDirectory()) continue;
       
       logger.log(`\nProcessing collection: ${collection}`);
       
-      const files = await fs.readdir(collectionPath);
+      const files = await secureFs.readdir(collectionPath);
       const documents = [];
       
       for (const file of files) {
         if (file.endsWith('.md') || file.endsWith('.txt')) {
           const filePath = path.join(collectionPath, file);
-          const content = await fs.readFile(filePath, 'utf8');
+          const content = await secureFs.readFile(filePath, 'utf8');
           
           const chunks = embeddingService.chunkText(content);
           
@@ -60,7 +60,7 @@ async function reembedAllCollections(vectorDB = 'both') {
       // Save to local vector store
       if (vectorDB === 'local' || vectorDB === 'both') {
         const localEmbeddingsPath = path.join(embeddingsPath, collection);
-        await fs.ensureDir(localEmbeddingsPath);
+        await secureFs.ensureDir(localEmbeddingsPath);
         const vectorStore = new VectorStore(localEmbeddingsPath);
         await vectorStore.saveDocuments(documents.map(doc => ({
           ...doc,

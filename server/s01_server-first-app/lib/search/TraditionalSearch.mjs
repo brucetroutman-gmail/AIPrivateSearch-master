@@ -1,6 +1,5 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
-import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
 
 export class TraditionalSearch {
@@ -38,12 +37,12 @@ export class TraditionalSearch {
 
   async getCollections(documentsPath) {
     const collections = [];
-    const entries = await fs.readdir(documentsPath, { withFileTypes: true });
+    const entries = await secureFs.readdir(documentsPath, { withFileTypes: true });
     
     for (const entry of entries) {
       if (entry.isDirectory()) {
         const collectionPath = path.join(documentsPath, entry.name);
-        const files = await fs.readdir(collectionPath);
+        const files = await secureFs.readdir(collectionPath);
         const documentFiles = files.filter(file => 
           !file.startsWith('META_') && 
           file.endsWith('.md')
@@ -77,7 +76,7 @@ export class TraditionalSearch {
 
   async searchInFile(filePath, query, options) {
     const results = [];
-    const fileStream = createReadStream(filePath);
+    const fileStream = secureFs.createReadStream(filePath);
     const rl = createInterface({ input: fileStream });
     
     let lineNumber = 0;

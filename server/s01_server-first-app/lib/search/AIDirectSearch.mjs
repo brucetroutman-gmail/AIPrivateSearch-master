@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 
 export class AIDirectSearch {
@@ -36,12 +36,12 @@ export class AIDirectSearch {
 
   async getCollections(documentsPath) {
     const collections = [];
-    const entries = await fs.readdir(documentsPath, { withFileTypes: true });
+    const entries = await secureFs.readdir(documentsPath, { withFileTypes: true });
     
     for (const entry of entries) {
       if (entry.isDirectory()) {
         const collectionPath = path.join(documentsPath, entry.name);
-        const files = await fs.readdir(collectionPath);
+        const files = await secureFs.readdir(collectionPath);
         const documentFiles = files.filter(file => 
           !file.startsWith('META_') && 
           file.endsWith('.md')
@@ -62,7 +62,7 @@ export class AIDirectSearch {
     // Process files in parallel for better performance
     const filePromises = collection.files.map(async (filename) => {
       const filePath = path.join(collection.path, filename);
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await secureFs.readFile(filePath, 'utf-8');
       
       const aiResult = await this.performAISearch(content, query, filename, options?.model || 'qwen2:0.5b');
       if (aiResult) {

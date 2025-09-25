@@ -1,4 +1,5 @@
 
+/* eslint-disable security/detect-non-literal-fs-filename */
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -51,5 +52,31 @@ export const secureFs = {
     createWriteStream(filePath, options) {
         const safePath = validatePath(filePath);
         return fs.createWriteStream(safePath, options);
+    },
+    
+    async remove(filePath) {
+        const safePath = validatePath(filePath);
+        return fs.remove(safePath);
+    },
+    
+    async ensureDir(dirPath) {
+        const safePath = validatePath(dirPath);
+        return fs.ensureDir(safePath);
+    },
+    
+    async unlink(filePath) {
+        const safePath = validatePath(filePath);
+        return fs.unlink(safePath);
+    },
+    
+    async exists(filePath) {
+        const safePath = validatePath(filePath);
+        try {
+            await fs.access(safePath);
+            return true;
+        } catch {
+            return false;
+        }
     }
 };
+/* eslint-enable security/detect-non-literal-fs-filename */

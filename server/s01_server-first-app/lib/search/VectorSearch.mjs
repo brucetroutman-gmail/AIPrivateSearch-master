@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import pkg from 'hnswlib-node';
 const { HierarchicalNSW, L2Space } = pkg;
@@ -72,7 +72,7 @@ export class VectorSearch {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     const documentFiles = files.filter(file => file.endsWith('.md'));
     
     // Initialize HNSW index
@@ -82,7 +82,7 @@ export class VectorSearch {
     
     for (const filename of documentFiles) {
       const filePath = path.join(collectionPath, filename);
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await secureFs.readFile(filePath, 'utf-8');
       await this.addDocument(filename, content, collection);
     }
     

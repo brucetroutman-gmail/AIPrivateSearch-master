@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Browser-compatible logging utility with input sanitization
 // Prevents log injection attacks by sanitizing all logged content
 

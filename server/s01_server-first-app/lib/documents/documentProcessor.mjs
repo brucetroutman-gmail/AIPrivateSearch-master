@@ -1,3 +1,4 @@
+import { secureFs } from '../utils/secureFileOps.mjs';
 import fs from 'fs-extra';
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
@@ -64,7 +65,7 @@ export class DocumentProcessor {
   }
 
   async addDocIdToFile(filePath, docId) {
-    const content = await fs.readFile(filePath, 'utf8');
+    const content = await secureFs.readFile(filePath, 'utf8');
     const docIdHeader = `---\nDocID: ${docId}\n---\n\n`;
     
     // Check if file already has docid
@@ -73,7 +74,7 @@ export class DocumentProcessor {
     }
     
     const updatedContent = docIdHeader + content;
-    await fs.writeFile(filePath, updatedContent, 'utf8');
+    await secureFs.writeFile(filePath, updatedContent, 'utf8');
     return docId;
   }
   
@@ -83,7 +84,7 @@ export class DocumentProcessor {
     try {
       // First try to get metadata model from config
       const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/model-list.json');
-      const modelList = JSON.parse(await fs.readFile(modelListPath, 'utf8'));
+      const modelList = JSON.parse(await secureFs.readFile(modelListPath, 'utf8'));
       const metadataModels = modelList.models.filter(m => m.category === 'metadata');
       
       if (metadataModels.length > 0) {
@@ -123,7 +124,7 @@ export class DocumentProcessor {
   }
 
   async processText(filePath) {
-    const content = await fs.readFile(filePath, 'utf8');
+    const content = await secureFs.readFile(filePath, 'utf8');
     const filename = path.basename(filePath, '.txt');
     
     return `# ${filename}\n\n${content}`;
@@ -146,7 +147,7 @@ export class DocumentProcessor {
   async convertCollectionFiles(collection) {
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     const results = [];
 
     for (const file of files) {
@@ -159,7 +160,7 @@ export class DocumentProcessor {
           const outputFile = safeFilename.replace(ext, '.md');
           const outputPath = path.join(collectionPath, outputFile);
           
-          await fs.writeFile(outputPath, markdown, 'utf8');
+          await secureFs.writeFile(outputPath, markdown, 'utf8');
           results.push({ original: file, converted: outputFile, success: true });
         } catch (error) {
           results.push({ original: file, error: error.message, success: false });
@@ -175,7 +176,7 @@ export class DocumentProcessor {
     
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     
     const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('META_'));
     
@@ -190,7 +191,7 @@ export class DocumentProcessor {
         const startTime = Date.now();
         try {
           const filePath = path.join(collectionPath, mdFile);
-          const content = await fs.readFile(filePath, 'utf8');
+          const content = await secureFs.readFile(filePath, 'utf8');
           
           // Extract existing DocID or generate new one
           let docId;
@@ -205,7 +206,7 @@ export class DocumentProcessor {
           const metadata = await this.createDocumentMetadata(content, mdFile, collection, startTime, docId);
           const metadataPath = path.join(collectionPath, `META_${mdFile}`);
           
-          await fs.writeFile(metadataPath, metadata, 'utf8');
+          await secureFs.writeFile(metadataPath, metadata, 'utf8');
           const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
           return { file: mdFile, success: true, processingTime: `${processingTime}s`, docId };
         } catch (error) {
@@ -377,7 +378,7 @@ ${response.response}
     const collectionPath = validatePath(collection, baseDir);
     
     try {
-      const files = await fs.readdir(collectionPath);
+      const files = await secureFs.readdir(collectionPath);
       const context = {
         collectionInfo: null,
         existingDocuments: [],
@@ -388,7 +389,7 @@ ${response.response}
       // Load collection metadata if exists
       const collectionMeta = files.find(f => f.startsWith('META_') && f.includes('_Collection.md'));
       if (collectionMeta) {
-        const collectionContent = await fs.readFile(path.join(collectionPath, collectionMeta), 'utf8');
+        const collectionContent = await secureFs.readFile(path.join(collectionPath, collectionMeta), 'utf8');
         context.collectionInfo = this.parseCollectionContext(collectionContent);
       }
       
@@ -398,7 +399,7 @@ ${response.response}
       for (const metaFile of metaFiles.slice(0, 5)) { // Limit to 5 for context
         const docName = metaFile.replace('META_', '').replace('.md', '');
         if (docName !== currentFilename.replace('.md', '')) {
-          const metaContent = await fs.readFile(path.join(collectionPath, metaFile), 'utf8');
+          const metaContent = await secureFs.readFile(path.join(collectionPath, metaFile), 'utf8');
           const docMeta = this.parseDocumentContext(metaContent);
           context.existingDocuments.push({ name: docName, ...docMeta });
           if (docMeta.mainTheme) context.relatedThemes.add(docMeta.mainTheme);
@@ -492,20 +493,20 @@ Content: ${content}`;
       const content = this.generateCollectionMarkdown(metadata);
       
       const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
-      await fs.writeFile(summaryPath, content, 'utf8');
+      await secureFs.writeFile(summaryPath, content, 'utf8');
       
       return { success: true, file: `META_${collection}_Collection.md` };
     } catch (error) {
       const errorContent = `# Collection Metadata: ${collection}\n\nError generating collection metadata: ${error.message}\n\n*Generated: ${new Date().toISOString()}*`;
       const summaryPath = path.join(collectionPath, `META_${collection}_Collection.md`);
-      await fs.writeFile(summaryPath, errorContent, 'utf8');
+      await secureFs.writeFile(summaryPath, errorContent, 'utf8');
       
       return { success: false, error: error.message };
     }
   }
   
   async buildCollectionMetadata(collection, collectionPath) {
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     
     // Only process META files for source documents (exclude collection META files)
     const metaFiles = files.filter(file => 
@@ -518,7 +519,7 @@ Content: ${content}`;
     
     for (const metaFile of metaFiles) {
       const filePath = path.join(collectionPath, metaFile);
-      const stats = await fs.stat(filePath);
+      const stats = await secureFs.stat(filePath);
       
       // Extract source filename from META filename
       const sourceFileName = metaFile.replace('META_', '').replace('.md', '') + '.md';
@@ -574,7 +575,7 @@ Content: ${content}`;
   
   async parseMetaFile(metaFilePath) {
     try {
-      const content = await fs.readFile(metaFilePath, 'utf8');
+      const content = await secureFs.readFile(metaFilePath, 'utf8');
       const metadata = {};
       
       // Extract DocID
@@ -672,7 +673,7 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
   async concatenateMetaFiles(collection) {
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     
     const metaFiles = files.filter(file => 
       file.startsWith('META_') && 
@@ -684,7 +685,7 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
     
     for (const metaFile of metaFiles) {
       const filePath = path.join(collectionPath, metaFile);
-      const content = await fs.readFile(filePath, 'utf8');
+      const content = await secureFs.readFile(filePath, 'utf8');
       concatenatedContent += content + '\n\n---\n\n';
     }
     
@@ -697,7 +698,7 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
     let metaPrompts = { metaPrompts: {} };
     
     try {
-      const existing = await fs.readFile(metaPromptsPath, 'utf8');
+      const existing = await secureFs.readFile(metaPromptsPath, 'utf8');
       metaPrompts = JSON.parse(existing);
     } catch (error) {
       // File doesn't exist or is invalid, use default structure
@@ -715,13 +716,13 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
       updatedAt: new Date().toISOString()
     };
     
-    await fs.writeFile(metaPromptsPath, JSON.stringify(metaPrompts, null, 2), 'utf8');
+    await secureFs.writeFile(metaPromptsPath, JSON.stringify(metaPrompts, null, 2), 'utf8');
   }
 
   async getMetaPrompt(collection) {
     try {
       const metaPromptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/meta-prompts.json');
-      const content = await fs.readFile(metaPromptsPath, 'utf8');
+      const content = await secureFs.readFile(metaPromptsPath, 'utf8');
       const metaPrompts = JSON.parse(content);
       
       return metaPrompts.metaPrompts[collection]?.prompt || null;

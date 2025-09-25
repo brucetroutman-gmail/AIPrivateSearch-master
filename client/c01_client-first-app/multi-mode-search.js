@@ -1,25 +1,13 @@
 
-// Security: HTML sanitization function
-function sanitizeHtml(html) {
-    const div = document.createElement('div');
-    div.textContent = html;
-    return div.innerHTML;
-}
 
 
-// Security: HTML sanitization function
-function sanitizeHtml(html) {
-    const div = document.createElement('div');
-    div.textContent = html;
-    return div.innerHTML;
-}
-
+/* eslint-disable no-console */
 // Multi-mode search functionality
 
 // DOM elements
 const searchQueryEl = document.getElementById('searchQuery');
 const searchAllBtn = document.getElementById('searchAllBtn');
-const tabButtons = document.querySelectorAll('.tab-button');
+
 const performanceSection = document.getElementById('performanceSection');
 const performanceTableBody = document.getElementById('performanceTableBody');
 const selectAllCheckbox = document.getElementById('selectAll');
@@ -265,42 +253,73 @@ function renderResults(containerId, searchResult) {
         return;
     }
     
-    const resultsHtml = searchResult.results.map(result => `
-        <div class="result-item">
-            <div class="result-header">
-                <h4>${result.title}</h4>
-                <span class="score">${Math.round(result.score * 100)}%</span>
-            </div>
-            <p class="result-excerpt">${result.excerpt}</p>
-            <div class="result-meta">
-                <span class="source">${result.source}</span>
-            </div>
-        </div>
-    `).join('');
-    
     container.innerHTML = '';
-    container.insertAdjacentHTML('beforeend', sanitizeHtml(resultsHtml));
+    searchResult.results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        
+        const header = document.createElement('div');
+        header.className = 'result-header';
+        
+        const title = document.createElement('h4');
+        title.textContent = result.title;
+        
+        const score = document.createElement('span');
+        score.className = 'score';
+        score.textContent = `${Math.round(result.score * 100)}%`;
+        
+        header.appendChild(title);
+        header.appendChild(score);
+        
+        const excerpt = document.createElement('p');
+        excerpt.className = 'result-excerpt';
+        excerpt.textContent = result.excerpt;
+        
+        const meta = document.createElement('div');
+        meta.className = 'result-meta';
+        
+        const source = document.createElement('span');
+        source.className = 'source';
+        source.textContent = result.source;
+        
+        meta.appendChild(source);
+        
+        div.appendChild(header);
+        div.appendChild(excerpt);
+        div.appendChild(meta);
+        
+        container.appendChild(div);
+    });
 }
 
 // Update performance table
 function updatePerformanceTable(results) {
-    const tableRows = Object.entries(results).map(([method, data]) => {
+    performanceTableBody.innerHTML = '';
+    Object.entries(results).forEach(([method, data]) => {
+        const row = document.createElement('tr');
         const avgScore = data.results.length > 0 
             ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length).toFixed(2)
             : '0.00';
-            
-        return `
-            <tr>
-                <td>${searchMethods[method].name}</td>
-                <td>${data.results.length}</td>
-                <td>${(data.time / 1000).toFixed(2)}s</td>
-                <td>${avgScore}</td>
-            </tr>
-        `;
-    }).join('');
-    
-    performanceTableBody.innerHTML = '';
-    performanceTableBody.insertAdjacentHTML('beforeend', sanitizeHtml(tableRows));
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = searchMethods[method].name;
+        
+        const countCell = document.createElement('td');
+        countCell.textContent = data.results.length;
+        
+        const timeCell = document.createElement('td');
+        timeCell.textContent = `${(data.time / 1000).toFixed(2)}s`;
+        
+        const scoreCell = document.createElement('td');
+        scoreCell.textContent = avgScore;
+        
+        row.appendChild(nameCell);
+        row.appendChild(countCell);
+        row.appendChild(timeCell);
+        row.appendChild(scoreCell);
+        
+        performanceTableBody.appendChild(row);
+    });
     performanceSection.style.display = 'block';
 }
 

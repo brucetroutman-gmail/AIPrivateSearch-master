@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { logger } from '../../../../shared/utils/logger.mjs';
@@ -12,7 +12,7 @@ class EpubConverter {
   checkDependencies() {
     try {
       execSync('which pandoc', { stdio: 'ignore' });
-    } catch (error) {
+    } catch {
       // logger sanitizes all inputs to prevent log injection
       logger.error('Pandoc not found. Install with: brew install pandoc');
     }
@@ -24,7 +24,7 @@ class EpubConverter {
       const baseDir = path.join(process.cwd(), '../../sources/local-documents');
       const safeEpubPath = validatePath(epubPath, baseDir);
       
-      if (!fs.existsSync(safeEpubPath)) {
+      if (!await secureFs.exists(safeEpubPath)) {
         throw new Error('EPUB file not found');
       }
 
@@ -42,8 +42,8 @@ class EpubConverter {
       execSync(command, { stdio: 'inherit' });
 
       // Verify output file was created
-      if (fs.existsSync(outputFile)) {
-        const stats = fs.statSync(outputFile);
+      if (await secureFs.exists(outputFile)) {
+        const stats = await secureFs.stat(outputFile);
         logger.log('Conversion successful, size KB:', Math.round(stats.size / 1024));
         return outputFile;
       } else {
@@ -61,7 +61,7 @@ class EpubConverter {
     try {
       const baseDir = path.join(process.cwd(), '../../sources/local-documents');
       const safeDirPath = validatePath(dirPath, baseDir);
-      const files = fs.readdirSync(safeDirPath);
+      const files = await secureFs.readdir(safeDirPath);
       const epubFiles = files.filter(file => file.toLowerCase().endsWith('.epub'));
       
       if (epubFiles.length === 0) {

@@ -8,7 +8,7 @@ import lanceDBService from '../lib/documents/lanceDBService.mjs';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { validatePath, validateFilename } from '../lib/utils/pathValidator.mjs';
-import fs from 'fs-extra';
+import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import path from 'path';
 
 const router = express.Router();
@@ -35,14 +35,14 @@ router.post('/collections/create', requireAuth, asyncHandler(async (req, res) =>
   const baseDir = path.join(process.cwd(), '../../sources/local-documents');
   const collectionPath = validatePath(name, baseDir);
   
-  if (await fs.pathExists(collectionPath)) {
+  if (await secureFs.exists(collectionPath)) {
     return res.status(409).json({ error: 'Collection already exists' });
   }
   
-  await fs.ensureDir(collectionPath);
+  await secureFs.ensureDir(collectionPath);
   
   const readmeContent = `# ${name} Collection\n\nThis is a document collection for AI search and analysis.\n\nAdd your documents to this folder and use the Collections interface to convert and index them.\n`;
-  await fs.writeFile(path.join(collectionPath, 'README.md'), readmeContent, 'utf8');
+  await secureFs.writeFile(path.join(collectionPath, 'README.md'), readmeContent, 'utf8');
   
   res.json({ success: true, message: `Collection '${name}' created successfully` });
 }));
@@ -53,8 +53,8 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
   try {
     // Remove all embeddings from local storage
     const localEmbeddingsPath = path.join(process.cwd(), 'data', 'embeddings', collection);
-    if (await fs.pathExists(localEmbeddingsPath)) {
-      await fs.remove(localEmbeddingsPath);
+    if (await secureFs.exists(localEmbeddingsPath)) {
+      await secureFs.remove(localEmbeddingsPath);
     }
     
     // Remove all embeddings from LanceDB
@@ -68,8 +68,8 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
     // Remove collection folder and all files
     const baseDir = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = validatePath(collection, baseDir);
-    if (await fs.pathExists(collectionPath)) {
-      await fs.remove(collectionPath);
+    if (await secureFs.exists(collectionPath)) {
+      await secureFs.remove(collectionPath);
     }
     
     res.json({ success: true, message: `Collection '${collection}' removed successfully` });
@@ -126,7 +126,7 @@ router.post('/collections/:collection/upload', requireAuth, asyncHandler(async (
     const safeFilename = validateFilename(filename);
     const saveTo = path.join(collectionPath, safeFilename);
     
-    file.pipe(fs.createWriteStream(saveTo));
+    file.pipe(secureFs.createWriteStream(saveTo));
     
     file.on('end', () => {
       res.json({ success: true, filename });
@@ -152,7 +152,7 @@ router.post('/collections/:collection/files/:filename', requireAuth, async (req,
     if (req.body.encoding === 'base64') {
       const buffer = Buffer.from(content, 'base64');
       const filePath = path.join(process.cwd(), '../../sources/local-documents', req.params.collection, req.params.filename);
-      await fs.writeFile(filePath, buffer);
+      await secureFs.writeFile(filePath, buffer);
       res.json({ success: true, path: filePath });
     } else {
       // Handle text content (existing functionality)
@@ -207,7 +207,7 @@ async function convertFiles(collection, files = null) {
         const outputFile = file.replace(ext, '.md');
         const outputPath = path.join(collectionPath, outputFile);
         
-        await fs.writeFile(outputPath, markdown, 'utf8');
+        await secureFs.writeFile(outputPath, markdown, 'utf8');
         converted++;
         results.push({ file, success: true });
       } catch (error) {

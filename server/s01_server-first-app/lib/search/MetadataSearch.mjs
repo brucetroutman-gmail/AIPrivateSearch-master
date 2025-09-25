@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import Database from 'better-sqlite3';
 import mime from 'mime-types';
@@ -145,7 +145,7 @@ export class MetadataSearch {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     const documentFiles = files.filter(file => file.endsWith('.md'));
     
     console.log(`Indexing metadata for ${documentFiles.length} documents in ${collection}`);
@@ -164,13 +164,13 @@ export class MetadataSearch {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
-    const files = await fs.readdir(collectionPath);
+    const files = await secureFs.readdir(collectionPath);
     const metaFiles = files.filter(file => file.startsWith('META_'));
     
     let deletedCount = 0;
     for (const filename of metaFiles) {
       const filePath = path.join(collectionPath, filename);
-      await fs.unlink(filePath);
+      await secureFs.unlink(filePath);
       deletedCount++;
       console.log(`Deleted META file: ${filename}`);
     }
@@ -217,8 +217,8 @@ export class MetadataSearch {
   }
 
   async extractAndStoreMetadata(filePath, filename, collection) {
-    const content = await fs.readFile(filePath, 'utf-8');
-    const stats = await fs.stat(filePath);
+    const content = await secureFs.readFile(filePath, 'utf-8');
+    const stats = await secureFs.stat(filePath);
     
     // Skip META_ files
     if (filename.startsWith('META_')) {
@@ -236,7 +236,7 @@ export class MetadataSearch {
       // Add DocID to source file if missing
       const docIdHeader = `---\nDocID: ${docId}\n---\n\n`;
       const updatedContent = docIdHeader + content;
-      await fs.writeFile(filePath, updatedContent, 'utf-8');
+      await secureFs.writeFile(filePath, updatedContent, 'utf-8');
       console.log(`Added DocID ${docId} to ${filename}`);
     }
     

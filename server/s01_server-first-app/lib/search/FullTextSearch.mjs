@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import lunr from 'lunr';
 
@@ -56,7 +56,7 @@ export class FullTextSearch {
     for (const coll of collections) {
       for (const filename of coll.files) {
         const filePath = path.join(coll.path, filename);
-        const content = await fs.readFile(filePath, 'utf-8');
+        const content = await secureFs.readFile(filePath, 'utf-8');
         const docId = `${coll.name}_${filename}`;
         
         const doc = {
@@ -86,12 +86,12 @@ export class FullTextSearch {
 
   async getCollections(documentsPath) {
     const collections = [];
-    const entries = await fs.readdir(documentsPath, { withFileTypes: true });
+    const entries = await secureFs.readdir(documentsPath, { withFileTypes: true });
     
     for (const entry of entries) {
       if (entry.isDirectory()) {
         const collectionPath = path.join(documentsPath, entry.name);
-        const files = await fs.readdir(collectionPath);
+        const files = await secureFs.readdir(collectionPath);
         const documentFiles = files.filter(file => 
           !file.startsWith('META_') && 
           file.endsWith('.md')

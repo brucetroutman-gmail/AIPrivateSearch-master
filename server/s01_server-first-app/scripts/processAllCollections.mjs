@@ -2,7 +2,7 @@ import { CollectionManager } from '../lib/documents/collectionManager.mjs';
 import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { logger } from '../../../shared/utils/logger.mjs';
-import fs from 'fs-extra';
+import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import path from 'path';
 
 async function processAllCollections() {
@@ -48,7 +48,7 @@ async function processAllCollections() {
 
 async function convertNonMarkdownFiles(collection, processor) {
   const collectionPath = path.join(process.cwd(), '../../sources/local-documents', collection);
-  const allFiles = await fs.readdir(collectionPath);
+  const allFiles = await secureFs.readdir(collectionPath);
   
   const nonMdFiles = allFiles.filter(file => {
     const ext = path.extname(file).toLowerCase();
@@ -68,7 +68,7 @@ async function convertNonMarkdownFiles(collection, processor) {
         const outputFile = file.replace(path.extname(file), '.md');
         const outputPath = path.join(collectionPath, outputFile);
         
-        await fs.writeFile(outputPath, markdown, 'utf8');
+        await secureFs.writeFile(outputPath, markdown, 'utf8');
         // logger sanitizes all inputs to prevent log injection
         logger.log('Converted file:', file, outputFile);
       } catch (error) {
