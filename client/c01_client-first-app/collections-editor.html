@@ -690,7 +690,7 @@
     }
     
     async function generateMetadata() {
-      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will:\n• Create SQLite database entries with comprehensive metadata\n• Delete existing META_ files (no longer needed)\n• Add DocIDs to source documents if missing`)) {
+      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will:\n• Create SQLite database entries with comprehensive metadata\n• Add DocIDs to source documents if missing`)) {
         return;
       }
       
@@ -700,27 +700,8 @@
       showLog(`Generating AI metadata for collection: ${currentCollection}...`, 'processing');
       
       try {
-        // Step 1: Delete existing META_ files
-        showLog(`Step 1: Removing existing META_ files...`);
-        const cleanupStartTime = Date.now();
-        
-        const cleanupResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/cleanup-meta-files`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ collection: currentCollection })
-        });
-        
-        const cleanupResult = await cleanupResponse.json();
-        const cleanupElapsed = ((Date.now() - cleanupStartTime) / 1000).toFixed(1);
-        
-        if (cleanupResult.success) {
-          showLog(`✓ Removed ${cleanupResult.filesDeleted} META_ files (${cleanupElapsed}s)`, 'success');
-        } else {
-          showLog(`✗ Cleanup failed: ${cleanupResult.error} (${cleanupElapsed}s)`, 'error');
-        }
-        
-        // Step 2: Generate SQLite metadata database
-        showLog(`\nStep 2: Generating SQLite metadata database...`);
+        // Generate SQLite metadata database
+        showLog(`Generating SQLite metadata database...`);
         const dbStartTime = Date.now();
         
         const dbResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/metadata-index`, {
@@ -1045,6 +1026,7 @@
       html += '<div><label><strong>Summary:</strong></label><br><textarea id="metaSummary" style="' + textareaStyle + '">' + (metadata.summary || '') + '</textarea></div>';
       html += '<div><label><strong>Comments:</strong></label><br><textarea id="metaComments" style="' + textareaStyle + '">' + (metadata.our_comments || '') + '</textarea></div>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">';
+      html += '<button type="button" onclick="exportMetadata()" class="btn btn-info">Save and Export</button>';
       html += '<button type="button" onclick="saveAllMetadata(\'' + metadata.id + '\')" class="btn btn-primary">Save All</button>';
       html += '<button type="button" onclick="closeMetadataEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
@@ -1055,6 +1037,7 @@
       document.body.appendChild(modal);
       
       window.currentMetadataModal = modal;
+      window.currentMetadata = metadata;
     }
     
     async function saveAllMetadata(metadataId) {
@@ -1103,10 +1086,80 @@
       }
     }
     
+    function exportMetadata() {
+      // Get current metadata from form
+      const exportData = {
+        doc_id: window.currentMetadata.doc_id,
+        collection: window.currentMetadata.collection,
+        filename: window.currentMetadata.filename,
+        file_type: window.currentMetadata.file_type,
+        file_size: window.currentMetadata.file_size,
+        file_path: document.getElementById('metaFilePath') ? document.getElementById('metaFilePath').value : window.currentMetadata.file_path,
+        created_date: window.currentMetadata.created_date,
+        last_modified_date: window.currentMetadata.last_modified_date,
+        author: document.getElementById('metaAuthor') ? document.getElementById('metaAuthor').value : window.currentMetadata.author,
+        language: document.getElementById('metaLanguage') ? document.getElementById('metaLanguage').value : window.currentMetadata.language,
+        source: document.getElementById('metaSource') ? document.getElementById('metaSource').value : window.currentMetadata.source,
+        version: document.getElementById('metaVersion') ? document.getElementById('metaVersion').value : window.currentMetadata.version,
+        word_count: window.currentMetadata.word_count,
+        access_level: document.getElementById('metaAccessLevel') ? document.getElementById('metaAccessLevel').value : window.currentMetadata.access_level,
+        license: document.getElementById('metaLicense') ? document.getElementById('metaLicense').value : window.currentMetadata.license,
+        title: document.getElementById('metaTitle') ? document.getElementById('metaTitle').value : window.currentMetadata.title,
+        summary: document.getElementById('metaSummary') ? document.getElementById('metaSummary').value : window.currentMetadata.summary,
+        topics: document.getElementById('metaTopics') ? document.getElementById('metaTopics').value : window.currentMetadata.topics,
+        keywords: document.getElementById('metaKeywords') ? document.getElementById('metaKeywords').value : window.currentMetadata.keywords,
+        key_phrases: document.getElementById('metaKeyPhrases') ? document.getElementById('metaKeyPhrases').value : window.currentMetadata.key_phrases,
+        category: document.getElementById('metaCategory') ? document.getElementById('metaCategory').value : window.currentMetadata.category,
+        sentiment: document.getElementById('metaSentiment') ? document.getElementById('metaSentiment').value : window.currentMetadata.sentiment,
+        entities: document.getElementById('metaEntities') ? document.getElementById('metaEntities').value : window.currentMetadata.entities,
+        complexity_score: document.getElementById('metaComplexityScore') ? document.getElementById('metaComplexityScore').value : window.currentMetadata.complexity_score,
+        readability_score: document.getElementById('metaReadabilityScore') ? document.getElementById('metaReadabilityScore').value : window.currentMetadata.readability_score,
+        reading_time: window.currentMetadata.reading_time,
+        paragraphs: window.currentMetadata.paragraphs,
+        sentences: window.currentMetadata.sentences,
+        character_count: window.currentMetadata.character_count,
+        unique_word_count: window.currentMetadata.unique_word_count,
+        average_sentence_length: window.currentMetadata.average_sentence_length,
+        links_count: window.currentMetadata.links_count,
+        image_count: window.currentMetadata.image_count,
+        generated_date: window.currentMetadata.generated_date,
+        metadata_version: document.getElementById('metaMetadataVersion') ? document.getElementById('metaMetadataVersion').value : window.currentMetadata.metadata_version,
+        tags: document.getElementById('metaTags') ? document.getElementById('metaTags').value : window.currentMetadata.tags,
+        geolocation: document.getElementById('metaGeolocation') ? document.getElementById('metaGeolocation').value : window.currentMetadata.geolocation,
+        our_comments: document.getElementById('metaComments') ? document.getElementById('metaComments').value : window.currentMetadata.our_comments
+      };
+      
+      // Create filename with timestamp
+      const now = new Date();
+      const timestamp = now.getFullYear() + 
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+      
+      const docName = (exportData.filename || 'document').replace(/\.[^/.]+$/, '');
+      const filename = `${exportData.collection}-${docName}-${timestamp}.json`;
+      
+      // Create and download file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showLog(`✓ Metadata exported to ${filename}`, 'success');
+    }
+    
     function closeMetadataEditor() {
       if (window.currentMetadataModal) {
         document.body.removeChild(window.currentMetadataModal);
         window.currentMetadataModal = null;
+        window.currentMetadata = null;
       }
     }
   </script>

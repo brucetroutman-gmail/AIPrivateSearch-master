@@ -3,6 +3,7 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import mime from 'mime-types';
 import { OllamaService } from '../utils/OllamaService.mjs';
+import natural from 'natural';
 
 export class MetadataSearch {
   constructor() {
@@ -10,6 +11,11 @@ export class MetadataSearch {
     this.description = 'Structured queries using document metadata';
     this.db = new Database('./metadata.db');
     this.setupDatabase();
+    
+    // Initialize NLP tools
+    this.tokenizer = new natural.WordTokenizer();
+    this.TfIdf = natural.TfIdf;
+    this.tfidf = new this.TfIdf();
   }
 
   setupDatabase() {
@@ -240,11 +246,30 @@ export class MetadataSearch {
     const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     const readingTime = Math.ceil(words.length / 200); // 200 words per minute
     
-    // Generate AI metadata (includes document type)
+    // Generate both NLP and AI metadata
+    const nlpMetadata = this.generateNLPMetadata(content);
     const aiMetadata = await this.generateAIMetadata(content, filename);
     
-    // Use AI-determined document type, fallback to rule-based
-    const category = aiMetadata.documentType || this.determineCategory(filename, content);
+    // Check if AI failed (indicated by fallback summary)
+    const aiSucceeded = aiMetadata.summary && !aiMetadata.summary.includes('Content analysis failed');
+    
+    // Combine NLP and AI results, using NLP when AI fails
+    const combinedMetadata = {
+      title: (aiSucceeded ? aiMetadata.title : null) || filename.replace(/\.[^/.]+$/, ''),
+      summary: (aiSucceeded ? aiMetadata.summary : null) || nlpMetadata.summary || '',
+      topics: (aiSucceeded && aiMetadata.topics?.length) ? aiMetadata.topics : nlpMetadata.topics,
+      keywords: (aiSucceeded && aiMetadata.keywords?.length) ? aiMetadata.keywords : nlpMetadata.keywords,
+      keyPhrases: (aiSucceeded && aiMetadata.keyPhrases?.length) ? aiMetadata.keyPhrases : nlpMetadata.keyPhrases,
+      documentType: (aiSucceeded ? aiMetadata.documentType : null) || nlpMetadata.documentType || 'general',
+      author: aiMetadata.author || '',
+      language: aiMetadata.language || 'en',
+      sentiment: aiMetadata.sentiment || '',
+      entities: aiMetadata.entities || [],
+      complexityScore: aiMetadata.complexityScore || 50,
+      readabilityScore: aiMetadata.readabilityScore || '',
+      tags: aiMetadata.tags || [],
+      geolocation: aiMetadata.geolocation || ''
+    };
     
     const metadata = {
       id: `${collection}_${filename}`,
@@ -257,23 +282,23 @@ export class MetadataSearch {
       filePath: filePath,
       createdDate: stats.birthtime.toISOString(),
       lastModifiedDate: stats.mtime.toISOString(),
-      author: aiMetadata.author || '',
-      language: aiMetadata.language || 'en',
+      author: combinedMetadata.author,
+      language: combinedMetadata.language,
       source: '',
       version: '1.0',
       wordCount: words.length,
       accessLevel: 'public',
       license: '',
-      title: aiMetadata.title || filename.replace(/\.[^/.]+$/, ''),
-      summary: aiMetadata.summary || '',
-      topics: aiMetadata.topics ? aiMetadata.topics.join(',') : '',
-      keywords: aiMetadata.keywords ? aiMetadata.keywords.join(',') : '',
-      keyPhrases: aiMetadata.keyPhrases ? aiMetadata.keyPhrases.join(',') : '',
-      category: aiMetadata.documentType || category,
-      sentiment: aiMetadata.sentiment || '',
-      entities: aiMetadata.entities ? aiMetadata.entities.join(',') : '',
-      complexityScore: aiMetadata.complexityScore || 50,
-      readabilityScore: aiMetadata.readabilityScore || '',
+      title: combinedMetadata.title,
+      summary: combinedMetadata.summary,
+      topics: combinedMetadata.topics.join(','),
+      keywords: combinedMetadata.keywords.join(','),
+      keyPhrases: combinedMetadata.keyPhrases.join(','),
+      category: combinedMetadata.documentType,
+      sentiment: combinedMetadata.sentiment,
+      entities: combinedMetadata.entities.join(','),
+      complexityScore: combinedMetadata.complexityScore,
+      readabilityScore: combinedMetadata.readabilityScore,
       readingTime,
       paragraphs: paragraphs.length,
       sentences: sentences.length,
@@ -284,8 +309,8 @@ export class MetadataSearch {
       imageCount: (content.match(/!\[[^\]]*\]\([^)]+\)/g) || []).length,
       generatedDate: new Date().toISOString(),
       metadataVersion: '1.0',
-      tags: aiMetadata.tags ? aiMetadata.tags.join(',') : '',
-      geolocation: aiMetadata.geolocation || ''
+      tags: combinedMetadata.tags.join(','),
+      geolocation: combinedMetadata.geolocation
     };
     
     this.addDocumentMetadata(metadata);
@@ -515,31 +540,116 @@ export class MetadataSearch {
     return 'document';
   }
 
+  generateNLPMetadata(content) {
+    try {
+      // Clean and tokenize the text
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      const tokens = this.tokenizer.tokenize(content.toLowerCase());
+      
+      // Generate summary (first 3 sentences or 100 words, whichever is shorter)
+      const summaryWords = sentences.slice(0, 3).join('. ').split(' ').slice(0, 100).join(' ');
+      const summary = summaryWords.endsWith('.') ? summaryWords : `${summaryWords}.`;
+      
+      // Extract keywords using TF-IDF
+      const tfidf = new this.TfIdf();
+      tfidf.addDocument(content);
+      const keywords = [];
+      tfidf.listTerms(0).forEach(item => {
+        if (item.tfidf > 1) { // Original threshold
+          keywords.push(item.term);
+        }
+      });
+      
+      // Generate topics (thematic categories based on content analysis)
+      const topicKeywords = {
+        'artificial intelligence': ['ai', 'artificial', 'intelligence', 'machine', 'learning', 'algorithm'],
+        'technology': ['tech', 'software', 'computer', 'digital', 'system', 'programming'],
+        'business': ['business', 'company', 'market', 'finance', 'economy', 'industry'],
+        'healthcare': ['health', 'medical', 'treatment', 'doctor', 'patient', 'disease'],
+        'education': ['education', 'school', 'learning', 'student', 'teacher', 'university'],
+        'research': ['research', 'study', 'analysis', 'methodology', 'findings', 'data'],
+        'government': ['government', 'policy', 'law', 'legal', 'constitution', 'congress'],
+        'literature': ['novel', 'story', 'character', 'narrative', 'fiction', 'author']
+      };
+      
+      const topics = [];
+      const contentLower = content.toLowerCase();
+      for (const [topic, words] of Object.entries(topicKeywords)) {
+        if (words.some(word => contentLower.includes(word))) {
+          topics.push(topic);
+        }
+      }
+      
+      // Extract key phrases (bigrams)
+      const bigrams = natural.NGrams.bigrams(tokens);
+      const keyPhrases = bigrams
+        .filter(phrase => phrase.join(' ').length > 5)
+        .slice(0, 5)
+        .map(phrase => phrase.join(' '));
+      
+      // Determine category (matching original categories)
+      const categoryKeywords = {
+        Technology: ['tech', 'software', 'ai', 'machine', 'computer'],
+        Health: ['health', 'medical', 'disease', 'treatment', 'doctor'],
+        Business: ['business', 'market', 'finance', 'economy', 'company'],
+        Education: ['education', 'school', 'learning', 'student', 'teacher']
+      };
+      
+      let category = 'General';
+      for (const [cat, words] of Object.entries(categoryKeywords)) {
+        if (keywords.some(keyword => words.includes(keyword))) {
+          category = cat;
+          break;
+        }
+      }
+      
+      return {
+        summary,
+        topics,
+        keywords: keywords.slice(0, 10),
+        keyPhrases,
+        documentType: category.toLowerCase()
+      };
+    } catch (error) {
+      console.log('NLP metadata generation failed:', error.message);
+      return {
+        summary: '',
+        topics: [],
+        keywords: [],
+        keyPhrases: [],
+        documentType: 'general'
+      };
+    }
+  }
+
   async generateAIMetadata(content, filename) {
     try {
-      const prompt = `Analyze this document and provide comprehensive metadata in JSON format:
+      const prompt = `You are an expert document analyst. Analyze this document excerpt and provide precise metadata.
 
-${content.substring(0, 2000)}...
+Document excerpt (${content.length} total chars):
+${content.substring(0, 3000)}${content.length > 3000 ? '...' : ''}
 
-Provide:
+Filename: ${filename}
+
+Provide ONLY valid JSON with these exact fields:
 {
-  "title": "Clear document title",
-  "summary": "2-3 sentence summary",
-  "topics": ["topic1", "topic2", "topic3"],
-  "keywords": ["keyword1", "keyword2", "keyword3"],
-  "keyPhrases": ["key phrase 1", "key phrase 2"],
-  "documentType": "legal|literature|poetry|financial|technical|academic|general",
-  "author": "Author name if identifiable",
-  "language": "en|es|fr|de|etc",
-  "sentiment": "positive|negative|neutral",
-  "entities": ["Person", "Organization", "Location"],
-  "complexityScore": 75,
-  "readabilityScore": "Grade level or Flesch score",
-  "tags": ["tag1", "tag2"],
-  "geolocation": "Country or region if mentioned"
+  "title": "Extract or create a clear, descriptive title (max 100 chars)",
+  "summary": "Write a concise 2-3 sentence summary focusing on main content and purpose",
+  "topics": ["3-5 specific topics covered - be precise, not generic"],
+  "keywords": ["5-8 important keywords - nouns, concepts, technical terms"],
+  "keyPhrases": ["2-4 key phrases that capture essential concepts"],
+  "documentType": "Choose ONE: legal|literature|poetry|financial|technical|academic|general",
+  "author": "Extract author name if clearly stated, otherwise empty string",
+  "language": "Detect language code: en|es|fr|de|it|pt|etc",
+  "sentiment": "Overall tone: positive|negative|neutral|mixed",
+  "entities": ["Extract proper nouns: people, places, organizations"],
+  "complexityScore": 1-100,
+  "readabilityScore": "Estimate reading level or complexity",
+  "tags": ["2-4 descriptive tags for categorization"],
+  "geolocation": "Geographic focus if any, otherwise empty"
 }
 
-Respond only with valid JSON:`;
+Be specific and accurate. Avoid generic terms. Focus on what makes this document unique.`;
 
       const ollama = new OllamaService();
       const response = await ollama.generateText(prompt, 'qwen2:1.5b');
@@ -548,9 +658,9 @@ Respond only with valid JSON:`;
       console.log('AI metadata generation failed, using fallback');
       return {
         title: filename.replace(/\.[^/.]+$/, ''),
-        summary: `Document containing ${content.split(/\s+/).length} words`,
-        topics: ['document', 'text'],
-        keywords: [filename.replace(/\.[^/.]+$/, ''), 'document'],
+        summary: `Document containing ${content.split(/\s+/).length} words. Content analysis failed - manual review needed.`,
+        topics: ['unprocessed', 'needs-review'],
+        keywords: [filename.replace(/\.[^/.]+$/, ''), 'unprocessed', 'manual-review-needed'],
         keyPhrases: ['document content'],
         documentType: 'general',
         author: '',

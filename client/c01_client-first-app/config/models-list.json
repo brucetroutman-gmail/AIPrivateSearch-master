@@ -11,6 +11,11 @@
       "size": "2.0 GB"
     },
     {
+      "category": "metadata",
+      "modelName": "llama3.2:3b",
+      "size": "2.0 GB"
+    },
+    {
       "category": "search",
       "modelName": "gemma2:2b",
       "size": "1.6 GB"
@@ -47,11 +52,6 @@
     },
     {
       "category": "search",
-      "modelName": "qwen2.5-coder:1.5b",
-      "size": "986 MB"
-    },
-    {
-      "category": "metadata",
       "modelName": "qwen2.5-coder:1.5b",
       "size": "986 MB"
     },
