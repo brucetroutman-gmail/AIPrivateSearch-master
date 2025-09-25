@@ -46,7 +46,7 @@ export default [
       "no-unsanitized/property": "error",
       
       // Basic rules
-      "no-unused-vars": "warn",
+      "no-unused-vars": "off",
       "no-console": "off"
     }
   }

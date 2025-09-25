@@ -1,4 +1,4 @@
-import path from 'path';
+
 import { TraditionalSearch } from './TraditionalSearch.mjs';
 import { MetadataSearch } from './MetadataSearch.mjs';
 import { FullTextSearch } from './FullTextSearch.mjs';

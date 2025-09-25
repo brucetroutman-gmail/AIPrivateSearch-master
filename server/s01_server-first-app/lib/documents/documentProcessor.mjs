@@ -1,5 +1,5 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
-import fs from 'fs-extra';
+
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 import { Ollama } from 'ollama';
