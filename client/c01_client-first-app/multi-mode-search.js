@@ -1,3 +1,19 @@
+
+// Security: HTML sanitization function
+function sanitizeHtml(html) {
+    const div = document.createElement('div');
+    div.textContent = html;
+    return div.innerHTML;
+}
+
+
+// Security: HTML sanitization function
+function sanitizeHtml(html) {
+    const div = document.createElement('div');
+    div.textContent = html;
+    return div.innerHTML;
+}
+
 // Multi-mode search functionality
 
 // DOM elements
@@ -263,7 +279,7 @@ function renderResults(containerId, searchResult) {
     `).join('');
     
     container.innerHTML = '';
-    container.insertAdjacentHTML('beforeend', resultsHtml);
+    container.insertAdjacentHTML('beforeend', sanitizeHtml(resultsHtml));
 }
 
 // Update performance table
@@ -284,7 +300,7 @@ function updatePerformanceTable(results) {
     }).join('');
     
     performanceTableBody.innerHTML = '';
-    performanceTableBody.insertAdjacentHTML('beforeend', tableRows);
+    performanceTableBody.insertAdjacentHTML('beforeend', sanitizeHtml(tableRows));
     performanceSection.style.display = 'block';
 }
 

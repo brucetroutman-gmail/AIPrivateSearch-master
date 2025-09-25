@@ -4,7 +4,11 @@ module.exports = {
         es2021: true,
         node: true
     },
-    extends: ['eslint:recommended'],
+    extends: [
+        'eslint:recommended',
+        'plugin:security/recommended'
+    ],
+    plugins: ['security', 'no-unsanitized'],
     parserOptions: {
         ecmaVersion: 2022,
         sourceType: 'module'
@@ -49,11 +53,29 @@ module.exports = {
         'no-control-regex': 'off',
         'no-unused-private-class-members': 'warn',
         
-        // Security rules - CRITICAL
+        // CRITICAL Security rules - Code Injection Prevention
         'no-eval': 'error',
         'no-implied-eval': 'error',
         'no-new-func': 'error',
         'no-script-url': 'error',
+        'security/detect-eval-with-expression': 'error',
+        'security/detect-non-literal-fs-filename': 'error',
+        'security/detect-non-literal-require': 'error',
+        'security/detect-unsafe-regex': 'error',
+        'security/detect-buffer-noassert': 'error',
+        'security/detect-child-process': 'error',
+        'security/detect-disable-mustache-escape': 'error',
+        'security/detect-no-csrf-before-method-override': 'error',
+        'security/detect-pseudoRandomBytes': 'error',
+        'security/detect-possible-timing-attacks': 'error',
+        'security/detect-new-buffer': 'error',
+        
+        // XSS Prevention
+        'no-unsanitized/method': 'error',
+        'no-unsanitized/property': 'error',
+        
+        // Path Traversal Prevention
+        'security/detect-non-literal-fs-filename': 'error',
         
         // Code quality rules
         'prefer-const': 'error',

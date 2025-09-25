@@ -1,7 +1,19 @@
 {
+  "scripts": {
+    "lint": "eslint .",
+    "lint:security": "eslint . --config eslint.security.config.mjs",
+    "lint:fix": "eslint . --fix --config eslint.security.config.mjs",
+    "security-check": "./security-check.sh",
+    "security-fix": "node security-fixes.mjs",
+    "audit": "npm audit --audit-level moderate",
+    "security-full": "npm run lint:security && npm run audit"
+  },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "eslint": "^9.35.0",
+    "eslint-plugin-no-unsanitized": "^4.1.4",
+    "eslint-plugin-security": "^3.0.1",
     "globals": "^16.4.0"
   }
 }

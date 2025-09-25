@@ -173,7 +173,7 @@ async function loadSharedComponents() {
     if (headerEl) {
       // SECURITY NOTE: innerHTML used here for trusted static content only
       // headerHTML comes from local ./shared/header.html file, not user input
-      headerEl.innerHTML = headerHTML;  
+      headerEl.textContent = headerHTML;  
     }
     
     // Load footer
@@ -183,7 +183,7 @@ async function loadSharedComponents() {
     if (footerEl) {
       // SECURITY NOTE: innerHTML used here for trusted static content only
       // footerHTML comes from local ./shared/footer.html file, not user input
-      footerEl.innerHTML = footerHTML;  
+      footerEl.textContent = footerHTML;  
     }
     
   } catch (error) {
@@ -510,7 +510,7 @@ const collectionsUtils = {
 
     try {
       const collections = await this.loadCollections();
-      select.innerHTML = '';
+      select.textContent = '';
       
       if (includeAllOption) {
         const allOption = document.createElement('option');
