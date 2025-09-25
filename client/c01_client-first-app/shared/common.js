@@ -197,8 +197,6 @@ async function loadSharedComponents() {
   } catch (error) {
     if (typeof logger !== 'undefined') {
       logger.error('Error loading shared components:', error);
-    } else {
-      console.error('Error loading shared components:', error);
     }
     throw error;
   }
@@ -333,8 +331,6 @@ async function loadScoreModels(selectElementId) {
     if (!scoreSelect) {
       if (typeof logger !== 'undefined') {
         logger.error('Score select element not found:', selectElementId);
-      } else {
-        console.error('Score select element not found:', selectElementId);
       }
       return;
     }
@@ -382,8 +378,6 @@ async function loadScoreModels(selectElementId) {
   } catch (error) {
     if (typeof logger !== 'undefined') {
       logger.error('Error loading score models:', error);
-    } else {
-      console.error('Error loading score models:', error);
     }
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {
@@ -415,10 +409,14 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       try {
         const date = new Date(result.createdAt);
         const formatted = date.toISOString().slice(0, 19).replace('T', ' ');
-        console.log('CreatedAt formatting:', 'original:', result.createdAt, 'formatted:', formatted, 'length:', formatted.length);
+        if (typeof logger !== 'undefined') {
+          logger.debug('CreatedAt formatting:', 'original:', result.createdAt, 'formatted:', formatted, 'length:', formatted.length);
+        }
         return formatted;
       } catch (e) {
-        console.error('Date formatting error:', e);
+        if (typeof logger !== 'undefined') {
+          logger.error('Date formatting error:', e);
+        }
         return null;
       }
     })(),
@@ -475,13 +473,17 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       throw new Error(`Database error: ${saveResult.error} (Code: ${saveResult.code || 'unknown'})`);
     }
   } catch (error) {
-    console.error('Full database export error:', error);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
+    if (typeof logger !== 'undefined') {
+      logger.error('Full database export error:', error);
+      logger.error('Error message:', error.message);
+      logger.error('Error stack:', error.stack);
+    }
     
     // Retry on connection issues (common on M4 Macs)
     if (error.message && (error.message.includes('ECONNRESET') || error.message.includes('ECONNREFUSED')) && retryCount < 3) {
-      console.log(`Database connection issue (${error.message.includes('ECONNREFUSED') ? 'refused' : 'reset'}), retrying... (attempt ${retryCount + 1})`);
+      if (typeof logger !== 'undefined') {
+        logger.warn(`Database connection issue (${error.message.includes('ECONNREFUSED') ? 'refused' : 'reset'}), retrying... (attempt ${retryCount + 1})`);
+      }
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return exportToDatabase(result, testCategory, testDescription, testParams, retryCount + 1);
     }
@@ -489,8 +491,6 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     const errorMsg = error.message || error.toString() || 'Unknown database error';
     if (typeof logger !== 'undefined') {
       logger.error('Database export error:', errorMsg);
-    } else {
-      console.error('Database export error:', errorMsg);
     }
     throw new Error(errorMsg);
   }
@@ -507,7 +507,7 @@ const collectionsUtils = {
       const data = await response.json();
       return data.collections || [];
     } catch (error) {
-      console.error('Failed to load collections:', error);
+      logger.error('Failed to load collections:', error);
       return [];
     }
   },
@@ -549,7 +549,7 @@ const collectionsUtils = {
         localStorage.setItem('selectedCollection', this.value);
       });
     } catch (error) {
-      console.error('Failed to populate collection select:', error);
+      logger.error('Failed to populate collection select:', error);
     }
   }
 };

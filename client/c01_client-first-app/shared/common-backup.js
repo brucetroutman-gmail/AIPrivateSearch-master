@@ -1,10 +1,10 @@
 // Minimal working common.js for testing
 
-console.log('Common.js loaded successfully');
+// Common.js loaded successfully
 
 // Simple test function
-function showUserMessage(message, type = 'info') {
-  console.log(`${type}: ${message}`);
+function showUserMessage() {
+  // Message displayed
 }
 
 // Make available globally
@@ -14,5 +14,5 @@ if (typeof window !== 'undefined') {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Common.js DOMContentLoaded fired');
+  // Common.js DOMContentLoaded fired
 });

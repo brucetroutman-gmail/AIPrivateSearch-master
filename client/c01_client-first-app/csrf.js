@@ -34,10 +34,10 @@ class CSRFManager {
       
       return this.token;
     } catch (error) {
-      console.error('Error fetching CSRF token:', error);
+      // Error fetching CSRF token - silently continue
       // For development, allow requests without CSRF token if server is not available
       if (error.message.includes('fetch')) {
-        console.warn('CSRF server unavailable, proceeding without token');
+        // CSRF server unavailable, proceeding without token
         return null;
       }
       throw error;
@@ -91,5 +91,5 @@ class CSRFManager {
 if (typeof window !== 'undefined') {
   window.csrfManager = new CSRFManager();
   // Initialize immediately
-  window.csrfManager.init().catch(console.error);
+  window.csrfManager.init().catch(() => {});
 }
