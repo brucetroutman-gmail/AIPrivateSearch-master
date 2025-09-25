@@ -13,7 +13,7 @@ export class TraditionalSearch {
     const results = [];
     
     try {
-      const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+      const documentsPath = '/Users/Shared/repos/aisearchscore/sources/local-documents';
       let collections = await this.getCollections(documentsPath);
       
       if (collection) {

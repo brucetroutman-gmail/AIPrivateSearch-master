@@ -6,7 +6,8 @@ import path from 'path';
 const ALLOWED_DIRS = [
     path.resolve('./sources/local-documents'),
     path.resolve('./data'),
-    path.resolve('./lib')
+    path.resolve('./lib'),
+    '/Users/Shared/repos/aisearchscore/sources/local-documents'
 ];
 
 function validatePath(filePath) {

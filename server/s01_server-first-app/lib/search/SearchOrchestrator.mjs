@@ -54,9 +54,9 @@ export class SearchOrchestrator {
   }
 
   async getAvailableCollections() {
-    return await this.searchMethods.traditional.getCollections(
-      path.join(process.cwd(), '../../sources/local-documents')
-    ).then(collections => collections.map(c => c.name));
+    const documentsPath = '/Users/Shared/repos/aisearchscore/sources/local-documents';
+    return await this.searchMethods.traditional.getCollections(documentsPath)
+      .then(collections => collections.map(c => c.name));
   }
 
   async indexCollectionMetadata(collection) {

@@ -171,9 +171,13 @@ async function loadSharedComponents() {
     const headerHTML = await headerResponse.text();
     const headerEl = document.getElementById('header-placeholder');
     if (headerEl) {
-      // SECURITY NOTE: innerHTML used here for trusted static content only
-      // headerHTML comes from local ./shared/header.html file, not user input
-      headerEl.textContent = headerHTML;  
+      // Safe HTML parsing to prevent XSS
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(headerHTML, 'text/html');
+      const headerContent = doc.body.firstElementChild;
+      if (headerContent) {
+        headerEl.appendChild(headerContent);
+      }
     }
     
     // Load footer
@@ -181,9 +185,13 @@ async function loadSharedComponents() {
     const footerHTML = await footerResponse.text();
     const footerEl = document.getElementById('footer-placeholder');
     if (footerEl) {
-      // SECURITY NOTE: innerHTML used here for trusted static content only
-      // footerHTML comes from local ./shared/footer.html file, not user input
-      footerEl.textContent = footerHTML;  
+      // Safe HTML parsing to prevent XSS
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(footerHTML, 'text/html');
+      const footerContent = doc.body.firstElementChild;
+      if (footerContent) {
+        footerEl.appendChild(footerContent);
+      }
     }
     
   } catch (error) {
