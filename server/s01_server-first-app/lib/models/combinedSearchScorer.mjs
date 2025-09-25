@@ -195,7 +195,7 @@ class CombinedSearchScorer {
     }
   }
 
-  // eslint-disable-next-line no-unused-vars
+   
   async score(query, answer, temperature = 0.3, context = 0.3, scoreModel = null) {
     try {
       logger.log('Starting scoring process');
@@ -340,7 +340,7 @@ Respond with only three numbers, one per line.`;
           this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
           return this.cachedPcCode;
         }
-      // eslint-disable-next-line no-unused-vars
+       
       } catch (e) {
         // Continue to system_profiler fallback
       }
@@ -354,7 +354,7 @@ Respond with only three numbers, one per line.`;
           this.cachedPcCode = serial.substring(0, 3) + serial.substring(serial.length - 3);
           return this.cachedPcCode;
         }
-      // eslint-disable-next-line no-unused-vars
+       
       } catch (e) {
         // Continue to hostname fallback
       }
