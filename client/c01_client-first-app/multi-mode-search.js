@@ -1,7 +1,7 @@
 
 
 
-/* eslint-disable no-console */
+ 
 // Multi-mode search functionality
 
 // DOM elements

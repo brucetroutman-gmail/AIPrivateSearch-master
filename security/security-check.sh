@@ -4,6 +4,11 @@
 
 echo "🔒 Running Security Validation..."
 
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Change to root directory (parent of security folder)
+cd "$SCRIPT_DIR/.."
+
 # 1. Check for banned patterns
 echo "📋 Checking for banned security patterns..."
 

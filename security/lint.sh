@@ -4,8 +4,13 @@
 
 echo "🔍 Running ESLint on AISearchScore JavaScript files..."
 
-# Run ESLint on all JS files
-npx eslint "client/**/*.{js,mjs}" "server/**/*.{js,mjs}" --fix
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Change to root directory (parent of security folder)
+cd "$SCRIPT_DIR/.."
+
+# Run ESLint with security config
+npx eslint "client/**/*.{js,mjs}" "server/**/*.{js,mjs}" --config ./security/eslint.security.config.mjs --fix
 
 # Capture exit code
 ESLINT_EXIT_CODE=$?
