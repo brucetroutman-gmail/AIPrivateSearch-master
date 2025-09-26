@@ -8,7 +8,7 @@ export class AIDirectSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null, model = 'qwen2:0.5b' } = options;
+    const { collection = null, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     const results = [];
     
     try {
@@ -78,55 +78,40 @@ export class AIDirectSearch {
     return results.filter(result => result !== null);
   }
 
-  async performAISearch(documentContent, query, filename, model = 'qwen2:0.5b') {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+  async performAISearch(documentContent, query, filename, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null) {
+    const options = {
+      temperature: temperature,
+      num_ctx: contextSize
+    };
     
-    try {
-      const response = await fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: model,
-          prompt: `${documentContent.substring(0, 1500)}\n\nQ: ${query}\nA:`,
-          stream: false,
-          options: {
-            temperature: 0.1,
-            num_predict: 200,
-            num_ctx: 2048
-          }
-        })
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      return {
-        id: `ai_${filename}_${Date.now()}`,
-        title: `AI Analysis: ${filename}`,
-        excerpt: result.response || 'No response generated',
-        score: 0.85,
-        source: `Ollama ${model} analysis of ${filename}`
-      };
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        return {
-          id: `ai_${filename}_${Date.now()}`,
-          title: `AI Analysis: ${filename}`,
-          excerpt: 'Analysis timed out. Please try a simpler query.',
-          score: 0.5,
-          source: `Timeout - ${filename}`
-        };
-      }
-      throw new Error(`Ollama API unavailable: ${error.message}`);
+    if (tokenLimit && tokenLimit !== 'No Limit') {
+      options.num_predict = parseInt(tokenLimit);
     }
+    
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: `${documentContent.substring(0, 1500)}\n\nQ: ${query}\nA:`,
+        stream: false,
+        options: options
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    return {
+      id: `ai_${filename}_${Date.now()}`,
+      title: `AI Analysis: ${filename}`,
+      excerpt: result.response || 'No response generated',
+      score: 0.85,
+      source: `Ollama ${model} analysis of ${filename}`
+    };
   }
 
   generateAIResponse(query, context) {

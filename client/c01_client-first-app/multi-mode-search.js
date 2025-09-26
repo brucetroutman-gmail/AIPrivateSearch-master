@@ -83,14 +83,14 @@ async function performTraditionalSearch(query, collection = null) {
     }
 }
 
-async function performAIDirectSearch(query, collection, model) {
+async function performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit) {
     const startTime = Date.now();
     
     try {
         const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-direct', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model } })
+            body: JSON.stringify({ query, options: { collection, model, temperature, contextSize, tokenLimit } })
         });
         
         const data = await response.json();
@@ -105,14 +105,14 @@ async function performAIDirectSearch(query, collection, model) {
     }
 }
 
-async function performRAGSearch(query, collection, model) {
+async function performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit) {
     const startTime = Date.now();
     
     try {
         const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model, topK: 3 } })
+            body: JSON.stringify({ query, options: { collection, model, topK: 3, temperature, contextSize, tokenLimit } })
         });
         
         const data = await response.json();
@@ -328,6 +328,9 @@ async function performAllSearches() {
     const query = searchQueryEl.value.trim();
     const collection = document.getElementById('collectionSelect').value;
     const model = document.getElementById('modelSelect').value;
+    const temperature = parseFloat(document.getElementById('temperatureSelect').value);
+    const contextSize = parseInt(document.getElementById('contextSelect').value);
+    const tokenLimit = document.getElementById('tokensSelect').value;
     
     if (!query) {
         window.showUserMessage('Please enter a search query', 'error');
@@ -386,11 +389,11 @@ async function performAllSearches() {
             methodMap['traditional'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('ai-direct')) {
-            searchPromises.push(performAIDirectSearch(query, collection, model));
+            searchPromises.push(performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['ai-direct'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('rag')) {
-            searchPromises.push(performRAGSearch(query, collection, model));
+            searchPromises.push(performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['rag'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('rag-simple')) {
@@ -512,7 +515,7 @@ async function loadModels() {
         const data = await response.json();
         const select = document.getElementById('modelSelect');
         
-        const models = data.models.filter(m => m.category === 'search').map(m => m.modelName);
+        const models = data.models.filter(m => m.category === 'search').map(m => m.modelName).sort();
         const savedModel = localStorage.getItem('selectedSearchModel');
         
         models.forEach(model => {

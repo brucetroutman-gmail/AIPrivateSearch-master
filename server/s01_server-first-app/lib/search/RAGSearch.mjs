@@ -8,7 +8,7 @@ export class RAGSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null, model = 'qwen2:0.5b', topK = 3 } = options;
+    const { collection = null, model = 'qwen2:0.5b', topK = 3, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
       console.log(`RAG search for query: "${query}" in collection: ${collection}`);
@@ -34,7 +34,7 @@ export class RAGSearch {
       
       let aiResponse;
       try {
-        aiResponse = await this.generateAIResponse(query, relevantChunks, model);
+        aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit);
       } catch (error) {
         console.log('AI generation failed, using chunks directly:', error.message);
         aiResponse = this.formatChunksDirectly(query, relevantChunks);
@@ -82,46 +82,36 @@ export class RAGSearch {
     return await this.embeddingService.findSimilarChunks(query, collection, topK);
   }
 
-  async generateAIResponse(query, chunks, model) {
-    // Limit context to prevent hangs
+  async generateAIResponse(query, chunks, model, temperature = 0.3, contextSize = 1024, tokenLimit = null) {
     const context = chunks.map(chunk => 
       `[${chunk.filename}]: ${chunk.content.substring(0, 800)}`
     ).join('\n\n');
     
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const options = {
+      temperature: temperature,
+      num_ctx: contextSize
+    };
     
-    try {
-      const response = await fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: model,
-          prompt: `${context}\n\nQ: ${query}\nA:`,
-          stream: false,
-          options: {
-            temperature: 0.1,
-            num_predict: 200,
-            num_ctx: 2048
-          }
-        })
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      return result.response || 'No response generated';
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        return 'Response generation timed out. Please try a simpler query.';
-      }
-      return 'AI generation failed. Please try again.';
+    if (tokenLimit && tokenLimit !== 'No Limit') {
+      options.num_predict = parseInt(tokenLimit);
     }
+    
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: `${context}\n\nQ: ${query}\nA:`,
+        stream: false,
+        options: options
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    return result.response || 'No response generated';
   }
 }
