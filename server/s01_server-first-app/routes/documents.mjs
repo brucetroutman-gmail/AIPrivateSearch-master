@@ -4,7 +4,7 @@ import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { asyncHandler } from '../middleware/errorHandler.mjs';
 import { requireAuth, requireAdminAuth } from '../middleware/auth.mjs';
-import lanceDBService from '../lib/documents/lanceDBService.mjs';
+import { UnifiedEmbeddingService } from '../lib/embeddings/unifiedEmbeddingService.mjs';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { validatePath, validateFilename } from '../lib/utils/pathValidator.mjs';
@@ -14,6 +14,7 @@ import path from 'path';
 const router = express.Router();
 const collectionManager = new CollectionManager();
 const documentProcessor = new DocumentProcessor();
+const embeddingService = new UnifiedEmbeddingService();
 
 // CRUD Operations
 router.get('/collections', requireAuth, asyncHandler(async (req, res) => {
@@ -57,12 +58,14 @@ router.delete('/collections/:collection', requireAdminAuth, asyncHandler(async (
       await secureFs.remove(localEmbeddingsPath);
     }
     
-    // Remove all embeddings from LanceDB
+    // Remove all embeddings from unified service
     try {
-      await lanceDBService.removeCollection(collection);
+      const documents = await embeddingService.listDocuments(collection);
+      for (const doc of documents) {
+        await embeddingService.removeDocument(collection, doc.filename);
+      }
     } catch (error) {
-      // logger sanitizes all inputs to prevent log injection
-      logger.log(`LanceDB collection ${collection} not found or already removed`);
+      logger.log(`Unified embeddings for collection ${collection} not found or already removed`);
     }
     
     // Remove collection folder and all files
@@ -280,20 +283,20 @@ router.post('/process-selected', requireAuth, asyncHandler(async (req, res) => {
 // Embedding Operations
 router.post('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
-    const { vectorDB = 'local' } = req.body;
-    const documentSearch = new DocumentSearch(req.params.collection);
-    await documentSearch.initialize();
-    
     const document = await collectionManager.readDocument(req.params.collection, req.params.filename);
     
-    // Estimate chunks based on content length (roughly 500 chars per chunk)
-    const estimatedChunks = Math.ceil(document.content.length / 500);
+    const result = await embeddingService.processDocument(
+      req.params.filename, 
+      document.content, 
+      req.params.collection
+    );
     
-    const result = await documentSearch.indexDocument(req.params.filename, document.content, vectorDB);
-    
-    // Add chunk information to result
-    result.estimatedChunks = estimatedChunks;
-    result.actualChunks = result.chunks || estimatedChunks;
+    // Add helpful message about reuse
+    if (result.reused) {
+      result.message = 'Document already embedded, reused existing embeddings';
+    } else {
+      result.message = 'Document embedded successfully';
+    }
     
     res.json(result);
   } catch (error) {
@@ -304,18 +307,8 @@ router.post('/collections/:collection/index/:filename', requireAuth, async (req,
 
 router.delete('/collections/:collection/index/:filename', requireAuth, async (req, res) => {
   try {
-    await lanceDBService.removeDocument(req.params.collection, req.params.filename);
-    const { vectorDB = 'local' } = req.body;
-    
-    if (vectorDB === 'lanceDB') {
-      await lanceDBService.removeDocument(req.params.collection, req.params.filename);
-    } else {
-      const localSearch = new DocumentSearch(req.params.collection, 'local');
-      await localSearch.initialize();
-      await localSearch.removeDocument(req.params.filename);
-    }
-    
-    res.json({ success: true });
+    const result = await embeddingService.removeDocument(req.params.collection, req.params.filename);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -324,11 +317,11 @@ router.delete('/collections/:collection/index/:filename', requireAuth, async (re
 // Search Operations
 router.post('/collections/:collection/search', requireAuth, async (req, res) => {
   try {
-    const { vectorDB = 'local' } = req.body;
-    const documentSearch = new DocumentSearch(req.params.collection, vectorDB);
-    await documentSearch.initialize();
-    
-    const results = await documentSearch.searchDocuments(req.body.query, req.body.limit || 5);
+    const results = await embeddingService.findSimilarChunks(
+      req.body.query, 
+      req.params.collection, 
+      req.body.limit || 5
+    );
     res.json({ results });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -337,29 +330,16 @@ router.post('/collections/:collection/search', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/indexed', requireAuth, async (req, res) => {
   try {
-    const localSearch = new DocumentSearch(req.params.collection, 'local');
-    await localSearch.initialize();
+    const documents = await embeddingService.listDocuments(req.params.collection);
     
-    const localDocs = await localSearch.listIndexedDocuments();
-    const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
+    const formattedDocs = documents.map(doc => ({
+      filename: doc.filename,
+      inLocal: false,
+      inLanceDB: true, // Using unified SQLite service
+      metadata: {}
+    }));
     
-    logger.log('Collection indexed docs - Local:', localDocs.length, 'LanceDB:', lanceDocs.length);
-    
-    // Combine and mark which storage each document is in
-    const allFilenames = new Set([...localDocs.map(d => d.filename), ...lanceDocs.map(d => d.filename)]);
-    const documents = Array.from(allFilenames).map(filename => {
-      const localDoc = localDocs.find(d => d.filename === filename);
-      const lanceDoc = lanceDocs.find(d => d.filename === filename);
-      
-      return {
-        filename,
-        inLocal: !!localDoc,
-        inLanceDB: !!lanceDoc,
-        metadata: localDoc?.metadata || lanceDoc?.metadata || {}
-      };
-    });
-    
-    res.json({ documents });
+    res.json({ documents: formattedDocs });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -367,30 +347,19 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
 
 router.get('/collections/:collection/embeddings-info', requireAuth, async (req, res) => {
   try {
-    const localSearch = new DocumentSearch(req.params.collection, 'local');
-    await localSearch.initialize();
+    const chunkCounts = await embeddingService.getChunkCounts(req.params.collection);
+    const stats = await embeddingService.getStats();
     
-    const localDocs = await localSearch.listIndexedDocuments();
-    const lanceDocs = await lanceDBService.listDocuments(req.params.collection);
-    const lanceChunks = await lanceDBService.getChunkCounts(req.params.collection);
-    
-    const localInfo = {
-      documents: localDocs.map(doc => ({
-        filename: doc.filename,
-        chunks: doc.chunks || 0
-      })),
-      totalChunks: localDocs.reduce((sum, doc) => sum + (doc.chunks || 0), 0)
-    };
-    
-    const lanceInfo = {
-      documents: Object.entries(lanceChunks).map(([filename, chunks]) => ({
+    const unifiedInfo = {
+      documents: Object.entries(chunkCounts).map(([filename, chunks]) => ({
         filename,
         chunks
       })),
-      totalChunks: Object.values(lanceChunks).reduce((sum, count) => sum + count, 0)
+      totalChunks: Object.values(chunkCounts).reduce((sum, count) => sum + count, 0),
+      globalStats: stats
     };
     
-    res.json({ local: localInfo, lanceDB: lanceInfo });
+    res.json({ local: { documents: [], totalChunks: 0 }, lanceDB: unifiedInfo });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

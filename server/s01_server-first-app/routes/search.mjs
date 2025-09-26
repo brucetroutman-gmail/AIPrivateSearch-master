@@ -35,6 +35,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       }
       
       const searchResults = await documentSearch.searchDocuments(query, 5);
+      console.log(`Search route: Got ${searchResults.length} results for collection "${collection}"`);
       
       if (searchResults.length === 0) {
         const result = {
@@ -67,20 +68,19 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         return res.json(result);
       }
       
-      // Create metadata-first prompt that instructs AI to read META chunks first
+      // Create enhanced query with search results
+      console.log('Building enhanced query with', searchResults.length, 'results');
       const enhancedQuery = documentSearch.buildMetadataFirstPrompt(query, searchResults);
+      console.log('Enhanced query length:', enhancedQuery.length);
       
       // Process through AI model using retry logic for tests
       const result = testCode ? 
         await scorer.processWithRetry(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel) :
         await scorer.process(enhancedQuery, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, scoreModel);
       
-      // Add collection info and metadata context to result
+      // Add collection info to result
       result.collection = collection;
       result.documentSources = searchResults.map(r => ({ filename: r.filename, similarity: r.similarity }));
-      result.metadataFirst = true;
-      result.metaChunks = searchResults.filter(r => r.filename.startsWith('META_')).length;
-      result.sourceChunks = searchResults.filter(r => !r.filename.startsWith('META_')).length;
       
       return res.json(result);
     }

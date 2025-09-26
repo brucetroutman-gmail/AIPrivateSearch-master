@@ -105,15 +105,15 @@ done
 # Auto-update control flag (set to false to disable automatic updates)
 AUTO_UPDATE_MODELS=true
 
-# Check if we need to update (24 hour check)
+# Check if we need to update (7 day check)
 if [ "$AUTO_UPDATE_MODELS" = true ]; then
     if [ -f "$LAST_PULL_FILE" ]; then
         LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
         TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
-        # 86400 seconds = 24 hours
-        if [ $TIME_DIFF -gt 86400 ]; then
+        # 604800 seconds = 7 days
+        if [ $TIME_DIFF -gt 604800 ]; then
             SHOULD_UPDATE=true
-            echo "⏰ Last model update was over 24 hours ago"
+            echo "⏰ Last model update was over 7 days ago"
         fi
     else
         SHOULD_UPDATE=true
@@ -137,7 +137,7 @@ if [ ${#MISSING_MODELS[@]} -gt 0 ]; then
     done
 fi
 
-# Update all models if needed (24 hour check) - M4-safe
+# Update all models if needed (7 day check) - M4-safe
 if [ "$SHOULD_UPDATE" = true ] && [ ${#MISSING_MODELS[@]} -eq 0 ]; then
     echo "🔄 Updating all models (one at a time for M4 compatibility)..."
     for model in $REQUIRED_MODELS; do

@@ -601,10 +601,9 @@
       }
       
       setProcessingState(true);
-      const vectorDB = 'lanceDB'; // Always use LanceDB
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Processing ${selectedMD.length} selected source MD files to LanceDB (META files excluded)...`, 'processing');
+      showLog(`Processing ${selectedMD.length} selected source MD files to unified SQLite embeddings (META files excluded)...`, 'processing');
       
       try {
       
@@ -627,15 +626,16 @@
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ vectorDB })
+            body: JSON.stringify({})
           });
           
           const result = await response.json();
           const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
           
           if (result.success) {
-            const chunkInfo = result.actualChunks ? ` (${result.actualChunks} chunks)` : '';
-            showLog(`${progress} ✓ Completed: ${filename}${chunkInfo} (${formatTime(fileElapsed)})`, 'success');
+            const chunkInfo = result.chunks ? ` (${result.chunks} chunks)` : '';
+            const reuseInfo = result.reused ? ' [reused existing]' : ' [new embedding]';
+            showLog(`${progress} ✓ Completed: ${filename}${chunkInfo}${reuseInfo} (${formatTime(fileElapsed)})`, 'success');
           } else {
             showLog(`${progress} ✗ Failed: ${filename} - ${result.error} (${formatTime(fileElapsed)})`, 'error');
           }
@@ -668,20 +668,27 @@
     
     async function viewEmbeddings() {
       clearLog();
-      showLog(`Checking LanceDB embeddings for collection: ${currentCollection}`);
+      showLog(`Checking unified SQLite embeddings for collection: ${currentCollection}`);
       
       try {
         const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/embeddings-info`);
         const data = await response.json();
         
-        showLog(`=== LANCEDB STORAGE ===`);
+        showLog(`=== UNIFIED SQLITE STORAGE ===`);
         if (data.lanceDB.documents.length > 0) {
           showLog(`✓ ${data.lanceDB.documents.length} documents, ${data.lanceDB.totalChunks} total chunks`);
           data.lanceDB.documents.forEach(doc => {
             showLog(`  • ${doc.filename}: ${doc.chunks} chunks`);
           });
+          
+          if (data.lanceDB.globalStats) {
+            showLog(`\n=== GLOBAL STATS ===`);
+            showLog(`Total unique documents: ${data.lanceDB.globalStats.documents}`);
+            showLog(`Total chunks: ${data.lanceDB.globalStats.chunks}`);
+            showLog(`Total collections: ${data.lanceDB.globalStats.collections}`);
+          }
         } else {
-          showLog(`✗ No documents in LanceDB storage`);
+          showLog(`✗ No documents in unified SQLite storage`);
         }
         
       } catch (error) {
@@ -733,16 +740,14 @@
       const query = await securePrompt(`Enter search query for ${currentCollection}:`);
       if (!query) return;
       
-      const vectorDB = 'lanceDB'; // Always use LanceDB
-      
       clearLog();
-      showLog(`Searching ${currentCollection} in LanceDB for: "${query}"...`);
+      showLog(`Searching ${currentCollection} in unified SQLite embeddings for: "${query}"...`);
       
       try {
         const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, limit: 3, vectorDB })
+          body: JSON.stringify({ query, limit: 3 })
         });
         
         const data = await response.json();
@@ -762,7 +767,7 @@
     }
     
     async function removeCollection() {
-      if (!await secureConfirm(`Are you sure you want to PERMANENTLY DELETE the entire '${currentCollection}' collection?\n\nThis will:\n- Remove all embeddings from both Local and LanceDB\n- Delete all files in the collection\n- Remove the collection folder\n\nThis action CANNOT be undone!`)) {
+      if (!await secureConfirm(`Are you sure you want to PERMANENTLY DELETE the entire '${currentCollection}' collection?\n\nThis will:\n- Remove all embeddings from unified SQLite storage\n- Delete all files in the collection\n- Remove the collection folder\n\nThis action CANNOT be undone!`)) {
         return;
       }
       
@@ -851,12 +856,12 @@
       
       const vectorDB = 'lanceDB'; // Always use LanceDB
       
-      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files in LanceDB?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files in unified SQLite storage?`)) {
         return;
       }
       
       clearLog();
-      showLog(`Removing embeddings from ${selectedMD.length} selected source files in LanceDB...`);
+      showLog(`Removing embeddings from ${selectedMD.length} selected source files in unified SQLite storage...`);
       
       for (let i = 0; i < selectedMD.length; i++) {
         const filename = selectedMD[i];
@@ -905,13 +910,13 @@
         showLog(`${progress} Deleting: ${filename}`);
         
         try {
-          // Remove from vector DB if it's an MD file
+          // Remove from unified SQLite embeddings if it's an MD file
           if (filename.endsWith('.md')) {
             const removeResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
               method: 'DELETE'
             });
             if (removeResponse.ok) {
-              showLog(`${progress} ✓ Removed from index: ${filename}`);
+              showLog(`${progress} ✓ Removed from embeddings: ${filename}`);
             }
           }
           
