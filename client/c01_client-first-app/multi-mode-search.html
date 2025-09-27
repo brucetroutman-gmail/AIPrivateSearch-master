@@ -59,6 +59,33 @@
             border-color: #555;
             color: #e0e0e0;
         }
+        
+        .controls-container {
+            display: flex !important;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
+        }
+        
+        .controls-container select {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        [data-theme="dark"] .search-input {
+            background: #333;
+            border-color: #555;
+            color: #e0e0e0;
+        }
     </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
@@ -74,6 +101,8 @@
         <div class="search-section">
             <div class="search-input-container">
                 <input type="text" id="searchQuery" placeholder="Enter your search query..." class="search-input">
+            </div>
+            <div class="controls-container">
                 <select id="collectionSelect" class="collection-select" required>
                     <option value="" disabled selected>Select Collection</option>
                 </select>
@@ -96,7 +125,6 @@
                     <option value="250">250</option>
                     <option value="500">500</option>
                 </select>
-                <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
             </div>
         </div>
 
@@ -114,6 +142,7 @@
                 <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Full-Text</label>
             </div>
+            <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
         </div>
 
 

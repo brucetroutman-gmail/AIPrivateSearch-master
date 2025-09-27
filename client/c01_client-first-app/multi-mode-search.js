@@ -127,14 +127,14 @@ async function performRAGSearch(query, collection, model, temperature, contextSi
     }
 }
 
-async function performRAGSimpleSearch(query, collection, model) {
+async function performRAGSimpleSearch(query, collection, model, temperature, contextSize, tokenLimit) {
     const startTime = Date.now();
     
     try {
         const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag-simple', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model, topK: 3 } })
+            body: JSON.stringify({ query, options: { collection, model, topK: 3, temperature, contextSize, tokenLimit } })
         });
         
         const data = await response.json();
@@ -328,9 +328,19 @@ async function performAllSearches() {
     const query = searchQueryEl.value.trim();
     const collection = document.getElementById('collectionSelect').value;
     const model = document.getElementById('modelSelect').value;
-    const temperature = parseFloat(document.getElementById('temperatureSelect').value);
-    const contextSize = parseInt(document.getElementById('contextSelect').value);
-    const tokenLimit = document.getElementById('tokensSelect').value;
+    const temperatureEl = document.getElementById('temperatureSelect');
+    const contextEl = document.getElementById('contextSelect');
+    const tokensEl = document.getElementById('tokensSelect');
+    
+    console.log('Temperature element:', temperatureEl, temperatureEl?.value);
+    console.log('Context element:', contextEl, contextEl?.value);
+    console.log('Tokens element:', tokensEl, tokensEl?.value);
+    
+    const temperature = parseFloat(temperatureEl?.value || '0.3');
+    const contextSize = parseInt(contextEl?.value || '1024');
+    const tokenLimit = tokensEl?.value || 'No Limit';
+    
+    console.log('Final values:', { temperature, contextSize, tokenLimit });
     
     if (!query) {
         window.showUserMessage('Please enter a search query', 'error');
@@ -397,7 +407,7 @@ async function performAllSearches() {
             methodMap['rag'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('rag-simple')) {
-            searchPromises.push(performRAGSimpleSearch(query, collection, model));
+            searchPromises.push(performRAGSimpleSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['rag-simple'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('vector')) {
