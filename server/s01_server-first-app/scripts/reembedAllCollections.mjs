@@ -4,14 +4,14 @@ import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import path from 'path';
 import { EmbeddingService } from '../lib/documents/embeddingService.mjs';
 import { VectorStore } from '../lib/documents/vectorStore.mjs';
-import lanceDBService from '../lib/documents/lanceDBService.mjs';
+
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
 const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
 const embeddingsPath = path.join(process.cwd(), 'data', 'embeddings');
 
-async function reembedAllCollections(vectorDB = 'both') {
+async function reembedAllCollections(vectorDB = 'local') {
   const embeddingService = new EmbeddingService();
   
   try {
@@ -58,22 +58,14 @@ async function reembedAllCollections(vectorDB = 'both') {
       }
       
       // Save to local vector store
-      if (vectorDB === 'local' || vectorDB === 'both') {
-        const localEmbeddingsPath = path.join(embeddingsPath, collection);
-        await secureFs.ensureDir(localEmbeddingsPath);
-        const vectorStore = new VectorStore(localEmbeddingsPath);
-        await vectorStore.saveDocuments(documents.map(doc => ({
-          ...doc,
-          embedding: doc.vector
-        })));
-        logger.log(`  ✓ Saved ${documents.length} chunks to local storage`);
-      }
-      
-      // Save to LanceDB
-      if (vectorDB === 'lanceDB' || vectorDB === 'both') {
-        await lanceDBService.createCollection(collection, documents);
-        logger.log(`  ✓ Saved ${documents.length} chunks to LanceDB`);
-      }
+      const localEmbeddingsPath = path.join(embeddingsPath, collection);
+      await secureFs.ensureDir(localEmbeddingsPath);
+      const vectorStore = new VectorStore(localEmbeddingsPath);
+      await vectorStore.saveDocuments(documents.map(doc => ({
+        ...doc,
+        embedding: doc.vector
+      })));
+      logger.log(`  ✓ Saved ${documents.length} chunks to local storage`);
     }
     
     logger.log('\n🎉 All collections re-embedded successfully!');
@@ -83,6 +75,5 @@ async function reembedAllCollections(vectorDB = 'both') {
   }
 }
 
-const vectorDB = process.argv[2] || 'both';
-logger.log(`Re-embedding all collections using: ${vectorDB}`);
-reembedAllCollections(vectorDB);
+logger.log('Re-embedding all collections using local storage');
+reembedAllCollections('local');

@@ -335,7 +335,7 @@ router.get('/collections/:collection/indexed', requireAuth, async (req, res) => 
     const formattedDocs = documents.map(doc => ({
       filename: doc.filename,
       inLocal: false,
-      inLanceDB: true, // Using unified SQLite service
+      inUnified: true, // Using unified SQLite service
       metadata: {}
     }));
     
@@ -359,7 +359,7 @@ router.get('/collections/:collection/embeddings-info', requireAuth, async (req, 
       globalStats: stats
     };
     
-    res.json({ local: { documents: [], totalChunks: 0 }, lanceDB: unifiedInfo });
+    res.json({ local: { documents: [], totalChunks: 0 }, unified: unifiedInfo });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -2,10 +2,7 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import lanceDBService from '../lib/documents/lanceDBService.mjs';
-
 const embeddingsPath = path.join(process.cwd(), 'data', 'embeddings');
-const lanceDBPath = path.join(process.cwd(), 'data', 'lancedb');
 
 async function clearAllEmbeddings() {
   console.log('Clearing all embeddings...');
@@ -17,11 +14,7 @@ async function clearAllEmbeddings() {
       console.log('✓ Cleared local embeddings');
     }
     
-    // Clear LanceDB
-    if (await fs.pathExists(lanceDBPath)) {
-      await fs.remove(lanceDBPath);
-      console.log('✓ Cleared LanceDB embeddings');
-    }
+
     
     console.log('All embeddings cleared successfully!');
   } catch (error) {

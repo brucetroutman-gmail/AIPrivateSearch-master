@@ -802,7 +802,7 @@ form.addEventListener('submit', async (e) => {
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
     const addMetaPrompt = addMetaPromptEl.checked;
-    // VectorDB removed - using LanceDB only
+    // VectorDB removed - using unified SQLite service only
     
     // Validate collection selection for local documents
     if (sourceTypeEl.value.includes('Docu') && !collection) {
