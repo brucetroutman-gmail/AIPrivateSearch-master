@@ -1,3 +1,10 @@
+
+Security check:
+
+cd security
+bash security-check.sh
+
+
 Summary
 I've successfully set up ESLint with comprehensive security rules to mitigate the security issues found in your AISearchScore application. Here's what was implemented:
 
