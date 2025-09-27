@@ -28,6 +28,8 @@ const autoExportToggle = document.getElementById('autoExportToggle');
 const manualExportSection = document.getElementById('manualExportSection');
 const collectionEl = document.getElementById('collection');
 const collectionSection = document.getElementById('collectionSection');
+const searchTypeEl = document.getElementById('searchType');
+const searchTypeSection = document.getElementById('searchTypeSection');
 const vectorDBEl = document.getElementById('vectorDB');
 const vectorDBSection = document.getElementById('vectorDBSection');
 const addMetaPromptEl = document.getElementById('addMetaPrompt');
@@ -70,6 +72,12 @@ async function loadCollections() {
     const lastUsed = localStorage.getItem('lastCollection');
     if (lastUsed && collections.includes(lastUsed)) {
       collectionEl.value = lastUsed;
+    }
+    
+    // Restore last used search type
+    const lastSearchType = localStorage.getItem('lastSearchType');
+    if (lastSearchType) {
+      searchTypeEl.value = lastSearchType;
     }
   } catch (error) {
     collectionEl.innerHTML = '<option value="">Error loading collections</option>';
@@ -179,9 +187,10 @@ loadSourceTypes().then(() => {
     if (showChunksToggle) showChunksToggle.checked = false;
   }
   
-  // Handle collection/vectorDB sections
+  // Handle collection/searchType/vectorDB sections
   if (sourceTypeEl.value.includes('Docu')) {
     collectionSection.style.display = 'block';
+    searchTypeSection.style.display = 'block';
     if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
   }
@@ -324,13 +333,15 @@ contextEl.addEventListener('change', () => {
 sourceTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSourceType', sourceTypeEl.value);
   
-  // Show/hide collection and vectorDB dropdowns based on source type
+  // Show/hide collection, searchType and vectorDB dropdowns based on source type
   if (sourceTypeEl.value.includes('Docu')) {
     collectionSection.style.display = 'block';
+    searchTypeSection.style.display = 'block';
     if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
   } else {
     collectionSection.style.display = 'none';
+    searchTypeSection.style.display = 'none';
     if (vectorDBSection) vectorDBSection.style.display = 'none';
   }
   
@@ -352,6 +363,11 @@ sourceTypeEl.addEventListener('change', () => {
 // Save collection selection
 collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
+});
+
+// Save search type selection
+searchTypeEl.addEventListener('change', () => {
+  localStorage.setItem('lastSearchType', searchTypeEl.value);
 });
 
 // Save meta prompt checkbox state
@@ -780,8 +796,9 @@ form.addEventListener('submit', async (e) => {
     // Generate TestCode
     const testCode = generateTestCode();
     
-    // Get collection if Local Documents source type is selected
+    // Get collection and search type if Local Documents source type is selected
     const collection = (sourceTypeEl.value.includes('Docu')) ? collectionEl.value : null;
+    const searchType = (sourceTypeEl.value.includes('Docu')) ? searchTypeEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
     const addMetaPrompt = addMetaPromptEl.checked;
@@ -794,7 +811,7 @@ form.addEventListener('submit', async (e) => {
     }
     
     updateProgress('Searching');
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt);
+    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
     
     // Show scoring phase if scores were generated
     if (result.scores) {

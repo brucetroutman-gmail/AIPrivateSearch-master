@@ -370,7 +370,7 @@ async function performAllSearches() {
     }
     
     // Clear previous results for all containers
-    ['traditional-container', 'ai-direct-container', 'rag-container', 'rag-simple-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
+    ['traditional-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
         const notSelectedDiv = document.createElement('div');
         notSelectedDiv.className = 'no-results';
@@ -406,10 +406,7 @@ async function performAllSearches() {
             searchPromises.push(performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['rag'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('rag-simple')) {
-            searchPromises.push(performRAGSimpleSearch(query, collection, model, temperature, contextSize, tokenLimit));
-            methodMap['rag-simple'] = searchPromises.length - 1;
-        }
+
         if (selectedMethods.includes('vector')) {
             searchPromises.push(performVectorSearch(query, collection));
             methodMap['vector'] = searchPromises.length - 1;
