@@ -11,6 +11,7 @@ class ScoringService {
 
   loadScoreSettings() {
     const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     const settings = {};
     config['score-settings'].forEach(item => {

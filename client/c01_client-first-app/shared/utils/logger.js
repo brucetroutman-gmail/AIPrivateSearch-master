@@ -18,7 +18,6 @@ function sanitizeLogInput(input) {
   // \r\n\t - newlines and tabs that could break log format
   // \x00-\x1f - control characters
   // \x7f-\x9f - additional control characters
-  // eslint-disable-next-line no-control-regex
   return str.replace(/[\r\n\t]/g, ' ').replace(/[\x00-\x1f\x7f-\x9f]/g, '');
 }
 

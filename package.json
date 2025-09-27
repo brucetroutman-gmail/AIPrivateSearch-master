@@ -1,10 +1,10 @@
 {
   "scripts": {
     "lint": "eslint .",
-    "lint:security": "eslint . --config eslint.security.config.mjs",
-    "lint:fix": "eslint . --fix --config eslint.security.config.mjs",
+    "lint:security": "eslint . --config security/eslint.security.config.mjs",
+    "lint:fix": "eslint . --fix --config security/eslint.security.config.mjs",
     "security-check": "./security-check.sh",
-    "security-fix": "node security-fixes.mjs",
+    "security-fix": "node security/security-fixes.mjs",
     "audit": "npm audit --audit-level moderate",
     "security-full": "npm run lint:security && npm run audit"
   },

@@ -22,6 +22,7 @@ Path Traversal: security/detect-non-literal-fs-filename
 Credential Security: security/detect-possible-timing-attacks
 
 📋 Usage Commands:
+```bash
 # Run security linting
 npm run lint:security
 
@@ -30,9 +31,12 @@ npm run security-fix
 
 # Full security audit
 npm run security-full
+```
 
-Copy
-bash
+📁 Security Files Location:
+- `security/eslint.security.config.mjs` - ESLint security configuration
+- `security/security-fixes.mjs` - Automated security fixes
+- `security/SECURITY_README.md` - This documentation
 🎯 Next Steps:
 Move hardcoded credentials to environment variables
 

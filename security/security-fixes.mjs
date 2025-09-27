@@ -27,11 +27,13 @@ export function validatePath(filePath, allowedDir) {
 
 export function safeReadFile(filePath, allowedDir) {
     const safePath = validatePath(filePath, allowedDir);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     return fs.readFile(safePath, 'utf8');
 }
 
 export function safeWriteFile(filePath, data, allowedDir) {
     const safePath = validatePath(filePath, allowedDir);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     return fs.writeFile(safePath, data);
 }
 
