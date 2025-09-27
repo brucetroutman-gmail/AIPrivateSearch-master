@@ -2,14 +2,14 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import Database from 'better-sqlite3';
 import mime from 'mime-types';
-import { OllamaService } from '../utils/OllamaService.mjs';
+import { OllamaService } from '../services/OllamaService.mjs';
 import natural from 'natural';
 
 export class MetadataSearch {
   constructor() {
     this.name = 'Metadata Search';
     this.description = 'Structured queries using document metadata';
-    this.db = new Database('./metadata.db');
+    this.db = new Database('./data/databases/metadata.db');
     this.setupDatabase();
     
     // Initialize NLP tools

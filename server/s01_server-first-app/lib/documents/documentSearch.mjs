@@ -1,4 +1,4 @@
-import { UnifiedEmbeddingService } from '../embeddings/unifiedEmbeddingService.mjs';
+import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
 
 export class DocumentSearch {
   constructor(collection, vectorDB = 'local') {

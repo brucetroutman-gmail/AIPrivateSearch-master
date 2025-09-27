@@ -4,7 +4,7 @@ import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { asyncHandler } from '../middleware/errorHandler.mjs';
 import { requireAuth, requireAdminAuth } from '../middleware/auth.mjs';
-import { UnifiedEmbeddingService } from '../lib/embeddings/unifiedEmbeddingService.mjs';
+import { UnifiedEmbeddingService } from '../lib/documents/unifiedEmbeddingService.mjs';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { validatePath, validateFilename } from '../lib/utils/pathValidator.mjs';
