@@ -2,14 +2,14 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
-import { TraditionalSearch } from './TraditionalSearch.mjs';
+import { ExactMatchSearch } from './ExactMatchSearch.mjs';
 import { VectorSearchSimple } from './VectorSearchSimple.mjs';
 
 export class HybridSearch {
   constructor() {
     this.name = 'Hybrid Search';
     this.description = 'Combined traditional and vector methods';
-    this.traditionalSearch = new TraditionalSearch();
+    this.traditionalSearch = new ExactMatchSearch();
     this.vectorSearch = new VectorSearchSimple();
     this.tfidf = new TfIdf();
     this.documents = new Map();

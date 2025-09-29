@@ -86,7 +86,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       const endTime = Date.now();
       
       const methodResult = searchResult.results[searchType];
-      if (!methodResult || methodResult.results.length === 0) {
+      if (!methodResult || !methodResult.results || methodResult.results.length === 0) {
         return res.json({
           response: 'No relevant documents found using the selected search method.',
           query,
@@ -98,9 +98,13 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
       }
       
-      // Get the search response
+      // Get the search response - for exact-match, use context lines format
       const firstResult = methodResult.results[0];
-      searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
+      if (searchType === 'exact-match') {
+        searchResponse = firstResult.excerpt || 'No content available';
+      } else {
+        searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
+      }
       
       // Create search metrics for document searches
       searchMetrics = {
@@ -192,6 +196,17 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       error: 'Internal server error',
       message: error.message 
     });
+  }
+});
+
+// Exact Match Search endpoint
+router.post('/exact-match', async (req, res) => {
+  try {
+    const { query, options = {} } = req.body;
+    const result = await searchOrchestrator.search(query, ['exact-match'], options);
+    res.json(result.results['exact-match']);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -1,24 +1,24 @@
 
-import { TraditionalSearch } from './TraditionalSearch.mjs';
+import { ExactMatchSearch } from './ExactMatchSearch.mjs';
 import { MetadataSearch } from './MetadataSearch.mjs';
 import { FullTextSearch } from './FullTextSearch.mjs';
 import { VectorSearchSimple } from './VectorSearchSimple.mjs';
 import { HybridSearch } from './HybridSearch.mjs';
 import { AIDirectSearch } from './AIDirectSearch.mjs';
 import { RAGSearch } from './RAGSearch.mjs';
-import { RAGSearchSimple } from './RAGSearchSimple.mjs';
+
 
 export class SearchOrchestrator {
   constructor() {
     this.searchMethods = {
-      traditional: new TraditionalSearch(),
+      'exact-match': new ExactMatchSearch(),
       metadata: new MetadataSearch(),
       fulltext: new FullTextSearch(),
       vector: new VectorSearchSimple(),
       hybrid: new HybridSearch(),
       'ai-direct': new AIDirectSearch(),
       rag: new RAGSearch(),
-      'rag-simple': new RAGSearchSimple()
+
     };
   }
 
@@ -54,9 +54,14 @@ export class SearchOrchestrator {
   }
 
   async getAvailableCollections() {
-    const documentsPath = '/Users/Shared/repos/aisearchscore/sources/local-documents';
-    return await this.searchMethods.traditional.getCollections(documentsPath)
-      .then(collections => collections.map(c => c.name));
+    try {
+      const documentsPath = '../../sources/local-documents';
+      const collections = await this.searchMethods['exact-match'].getCollections(documentsPath);
+      return collections.map(c => c.name);
+    } catch (error) {
+      console.error('Error loading collections:', error.message);
+      return [];
+    }
   }
 
   async indexCollectionMetadata(collection) {

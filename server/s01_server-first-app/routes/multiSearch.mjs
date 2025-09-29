@@ -33,11 +33,11 @@ router.post('/multi-method', async (req, res) => {
 });
 
 // Individual method endpoints
-router.post('/traditional', async (req, res) => {
+router.post('/exact-match', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['traditional'], options);
-    res.json(result.results.traditional);
+    const result = await searchOrchestrator.search(query, ['exact-match'], options);
+    res.json(result.results['exact-match']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -103,29 +103,21 @@ router.post('/rag', async (req, res) => {
   }
 });
 
-router.post('/rag-simple', async (req, res) => {
-  try {
-    const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['rag-simple'], options);
-    res.json(result.results['rag-simple']);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+
 
 // Get available methods
 router.get('/methods', (req, res) => {
   res.json({
     methods: searchOrchestrator.getAvailableMethods(),
     descriptions: {
-      traditional: 'File-based grep-like search for exact matches',
+      'exact-match': 'Exact match search for precise text matching',
       metadata: 'Structured queries using document metadata',
       fulltext: 'Indexed search with ranking and stemming',
       vector: 'Semantic similarity using embeddings',
       hybrid: 'Combined traditional and vector methods',
       'ai-direct': 'Question-answering models for contextual understanding',
       rag: 'Chunked documents with AI retrieval',
-      'rag-simple': 'Chunked documents with text similarity (no embeddings)'
+
     }
   });
 });

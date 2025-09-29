@@ -169,13 +169,15 @@ specs-3-scoring
 
 80. In create metadata the docid for source does not equal docid for meta --done 
 
-81. Review processing time for create Metadata
+81. Review processing time for create Metadata  --done
 
-82. Test multi-mode-search 
+82. Test multi-mode-search --done
 
-83. Document each mode
+83. Document each mode  --done
 
-83. eval uate the best techniques for a user.
+83. eval uate the best techniques for a user  --started
+
+84. Enhance Traditonal Text (Exact Match Search) rename and improve
 
 
 

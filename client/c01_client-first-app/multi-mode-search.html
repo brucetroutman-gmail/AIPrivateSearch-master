@@ -133,7 +133,7 @@
             <h3>Select Search Methods:</h3>
             <div class="method-checkboxes">
                 <label><input type="checkbox" id="selectAll"> Select All</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="traditional"> Traditional Text</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Exact Match Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="rag"> RAG Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="vector"> Vector DB</label>
@@ -148,10 +148,10 @@
 
         <!-- Results Grid -->
         <div class="results-grid">
-            <div class="result-column" id="traditional-results">
-                <h3>Traditional Text Search</h3>
+            <div class="result-column" id="exact-match-results">
+                <h3>Exact Match Search</h3>
                 <div class="method-description">File-based grep-like search for exact matches</div>
-                <div class="results-container" id="traditional-container">
+                <div class="results-container" id="exact-match-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>

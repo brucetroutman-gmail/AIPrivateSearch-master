@@ -415,6 +415,8 @@ if (addMetaPromptSetting === 'true') {
   addMetaPromptEl.checked = true;
 }
 
+
+
 // Restore prompt text after page loads
 setTimeout(() => {
   const lastPrompt = localStorage.getItem('lastPrompt');
@@ -745,9 +747,11 @@ function render(result) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  console.log('Form submitted');
   
   // Check authorization - require email for access
   const userEmail = localStorage.getItem('userEmail');
+  console.log('User email:', userEmail);
   if (!userEmail || userEmail.trim() === '') {
     outputEl.textContent = 'Please provide your email address to use this service.';
     return;
@@ -810,8 +814,18 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     
+    console.log('About to call search API with:', {
+      query: queryEl.value,
+      searchType,
+      collection,
+      sourceType: sourceTypeEl.value
+    });
+    
     updateProgress('Searching');
-    const result = await search(queryEl.value, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
+    const trimmedQuery = queryEl.value.trim();
+    console.log('Calling search with trimmed query:', trimmedQuery);
+    const result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
+    console.log('Search result:', result);
     
     // Show scoring phase if scores were generated
     if (result.scores) {
@@ -845,6 +859,7 @@ form.addEventListener('submit', async (e) => {
     
     // Export section is now part of the answer
   } catch (err) {
+    console.error('Search error:', err);
     outputEl.textContent = err.message;
     // logger sanitizes all inputs to prevent log injection
     logger.error(err);

@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 const ALLOWED_DIRS = [
-    path.resolve('./sources/local-documents'),
+    path.resolve('../../sources'),
     path.resolve('./data'),
     path.resolve('./lib')
 ];
@@ -12,14 +12,13 @@ function validatePath(filePath) {
     const normalizedPath = path.normalize(filePath);
     const resolvedPath = path.resolve(normalizedPath);
     
-    const isAllowed = ALLOWED_DIRS.some(allowedDir => 
-        resolvedPath.startsWith(allowedDir)
-    );
-    
-    if (!isAllowed) {
-        throw new Error('Path traversal attempt detected: ' + filePath);
+    // Allow any path under the aisearchscore project directory
+    const projectRoot = '/Users/Shared/repos/aisearchscore';
+    if (resolvedPath.startsWith(projectRoot)) {
+        return resolvedPath;
     }
-    return resolvedPath;
+    
+    throw new Error('Path traversal attempt detected: ' + filePath);
 }
 
 export const secureFs = {

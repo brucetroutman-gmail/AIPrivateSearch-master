@@ -2,9 +2,9 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import { createInterface } from 'readline';
 
-export class TraditionalSearch {
+export class ExactMatchSearch {
   constructor() {
-    this.name = 'Traditional Text Search';
+    this.name = 'Exact Match Search';
     this.description = 'File-based grep-like search for exact matches';
   }
 
@@ -13,7 +13,7 @@ export class TraditionalSearch {
     const results = [];
     
     try {
-      const documentsPath = '/Users/Shared/repos/aisearchscore/sources/local-documents';
+      const documentsPath = '../../sources/local-documents';
       let collections = await this.getCollections(documentsPath);
       
       if (collection) {
@@ -37,7 +37,9 @@ export class TraditionalSearch {
 
   async getCollections(documentsPath) {
     const collections = [];
-    const entries = await secureFs.readdir(documentsPath, { withFileTypes: true });
+    
+    try {
+      const entries = await secureFs.readdir(documentsPath, { withFileTypes: true });
     
     for (const entry of entries) {
       if (entry.isDirectory()) {
@@ -56,7 +58,14 @@ export class TraditionalSearch {
       }
     }
     
-    return collections;
+      return collections;
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        console.log('Documents directory not found:', documentsPath);
+        return [];
+      }
+      throw error;
+    }
   }
 
   async searchInCollection(collection, query, options) {
@@ -64,7 +73,7 @@ export class TraditionalSearch {
     
     for (const filename of collection.files) {
       const filePath = path.join(collection.path, filename);
-      const fileResults = await this.searchInFile(filePath, query, options);
+      const fileResults = await this.searchInFile(filePath, query, options, collection);
       results.push(...fileResults.map(result => ({
         ...result,
         collection: collection.name
@@ -74,22 +83,47 @@ export class TraditionalSearch {
     return results;
   }
 
-  async searchInFile(filePath, query, options) {
+  async searchInFile(filePath, query, options, collection) {
     const results = [];
     const fileStream = secureFs.createReadStream(filePath);
     const rl = createInterface({ input: fileStream });
     
+    const lines = [];
     let lineNumber = 0;
+    
+    // First pass: collect all lines
     for await (const line of rl) {
       lineNumber++;
-      if (this.matchesQuery(line, query, options)) {
+      lines.push({ number: lineNumber, text: line });
+    }
+    
+    // Second pass: find matches and add context
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (this.matchesQuery(line.text, query, options)) {
+        const contextLines = [];
+        
+        // Add 2 lines before
+        for (let j = Math.max(0, i - 2); j < i; j++) {
+          contextLines.push(`${lines[j].number}: ${lines[j].text}`);
+        }
+        
+        // Add the matching line
+        contextLines.push(`${line.number}: ${line.text} ← MATCH`);
+        
+        // Add 2 lines after
+        for (let j = i + 1; j <= Math.min(lines.length - 1, i + 2); j++) {
+          contextLines.push(`${lines[j].number}: ${lines[j].text}`);
+        }
+        
         results.push({
-          id: `${path.basename(filePath)}_${lineNumber}`,
+          id: `${path.basename(filePath)}_${line.number}`,
           title: path.basename(filePath),
-          excerpt: this.extractExcerpt(line.trim(), query),
-          score: this.calculateRelevanceScore(line, query),
-          source: `${path.basename(filePath)}:${lineNumber}`,
-          lineNumber
+          excerpt: contextLines.join('\n'),
+          score: this.calculateRelevanceScore(line.text, query),
+          source: `${path.basename(filePath)}:${line.number}`,
+          lineNumber: line.number,
+          documentPath: `/api/documents/${collection.name}/${path.basename(filePath)}`
         });
       }
     }

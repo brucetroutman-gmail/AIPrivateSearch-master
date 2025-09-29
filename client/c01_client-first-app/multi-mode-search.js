@@ -23,9 +23,9 @@ const methodCheckboxes = document.querySelectorAll('.method-checkbox');
 
 // Search methods configuration
 const searchMethods = {
-    traditional: {
-        name: 'Traditional Text',
-        endpoint: '/api/search/traditional',
+    'exact-match': {
+        name: 'Exact Match Search',
+        endpoint: '/api/search/exact-match',
         description: 'File-based grep-like search for exact matches'
     },
     'ai-direct': {
@@ -38,11 +38,7 @@ const searchMethods = {
         endpoint: '/api/search/rag',
         description: 'Chunked documents with AI retrieval'
     },
-    'rag-simple': {
-        name: 'RAG Simple',
-        endpoint: '/api/search/rag-simple',
-        description: 'Chunked documents with text similarity (no embeddings)'
-    },
+
     vector: {
         name: 'Vector Database',
         endpoint: '/api/search/vector',
@@ -66,14 +62,14 @@ const searchMethods = {
 };
 
 // Real API search functions
-async function performTraditionalSearch(query, collection = null) {
+async function performExactMatchSearch(query, collection = null) {
     const startTime = Date.now();
     
     try {
         const options = { query };
         if (collection) options.collection = collection;
         
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/traditional', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, options: { collection } })
@@ -83,11 +79,11 @@ async function performTraditionalSearch(query, collection = null) {
         return { 
             results: data.results || [], 
             time: Date.now() - startTime, 
-            method: 'traditional' 
+            method: 'exact-match' 
         };
     } catch (error) {
-        console.error('Traditional search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'traditional' };
+        console.error('Exact match search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'exact-match' };
     }
 }
 
@@ -135,27 +131,7 @@ async function performRAGSearch(query, collection, model, temperature, contextSi
     }
 }
 
-async function performRAGSimpleSearch(query, collection, model, temperature, contextSize, tokenLimit) {
-    const startTime = Date.now();
-    
-    try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag-simple', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model, topK: 3, temperature, contextSize, tokenLimit } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'rag-simple' 
-        };
-    } catch (error) {
-        console.error('RAG Simple search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'rag-simple' };
-    }
-}
+
 
 async function performVectorSearch(query, collection) {
     const startTime = Date.now();
@@ -292,6 +268,17 @@ function renderResults(containerId, searchResult) {
         
         meta.appendChild(source);
         
+        // Add document link if available
+        if (result.documentPath) {
+            const link = document.createElement('a');
+            link.href = `http://localhost:3001${result.documentPath}`;
+            link.textContent = ' [View Document]';
+            link.target = '_blank';
+            link.style.marginLeft = '10px';
+            link.style.color = '#007bff';
+            meta.appendChild(link);
+        }
+        
         div.appendChild(header);
         div.appendChild(excerpt);
         div.appendChild(meta);
@@ -378,7 +365,7 @@ async function performAllSearches() {
     }
     
     // Clear previous results for all containers
-    ['traditional-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
+    ['exact-match-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
         const container = document.getElementById(id);
         const notSelectedDiv = document.createElement('div');
         notSelectedDiv.className = 'no-results';
@@ -402,9 +389,9 @@ async function performAllSearches() {
         const searchPromises = [];
         const methodMap = {};
         
-        if (selectedMethods.includes('traditional')) {
-            searchPromises.push(performTraditionalSearch(query, collection));
-            methodMap['traditional'] = searchPromises.length - 1;
+        if (selectedMethods.includes('exact-match')) {
+            searchPromises.push(performExactMatchSearch(query, collection));
+            methodMap['exact-match'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('ai-direct')) {
             searchPromises.push(performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit));
@@ -414,7 +401,6 @@ async function performAllSearches() {
             searchPromises.push(performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['rag'] = searchPromises.length - 1;
         }
-
         if (selectedMethods.includes('vector')) {
             searchPromises.push(performVectorSearch(query, collection));
             methodMap['vector'] = searchPromises.length - 1;
