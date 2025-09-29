@@ -614,14 +614,7 @@
         const fileStartTime = Date.now();
         
         try {
-          // First get file info to estimate chunks
-          const infoResponse = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}`);
-          const fileInfo = await infoResponse.json();
-          const estimatedChunks = Math.ceil(fileInfo.content.length / 500);
-          
-          // Show processing message with chunk estimation if large file
-          const chunkInfo = estimatedChunks > 5 ? ` (~${estimatedChunks} chunks estimated)` : '';
-          showLog(`${progress} Processing: ${filename}${chunkInfo}`, 'processing');
+          showLog(`${progress} Processing: ${filename}`, 'processing');
           
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'POST',
@@ -829,18 +822,10 @@
       return `${minutes}m ${remainingSeconds}s`;
     }
     
-    async function openFile(filename) {
-      try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}/open`, {
-          method: 'POST'
-        });
-        const result = await response.json();
-        if (!result.success) {
-          showLog(`✗ Failed to open ${filename}: ${result.error}`);
-        }
-      } catch (error) {
-        showLog(`✗ Error opening ${filename}: ${error.message}`);
-      }
+    function openFile(filename) {
+      // Open document content in new tab
+      const url = `http://localhost:3001/api/documents/${currentCollection}/${filename}`;
+      window.open(url, '_blank');
     }
     
 

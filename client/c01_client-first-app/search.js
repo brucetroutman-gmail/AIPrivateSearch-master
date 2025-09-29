@@ -358,6 +358,9 @@ sourceTypeEl.addEventListener('change', () => {
   
   // Filter assistant types based on source type
   filterAssistantTypes();
+  
+  // Toggle Generate Scores visibility
+  toggleGenerateScoresVisibility();
 });
 
 // Save collection selection
@@ -365,10 +368,31 @@ collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
 });
 
-// Save search type selection
+// Save search type selection and toggle Generate Scores visibility
 searchTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSearchType', searchTypeEl.value);
+  toggleGenerateScoresVisibility();
 });
+
+// Function to show/hide Generate Scores based on source type and search type
+function toggleGenerateScoresVisibility() {
+  const scoreLabel = scoreTglEl.parentElement;
+  const showScores = sourceTypeEl.value.includes('Docu') && searchTypeEl.value === 'rag';
+  
+  console.log('Toggle visibility:', {
+    sourceType: sourceTypeEl.value,
+    searchType: searchTypeEl.value,
+    showScores
+  });
+  
+  if (scoreLabel) {
+    scoreLabel.style.display = showScores ? 'flex' : 'none';
+    if (!showScores) {
+      scoreTglEl.checked = false;
+      document.getElementById('scoringSection').style.display = 'none';
+    }
+  }
+}
 
 // Save meta prompt checkbox state
 addMetaPromptEl.addEventListener('change', () => {
@@ -423,6 +447,8 @@ setTimeout(() => {
   if (lastPrompt && queryEl) {
     queryEl.value = lastPrompt;
   }
+  // Check Generate Scores visibility on page load
+  toggleGenerateScoresVisibility();
 }, 50);
 
 // Load and populate scoring options
