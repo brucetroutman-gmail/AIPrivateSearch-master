@@ -572,14 +572,39 @@ function render(result) {
   answerH.textContent = 'Answer';
   const answerP = document.createElement('div');
   
-  // Convert markdown links to HTML links
-  const responseWithLinks = result.response.replace(
-    /\[([^\]]+)\]\(([^\)]+)\)/g,
-    '<a href="$2" target="_blank" style="color: var(--link-color, #0066cc); text-decoration: underline;">$1</a>'
-  );
+  // Safely parse and create links
+  const lines = result.response.split('\n');
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      answerP.appendChild(document.createElement('br'));
+    }
+    
+    // Check for markdown links
+    const linkMatch = line.match(/\[([^\]]+)\]\(([^\)]+)\)/);
+    if (linkMatch) {
+      const beforeLink = line.substring(0, linkMatch.index);
+      const afterLink = line.substring(linkMatch.index + linkMatch[0].length);
+      
+      if (beforeLink) {
+        answerP.appendChild(document.createTextNode(beforeLink));
+      }
+      
+      const link = document.createElement('a');
+      link.href = linkMatch[2];
+      link.target = '_blank';
+      link.style.color = 'var(--link-color, #0066cc)';
+      link.style.textDecoration = 'underline';
+      link.textContent = linkMatch[1];
+      answerP.appendChild(link);
+      
+      if (afterLink) {
+        answerP.appendChild(document.createTextNode(afterLink));
+      }
+    } else {
+      answerP.appendChild(document.createTextNode(line));
+    }
+  });
   
-  // Convert line breaks and preserve formatting
-  answerP.innerHTML = responseWithLinks.replace(/\n/g, '<br>');
   outputEl.append(answerH, answerP);
 
   // 2. (optional) scores
