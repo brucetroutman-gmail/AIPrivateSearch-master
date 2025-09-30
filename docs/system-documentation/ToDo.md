@@ -177,7 +177,9 @@ specs-3-scoring
 
 83. eval uate the best techniques for a user  --started
 
-84. Enhance Traditonal Text (Exact Match Search) rename and improve
+84. Enhance Traditonal Text (Exact Match Search) rename and improve  --done
+
+85. Get full-search working on search page
 
 
 

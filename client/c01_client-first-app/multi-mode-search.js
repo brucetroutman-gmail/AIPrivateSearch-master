@@ -271,7 +271,8 @@ function renderResults(containerId, searchResult) {
         // Add document link if available
         if (result.documentPath) {
             const link = document.createElement('a');
-            link.href = `http://localhost:3001${result.documentPath}`;
+            // Handle both full URLs and relative paths
+            link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
             link.textContent = ' [View Document]';
             link.target = '_blank';
             link.style.marginLeft = '10px';

@@ -28,7 +28,8 @@ export class FullTextSearch {
           title: `Full-Text: ${doc.filename}`,
           excerpt: this.extractExcerpt(doc.content, query),
           score: result.score,
-          source: `Lunr Index - ${doc.filename}`
+          source: `Lunr Index - ${doc.filename}`,
+          documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}`
         };
       });
       
