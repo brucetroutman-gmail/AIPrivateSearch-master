@@ -123,7 +123,7 @@ export class ExactMatchSearch {
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,
-          documentPath: `/api/documents/${collection.name}/${path.basename(filePath)}`
+          documentPath: `http://localhost:3001/api/documents/${collection.name}/${path.basename(filePath)}`
         });
       }
     }

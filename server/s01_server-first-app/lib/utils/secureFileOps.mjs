@@ -56,5 +56,17 @@ export const secureFs = {
         const safePath = validatePath(filePath);
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.createWriteStream(safePath, options);
+    },
+    
+    async unlink(filePath) {
+        const safePath = validatePath(filePath);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        return fs.unlink(safePath);
+    },
+    
+    async rmdir(dirPath, options) {
+        const safePath = validatePath(dirPath);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        return fs.rmdir(safePath, options);
     }
 };

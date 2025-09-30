@@ -116,6 +116,50 @@ router.post('/collections/:collection/search', async (req, res) => {
   }
 });
 
+// Delete individual file
+router.delete('/collections/:collection/files/:filename', async (req, res) => {
+  try {
+    const { collection, filename } = req.params;
+    
+    const filePath = path.join('../../sources/local-documents', collection, filename);
+    await secureFs.unlink(filePath);
+    
+    res.json({ success: true });
+  } catch (error) {
+    if (error.message.includes('Path traversal')) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+    if (error.code === 'ENOENT') {
+      return res.status(404).json({ success: false, error: 'File not found' });
+    }
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete entire collection
+router.delete('/collections/:collection', async (req, res) => {
+  try {
+    const { collection } = req.params;
+    
+    // Remove all embeddings for this collection
+    const documents = await embeddingService.listDocuments(collection);
+    for (const doc of documents) {
+      await embeddingService.removeDocument(collection, doc.filename);
+    }
+    
+    // Remove collection folder
+    const collectionPath = path.join('../../sources/local-documents', collection);
+    await secureFs.rmdir(collectionPath, { recursive: true });
+    
+    res.json({ success: true });
+  } catch (error) {
+    if (error.message.includes('Path traversal')) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Serve document files (must be last due to generic pattern)
 router.get('/:collection/:filename', async (req, res) => {
   try {

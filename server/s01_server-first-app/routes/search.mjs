@@ -98,11 +98,16 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
       }
       
-      // Get the search response - for exact-match, use context lines format
-      const firstResult = methodResult.results[0];
+      // Get the search response - for exact-match, return multiple results with context
       if (searchType === 'exact-match') {
-        searchResponse = firstResult.excerpt || 'No content available';
+        // Return multiple results like multi-mode page
+        const topResults = methodResult.results.slice(0, 3); // Top 3 results
+        searchResponse = topResults.map((result, index) => {
+          const docLink = result.documentPath ? `[View Document](${result.documentPath})` : '';
+          return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
+        }).join('\n---\n\n');
       } else {
+        const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
       }
       

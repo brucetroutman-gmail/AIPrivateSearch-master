@@ -379,12 +379,6 @@ function toggleGenerateScoresVisibility() {
   const scoreLabel = scoreTglEl.parentElement;
   const showScores = sourceTypeEl.value.includes('Docu') && searchTypeEl.value === 'rag';
   
-  console.log('Toggle visibility:', {
-    sourceType: sourceTypeEl.value,
-    searchType: searchTypeEl.value,
-    showScores
-  });
-  
   if (scoreLabel) {
     scoreLabel.style.display = showScores ? 'flex' : 'none';
     if (!showScores) {
@@ -576,8 +570,16 @@ function render(result) {
   // 1. the raw answer
   const answerH = document.createElement('h3');
   answerH.textContent = 'Answer';
-  const answerP = document.createElement('p');
-  answerP.textContent = result.response;
+  const answerP = document.createElement('div');
+  
+  // Convert markdown links to HTML links
+  const responseWithLinks = result.response.replace(
+    /\[([^\]]+)\]\(([^\)]+)\)/g,
+    '<a href="$2" target="_blank" style="color: var(--link-color, #0066cc); text-decoration: underline;">$1</a>'
+  );
+  
+  // Convert line breaks and preserve formatting
+  answerP.innerHTML = responseWithLinks.replace(/\n/g, '<br>');
   outputEl.append(answerH, answerP);
 
   // 2. (optional) scores
