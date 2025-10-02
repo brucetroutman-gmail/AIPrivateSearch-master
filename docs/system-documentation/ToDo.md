@@ -179,13 +179,20 @@ specs-3-scoring
 
 84. Enhance Traditonal Text (Exact Match Search) rename and improve  --done
 
-85. Get full-search working on search page
+85. Move Document search to search page - common routine for responses. 
 
 86. Create common Line Search formatting routine for both search and multi-mode pages --done
 
 87. Enhance Line Search View Document links to show line numbers and jump to match line --done
 
 88. Add dark mode support to document viewer --done
+
+89. Modify Document Search View Document links to work like Line Search with line numbers --done
+
+91. Document search disability and will finds Health Care --investigated: Health Insurance.md contains "Disabled dependents covered indefinitely" which matches "disability" search
+
+92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done
+
 
 
 

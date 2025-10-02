@@ -20,16 +20,24 @@ export class FullTextSearch {
         return { results: [], method: 'fulltext', total: 0 };
       }
       
-      const searchResults = this.index.search(query);
-      const results = searchResults.map(result => {
+      // Store original query terms for highlighting (before wildcard conversion)
+      this.lastQueryTerms = this.parseQueryTerms(query);
+      
+      // Convert query to wildcard format for better substring matching
+      const wildcardQuery = this.buildWildcardQuery(query);
+      const searchResults = this.index.search(wildcardQuery);
+      const results = searchResults.map((result, index) => {
         const doc = this.documents.get(result.ref);
+        const matchedTerms = this.extractMatchedTerms(result) || this.lastQueryTerms;
+        const matchData = this.findMatchesInDocument(doc.content, matchedTerms);
+        
         return {
           id: result.ref,
-          title: `Document Search: ${doc.filename}`,
-          excerpt: this.extractExcerpt(doc.content, query),
+          title: doc.filename,
+          excerpt: this.formatAsLineSearchResult(matchData, doc.filename, doc.collection, index + 1),
           score: result.score,
-          source: `Lunr Index - ${doc.filename}`,
-          documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}`
+          source: `Document Search - ${doc.filename}`,
+          documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view?line=${matchData.lineNumber}`
         };
       });
       
@@ -83,6 +91,9 @@ export class FullTextSearch {
       
       docs.forEach(doc => this.add(doc));
     });
+    
+    // Store original query terms for fallback highlighting
+    this.lastQueryTerms = [];
   }
 
   async getCollections(documentsPath) {
@@ -109,61 +120,106 @@ export class FullTextSearch {
     return collections;
   }
 
-  extractExcerpt(content, query, maxLength = 300) {
-    const queryTerms = this.parseQueryTerms(query);
-    const contentLower = content.toLowerCase();
-    const matches = [];
+  findMatchesInDocument(content, matchedTerms) {
+    const lines = content.split('\n');
     
-    // Find all matches for each query term
-    queryTerms.forEach(term => {
-      const termLower = term.toLowerCase();
-      let index = 0;
-      while ((index = contentLower.indexOf(termLower, index)) !== -1) {
-        matches.push({
-          term,
-          start: index,
-          end: index + term.length,
-          context: this.getContextAroundMatch(content, index, term.length)
-        });
-        index += term.length;
+    // Also check original query terms for fallback
+    const allTerms = [...matchedTerms, ...this.lastQueryTerms];
+    
+    // Find all matches and return the best one
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      for (const term of allTerms) {
+        const actualMatch = this.findActualMatchInLine(line, term);
+        
+        if (actualMatch) {
+          return {
+            lineNumber: i + 1,
+            line: line,
+            matchedTerm: term,
+            actualMatch: actualMatch
+          };
+        }
       }
-    });
-    
-    if (matches.length === 0) {
-      return content.substring(0, maxLength) + '...';
     }
     
-    // Sort matches by position and take the best ones
-    matches.sort((a, b) => a.start - b.start);
+    return { lineNumber: 1, line: lines[0] || '', matchedTerm: matchedTerms[0] || '', actualMatch: '' };
+  }
+  
+  findActualMatchInLine(line, term) {
+    const words = line.match(/\b\w+\b/g) || [];
     
-    // Create excerpt with highlighted terms
-    const bestMatch = matches[0];
-    const contextStart = Math.max(0, bestMatch.start - 100);
-    const contextEnd = Math.min(content.length, bestMatch.start + maxLength);
-    
-    let excerpt = content.substring(contextStart, contextEnd);
-    
-    // Highlight all query terms in the excerpt with colored background
-    queryTerms.forEach(term => {
-      const regex = new RegExp(`(${this.escapeRegex(term)})`, 'gi');
-      excerpt = excerpt.replace(regex, '<mark class="search-highlight">$1</mark>');
+    // Find words containing the search term (substring match)
+    const containsMatch = words.find(word => {
+      const wordLower = word.toLowerCase();
+      const termLower = term.toLowerCase();
+      return wordLower.includes(termLower) && termLower.length > 1;
     });
     
-    // Add ellipsis if needed
-    if (contextStart > 0) excerpt = '...' + excerpt;
-    if (contextEnd < content.length) excerpt = excerpt + '...';
+    return containsMatch || null;
+  }
+  
+  formatAsLineSearchResult(matchData, filename, collection, resultIndex) {
+    // Highlight the actual matched word
+    let highlightedLine = matchData.line;
+    if (matchData.actualMatch) {
+      const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
+      highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
     
-    return excerpt;
+    return `**Result ${resultIndex}: ${filename}**\n${matchData.lineNumber}: ${highlightedLine}\n`;
+  }
+  
+  extractMatchedTerms(lunrResult) {
+    const matchedTerms = [];
+    
+    // Extract terms from Lunr's match metadata if available
+    if (lunrResult.matchData && lunrResult.matchData.metadata) {
+      Object.keys(lunrResult.matchData.metadata).forEach(term => {
+        matchedTerms.push(term);
+      });
+    }
+    
+    // If no match data, return null to use fallback
+    return matchedTerms.length > 0 ? matchedTerms : null;
+  }
+
+
+  
+
+  
+  buildWildcardQuery(query) {
+    // Parse the original query to handle Boolean operators
+    const terms = query
+      .replace(/[+\-"~]/g, ' ')
+      .split(/\s+/)
+      .filter(term => term.length > 0);
+    
+    const wildcardTerms = [];
+    
+    for (let i = 0; i < terms.length; i++) {
+      const term = terms[i];
+      
+      // Keep Boolean operators as-is
+      if (/^(AND|OR|NOT)$/i.test(term)) {
+        wildcardTerms.push(term);
+      } else {
+        // Add wildcards around each word for substring matching
+        wildcardTerms.push(`*${term}*`);
+      }
+    }
+    
+    return wildcardTerms.join(' ');
   }
   
   parseQueryTerms(query) {
-    // Handle Boolean operators and extract individual terms
     return query
-      .replace(/[+\-"~*]/g, ' ') // Remove Lunr operators
-      .replace(/\b(AND|OR|NOT)\b/gi, ' ') // Remove Boolean operators
+      .replace(/[+\-"~*]/g, ' ')
+      .replace(/\b(AND|OR|NOT)\b/gi, ' ')
       .split(/\s+/)
-      .filter(term => term.length > 2) // Only terms longer than 2 chars
-      .slice(0, 5); // Limit to 5 terms for performance
+      .filter(term => term.length > 0)
+      .slice(0, 5);
   }
   
   getContextAroundMatch(content, matchStart, matchLength) {

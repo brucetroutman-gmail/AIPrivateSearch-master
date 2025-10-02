@@ -268,7 +268,11 @@ function renderResults(containerId, searchResult) {
         
         const excerpt = document.createElement('p');
         excerpt.className = 'result-excerpt';
-        excerpt.textContent = result.excerpt;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(result.excerpt, 'text/html');
+        while (doc.body.firstChild) {
+            excerpt.appendChild(doc.body.firstChild);
+        }
         
         const meta = document.createElement('div');
         meta.className = 'result-meta';
