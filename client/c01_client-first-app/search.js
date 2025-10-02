@@ -33,6 +33,8 @@ const searchTypeSection = document.getElementById('searchTypeSection');
 const vectorDBEl = document.getElementById('vectorDB');
 const vectorDBSection = document.getElementById('vectorDBSection');
 const addMetaPromptEl = document.getElementById('addMetaPrompt');
+const wildcardSection = document.getElementById('wildcardSection');
+const useWildcardsEl = document.getElementById('useWildcards');
 
 let systemPrompts = [];
 
@@ -193,6 +195,8 @@ loadSourceTypes().then(() => {
     searchTypeSection.style.display = 'block';
     if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
+    // Check wildcard visibility after search type section is shown
+    setTimeout(() => toggleWildcardVisibility(), 10);
   }
 }).catch(() => {
   // Fallback: keep checkbox hidden if source types fail to load
@@ -372,7 +376,33 @@ collectionEl.addEventListener('change', () => {
 searchTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSearchType', searchTypeEl.value);
   toggleGenerateScoresVisibility();
+  toggleWildcardVisibility();
 });
+
+// Function to show/hide wildcard checkbox based on search type
+function toggleWildcardVisibility() {
+  const showWildcard = searchTypeEl.value === 'exact-match' || searchTypeEl.value === 'fulltext';
+  
+  if (wildcardSection) {
+    wildcardSection.style.display = showWildcard ? 'block' : 'none';
+    if (!showWildcard) {
+      useWildcardsEl.checked = false;
+    }
+  }
+}
+
+// Save wildcard setting
+if (useWildcardsEl) {
+  useWildcardsEl.addEventListener('change', () => {
+    localStorage.setItem('useWildcards', useWildcardsEl.checked);
+  });
+  
+  // Restore wildcard setting
+  const wildcardSetting = localStorage.getItem('useWildcards');
+  if (wildcardSetting === 'true') {
+    useWildcardsEl.checked = true;
+  }
+}
 
 // Function to show/hide Generate Scores based on source type and search type
 function toggleGenerateScoresVisibility() {
@@ -443,6 +473,8 @@ setTimeout(() => {
   }
   // Check Generate Scores visibility on page load
   toggleGenerateScoresVisibility();
+  // Check wildcard visibility on page load
+  toggleWildcardVisibility();
 }, 50);
 
 // Load and populate scoring options
@@ -888,7 +920,8 @@ form.addEventListener('submit', async (e) => {
     updateProgress('Searching');
     const trimmedQuery = queryEl.value.trim();
     console.log('Calling search with trimmed query:', trimmedQuery);
-    const result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
+    const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
+    const result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
     console.log('Search result:', result);
     
     // Show scoring phase if scores were generated

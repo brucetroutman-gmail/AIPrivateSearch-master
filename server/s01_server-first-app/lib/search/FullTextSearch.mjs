@@ -23,9 +23,9 @@ export class FullTextSearch {
       // Store original query terms for highlighting (before wildcard conversion)
       this.lastQueryTerms = this.parseQueryTerms(query);
       
-      // Convert query to wildcard format for better substring matching
-      const wildcardQuery = this.buildWildcardQuery(query);
-      const searchResults = this.index.search(wildcardQuery);
+      // Convert query to wildcard format if enabled
+      const searchQuery = options.useWildcards ? this.buildWildcardQuery(query) : query;
+      const searchResults = this.index.search(searchQuery);
       const results = searchResults.map((result, index) => {
         const doc = this.documents.get(result.ref);
         const matchedTerms = this.extractMatchedTerms(result) || this.lastQueryTerms;

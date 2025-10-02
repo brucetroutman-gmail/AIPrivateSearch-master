@@ -20,6 +20,8 @@ const performanceSection = document.getElementById('performanceSection');
 const performanceTableBody = document.getElementById('performanceTableBody');
 const selectAllCheckbox = document.getElementById('selectAll');
 const methodCheckboxes = document.querySelectorAll('.method-checkbox');
+const wildcardOption = document.getElementById('wildcardOption');
+const useWildcardsMulti = document.getElementById('useWildcardsMulti');
 
 // Search methods configuration
 const searchMethods = {
@@ -62,17 +64,17 @@ const searchMethods = {
 };
 
 // Real API search functions
-async function performExactMatchSearch(query, collection = null) {
+async function performExactMatchSearch(query, collection = null, useWildcards = false) {
     const startTime = Date.now();
     
     try {
-        const options = { query };
+        const options = { query, useWildcards };
         if (collection) options.collection = collection;
         
         const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection } })
+            body: JSON.stringify({ query, options })
         });
         
         const data = await response.json();
@@ -202,14 +204,14 @@ async function performMetadataSearch(query, collection = null) {
     }
 }
 
-async function performFullTextSearch(query, collection) {
+async function performFullTextSearch(query, collection, useWildcards = false) {
     const startTime = Date.now();
     
     try {
         const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/fulltext', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection } })
+            body: JSON.stringify({ query, options: { collection, useWildcards } })
         });
         
         const data = await response.json();
@@ -374,8 +376,9 @@ async function performAllSearches() {
     searchAllBtn.textContent = 'Searching...';
     searchAllBtn.disabled = true;
     
-    // Get selected methods
+    // Get selected methods and wildcard setting
     const selectedMethods = getSelectedMethods();
+    const useWildcards = useWildcardsMulti ? useWildcardsMulti.checked : false;
     
     if (selectedMethods.length === 0) {
         window.showUserMessage('Please select at least one search method', 'error');
@@ -408,7 +411,7 @@ async function performAllSearches() {
         const methodMap = {};
         
         if (selectedMethods.includes('exact-match')) {
-            searchPromises.push(performExactMatchSearch(query, collection));
+            searchPromises.push(performExactMatchSearch(query, collection, useWildcards));
             methodMap['exact-match'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('ai-direct')) {
@@ -432,7 +435,7 @@ async function performAllSearches() {
             methodMap['metadata'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('fulltext')) {
-            searchPromises.push(performFullTextSearch(query, collection));
+            searchPromises.push(performFullTextSearch(query, collection, useWildcards));
             methodMap['fulltext'] = searchPromises.length - 1;
         }
         
@@ -474,6 +477,7 @@ selectAllCheckbox.addEventListener('change', function() {
         checkbox.checked = this.checked;
     });
     updateResultColumnVisibility();
+    updateWildcardVisibility();
 });
 
 // Individual checkbox change handler
@@ -488,8 +492,37 @@ methodCheckboxes.forEach(checkbox => {
         
         // Update column visibility
         updateResultColumnVisibility();
+        
+        // Update wildcard option visibility
+        updateWildcardVisibility();
     });
 });
+
+// Function to show/hide wildcard option based on selected methods
+function updateWildcardVisibility() {
+    const selectedMethods = getSelectedMethods();
+    const hasSearchMethods = selectedMethods.includes('exact-match') || selectedMethods.includes('fulltext');
+    
+    if (wildcardOption) {
+        wildcardOption.style.display = hasSearchMethods ? 'block' : 'none';
+        if (!hasSearchMethods && useWildcardsMulti) {
+            useWildcardsMulti.checked = false;
+        }
+    }
+}
+
+// Save wildcard setting
+if (useWildcardsMulti) {
+    useWildcardsMulti.addEventListener('change', () => {
+        localStorage.setItem('useWildcardsMulti', useWildcardsMulti.checked);
+    });
+    
+    // Restore wildcard setting
+    const wildcardSetting = localStorage.getItem('useWildcardsMulti');
+    if (wildcardSetting === 'true') {
+        useWildcardsMulti.checked = true;
+    }
+}
 
 // Update result column visibility based on selected methods
 function updateResultColumnVisibility() {

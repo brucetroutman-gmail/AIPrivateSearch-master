@@ -58,7 +58,7 @@ async function getSystemInfo() {
 router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
   try {
     logger.log('Received request with keys:', Object.keys(req.body));
-    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel, searchType } = req.body;
+    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, sourceType, testCode, collection, showChunks, scoreModel, searchType, useWildcards } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
@@ -81,7 +81,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         model,
         temperature,
         contextSize: context,
-        tokenLimit
+        tokenLimit,
+        useWildcards
       });
       const endTime = Date.now();
       

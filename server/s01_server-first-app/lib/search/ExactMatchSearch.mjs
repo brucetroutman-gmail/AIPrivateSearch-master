@@ -119,7 +119,7 @@ export class ExactMatchSearch {
         results.push({
           id: `${path.basename(filePath)}_${line.number}`,
           title: path.basename(filePath),
-          excerpt: this.highlightQueryTerms(contextLines.join('\n'), query),
+          excerpt: this.highlightQueryTerms(contextLines.join('\n'), query, options),
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,
@@ -135,6 +135,11 @@ export class ExactMatchSearch {
     let searchText = options.caseSensitive ? text : text.toLowerCase();
     let searchQuery = options.caseSensitive ? query : query.toLowerCase();
     
+    // Apply wildcards if enabled
+    if (options.useWildcards) {
+      searchQuery = this.applyWildcards(searchQuery);
+    }
+    
     // Handle Boolean logic
     if (this.hasBooleanOperators(searchQuery)) {
       return this.evaluateBooleanQuery(searchText, searchQuery, options);
@@ -143,6 +148,11 @@ export class ExactMatchSearch {
     if (options.wholeWords) {
       const regex = new RegExp(`\\b${this.escapeRegex(searchQuery)}\\b`, 'gi');
       return regex.test(searchText);
+    }
+    
+    // For wildcard searches, use substring matching
+    if (options.useWildcards) {
+      return this.wildcardMatch(searchText, searchQuery);
     }
     
     return searchText.includes(searchQuery);
@@ -202,6 +212,12 @@ export class ExactMatchSearch {
       const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, 'gi');
       return regex.test(text);
     }
+    
+    // For wildcard searches, use substring matching
+    if (options.useWildcards) {
+      return this.wildcardMatch(text, term);
+    }
+    
     return text.includes(term);
   }
 
@@ -251,7 +267,11 @@ export class ExactMatchSearch {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
   
-  highlightQueryTerms(text, query) {
+  highlightQueryTerms(text, query, options = {}) {
+    if (options.useWildcards) {
+      return this.highlightWildcardMatches(text, query);
+    }
+    
     const queryTerms = this.parseQueryTerms(query);
     let highlightedText = text;
     
@@ -264,10 +284,56 @@ export class ExactMatchSearch {
     return highlightedText;
   }
   
+  highlightWildcardMatches(text, query) {
+    const queryTerms = this.parseQueryTerms(query);
+    let highlightedText = text;
+    
+    queryTerms.forEach(term => {
+      // Find all words that contain the search term
+      const words = text.match(/\b\w+\b/g) || [];
+      const matchingWords = words.filter(word => 
+        word.toLowerCase().includes(term.toLowerCase())
+      );
+      
+      // Highlight each matching word
+      matchingWords.forEach(word => {
+        const regex = new RegExp(`\\b(${this.escapeRegex(word)})\\b`, 'gi');
+        highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+      });
+    });
+    
+    return highlightedText;
+  }
+  
+  applyWildcards(query) {
+    // Split query into terms and add wildcards to non-Boolean terms
+    return query.split(/\s+/).map(term => {
+      if (/^(AND|OR|NOT|&|\||!)$/i.test(term)) {
+        return term; // Keep Boolean operators as-is
+      }
+      return `*${term}*`; // Add wildcards around search terms
+    }).join(' ');
+  }
+  
+  wildcardMatch(text, pattern) {
+    // Convert wildcard pattern to regex
+    const regexPattern = pattern
+      .replace(/\*/g, '.*') // Replace * with .*
+      .replace(/\?/g, '.'); // Replace ? with .
+    
+    try {
+      const regex = new RegExp(regexPattern, 'i');
+      return regex.test(text);
+    } catch (e) {
+      // Fallback to simple substring match if regex fails
+      return text.toLowerCase().includes(pattern.replace(/\*/g, '').toLowerCase());
+    }
+  }
+  
   parseQueryTerms(query) {
     // Handle Boolean operators and extract individual terms
     return query
-      .replace(/[&|!]/g, ' ') // Remove Boolean operators
+      .replace(/[&|!*]/g, ' ') // Remove Boolean operators and wildcards
       .replace(/\b(AND|OR|NOT)\b/gi, ' ') // Remove Boolean words
       .split(/\s+/)
       .filter(term => term.length > 1) // Only terms longer than 1 char
