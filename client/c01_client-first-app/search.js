@@ -575,7 +575,12 @@ function render(result) {
   // Check if this is Line Search results (exact-match) with formatted results
   if (result.searchType === 'exact-match' && result.response.includes('**Result ') && result.response.includes('---')) {
     // Use common Line Search formatter
-    answerP.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
+    const formattedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(formattedHTML, 'text/html');
+    while (doc.body.firstChild) {
+      answerP.appendChild(doc.body.firstChild);
+    }
   } else {
     // Standard response formatting for other search types
     const lines = result.response.split('\n');

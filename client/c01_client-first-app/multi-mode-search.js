@@ -241,7 +241,10 @@ function renderResults(containerId, searchResult) {
     
     // Special formatting for Line Search (exact-match) using common utility
     if (searchResult.method === 'exact-match') {
-        container.innerHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+        const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formattedHTML, 'text/html');
+        container.appendChild(doc.body.firstElementChild);
         return;
     }
     
@@ -265,7 +268,7 @@ function renderResults(containerId, searchResult) {
         
         const excerpt = document.createElement('p');
         excerpt.className = 'result-excerpt';
-        excerpt.innerHTML = result.excerpt;
+        excerpt.textContent = result.excerpt;
         
         const meta = document.createElement('div');
         meta.className = 'result-meta';
