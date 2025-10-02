@@ -160,6 +160,72 @@ router.delete('/collections/:collection', async (req, res) => {
   }
 });
 
+// View document with line numbers and highlighting
+router.get('/:collection/:filename/view', async (req, res) => {
+  try {
+    const { collection, filename } = req.params;
+    const { line } = req.query;
+    
+    const filePath = path.join('../../sources/local-documents', collection, filename);
+    const content = await secureFs.readFile(filePath, 'utf8');
+    
+    const lines = content.split('\n');
+    const targetLine = line ? parseInt(line) : null;
+    
+    let html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>${filename}</title>
+  <style>
+    body { font-family: monospace; margin: 20px; background: #f5f5f5; color: #333; }
+    .line { padding: 2px 5px; border-left: 3px solid transparent; }
+    .line-number { color: #666; margin-right: 10px; user-select: none; }
+    .highlight { background: yellow; border-left-color: #ff6b35; }
+    .content { white-space: pre-wrap; }
+    h1 { color: #333; }
+    
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e0e0e0; }
+      .line-number { color: #888; }
+      .highlight { background: #4a4a00; color: #fff; border-left-color: #ff6b35; }
+      h1 { color: #87ceeb; }
+    }
+  </style>
+</head>
+<body>
+  <h1>${filename}</h1>
+  <div class="document">`;
+    
+    lines.forEach((lineContent, index) => {
+      const lineNum = index + 1;
+      const isHighlight = targetLine && lineNum === targetLine;
+      html += `<div class="line${isHighlight ? ' highlight' : ''}" id="line-${lineNum}">`;
+      html += `<span class="line-number">${lineNum.toString().padStart(4, ' ')}:</span>`;
+      html += `<span class="content">${lineContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
+      html += `</div>`;
+    });
+    
+    html += `</div>`;
+    
+    if (targetLine) {
+      html += `<script>document.getElementById('line-${targetLine}').scrollIntoView({behavior: 'smooth', block: 'center'});</script>`;
+    }
+    
+    html += `</body></html>`;
+    
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (error) {
+    if (error.message.includes('Path traversal')) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    if (error.code === 'ENOENT') {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+    res.status(500).json({ error: 'Failed to load document' });
+  }
+});
+
 // Serve document files (must be last due to generic pattern)
 router.get('/:collection/:filename', async (req, res) => {
   try {

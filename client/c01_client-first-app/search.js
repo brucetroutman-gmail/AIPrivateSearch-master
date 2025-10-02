@@ -572,38 +572,44 @@ function render(result) {
   answerH.textContent = 'Answer';
   const answerP = document.createElement('div');
   
-  // Safely parse and create links
-  const lines = result.response.split('\n');
-  lines.forEach((line, index) => {
-    if (index > 0) {
-      answerP.appendChild(document.createElement('br'));
-    }
-    
-    // Check for markdown links
-    const linkMatch = line.match(/\[([^\]]+)\]\(([^\)]+)\)/);
-    if (linkMatch) {
-      const beforeLink = line.substring(0, linkMatch.index);
-      const afterLink = line.substring(linkMatch.index + linkMatch[0].length);
-      
-      if (beforeLink) {
-        answerP.appendChild(document.createTextNode(beforeLink));
+  // Check if this is Line Search results (exact-match) with formatted results
+  if (result.searchType === 'exact-match' && result.response.includes('**Result ') && result.response.includes('---')) {
+    // Use common Line Search formatter
+    answerP.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
+  } else {
+    // Standard response formatting for other search types
+    const lines = result.response.split('\n');
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        answerP.appendChild(document.createElement('br'));
       }
       
-      const link = document.createElement('a');
-      link.href = linkMatch[2];
-      link.target = '_blank';
-      link.style.color = 'var(--link-color, #0066cc)';
-      link.style.textDecoration = 'underline';
-      link.textContent = linkMatch[1];
-      answerP.appendChild(link);
-      
-      if (afterLink) {
-        answerP.appendChild(document.createTextNode(afterLink));
+      // Check for markdown links
+      const linkMatch = line.match(/\[([^\]]+)\]\(([^\)]+)\)/);
+      if (linkMatch) {
+        const beforeLink = line.substring(0, linkMatch.index);
+        const afterLink = line.substring(linkMatch.index + linkMatch[0].length);
+        
+        if (beforeLink) {
+          answerP.appendChild(document.createTextNode(beforeLink));
+        }
+        
+        const link = document.createElement('a');
+        link.href = linkMatch[2];
+        link.target = '_blank';
+        link.style.color = 'var(--link-color, #0066cc)';
+        link.style.textDecoration = 'underline';
+        link.textContent = linkMatch[1];
+        answerP.appendChild(link);
+        
+        if (afterLink) {
+          answerP.appendChild(document.createTextNode(afterLink));
+        }
+      } else {
+        answerP.appendChild(document.createTextNode(line));
       }
-    } else {
-      answerP.appendChild(document.createTextNode(line));
-    }
-  });
+    });
+  }
   
   outputEl.append(answerH, answerP);
 

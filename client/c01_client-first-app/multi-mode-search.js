@@ -24,9 +24,9 @@ const methodCheckboxes = document.querySelectorAll('.method-checkbox');
 // Search methods configuration
 const searchMethods = {
     'exact-match': {
-        name: 'Exact Match Search',
+        name: 'Line Search',
         endpoint: '/api/search/exact-match',
-        description: 'File-based grep-like search for exact matches'
+        description: 'Line-by-line search with context and Boolean logic'
     },
     'ai-direct': {
         name: 'AI Direct',
@@ -55,9 +55,9 @@ const searchMethods = {
         description: 'Structured queries using document metadata'
     },
     fulltext: {
-        name: 'Full-Text',
+        name: 'Document Search',
         endpoint: '/api/search/fulltext',
-        description: 'Indexed search with ranking and stemming'
+        description: 'Document-wide search with ranking and Boolean logic'
     }
 };
 
@@ -238,6 +238,14 @@ function renderResults(containerId, searchResult) {
     }
     
     container.innerHTML = '';
+    
+    // Special formatting for Line Search (exact-match) using common utility
+    if (searchResult.method === 'exact-match') {
+        container.innerHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+        return;
+    }
+    
+    // Standard formatting for other search methods
     searchResult.results.forEach(result => {
         const div = document.createElement('div');
         div.className = 'result-item';
@@ -257,7 +265,7 @@ function renderResults(containerId, searchResult) {
         
         const excerpt = document.createElement('p');
         excerpt.className = 'result-excerpt';
-        excerpt.textContent = result.excerpt;
+        excerpt.innerHTML = result.excerpt;
         
         const meta = document.createElement('div');
         meta.className = 'result-meta';
@@ -287,6 +295,8 @@ function renderResults(containerId, searchResult) {
         container.appendChild(div);
     });
 }
+
+
 
 // Update performance table
 function updatePerformanceTable(results) {

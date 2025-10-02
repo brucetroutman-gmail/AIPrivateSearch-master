@@ -89,6 +89,7 @@
     </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
+    <script src="shared/utils/lineSearchFormatter.js"></script>
 </head>
 <body>
     <div id="header-placeholder"></div>
@@ -133,13 +134,13 @@
             <h3>Select Search Methods:</h3>
             <div class="method-checkboxes">
                 <label><input type="checkbox" id="selectAll"> Select All</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Exact Match Search</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Line Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="rag"> RAG Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="vector"> Vector DB</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Full-Text</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Document Search</label>
             </div>
             <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
         </div>
@@ -149,8 +150,8 @@
         <!-- Results Grid -->
         <div class="results-grid">
             <div class="result-column" id="exact-match-results">
-                <h3>Exact Match Search</h3>
-                <div class="method-description">File-based grep-like search for exact matches</div>
+                <h3>Line Search</h3>
+                <div class="method-description">Line-by-line search with context and Boolean logic</div>
                 <div class="results-container" id="exact-match-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
@@ -197,8 +198,8 @@
             </div>
 
             <div class="result-column" id="fulltext-results">
-                <h3>Full-Text Engine</h3>
-                <div class="method-description">Indexed search with ranking and stemming</div>
+                <h3>Document Search</h3>
+                <div class="method-description">Document-wide search with ranking and Boolean logic</div>
                 <div class="results-container" id="fulltext-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>

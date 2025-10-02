@@ -4,8 +4,8 @@ import lunr from 'lunr';
 
 export class FullTextSearch {
   constructor() {
-    this.name = 'Full-Text Search';
-    this.description = 'Indexed search with ranking and stemming';
+    this.name = 'Document Search';
+    this.description = 'Document-wide search with ranking and Boolean logic';
     this.index = null;
     this.documents = new Map();
   }
@@ -25,7 +25,7 @@ export class FullTextSearch {
         const doc = this.documents.get(result.ref);
         return {
           id: result.ref,
-          title: `Full-Text: ${doc.filename}`,
+          title: `Document Search: ${doc.filename}`,
           excerpt: this.extractExcerpt(doc.content, query),
           score: result.score,
           source: `Lunr Index - ${doc.filename}`,
@@ -109,18 +109,70 @@ export class FullTextSearch {
     return collections;
   }
 
-  extractExcerpt(content, query, maxLength = 200) {
-    const queryLower = query.toLowerCase();
+  extractExcerpt(content, query, maxLength = 300) {
+    const queryTerms = this.parseQueryTerms(query);
     const contentLower = content.toLowerCase();
-    const queryIndex = contentLower.indexOf(queryLower);
+    const matches = [];
     
-    if (queryIndex === -1) {
+    // Find all matches for each query term
+    queryTerms.forEach(term => {
+      const termLower = term.toLowerCase();
+      let index = 0;
+      while ((index = contentLower.indexOf(termLower, index)) !== -1) {
+        matches.push({
+          term,
+          start: index,
+          end: index + term.length,
+          context: this.getContextAroundMatch(content, index, term.length)
+        });
+        index += term.length;
+      }
+    });
+    
+    if (matches.length === 0) {
       return content.substring(0, maxLength) + '...';
     }
     
-    const start = Math.max(0, queryIndex - 50);
-    const end = Math.min(content.length, queryIndex + maxLength - 50);
+    // Sort matches by position and take the best ones
+    matches.sort((a, b) => a.start - b.start);
     
-    return '...' + content.substring(start, end) + '...';
+    // Create excerpt with highlighted terms
+    const bestMatch = matches[0];
+    const contextStart = Math.max(0, bestMatch.start - 100);
+    const contextEnd = Math.min(content.length, bestMatch.start + maxLength);
+    
+    let excerpt = content.substring(contextStart, contextEnd);
+    
+    // Highlight all query terms in the excerpt with colored background
+    queryTerms.forEach(term => {
+      const regex = new RegExp(`(${this.escapeRegex(term)})`, 'gi');
+      excerpt = excerpt.replace(regex, '<mark class="search-highlight">$1</mark>');
+    });
+    
+    // Add ellipsis if needed
+    if (contextStart > 0) excerpt = '...' + excerpt;
+    if (contextEnd < content.length) excerpt = excerpt + '...';
+    
+    return excerpt;
+  }
+  
+  parseQueryTerms(query) {
+    // Handle Boolean operators and extract individual terms
+    return query
+      .replace(/[+\-"~*]/g, ' ') // Remove Lunr operators
+      .replace(/\b(AND|OR|NOT)\b/gi, ' ') // Remove Boolean operators
+      .split(/\s+/)
+      .filter(term => term.length > 2) // Only terms longer than 2 chars
+      .slice(0, 5); // Limit to 5 terms for performance
+  }
+  
+  getContextAroundMatch(content, matchStart, matchLength) {
+    const start = Math.max(0, matchStart - 50);
+    const end = Math.min(content.length, matchStart + matchLength + 50);
+    return content.substring(start, end);
+  }
+  
+  escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

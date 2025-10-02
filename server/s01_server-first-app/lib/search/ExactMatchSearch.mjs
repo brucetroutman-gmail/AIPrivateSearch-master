@@ -4,8 +4,8 @@ import { createInterface } from 'readline';
 
 export class ExactMatchSearch {
   constructor() {
-    this.name = 'Exact Match Search';
-    this.description = 'File-based grep-like search for exact matches';
+    this.name = 'Line Search';
+    this.description = 'Line-by-line search with context and Boolean logic';
   }
 
   async search(query, options = {}) {
@@ -119,11 +119,11 @@ export class ExactMatchSearch {
         results.push({
           id: `${path.basename(filePath)}_${line.number}`,
           title: path.basename(filePath),
-          excerpt: contextLines.join('\n'),
+          excerpt: this.highlightQueryTerms(contextLines.join('\n'), query),
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,
-          documentPath: `http://localhost:3001/api/documents/${collection.name}/${path.basename(filePath)}`
+          documentPath: `http://localhost:3001/api/documents/${collection.name}/${path.basename(filePath)}/view?line=${line.number}`
         });
       }
     }
@@ -135,12 +135,74 @@ export class ExactMatchSearch {
     let searchText = options.caseSensitive ? text : text.toLowerCase();
     let searchQuery = options.caseSensitive ? query : query.toLowerCase();
     
+    // Handle Boolean logic
+    if (this.hasBooleanOperators(searchQuery)) {
+      return this.evaluateBooleanQuery(searchText, searchQuery, options);
+    }
+    
     if (options.wholeWords) {
       const regex = new RegExp(`\\b${this.escapeRegex(searchQuery)}\\b`, 'gi');
       return regex.test(searchText);
     }
     
     return searchText.includes(searchQuery);
+  }
+  
+  hasBooleanOperators(query) {
+    return /\b(and|or|not)\b/i.test(query) || /[&|!]/.test(query);
+  }
+  
+  evaluateBooleanQuery(text, query, options) {
+    // Normalize boolean operators
+    let normalizedQuery = query
+      .replace(/\band\b/gi, '&')
+      .replace(/\bor\b/gi, '|')
+      .replace(/\bnot\b/gi, '!')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Split by OR first (lowest precedence)
+    const orTerms = normalizedQuery.split('|');
+    
+    for (const orTerm of orTerms) {
+      if (this.evaluateAndNotExpression(text, orTerm.trim(), options)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  evaluateAndNotExpression(text, expression, options) {
+    // Split by AND
+    const andTerms = expression.split('&');
+    
+    for (const term of andTerms) {
+      const trimmedTerm = term.trim();
+      
+      if (trimmedTerm.startsWith('!')) {
+        // NOT operation
+        const notTerm = trimmedTerm.substring(1).trim();
+        if (this.termMatches(text, notTerm, options)) {
+          return false; // If NOT term is found, this AND expression fails
+        }
+      } else {
+        // Regular term
+        if (!this.termMatches(text, trimmedTerm, options)) {
+          return false; // If required term not found, this AND expression fails
+        }
+      }
+    }
+    
+    return true; // All AND conditions met
+  }
+  
+  termMatches(text, term, options) {
+    if (options.wholeWords) {
+      const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, 'gi');
+      return regex.test(text);
+    }
+    return text.includes(term);
   }
 
   calculateRelevanceScore(text, query) {
@@ -187,5 +249,28 @@ export class ExactMatchSearch {
 
   escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  
+  highlightQueryTerms(text, query) {
+    const queryTerms = this.parseQueryTerms(query);
+    let highlightedText = text;
+    
+    // Highlight all query terms
+    queryTerms.forEach(term => {
+      const regex = new RegExp(`(${this.escapeRegex(term)})`, 'gi');
+      highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    });
+    
+    return highlightedText;
+  }
+  
+  parseQueryTerms(query) {
+    // Handle Boolean operators and extract individual terms
+    return query
+      .replace(/[&|!]/g, ' ') // Remove Boolean operators
+      .replace(/\b(AND|OR|NOT)\b/gi, ' ') // Remove Boolean words
+      .split(/\s+/)
+      .filter(term => term.length > 1) // Only terms longer than 1 char
+      .slice(0, 5); // Limit to 5 terms for performance
   }
 }

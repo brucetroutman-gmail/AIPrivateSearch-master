@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
+  <script src="shared/utils/lineSearchFormatter.js"></script>
   <style>
     h1 { margin-top: 0; }
     
@@ -256,8 +257,8 @@
             <div id="searchTypeSection" class="field" style="display: none;">
               <label for="searchType">Search Type</label>
               <select id="searchType">
-                <option value="exact-match">Exact Match Search</option>
-                <option value="fulltext">Full-Text</option>
+                <option value="exact-match">Line Search</option>
+                <option value="fulltext">Document Search</option>
                 <option value="ai-direct">AI Direct</option>
                 <option value="rag" selected>RAG Search</option>
                 <option value="vector">Vector DB</option>

@@ -181,6 +181,12 @@ specs-3-scoring
 
 85. Get full-search working on search page
 
+86. Create common Line Search formatting routine for both search and multi-mode pages --done
+
+87. Enhance Line Search View Document links to show line numbers and jump to match line --done
+
+88. Add dark mode support to document viewer --done
+
 
 
 
