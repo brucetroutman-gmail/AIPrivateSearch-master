@@ -34,7 +34,7 @@ export class FullTextSearch {
         return {
           id: result.ref,
           title: doc.filename,
-          excerpt: this.formatAsLineSearchResult(matchData, doc.filename, doc.collection, index + 1),
+          excerpt: this.formatMatchedLine(matchData),
           score: result.score,
           source: `Document Search - ${doc.filename}`,
           documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view?line=${matchData.lineNumber}`
@@ -123,8 +123,8 @@ export class FullTextSearch {
   findMatchesInDocument(content, matchedTerms) {
     const lines = content.split('\n');
     
-    // Also check original query terms for fallback
-    const allTerms = [...matchedTerms, ...this.lastQueryTerms];
+    // Use both matched terms and original query terms
+    const allTerms = [...new Set([...matchedTerms, ...this.lastQueryTerms])];
     
     // Find all matches and return the best one
     for (let i = 0; i < lines.length; i++) {
@@ -144,16 +144,20 @@ export class FullTextSearch {
       }
     }
     
-    return { lineNumber: 1, line: lines[0] || '', matchedTerm: matchedTerms[0] || '', actualMatch: '' };
+    return { lineNumber: 1, line: lines[0] || '', matchedTerm: allTerms[0] || '', actualMatch: '' };
   }
   
   findActualMatchInLine(line, term) {
     const words = line.match(/\b\w+\b/g) || [];
+    const termLower = term.toLowerCase();
     
-    // Find words containing the search term (substring match)
+    // First try exact word match
+    const exactMatch = words.find(word => word.toLowerCase() === termLower);
+    if (exactMatch) return exactMatch;
+    
+    // Then try substring match for longer terms
     const containsMatch = words.find(word => {
       const wordLower = word.toLowerCase();
-      const termLower = term.toLowerCase();
       return wordLower.includes(termLower) && termLower.length > 1;
     });
     
@@ -169,6 +173,17 @@ export class FullTextSearch {
     }
     
     return `**Result ${resultIndex}: ${filename}**\n${matchData.lineNumber}: ${highlightedLine}\n`;
+  }
+  
+  formatMatchedLine(matchData) {
+    // Highlight the actual matched word
+    let highlightedLine = matchData.line;
+    if (matchData.actualMatch) {
+      const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
+      highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
+    
+    return `${matchData.lineNumber}: ${highlightedLine}`;
   }
   
   extractMatchedTerms(lunrResult) {

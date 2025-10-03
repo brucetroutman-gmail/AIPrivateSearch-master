@@ -179,7 +179,7 @@ specs-3-scoring
 
 84. Enhance Traditonal Text (Exact Match Search) rename and improve  --done
 
-85. Move Document search to search page - common routine for responses. 
+85. Move Document search to search page - common routine for responses. --done 
 
 86. Create common Line Search formatting routine for both search and multi-mode pages --done
 
@@ -189,9 +189,11 @@ specs-3-scoring
 
 89. Modify Document Search View Document links to work like Line Search with line numbers --done
 
-91. Document search disability and will finds Health Care --investigated: Health Insurance.md contains "Disabled dependents covered indefinitely" which matches "disability" search
+91. Document search disability and will finds Health Care --investigated: Health Insurance.md contains "Disabled dependents covered indefinitely" which matches "disability" search  --done
 
 92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done
+
+93. Review show hide on search page. Is it in one function?
 
 
 

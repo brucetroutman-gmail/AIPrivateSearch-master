@@ -99,9 +99,9 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
       }
       
-      // Get the search response - for exact-match, return all results with context
-      if (searchType === 'exact-match') {
-        // Return all results like multi-mode page
+      // Get the search response - for exact-match and fulltext, return all results with context
+      if (searchType === 'exact-match' || searchType === 'fulltext') {
+        // Use common formatting logic
         searchResponse = methodResult.results.map((result, index) => {
           const docLink = result.documentPath ? `[View Document](${result.documentPath})` : '';
           return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;

@@ -80,6 +80,11 @@ async function loadCollections() {
     const lastSearchType = localStorage.getItem('lastSearchType');
     if (lastSearchType) {
       searchTypeEl.value = lastSearchType;
+      // Check wildcard visibility after restoring search type
+      setTimeout(() => {
+        toggleWildcardVisibility();
+        toggleModelFieldsVisibility();
+      }, 100);
     }
   } catch (error) {
     collectionEl.innerHTML = '<option value="">Error loading collections</option>';
@@ -377,6 +382,7 @@ searchTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSearchType', searchTypeEl.value);
   toggleGenerateScoresVisibility();
   toggleWildcardVisibility();
+  toggleModelFieldsVisibility();
 });
 
 // Function to show/hide wildcard checkbox based on search type
@@ -387,6 +393,39 @@ function toggleWildcardVisibility() {
     wildcardSection.style.display = showWildcard ? 'block' : 'none';
     if (!showWildcard) {
       useWildcardsEl.checked = false;
+    }
+  }
+}
+
+// Function to show/hide model-related fields based on search type
+function toggleModelFieldsVisibility() {
+  const isNonModelSearch = searchTypeEl.value === 'exact-match' || searchTypeEl.value === 'fulltext';
+  
+  // Hide/show model field
+  const modelField = modelEl.parentElement;
+  if (modelField) {
+    modelField.style.display = isNonModelSearch ? 'none' : 'block';
+  }
+  
+  // Hide/show model options (temperature, context, tokens)
+  const modelOptions = document.querySelectorAll('.model-options');
+  modelOptions.forEach(option => {
+    option.style.display = isNonModelSearch ? 'none' : 'flex';
+  });
+  
+  // Hide/show assistant type field
+  const assistantField = assistantTypeEl.parentElement;
+  if (assistantField) {
+    assistantField.style.display = isNonModelSearch ? 'none' : 'block';
+  }
+  
+  // Hide source chunks checkbox for non-model searches
+  const showChunksLabel = document.getElementById('showChunksLabel');
+  if (showChunksLabel) {
+    if (isNonModelSearch) {
+      showChunksLabel.classList.add('hide-chunks-checkbox');
+    } else {
+      showChunksLabel.classList.remove('hide-chunks-checkbox');
     }
   }
 }
@@ -475,6 +514,10 @@ setTimeout(() => {
   toggleGenerateScoresVisibility();
   // Check wildcard visibility on page load
   toggleWildcardVisibility();
+  // Check model fields visibility on page load
+  setTimeout(() => {
+    toggleModelFieldsVisibility();
+  }, 100);
 }, 50);
 
 // Load and populate scoring options
@@ -604,14 +647,67 @@ function render(result) {
   answerH.textContent = 'Answer';
   const answerP = document.createElement('div');
   
-  // Check if this is Line Search results (exact-match) with formatted results
+  // Check if this is Line Search or Document Search results with formatted results
+  console.log('Result searchType:', result.searchType);
+  console.log('Response includes **Result:', result.response.includes('**Result '));
+  console.log('Response includes ---:', result.response.includes('---'));
+  
+  // Debug: Check for HTML-encoded mark elements
+  if (result.response.includes('&lt;mark')) {
+    console.log('Found HTML-encoded mark elements in response');
+    console.log('Sample:', result.response.substring(result.response.indexOf('&lt;mark'), result.response.indexOf('&lt;mark') + 100));
+    
+    // Decode HTML entities and apply highlighting
+    setTimeout(() => {
+      const allElements = answerP.querySelectorAll('*');
+      allElements.forEach(el => {
+        if (el.innerHTML.includes('&lt;mark')) {
+          console.log('Decoding HTML entities in element:', el.tagName);
+          const safeContent = el.innerHTML
+            .replace(/&lt;mark class=&quot;search-highlight&quot;&gt;/g, '<mark class="search-highlight">')
+            .replace(/&lt;\/mark&gt;/g, '</mark>');
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(`<div>${safeContent}</div>`, 'text/html');
+          const newContent = doc.body.firstElementChild;
+          if (newContent) {
+            el.replaceChildren(...newContent.childNodes);
+          }
+        }
+      });
+    }, 100);
+  }
   if (result.searchType === 'exact-match' && result.response.includes('**Result ') && result.response.includes('---')) {
-    // Use common Line Search formatter
+    // Use Line Search formatter for exact-match
     const formattedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
     const parser = new DOMParser();
-    const doc = parser.parseFromString(formattedHTML, 'text/html');
-    while (doc.body.firstChild) {
-      answerP.appendChild(doc.body.firstChild);
+    const doc = parser.parseFromString(`<div>${formattedHTML}</div>`, 'text/html');
+    const content = doc.body.firstElementChild;
+    if (content) {
+      while (content.firstChild) {
+        answerP.appendChild(content.firstChild);
+      }
+    }
+  } else if (result.searchType === 'fulltext' && result.response.includes('**Result ') && result.response.includes('---')) {
+    // Parse fulltext response and render as HTML (preserving mark tags)
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<div>${result.response}</div>`, 'text/html');
+    const content = doc.body.firstElementChild;
+    if (content) {
+      // Decode HTML entities in the content safely
+      const safeContent = content.innerHTML
+        .replace(/&lt;mark class=&quot;search-highlight&quot;&gt;/g, '<mark class="search-highlight">')
+        .replace(/&lt;\/mark&gt;/g, '</mark>')
+        .replace(/&amp;/g, '&');
+      const parser2 = new DOMParser();
+      const doc2 = parser2.parseFromString(`<div>${safeContent}</div>`, 'text/html');
+      const newContent = doc2.body.firstElementChild;
+      if (newContent) {
+        content.replaceChildren(...newContent.childNodes);
+      }
+      
+      while (content.firstChild) {
+        answerP.appendChild(content.firstChild);
+      }
     }
   } else {
     // Standard response formatting for other search types
@@ -853,7 +949,11 @@ form.addEventListener('submit', async (e) => {
     return;
   }
   
-  if (!modelEl.value) {
+  // Only require model for AI-based searches
+  const searchType = (sourceTypeEl.value.includes('Docu')) ? searchTypeEl.value : null;
+  const isNonModelSearch = searchType === 'exact-match' || searchType === 'fulltext';
+  
+  if (!isNonModelSearch && !modelEl.value) {
     outputEl.textContent = 'Please select a model first.';
     return;
   }
@@ -921,7 +1021,39 @@ form.addEventListener('submit', async (e) => {
     const trimmedQuery = queryEl.value.trim();
     console.log('Calling search with trimmed query:', trimmedQuery);
     const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
-    const result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
+    let result;
+    if (searchType === 'fulltext') {
+      // Use same endpoint as multi-mode for fulltext searches
+      const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection, useWildcards);
+      result = {
+        response: searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
+        searchType: 'fulltext',
+        query: trimmedQuery,
+        collection,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString()
+      };
+    } else if (searchType === 'exact-match') {
+      // Use same endpoint as multi-mode for exact-match searches
+      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: trimmedQuery, options: { collection, useWildcards } })
+      });
+      const data = await response.json();
+      result = {
+        response: data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
+        searchType: 'exact-match',
+        query: trimmedQuery,
+        collection,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString()
+      };
+    } else {
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
+    }
     console.log('Search result:', result);
     
     // Show scoring phase if scores were generated

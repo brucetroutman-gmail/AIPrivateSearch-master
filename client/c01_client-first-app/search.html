@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>Search-n-Score – Demo</title>
-  <link rel="stylesheet" href="shared/styles.css">
+  <link rel="stylesheet" href="shared/styles.css?v=20241003">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
   <script src="shared/utils/lineSearchFormatter.js"></script>
+  <script src="shared/utils/documentSearchCommon.js"></script>
+  <script src="shared/utils/searchResultFormatter.js"></script>
   <style>
     h1 { margin-top: 0; }
     
@@ -195,6 +197,45 @@
       color: #87ceeb;
     }
     
+    /* Search Highlighting */
+    .search-highlight {
+      background-color: yellow !important;
+      color: black !important;
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: bold;
+    }
+    
+    [data-theme="dark"] .search-highlight {
+      background-color: #ffd700 !important;
+      color: #000 !important;
+    }
+    
+    /* Aggressive mark element styling */
+    mark,
+    mark.search-highlight,
+    .search-highlight,
+    [class*="search-highlight"] {
+      background-color: #ffff00 !important;
+      color: #000000 !important;
+      font-weight: bold !important;
+      padding: 2px 4px !important;
+      border-radius: 3px !important;
+      display: inline !important;
+      border: 1px solid #ff0000 !important;
+    }
+    
+    /* Force visibility on any HTML-encoded mark elements */
+    *[innerHTML*="&lt;mark"],
+    *[textContent*="&lt;mark"] {
+      border: 2px solid lime !important;
+    }
+    
+    /* Debug: Show all elements containing WILL or DISA */
+    *:contains("WILL"),
+    *:contains("DISA") {
+      outline: 2px solid red !important;
+    }
     
     /* Responsive Design */
     @media (max-width: 1024px) {

@@ -205,25 +205,7 @@ async function performMetadataSearch(query, collection = null) {
 }
 
 async function performFullTextSearch(query, collection, useWildcards = false) {
-    const startTime = Date.now();
-    
-    try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/fulltext', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, useWildcards } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'fulltext' 
-        };
-    } catch (error) {
-        console.error('Full-text search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'fulltext' };
-    }
+    return await window.documentSearchCommon.performDocumentSearch(query, collection, useWildcards);
 }
 
 // Render results for a specific method
@@ -241,9 +223,17 @@ function renderResults(containerId, searchResult) {
     
     container.innerHTML = '';
     
-    // Special formatting for Line Search (exact-match) using common utility
+    // Special formatting for Line Search (exact-match) and Document Search (fulltext) using common utilities
     if (searchResult.method === 'exact-match') {
         const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formattedHTML, 'text/html');
+        container.appendChild(doc.body.firstElementChild);
+        return;
+    }
+    
+    if (searchResult.method === 'fulltext') {
+        const formattedHTML = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
         const parser = new DOMParser();
         const doc = parser.parseFromString(formattedHTML, 'text/html');
         container.appendChild(doc.body.firstElementChild);

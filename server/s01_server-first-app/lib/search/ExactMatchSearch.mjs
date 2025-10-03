@@ -109,7 +109,7 @@ export class ExactMatchSearch {
         }
         
         // Add the matching line
-        contextLines.push(`${line.number}: ${line.text} ← MATCH`);
+        contextLines.push(`${line.number}: ${line.text}`);
         
         // Add 2 lines after
         for (let j = i + 1; j <= Math.min(lines.length - 1, i + 2); j++) {
