@@ -338,38 +338,20 @@ contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
 });
 
-// Save source type selection and handle collection dropdown
+// Save source type selection and handle visibility
 sourceTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSourceType', sourceTypeEl.value);
   
-  // Show/hide collection, searchType and vectorDB dropdowns based on source type
+  // Load collections if documents are involved
   if (sourceTypeEl.value.includes('Docu')) {
-    collectionSection.style.display = 'block';
-    searchTypeSection.style.display = 'block';
-    if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
-  } else {
-    collectionSection.style.display = 'none';
-    searchTypeSection.style.display = 'none';
-    if (vectorDBSection) vectorDBSection.style.display = 'none';
-  }
-  
-  // Show/hide source chunks checkbox only for Local Documents source types
-  const showChunksLabel = document.getElementById('showChunksLabel');
-  const showChunksToggle = document.getElementById('showChunksToggle');
-  
-  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
-    if (showChunksLabel) showChunksLabel.classList.remove('hide-chunks-checkbox');
-  } else {
-    if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
-    if (showChunksToggle) showChunksToggle.checked = false;
   }
   
   // Filter assistant types based on source type
   filterAssistantTypes();
   
-  // Toggle Generate Scores visibility
-  toggleGenerateScoresVisibility();
+  // Update all field visibility
+  updateFieldVisibility();
 });
 
 // Save collection selection
@@ -377,58 +359,88 @@ collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
 });
 
-// Save search type selection and toggle Generate Scores visibility
+// Save search type selection and update visibility
 searchTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSearchType', searchTypeEl.value);
-  toggleGenerateScoresVisibility();
-  toggleWildcardVisibility();
-  toggleModelFieldsVisibility();
+  updateFieldVisibility();
 });
 
-// Function to show/hide wildcard checkbox based on search type
-function toggleWildcardVisibility() {
-  const showWildcard = searchTypeEl.value === 'exact-match' || searchTypeEl.value === 'fulltext';
+// Unified visibility control function
+function updateFieldVisibility() {
+  const sourceType = sourceTypeEl.value;
+  const searchType = searchTypeEl.value;
   
+  // Determine source type categories
+  const isLocalModelOnly = sourceType === 'Local Model Only';
+  const isLocalDocsOnly = sourceType === 'Local Documents Only';
+  const isLocalModelAndDocs = sourceType === 'Local Model and Documents';
+  const hasDocuments = isLocalDocsOnly || isLocalModelAndDocs;
+  const hasModel = isLocalModelOnly || isLocalModelAndDocs;
+  
+  // Determine search type categories
+  const isNonModelSearch = searchType === 'exact-match' || searchType === 'fulltext';
+  const needsModel = hasModel && !isNonModelSearch;
+  
+  // Collection and Search Type sections
+  collectionSection.style.display = hasDocuments ? 'block' : 'none';
+  searchTypeSection.style.display = hasDocuments ? 'block' : 'none';
+  if (vectorDBSection) vectorDBSection.style.display = hasDocuments ? 'block' : 'none';
+  
+  // Wildcard checkbox
   if (wildcardSection) {
+    const showWildcard = hasDocuments && (searchType === 'exact-match' || searchType === 'fulltext');
     wildcardSection.style.display = showWildcard ? 'block' : 'none';
-    if (!showWildcard) {
+    if (!showWildcard && useWildcardsEl) {
       useWildcardsEl.checked = false;
     }
   }
-}
-
-// Function to show/hide model-related fields based on search type
-function toggleModelFieldsVisibility() {
-  const isNonModelSearch = searchTypeEl.value === 'exact-match' || searchTypeEl.value === 'fulltext';
   
-  // Hide/show model field
+  // Model fields
   const modelField = modelEl.parentElement;
   if (modelField) {
-    modelField.style.display = isNonModelSearch ? 'none' : 'block';
+    modelField.style.display = needsModel ? 'block' : 'none';
   }
   
-  // Hide/show model options (temperature, context, tokens)
+  // Model options (temperature, context, tokens)
   const modelOptions = document.querySelectorAll('.model-options');
   modelOptions.forEach(option => {
-    option.style.display = isNonModelSearch ? 'none' : 'flex';
+    option.style.display = needsModel ? 'flex' : 'none';
   });
   
-  // Hide/show assistant type field
+  // Assistant type field
   const assistantField = assistantTypeEl.parentElement;
   if (assistantField) {
-    assistantField.style.display = isNonModelSearch ? 'none' : 'block';
+    assistantField.style.display = needsModel ? 'block' : 'none';
   }
   
-  // Hide source chunks checkbox for non-model searches
+  // Show chunks checkbox
   const showChunksLabel = document.getElementById('showChunksLabel');
   if (showChunksLabel) {
-    if (isNonModelSearch) {
-      showChunksLabel.classList.add('hide-chunks-checkbox');
-    } else {
+    if (hasDocuments && !isNonModelSearch) {
       showChunksLabel.classList.remove('hide-chunks-checkbox');
+    } else {
+      showChunksLabel.classList.add('hide-chunks-checkbox');
+      const showChunksToggle = document.getElementById('showChunksToggle');
+      if (showChunksToggle) showChunksToggle.checked = false;
+    }
+  }
+  
+  // Generate Scores visibility
+  const scoreLabel = scoreTglEl.parentElement;
+  const showScores = hasDocuments && searchType === 'rag';
+  if (scoreLabel) {
+    scoreLabel.style.display = showScores ? 'flex' : 'none';
+    if (!showScores) {
+      scoreTglEl.checked = false;
+      document.getElementById('scoringSection').style.display = 'none';
     }
   }
 }
+
+// Legacy function wrappers for compatibility
+function toggleWildcardVisibility() { updateFieldVisibility(); }
+function toggleModelFieldsVisibility() { updateFieldVisibility(); }
+function toggleGenerateScoresVisibility() { updateFieldVisibility(); }
 
 // Save wildcard setting
 if (useWildcardsEl) {
@@ -440,20 +452,6 @@ if (useWildcardsEl) {
   const wildcardSetting = localStorage.getItem('useWildcards');
   if (wildcardSetting === 'true') {
     useWildcardsEl.checked = true;
-  }
-}
-
-// Function to show/hide Generate Scores based on source type and search type
-function toggleGenerateScoresVisibility() {
-  const scoreLabel = scoreTglEl.parentElement;
-  const showScores = sourceTypeEl.value.includes('Docu') && searchTypeEl.value === 'rag';
-  
-  if (scoreLabel) {
-    scoreLabel.style.display = showScores ? 'flex' : 'none';
-    if (!showScores) {
-      scoreTglEl.checked = false;
-      document.getElementById('scoringSection').style.display = 'none';
-    }
   }
 }
 
@@ -677,7 +675,7 @@ function render(result) {
     }, 100);
   }
   if (result.searchType === 'exact-match' && result.response.includes('**Result ') && result.response.includes('---')) {
-    // Use Line Search formatter for exact-match
+    // Use same Line Search formatter as multi-mode
     const formattedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
     const parser = new DOMParser();
     const doc = parser.parseFromString(`<div>${formattedHTML}</div>`, 'text/html');
@@ -1045,6 +1043,33 @@ form.addEventListener('submit', async (e) => {
       result = {
         response: data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
         searchType: 'exact-match',
+        query: trimmedQuery,
+        collection,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString()
+      };
+    } else if (searchType === 'rag') {
+      // Use same endpoint as multi-mode for RAG searches
+      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          query: trimmedQuery, 
+          options: { 
+            collection, 
+            model: modelEl.value, 
+            temperature: parseFloat(temperatureEl.value), 
+            contextSize: parseFloat(contextEl.value), 
+            tokenLimit,
+            topK: 3 
+          } 
+        })
+      });
+      const data = await response.json();
+      result = {
+        response: data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
+        searchType: 'rag',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,

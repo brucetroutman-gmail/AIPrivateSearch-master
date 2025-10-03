@@ -1,0 +1,220 @@
+{
+  "visibilityRules": {
+    "Local Model Only": {
+      "exact-match": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "fulltext": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "ai-direct": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "rag": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "vector": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "hybrid": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "metadata": {
+        "collectionSection": "N",
+        "searchTypeSection": "N",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "N",
+        "generateScores": "N"
+      }
+    },
+    "Local Documents Only": {
+      "exact-match": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "Y",
+        "modelField": "N",
+        "modelOptions": "N",
+        "assistantType": "N",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "fulltext": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "Y",
+        "modelField": "N",
+        "modelOptions": "N",
+        "assistantType": "N",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "ai-direct": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "rag": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "Y"
+      },
+      "vector": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "hybrid": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "metadata": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      }
+    },
+    "Local Model and Documents": {
+      "exact-match": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "Y",
+        "modelField": "N",
+        "modelOptions": "N",
+        "assistantType": "N",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "fulltext": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "Y",
+        "modelField": "N",
+        "modelOptions": "N",
+        "assistantType": "N",
+        "showChunks": "N",
+        "generateScores": "N"
+      },
+      "ai-direct": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "rag": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "Y"
+      },
+      "vector": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "hybrid": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      },
+      "metadata": {
+        "collectionSection": "Y",
+        "searchTypeSection": "Y",
+        "wildcardCheckbox": "N",
+        "modelField": "Y",
+        "modelOptions": "Y",
+        "assistantType": "Y",
+        "showChunks": "Y",
+        "generateScores": "N"
+      }
+    }
+  }
+}

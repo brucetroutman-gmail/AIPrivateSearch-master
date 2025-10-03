@@ -193,7 +193,7 @@ specs-3-scoring
 
 92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done
 
-93. Review show hide on search page. Is it in one function?
+93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.
 
 
 
