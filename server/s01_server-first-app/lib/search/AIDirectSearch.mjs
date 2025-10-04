@@ -64,7 +64,15 @@ export class AIDirectSearch {
       const filePath = path.join(collection.path, filename);
       const content = await secureFs.readFile(filePath, 'utf-8');
       
-      const aiResult = await this.performAISearch(content, query, filename, options?.model || 'qwen2:0.5b');
+      const aiResult = await this.performAISearch(
+        content, 
+        query, 
+        filename, 
+        options?.model || 'qwen2:0.5b',
+        options?.temperature || 0.3,
+        options?.contextSize || 1024,
+        options?.tokenLimit || null
+      );
       if (aiResult) {
         return {
           ...aiResult,

@@ -195,6 +195,12 @@ specs-3-scoring
 
 93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.
 
+94. We have lost highlighting of matches in line search
+
+95. line serach, document search, RAG search, ai directis missing performancce metrics and system information
+
+96. 
+
 
 
 

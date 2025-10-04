@@ -93,15 +93,11 @@ async function performAIDirectSearch(query, collection, model, temperature, cont
     const startTime = Date.now();
     
     try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-direct', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model, temperature, contextSize, tokenLimit } })
+        const searchResult = await window.aiDirectCommon.performAIDirectSearch(query, collection, {
+            model, temperature, contextSize, tokenLimit
         });
-        
-        const data = await response.json();
         return { 
-            results: data.results || [], 
+            results: searchResult.results || [], 
             time: Date.now() - startTime, 
             method: 'ai-direct' 
         };

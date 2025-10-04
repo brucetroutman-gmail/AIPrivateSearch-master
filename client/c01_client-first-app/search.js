@@ -37,6 +37,7 @@ const wildcardSection = document.getElementById('wildcardSection');
 const useWildcardsEl = document.getElementById('useWildcards');
 
 let systemPrompts = [];
+let visibilityConfig = null;
 
 // Utility function to format CreatedAt timestamps
 function formatCreatedAt(timestamp) {
@@ -213,6 +214,7 @@ loadSourceTypes().then(() => {
 loadModels();
 loadSystemPrompts();
 loadUserPrompts();
+loadVisibilityConfig();
 
 loadTokensOptions();
 loadTemperatureOptions();
@@ -365,8 +367,103 @@ searchTypeEl.addEventListener('change', () => {
   updateFieldVisibility();
 });
 
-// Unified visibility control function
+// Load visibility configuration from JSON
+async function loadVisibilityConfig() {
+  try {
+    const response = await fetch('./config/show-hide.json');
+    const data = await response.json();
+    visibilityConfig = data.visibilityRules;
+    logger.log('Visibility configuration loaded successfully');
+  } catch (error) {
+    logger.error('Failed to load visibility configuration:', error);
+    // Fallback to default behavior if config fails to load
+    visibilityConfig = null;
+  }
+}
+
+// Unified visibility control function using JSON configuration
 function updateFieldVisibility() {
+  if (!visibilityConfig) {
+    logger.warn('Visibility config not loaded, using fallback logic');
+    updateFieldVisibilityFallback();
+    return;
+  }
+  
+  const sourceType = sourceTypeEl.value;
+  const searchType = sourceType === 'Local Model Only' ? '' : (searchTypeEl.value || 'exact-match');
+  
+  // Get visibility rules for current combination
+  const rules = visibilityConfig[sourceType]?.[searchType];
+  if (!rules) {
+    logger.warn(`No visibility rules found for ${sourceType} + ${searchType}`);
+    return;
+  }
+  
+  // Apply visibility rules from JSON
+  applyVisibilityRule('collectionSection', collectionSection, rules.collectionSection);
+  applyVisibilityRule('searchTypeSection', searchTypeSection, rules.searchTypeSection);
+  if (vectorDBSection) applyVisibilityRule('vectorDBSection', vectorDBSection, rules.searchTypeSection); // Same as searchType
+  
+  // Wildcard checkbox
+  if (wildcardSection) {
+    applyVisibilityRule('wildcardCheckbox', wildcardSection, rules.wildcardCheckbox);
+    if (rules.wildcardCheckbox === 'N' && useWildcardsEl) {
+      useWildcardsEl.checked = false;
+    }
+  }
+  
+  // Model field
+  const modelField = modelEl.parentElement;
+  if (modelField) {
+    applyVisibilityRule('modelField', modelField, rules.modelField);
+  }
+  
+  // Model options (temperature, context, tokens)
+  const modelOptions = document.querySelectorAll('.model-options');
+  modelOptions.forEach(option => {
+    option.style.display = rules.modelOptions === 'Y' ? 'flex' : 'none';
+  });
+  
+  // Assistant type field
+  const assistantField = assistantTypeEl.parentElement;
+  if (assistantField) {
+    applyVisibilityRule('assistantType', assistantField, rules.assistantType);
+  }
+  
+  // Show chunks checkbox
+  const showChunksLabel = document.getElementById('showChunksLabel');
+  if (showChunksLabel) {
+    if (rules.showChunks === 'Y') {
+      showChunksLabel.classList.remove('hide-chunks-checkbox');
+    } else {
+      showChunksLabel.classList.add('hide-chunks-checkbox');
+      const showChunksToggle = document.getElementById('showChunksToggle');
+      if (showChunksToggle) showChunksToggle.checked = false;
+    }
+  }
+  
+  // Generate Scores visibility
+  const scoreLabel = scoreTglEl.parentElement;
+  if (scoreLabel) {
+    scoreLabel.style.display = rules.generateScores === 'Y' ? 'flex' : 'none';
+    if (rules.generateScores === 'N') {
+      scoreTglEl.checked = false;
+      document.getElementById('scoringSection').style.display = 'none';
+    }
+  }
+}
+
+// Helper function to apply visibility rule
+function applyVisibilityRule(fieldName, element, rule) {
+  if (!element) {
+    logger.warn(`Element not found for field: ${fieldName}`);
+    return;
+  }
+  element.style.display = rule === 'Y' ? 'block' : 'none';
+}
+
+// Fallback function with original logic
+function updateFieldVisibilityFallback() {
   const sourceType = sourceTypeEl.value;
   const searchType = searchTypeEl.value;
   
@@ -707,6 +804,15 @@ function render(result) {
         answerP.appendChild(content.firstChild);
       }
     }
+  } else if (result.searchType === 'ai-direct' && result.response.includes('**Result ') && result.response.includes('---')) {
+    // Format AI Direct response similar to other search types
+    const lines = result.response.split('\n');
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        answerP.appendChild(document.createElement('br'));
+      }
+      answerP.appendChild(document.createTextNode(line));
+    });
   } else {
     // Standard response formatting for other search types
     const lines = result.response.split('\n');
@@ -1076,6 +1182,16 @@ form.addEventListener('submit', async (e) => {
         testCode,
         createdAt: new Date().toISOString()
       };
+    } else if (searchType === 'ai-direct') {
+      // Use AI Direct common utility
+      result = await window.aiDirectCommon.handleSearchPageAIDirectSearch(trimmedQuery, collection, {
+        model: modelEl.value,
+        temperature: parseFloat(temperatureEl.value),
+        contextSize: parseFloat(contextEl.value),
+        tokenLimit
+      });
+      result.sourceType = sourceTypeEl.value;
+      result.testCode = testCode;
     } else {
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
     }

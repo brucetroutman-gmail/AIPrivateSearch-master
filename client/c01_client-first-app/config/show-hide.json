@@ -1,7 +1,7 @@
 {
   "visibilityRules": {
     "Local Model Only": {
-      "exact-match": {
+      "": {
         "collectionSection": "N",
         "searchTypeSection": "N",
         "wildcardCheckbox": "N",
@@ -9,67 +9,7 @@
         "modelOptions": "Y",
         "assistantType": "Y",
         "showChunks": "N",
-        "generateScores": "N"
-      },
-      "fulltext": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
-      },
-      "ai-direct": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
-      },
-      "rag": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
-      },
-      "vector": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
-      },
-      "hybrid": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
-      },
-      "metadata": {
-        "collectionSection": "N",
-        "searchTypeSection": "N",
-        "wildcardCheckbox": "N",
-        "modelField": "Y",
-        "modelOptions": "Y",
-        "assistantType": "Y",
-        "showChunks": "N",
-        "generateScores": "N"
+        "generateScores": "Y"
       }
     },
     "Local Documents Only": {
