@@ -9,9 +9,8 @@ function decodeHtmlEntities(text) {
 
 // Convert markdown to HTML with safe link handling
 function convertMarkdownToHTML(markdown) {
-    // First decode any HTML entities
-    const decodedMarkdown = decodeHtmlEntities(markdown);
-    const lines = decodedMarkdown.split('\n');
+    // Don't decode HTML entities to preserve search highlighting marks
+    const lines = markdown.split('\n');
     let html = '';
     
     lines.forEach((line, index) => {

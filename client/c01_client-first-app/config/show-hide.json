@@ -40,7 +40,7 @@
         "modelField": "Y",
         "modelOptions": "Y",
         "assistantType": "Y",
-        "showChunks": "Y",
+        "showChunks": "N",
         "generateScores": "N"
       },
       "rag": {
