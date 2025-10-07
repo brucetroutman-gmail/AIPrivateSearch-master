@@ -180,6 +180,12 @@ else
     echo "✅ .env file found in /Users/Shared"
 fi
 
+# Fix dotenv version if needed (common issue with invalid version)
+if grep -q '"dotenv": "\^17\.' package.json; then
+    echo "🔧 Fixing dotenv version in package.json..."
+    sed -i '' 's/"dotenv": "\^17\.[0-9]\+\.[0-9]\+"/"dotenv": "^16.4.5"/' package.json
+fi
+
 npm install --silent
 echo "Starting backend server..."
 npm start &
