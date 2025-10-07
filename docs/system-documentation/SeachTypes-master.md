@@ -1,3 +1,4 @@
+
 {
   "search_types": [
     {
@@ -19,6 +20,21 @@
       "value": "rag",
       "name": "AI Document Chat",
       "description": "Chunked documents with AI retrieval"
+    },
+    {
+      "value": "vector",
+      "name": "AI Concept",
+      "description": "Semantic similarity using embeddings"
+    },
+    {
+      "value": "hybrid",
+      "name": "Hybrid",
+      "description": "Combined traditional and vector methods"
+    },
+    {
+      "value": "metadata",
+      "name": "Metadata",
+      "description": "Structured queries using document metadata"
     }
   ]
 }

@@ -201,7 +201,9 @@ specs-3-scoring
 
 96. after persisting temp etc. responses are not correct. are these parm being used is search?
 
-97. Load-aiss.command fails on mac mini 16mb
+97. Changed from sqllite3 to sql.js to remove Command line tools requirement on mac. --done
+
+
 
 
 
