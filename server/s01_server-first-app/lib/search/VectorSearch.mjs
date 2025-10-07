@@ -1,34 +1,13 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
-
-// Optional native modules - gracefully handle missing dependencies
-let HierarchicalNSW, L2Space, Database;
-try {
-  const pkg = await import('hnswlib-node');
-  ({ HierarchicalNSW, L2Space } = pkg.default || pkg);
-} catch (error) {
-  console.warn('hnswlib-node not available - vector search disabled');
-}
-
-try {
-  const dbPkg = await import('better-sqlite3');
-  Database = dbPkg.default || dbPkg;
-} catch (error) {
-  console.warn('better-sqlite3 not available - using fallback storage');
-}
+import pkg from 'hnswlib-node';
+const { HierarchicalNSW, L2Space } = pkg;
+import Database from 'better-sqlite3';
 
 export class VectorSearch {
   constructor() {
     this.name = 'Vector Database';
     this.description = 'Semantic similarity using embeddings';
-    
-    if (!Database || !HierarchicalNSW) {
-      console.warn('Vector search unavailable - missing native dependencies');
-      this.available = false;
-      return;
-    }
-    
-    this.available = true;
     this.db = new Database('./vector_index.db');
     this.vectorIndex = null;
     this.dimension = 384; // all-minilm dimension
@@ -56,20 +35,6 @@ export class VectorSearch {
   }
 
   async search(query, options = {}) {
-    if (!this.available) {
-      return {
-        results: [{
-          id: 'vector_unavailable',
-          title: 'Vector Search Unavailable',
-          excerpt: 'Vector search requires native dependencies that are not installed. Use other search methods.',
-          score: 0,
-          source: 'System message'
-        }],
-        method: 'vector',
-        total: 1
-      };
-    }
-    
     const { collection = null, topK = 5 } = options;
     
     try {

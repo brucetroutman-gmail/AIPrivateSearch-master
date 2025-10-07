@@ -201,6 +201,8 @@ specs-3-scoring
 
 96. after persisting temp etc. responses are not correct. are these parm being used is search?
 
+97. Load-aiss.command fails on mac mini 16mb
+
 
 
 
