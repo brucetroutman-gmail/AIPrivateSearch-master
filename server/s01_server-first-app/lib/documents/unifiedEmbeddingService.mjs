@@ -1,13 +1,17 @@
-import Database from 'better-sqlite3';
+import { SqlJsWrapper } from '../utils/SqlJsWrapper.mjs';
 import crypto from 'crypto';
 
 export class UnifiedEmbeddingService {
   constructor() {
-    this.db = new Database('./data/databases/unified_embeddings.db');
-    this.setupDatabase();
+    this.db = new SqlJsWrapper('./data/databases/unified_embeddings.db');
+    this.initialized = false;
   }
 
-  setupDatabase() {
+  async setupDatabase() {
+    if (!this.initialized) {
+      await this.db.init();
+      this.initialized = true;
+    }
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY,
@@ -51,6 +55,7 @@ export class UnifiedEmbeddingService {
   }
 
   async processDocument(filename, content, collection) {
+    await this.setupDatabase();
     const contentHash = this.generateContentHash(content);
     const documentId = `doc_${contentHash}`;
     
@@ -142,6 +147,7 @@ export class UnifiedEmbeddingService {
   }
 
   async findSimilarChunks(query, collection, topK = 5) {
+    await this.setupDatabase();
     const queryEmbedding = await this.createEmbedding(query);
     
     const stmt = this.db.prepare(`
@@ -190,6 +196,7 @@ export class UnifiedEmbeddingService {
   }
 
   async removeDocument(collection, filename) {
+    await this.setupDatabase();
     // Find document ID for this collection/filename
     const docStmt = this.db.prepare(`
       SELECT document_id FROM collection_documents 
@@ -227,6 +234,7 @@ export class UnifiedEmbeddingService {
   }
 
   async listDocuments(collection) {
+    await this.setupDatabase();
     const stmt = this.db.prepare(`
       SELECT cd.filename, d.processed_at
       FROM collection_documents cd
@@ -237,6 +245,7 @@ export class UnifiedEmbeddingService {
   }
 
   async getChunkCounts(collection) {
+    await this.setupDatabase();
     const stmt = this.db.prepare(`
       SELECT cd.filename, COUNT(c.id) as chunks 
       FROM collection_documents cd
@@ -255,6 +264,7 @@ export class UnifiedEmbeddingService {
   }
 
   async getStats() {
+    await this.setupDatabase();
     const totalDocs = this.db.prepare('SELECT COUNT(*) as count FROM documents').get();
     const totalChunks = this.db.prepare('SELECT COUNT(*) as count FROM chunks').get();
     const totalCollections = this.db.prepare('SELECT COUNT(DISTINCT collection) as count FROM collection_documents').get();

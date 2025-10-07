@@ -2,7 +2,7 @@
 import { ExactMatchSearch } from './ExactMatchSearch.mjs';
 import { MetadataSearch } from './MetadataSearch.mjs';
 import { FullTextSearch } from './FullTextSearch.mjs';
-import { VectorSearchSimple } from './VectorSearchSimple.mjs';
+
 import { HybridSearch } from './HybridSearch.mjs';
 import { AIDirectSearch } from './AIDirectSearch.mjs';
 import { RAGSearch } from './RAGSearch.mjs';
@@ -14,7 +14,7 @@ export class SearchOrchestrator {
       'exact-match': new ExactMatchSearch(),
       metadata: new MetadataSearch(),
       fulltext: new FullTextSearch(),
-      vector: new VectorSearchSimple(),
+
       hybrid: new HybridSearch(),
       'ai-direct': new AIDirectSearch(),
       rag: new RAGSearch(),

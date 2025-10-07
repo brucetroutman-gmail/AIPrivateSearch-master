@@ -1,6 +1,6 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
-import Database from 'better-sqlite3';
+import { SqlJsWrapper } from '../utils/SqlJsWrapper.mjs';
 import mime from 'mime-types';
 import { OllamaService } from '../services/OllamaService.mjs';
 import natural from 'natural';
@@ -9,8 +9,8 @@ export class MetadataSearch {
   constructor() {
     this.name = 'Metadata Search';
     this.description = 'Structured queries using document metadata';
-    this.db = new Database('./data/databases/metadata.db');
-    this.setupDatabase();
+    this.db = new SqlJsWrapper('./data/databases/metadata.db');
+    this.initialized = false;
     
     // Initialize NLP tools
     this.tokenizer = new natural.WordTokenizer();
@@ -18,7 +18,11 @@ export class MetadataSearch {
     this.tfidf = new this.TfIdf();
   }
 
-  setupDatabase() {
+  async setupDatabase() {
+    if (!this.initialized) {
+      await this.db.init();
+      this.initialized = true;
+    }
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS document_metadata (
         id TEXT PRIMARY KEY,
@@ -83,7 +87,7 @@ export class MetadataSearch {
       const criteria = this.parseQuery(query);
       criteria.collection = collection;
       
-      const results = this.searchByMetadata(criteria);
+      const results = await this.searchByMetadata(criteria);
       
       return {
         results: results.map(doc => {
@@ -133,10 +137,11 @@ export class MetadataSearch {
   }
 
   async ensureMetadataIndexed(collection) {
+    await this.setupDatabase();
     const stmt = this.db.prepare('SELECT COUNT(*) as count FROM document_metadata WHERE collection = ?');
     const result = stmt.get(collection);
     
-    if (result.count === 0) {
+    if (!result || result.count === 0) {
       await this.indexCollection(collection);
     }
   }
@@ -178,23 +183,27 @@ export class MetadataSearch {
     return { filesDeleted: deletedCount };
   }
 
-  getDocumentMetadata(collection, filename) {
+  async getDocumentMetadata(collection, filename) {
+    await this.setupDatabase();
     const stmt = this.db.prepare('SELECT * FROM document_metadata WHERE collection = ? AND filename = ?');
     return stmt.get(collection, filename);
   }
 
-  updateMetadataComments(id, comments) {
+  async updateMetadataComments(id, comments) {
+    await this.setupDatabase();
     const stmt = this.db.prepare('UPDATE document_metadata SET our_comments = ? WHERE id = ?');
     const result = stmt.run(comments, id);
     return { updated: result.changes > 0 };
   }
 
-  getMetadataStatus(collection) {
+  async getMetadataStatus(collection) {
+    await this.setupDatabase();
     const stmt = this.db.prepare('SELECT filename FROM document_metadata WHERE collection = ?');
     return stmt.all(collection);
   }
 
-  updateAllMetadata(metadata) {
+  async updateAllMetadata(metadata) {
+    await this.setupDatabase();
     const stmt = this.db.prepare(`
       UPDATE document_metadata SET 
         file_path = ?, title = ?, author = ?, language = ?, source = ?, version = ?,
@@ -313,10 +322,11 @@ export class MetadataSearch {
       geolocation: combinedMetadata.geolocation
     };
     
-    this.addDocumentMetadata(metadata);
+    await this.addDocumentMetadata(metadata);
   }
 
-  addDocumentMetadata(metadata) {
+  async addDocumentMetadata(metadata) {
+    await this.setupDatabase();
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO document_metadata 
       (id, doc_id, collection, our_comments, filename, file_type, file_size, file_path,
@@ -445,7 +455,8 @@ export class MetadataSearch {
     return criteria;
   }
 
-  searchByMetadata(criteria) {
+  async searchByMetadata(criteria) {
+    await this.setupDatabase();
     let query = 'SELECT * FROM document_metadata WHERE collection = ?';
     const params = [criteria.collection];
 

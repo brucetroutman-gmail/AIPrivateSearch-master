@@ -180,51 +180,24 @@ else
     echo "✅ .env file found in /Users/Shared"
 fi
 
-# Ensure build tools are available for native dependencies
-echo "🔧 Checking build tools for native dependencies..."
-if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
-    echo "⚠️  Python not found - installing via Xcode Command Line Tools..."
-    if ! xcode-select -p &> /dev/null; then
-        echo "📦 Installing Xcode Command Line Tools (required for native modules)..."
-        xcode-select --install
-        echo "⏳ Please complete the Xcode Command Line Tools installation dialog"
-        echo "   and wait for installation to complete (this may take several minutes)"
-        echo "   Then run this script again."
-        read -p "Press Enter after installation is complete..."
-    fi
-fi
-
 # Clean install to avoid any cached issues
 echo "🧹 Cleaning previous installation..."
 rm -rf node_modules package-lock.json 2>/dev/null || true
 
-# Set environment variables for native compilation
-export PYTHON=$(which python3 2>/dev/null || which python 2>/dev/null || echo "python3")
-export npm_config_python="$PYTHON"
-
-echo "📦 Installing dependencies (this may take a moment)..."
-echo "   Note: Native modules (better-sqlite3, hnswlib-node) require compilation"
+echo "📦 Installing dependencies (pure JavaScript - no compilation needed)..."
 if npm install; then
     echo "✅ Dependencies installed successfully"
 else
     echo "❌ npm install failed!"
     echo "🔍 Debug: Node version: $(node --version)"
     echo "🔍 Debug: npm version: $(npm --version)"
-    echo "🔍 Debug: Python: $PYTHON"
-    echo "🔍 Debug: Xcode tools: $(xcode-select -p 2>/dev/null || echo 'Not installed')"
     echo ""
-    echo "💡 Common solutions:"
-    echo "   1. Install Xcode Command Line Tools: xcode-select --install"
-    echo "   2. Ensure Python is available: python3 --version"
-    echo "   3. Try: npm install --build-from-source"
-    echo ""
-    echo "Attempting rebuild..."
+    echo "Retrying npm install..."
     
-    if npm install --build-from-source; then
-        echo "✅ Dependencies installed after rebuild"
+    if npm install --no-optional; then
+        echo "✅ Dependencies installed after retry"
     else
-        echo "❌ npm install still failing."
-        echo "Please install Xcode Command Line Tools manually and try again."
+        echo "❌ npm install still failing. Please check your internet connection."
         exit 1
     fi
 fi
