@@ -70,7 +70,7 @@ export class UnifiedEmbeddingService {
       `);
       
       const docEmbedding = await this.createEmbedding(content.substring(0, 8000));
-      docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
+      await docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
       
       // Create chunks
       const chunks = this.semanticChunking(content);
@@ -83,7 +83,7 @@ export class UnifiedEmbeddingService {
         const chunk = chunks[i];
         const embedding = await this.createEmbedding(chunk.content);
         
-        chunkStmt.run(
+        await chunkStmt.run(
           `${documentId}_chunk_${i}`,
           documentId,
           i,
@@ -101,7 +101,7 @@ export class UnifiedEmbeddingService {
       INSERT OR IGNORE INTO collection_documents (collection, document_id, filename)
       VALUES (?, ?, ?)
     `);
-    linkStmt.run(collection, documentId, filename);
+    await linkStmt.run(collection, documentId, filename);
     
     // Get chunk count
     const chunkCount = this.db.prepare('SELECT COUNT(*) as count FROM chunks WHERE document_id = ?').get(documentId);
@@ -213,7 +213,7 @@ export class UnifiedEmbeddingService {
       DELETE FROM collection_documents 
       WHERE collection = ? AND filename = ?
     `);
-    removeFromCollection.run(collection, filename);
+    await removeFromCollection.run(collection, filename);
     
     // Check if document is used in other collections
     const otherCollections = this.db.prepare(`
@@ -226,8 +226,8 @@ export class UnifiedEmbeddingService {
       const deleteChunks = this.db.prepare('DELETE FROM chunks WHERE document_id = ?');
       const deleteDoc = this.db.prepare('DELETE FROM documents WHERE id = ?');
       
-      deleteChunks.run(doc.document_id);
-      deleteDoc.run(doc.document_id);
+      await deleteChunks.run(doc.document_id);
+      await deleteDoc.run(doc.document_id);
     }
     
     return { success: true };

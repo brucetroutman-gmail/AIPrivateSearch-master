@@ -192,7 +192,7 @@ export class MetadataSearch {
   async updateMetadataComments(id, comments) {
     await this.setupDatabase();
     const stmt = this.db.prepare('UPDATE document_metadata SET our_comments = ? WHERE id = ?');
-    const result = stmt.run(comments, id);
+    const result = await stmt.run(comments, id);
     return { updated: result.changes > 0 };
   }
 
@@ -213,7 +213,7 @@ export class MetadataSearch {
       WHERE id = ?
     `);
     
-    const result = stmt.run(
+    const result = await stmt.run(
       metadata.file_path, metadata.title, metadata.author, metadata.language, 
       metadata.source, metadata.version, metadata.access_level, metadata.license, 
       metadata.category, metadata.metadata_version, metadata.summary, metadata.topics, 
@@ -338,7 +338,7 @@ export class MetadataSearch {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    stmt.run(
+    await stmt.run(
       metadata.id, metadata.docId, metadata.collection, metadata.ourComments,
       metadata.filename, metadata.fileType, metadata.fileSize, metadata.filePath,
       metadata.createdDate, metadata.lastModifiedDate, metadata.author, metadata.language,

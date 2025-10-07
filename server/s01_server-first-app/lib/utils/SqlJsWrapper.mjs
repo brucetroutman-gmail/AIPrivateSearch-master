@@ -1,6 +1,6 @@
 import initSqlJs from 'sql.js';
-import fs from 'fs';
 import path from 'path';
+import { secureFs } from './secureFileOps.mjs';
 
 export class SqlJsWrapper {
   constructor(dbPath) {
@@ -14,15 +14,18 @@ export class SqlJsWrapper {
     
     // Create directory if it doesn't exist
     const dir = path.dirname(this.dbPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      await secureFs.mkdir(dir, { recursive: true });
+    } catch (error) {
+      // Directory might already exist
     }
     
     // Load existing database or create new one
-    if (fs.existsSync(this.dbPath)) {
-      const data = fs.readFileSync(this.dbPath);
+    try {
+      const data = await secureFs.readFile(this.dbPath);
       this.db = new this.SQL.Database(data);
-    } else {
+    } catch (error) {
+      // File doesn't exist, create new database
       this.db = new this.SQL.Database();
     }
   }
@@ -37,12 +40,12 @@ export class SqlJsWrapper {
     if (!this.db) throw new Error('Database not initialized');
     
     return {
-      run: (...params) => {
+      run: async (...params) => {
         const stmt = this.db.prepare(sql);
         stmt.bind(params);
         stmt.step();
         stmt.free();
-        this.save();
+        await this.save();
         return { changes: 1 };
       },
       get: (...params) => {
@@ -65,15 +68,15 @@ export class SqlJsWrapper {
     };
   }
 
-  save() {
+  async save() {
     if (!this.db) return;
     const data = this.db.export();
-    fs.writeFileSync(this.dbPath, data);
+    await secureFs.writeFile(this.dbPath, data);
   }
 
-  close() {
+  async close() {
     if (this.db) {
-      this.save();
+      await this.save();
       this.db.close();
     }
   }
