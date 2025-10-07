@@ -1,6 +1,13 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
-import Database from 'better-sqlite3';
+// Optional native module
+let Database;
+try {
+  const dbPkg = await import('better-sqlite3');
+  Database = dbPkg.default || dbPkg;
+} catch (error) {
+  console.warn('better-sqlite3 not available - metadata search will use fallback');
+}
 import mime from 'mime-types';
 import { OllamaService } from '../services/OllamaService.mjs';
 import natural from 'natural';

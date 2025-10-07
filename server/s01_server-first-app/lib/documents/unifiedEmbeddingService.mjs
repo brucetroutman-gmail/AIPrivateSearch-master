@@ -1,4 +1,11 @@
-import Database from 'better-sqlite3';
+// Optional native module
+let Database;
+try {
+  const dbPkg = await import('better-sqlite3');
+  Database = dbPkg.default || dbPkg;
+} catch (error) {
+  console.warn('better-sqlite3 not available - using fallback embedding storage');
+}
 import crypto from 'crypto';
 
 export class UnifiedEmbeddingService {
