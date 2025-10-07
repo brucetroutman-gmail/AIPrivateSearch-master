@@ -180,13 +180,44 @@ else
     echo "✅ .env file found in /Users/Shared"
 fi
 
+# Debug: Show current directory and package.json status
+echo "🔍 Debug: Current directory: $(pwd)"
+echo "🔍 Debug: package.json exists: $([ -f package.json ] && echo 'Yes' || echo 'No')"
+
 # Fix dotenv version if needed (common issue with invalid version)
-if grep -q '"dotenv": "\^17\.' package.json; then
+if [ -f package.json ] && grep -q '"dotenv": "\^17\.' package.json; then
     echo "🔧 Fixing dotenv version in package.json..."
     sed -i '' 's/"dotenv": "\^17\.[0-9]\+\.[0-9]\+"/"dotenv": "^16.4.5"/' package.json
+    echo "✅ Fixed dotenv version"
 fi
 
-npm install --silent
+# Clean install to avoid any cached issues
+echo "🧹 Cleaning previous installation..."
+rm -rf node_modules package-lock.json 2>/dev/null || true
+
+echo "📦 Installing dependencies (this may take a moment)..."
+if npm install; then
+    echo "✅ Dependencies installed successfully"
+else
+    echo "❌ npm install failed!"
+    echo "🔍 Debug: Node version: $(node --version)"
+    echo "🔍 Debug: npm version: $(npm --version)"
+    echo "🔍 Debug: package.json dotenv line:"
+    grep dotenv package.json || echo "dotenv not found in package.json"
+    echo ""
+    echo "Attempting to fix and retry..."
+    
+    # Force fix dotenv version
+    sed -i '' 's/"dotenv": "[^"]*"/"dotenv": "^16.4.5"/' package.json
+    
+    if npm install; then
+        echo "✅ Dependencies installed after fix"
+    else
+        echo "❌ npm install still failing. Exiting."
+        exit 1
+    fi
+fi
+
 echo "Starting backend server..."
 npm start &
 BACKEND_PID=$!
