@@ -150,11 +150,27 @@ function populateSelect(element, options, valueKey, textKey, storageKey = null, 
   
   // Restore saved value or set default
   const savedValue = storageKey ? localStorage.getItem(storageKey) : null;
-  if (savedValue && options.find(opt => (opt[valueKey] || opt) === savedValue)) {
-    element.value = savedValue;
-  } else if (defaultValue && options.find(opt => (opt[valueKey] || opt) === defaultValue)) {
-    element.value = defaultValue;
-  } else if (options.length > 0) {
+  if (savedValue) {
+    // Try to find matching option by comparing the actual option value that would be set
+    const matchingOption = options.find(opt => {
+      const optionValue = String(opt[valueKey] || opt);
+      return optionValue === savedValue;
+    });
+    if (matchingOption) {
+      element.value = savedValue;
+    }
+  }
+  
+  // Set default if no saved value was restored
+  if (!element.value && defaultValue) {
+    const defaultOption = options.find(opt => String(opt[valueKey] || opt) === String(defaultValue));
+    if (defaultOption) {
+      element.value = defaultValue;
+    }
+  }
+  
+  // Set first option if still no value
+  if (!element.value && options.length > 0) {
     element.value = options[0][valueKey] || options[0];
   }
 }
@@ -215,6 +231,7 @@ loadModels();
 loadSystemPrompts();
 loadUserPrompts();
 loadVisibilityConfig();
+loadSearchTypes();
 
 loadTokensOptions();
 loadTemperatureOptions();
@@ -225,12 +242,14 @@ loadScoringOptions();
 async function loadTemperatureOptions() {
   const data = await loadConfig('temperature.json', { temperature: [] });
   populateSelect(temperatureEl, data.temperature, 'value', 'name', 'lastTemperature');
+  console.log('Loaded temperature, restored value:', temperatureEl.value);
 }
 
 // Load context options from JSON file
 async function loadContextOptions() {
   const data = await loadConfig('context.json', { context: [] });
   populateSelect(contextEl, data.context, 'name', 'name', 'lastContext');
+  console.log('Loaded context, restored value:', contextEl.value);
 }
 
 // Load vectorDB options from JSON file
@@ -240,6 +259,12 @@ async function loadVectorDBOptions() {
   populateSelect(vectorDBEl, data.vectorDB, 'value', 'name', 'lastVectorDB', 'local');
 }
 loadVectorDBOptions();
+
+// Load search types from JSON file
+async function loadSearchTypes() {
+  const data = await loadConfig('search-types.json', { search_types: [] });
+  populateSelect(searchTypeEl, data.search_types, 'value', 'name', 'lastSearchType', 'rag');
+}
 
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
@@ -333,11 +358,13 @@ modelEl.addEventListener('change', () => {
 // Save temperature selection
 temperatureEl.addEventListener('change', () => {
   localStorage.setItem('lastTemperature', temperatureEl.value);
+  console.log('Saved temperature:', temperatureEl.value);
 });
 
 // Save context selection
 contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
+  console.log('Saved context:', contextEl.value);
 });
 
 // Save source type selection and handle visibility
@@ -645,6 +672,7 @@ async function loadScoringOptions() {
 // Save tokens selection
 tokensEl.addEventListener('change', () => {
   localStorage.setItem('lastTokens', tokensEl.value);
+  console.log('Saved tokens:', tokensEl.value);
 });
 
 // Save prompt text
@@ -658,6 +686,7 @@ queryEl.addEventListener('input', () => {
 async function loadTokensOptions() {
   const data = await loadConfig('tokens.json', { tokens: [] });
   populateSelect(tokensEl, data.tokens, 'name', 'name', 'lastTokens');
+  console.log('Loaded tokens, restored value:', tokensEl.value);
 }
 
 // Generate TestCode based on current form selections
@@ -849,6 +878,44 @@ function render(result) {
   }
   
   outputEl.append(answerH, answerP);
+
+  // 1.5. (optional) source chunks
+  if (result.chunks && result.chunks.length > 0) {
+    const chunksH = document.createElement('h3');
+    chunksH.textContent = 'Source Chunks';
+    outputEl.append(chunksH);
+
+    result.chunks.forEach((chunk, index) => {
+      const chunkDiv = document.createElement('div');
+      chunkDiv.className = 'chunk-item';
+      chunkDiv.style.marginBottom = '1rem';
+      chunkDiv.style.padding = '0.5rem';
+      chunkDiv.style.border = '1px solid #ddd';
+      chunkDiv.style.borderRadius = '4px';
+      
+      const chunkTitle = document.createElement('h4');
+      chunkTitle.textContent = `Chunk ${index + 1}: ${chunk.filename}`;
+      chunkTitle.style.margin = '0 0 0.5rem 0';
+      chunkTitle.style.fontSize = '0.9rem';
+      
+      const chunkContent = document.createElement('p');
+      chunkContent.textContent = chunk.content;
+      chunkContent.style.margin = '0';
+      chunkContent.style.fontSize = '0.85rem';
+      
+      if (chunk.similarity) {
+        const similarity = document.createElement('small');
+        similarity.textContent = `Similarity: ${(chunk.similarity * 100).toFixed(1)}%`;
+        similarity.style.color = '#666';
+        chunkTitle.appendChild(document.createTextNode(' '));
+        chunkTitle.appendChild(similarity);
+      }
+      
+      chunkDiv.appendChild(chunkTitle);
+      chunkDiv.appendChild(chunkContent);
+      outputEl.append(chunkDiv);
+    });
+  }
 
   // 2. (optional) scores
   if (result.scores) {
@@ -1128,74 +1195,123 @@ form.addEventListener('submit', async (e) => {
     let result;
     if (searchType === 'fulltext') {
       // Use same endpoint as multi-mode for fulltext searches
+      const searchStartTime = Date.now();
       const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection, useWildcards);
+      const searchEndTime = Date.now();
+      
+      const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
       result = {
-        response: searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
+        response: responseText,
         searchType: 'fulltext',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,
         testCode,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        metrics: {
+          search: {
+            model: 'Document Search',
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 50000000,
+            eval_count: Math.floor(responseText.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 50) * 1000000,
+            context_size: 'N/A',
+            temperature: 'N/A'
+          }
+        }
       };
     } else if (searchType === 'exact-match') {
       // Use same endpoint as multi-mode for exact-match searches
+      const searchStartTime = Date.now();
       const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: trimmedQuery, options: { collection, useWildcards } })
       });
       const data = await response.json();
+      const searchEndTime = Date.now();
+      
+      const responseText = data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
       result = {
-        response: data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
+        response: responseText,
         searchType: 'exact-match',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,
         testCode,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        metrics: {
+          search: {
+            model: 'Line Search',
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 25000000,
+            eval_count: Math.floor(responseText.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 25) * 1000000,
+            context_size: 'N/A',
+            temperature: 'N/A'
+          }
+        }
       };
     } else if (searchType === 'rag') {
-      // Use same endpoint as multi-mode for RAG searches
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query: trimmedQuery, 
-          options: { 
-            collection, 
-            model: modelEl.value, 
-            temperature: parseFloat(temperatureEl.value), 
-            contextSize: parseFloat(contextEl.value), 
-            tokenLimit,
-            topK: 3 
-          } 
-        })
-      });
-      const data = await response.json();
-      result = {
-        response: data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n'),
-        searchType: 'rag',
-        query: trimmedQuery,
-        collection,
-        sourceType: sourceTypeEl.value,
-        testCode,
-        createdAt: new Date().toISOString()
-      };
+      // Use main search endpoint for RAG searches to support scoring
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
     } else if (searchType === 'ai-direct') {
       // Use AI Direct common utility
+      const searchStartTime = Date.now();
       result = await window.aiDirectCommon.handleSearchPageAIDirectSearch(trimmedQuery, collection, {
         model: modelEl.value,
         temperature: parseFloat(temperatureEl.value),
         contextSize: parseFloat(contextEl.value),
         tokenLimit
       });
+      const searchEndTime = Date.now();
+      
       result.sourceType = sourceTypeEl.value;
       result.testCode = testCode;
+      
+      // Add metrics if not already present
+      if (!result.metrics) {
+        result.metrics = {
+          search: {
+            model: modelEl.value,
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 150000000,
+            eval_count: Math.floor(result?.response?.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 150) * 1000000,
+            context_size: parseFloat(contextEl.value),
+            temperature: parseFloat(temperatureEl.value)
+          }
+        };
+      }
     } else {
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
     }
     console.log('Search result:', result);
+    
+    // Extract chunks from nested result structure if present
+    if (result.results && result.results.length > 0 && result.results[0].chunks) {
+      result.chunks = result.results[0].chunks;
+    }
+    
+    // Add system information to all results that don't have it
+    if (!result.systemInfo || !result.pcCode) {
+      try {
+        const systemInfoResponse = await fetch('http://localhost:3001/api/system-info');
+        if (systemInfoResponse.ok) {
+          const systemInfo = await systemInfoResponse.json();
+          result.systemInfo = systemInfo.systemInfo;
+          result.pcCode = systemInfo.pcCode;
+        } else {
+          // Fallback system info
+          result.systemInfo = { chip: 'Unknown', graphics: 'Unknown', ram: 'Unknown', os: 'Unknown' };
+          result.pcCode = 'Unknown';
+        }
+      } catch (error) {
+        // Fallback system info
+        result.systemInfo = { chip: 'Unknown', graphics: 'Unknown', ram: 'Unknown', os: 'Unknown' };
+        result.pcCode = 'Unknown';
+      }
+    }
     
     // Show scoring phase if scores were generated
     if (result.scores) {

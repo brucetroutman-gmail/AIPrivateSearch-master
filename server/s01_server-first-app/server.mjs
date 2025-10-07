@@ -30,6 +30,20 @@ app.get('/api/csrf-token', generateCSRFToken, (req, res) => {
   res.json({ csrfToken: req.csrfToken });
 });
 
+// System info endpoint (no auth required)
+app.get('/api/system-info', async (req, res) => {
+  try {
+    const { getSystemInfo } = await import('./routes/../lib/utils/systemInfo.mjs');
+    const systemInfo = await getSystemInfo();
+    res.json(systemInfo);
+  } catch (error) {
+    res.status(500).json({ 
+      systemInfo: { chip: 'Unknown', graphics: 'Unknown', ram: 'Unknown', os: 'Unknown' },
+      pcCode: 'Unknown'
+    });
+  }
+});
+
 // Apply origin validation and CSRF protection to all API routes
 app.use('/api', validateOrigin);
 app.use('/api', validateCSRFToken);

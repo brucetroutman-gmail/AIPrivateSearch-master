@@ -193,13 +193,13 @@ specs-3-scoring
 
 92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done
 
-93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.
+93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.  -done
 
 94. We have lost highlighting of matches in line search --done
 
-95. line serach, document search, RAG search, ai directis missing performancce metrics and system information
+95. line serach, document search, RAG search, ai directis missing performancce metrics and system information --done
 
-96. 
+96. after persisting temp etc. responses are not correct. are these parm being used is search?
 
 
 

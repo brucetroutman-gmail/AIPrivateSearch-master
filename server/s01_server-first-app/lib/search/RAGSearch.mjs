@@ -8,7 +8,7 @@ export class RAGSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null, model = 'qwen2:0.5b', topK = 3, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
+    const { collection = null, model, topK = 5, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
       console.log(`RAG search for query: "${query}" in collection: ${collection}`);
@@ -40,22 +40,28 @@ export class RAGSearch {
         aiResponse = this.formatChunksDirectly(query, relevantChunks);
       }
       
-      return {
+      const result = {
         results: [{
           id: `rag_${Date.now()}`,
-          title: 'RAG Analysis',
+          title: 'Chat Analysis',
           excerpt: aiResponse,
           score: 0.8,
-          source: `${relevantChunks.length} relevant chunks`,
-          chunks: relevantChunks.map(chunk => ({
-            filename: chunk.filename,
-            content: chunk.content.substring(0, 100) + '...',
-            similarity: chunk.similarity
-          }))
+          source: `${relevantChunks.length} relevant chunks`
         }],
         method: 'rag',
         total: 1
       };
+      
+      // Add chunks if requested
+      if (options.showChunks) {
+        result.results[0].chunks = relevantChunks.map(chunk => ({
+          filename: chunk.filename,
+          content: chunk.content,
+          similarity: chunk.similarity
+        }));
+      }
+      
+      return result;
     } catch (error) {
       console.error('RAG search error:', error);
       throw new Error(`RAG search failed: ${error.message}`);
@@ -63,14 +69,17 @@ export class RAGSearch {
   }
   
   formatChunksDirectly(query, chunks) {
-    let response = `Based on the embedded documents, here are the top 3 relevant findings:\n\n`;
+    let response = `## Document Analysis Results\n\n`;
+    response += `Based on your query "${query}", here are the most relevant findings from the document collection:\n\n`;
     
-    chunks.forEach((chunk, index) => {
-      response += `**${index + 1}. From ${chunk.filename}:**\n`;
-      response += `${chunk.content.substring(0, 400)}\n\n`;
+    chunks.slice(0, 3).forEach((chunk, index) => {
+      const similarity = chunk.similarity ? ` (${(chunk.similarity * 100).toFixed(1)}% match)` : '';
+      response += `### ${index + 1}. ${chunk.filename}${similarity}\n\n`;
+      response += `${chunk.content.substring(0, 500)}...\n\n`;
+      response += `---\n\n`;
     });
     
-    response += `*Source: ${chunks.length} relevant chunks from unified SQLite embeddings*`;
+    response += `*Analysis based on ${chunks.length} relevant document chunks using semantic search.*`;
     return response;
   }
 
@@ -83,8 +92,8 @@ export class RAGSearch {
   }
 
   async generateAIResponse(query, chunks, model, temperature = 0.3, contextSize = 1024, tokenLimit = null) {
-    const context = chunks.map(chunk => 
-      `[${chunk.filename}]: ${chunk.content.substring(0, 800)}`
+    const context = chunks.map((chunk, index) => 
+      `**Source ${index + 1}: ${chunk.filename}**\n${chunk.content.substring(0, 800)}`
     ).join('\n\n');
     
     const options = {
@@ -96,12 +105,28 @@ export class RAGSearch {
       options.num_predict = parseInt(tokenLimit);
     }
     
+    const enhancedPrompt = `You are an AI assistant analyzing documents to answer user questions. Use the provided document excerpts to give accurate, well-structured responses.
+
+**DOCUMENT EXCERPTS:**
+${context}
+
+**USER QUESTION:** ${query}
+
+**INSTRUCTIONS:**
+- Answer based primarily on the provided document excerpts
+- Structure your response clearly with headings or bullet points when appropriate
+- If the documents contain specific details (names, dates, numbers, policies), include them
+- If the answer spans multiple documents, synthesize the information coherently
+- If the documents don't fully answer the question, acknowledge what information is available
+
+**RESPONSE:**`;
+    
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: model,
-        prompt: `${context}\n\nQ: ${query}\nA:`,
+        prompt: enhancedPrompt,
         stream: false,
         options: options
       })
