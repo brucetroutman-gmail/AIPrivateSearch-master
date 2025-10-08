@@ -235,24 +235,25 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
     if [ -d "aisearchscore" ]; then
         echo "   ✅ Repository downloaded successfully"
         
-        # Create .env file if it doesn't exist
-        if [ ! -f "/Users/Shared/.env" ]; then
-            echo "📝 Creating .env configuration file..."
-            echo "# Database Configuration" > "/Users/Shared/.env"
-            echo "DB_HOST=92.112.184.206" >> "/Users/Shared/.env"
-            echo "DB_PORT=3306" >> "/Users/Shared/.env"
-            echo "DB_DATABASE=aisearchscore" >> "/Users/Shared/.env"
-            echo "DB_USERNAME=nimdas" >> "/Users/Shared/.env"
-            echo "DB_PASSWORD=FormR!1234" >> "/Users/Shared/.env"
-            
-            if [ -f "/Users/Shared/.env" ]; then
-                echo "   ✅ .env file created at /Users/Shared/.env"
-                echo "   💡 Database configured for remote MySQL server"
-            else
-                echo "   ❌ Failed to create .env file - check permissions"
-            fi
+        # Delete existing .env file and create new one
+        if [ -f "/Users/Shared/.env" ]; then
+            echo "🗑️  Removing existing .env file..."
+            rm -f "/Users/Shared/.env"
+        fi
+        
+        echo "📝 Creating .env configuration file..."
+        echo "# Database Configuration" > "/Users/Shared/.env"
+        echo "DB_HOST=92.112.184.206" >> "/Users/Shared/.env"
+        echo "DB_PORT=3306" >> "/Users/Shared/.env"
+        echo "DB_DATABASE=aisearchscore" >> "/Users/Shared/.env"
+        echo "DB_USERNAME=nimdas" >> "/Users/Shared/.env"
+        echo "DB_PASSWORD=FormR!1234" >> "/Users/Shared/.env"
+        
+        if [ -f "/Users/Shared/.env" ]; then
+            echo "   ✅ .env file created at /Users/Shared/.env"
+            echo "   💡 Database configured for remote MySQL server"
         else
-            echo "   ✅ .env file already exists"
+            echo "   ❌ Failed to create .env file - check permissions"
         fi
         
         # Start the application
