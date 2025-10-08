@@ -281,14 +281,14 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
             echo "📝 Creating .env configuration file..."
             cat > "/Users/Shared/.env" << 'EOF'
 NODE_ENV=development
-DB_HOST=localhost
+DB_HOST=92.112.184.206
 DB_PORT=3306
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=nimdas
+DB_PASSWORD=FormR!1234
 DB_DATABASE=aisearchscore
 EOF
             echo "   ✅ .env file created at /Users/Shared/.env"
-            echo "   💡 Edit this file to configure your database connection"
+            echo "   💡 Database configured for remote MySQL server"
         else
             echo "   ✅ .env file already exists"
         fi
