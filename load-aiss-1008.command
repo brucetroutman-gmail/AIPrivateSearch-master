@@ -238,12 +238,12 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
         # Create .env file if it doesn't exist
         if [ ! -f "/Users/Shared/.env" ]; then
             echo "📝 Creating .env configuration file..."
-            echo "NODE_ENV=development" > "/Users/Shared/.env"
+            echo "# Database Configuration" > "/Users/Shared/.env"
             echo "DB_HOST=92.112.184.206" >> "/Users/Shared/.env"
             echo "DB_PORT=3306" >> "/Users/Shared/.env"
+            echo "DB_DATABASE=aisearchscore" >> "/Users/Shared/.env"
             echo "DB_USERNAME=nimdas" >> "/Users/Shared/.env"
             echo "DB_PASSWORD=FormR!1234" >> "/Users/Shared/.env"
-            echo "DB_DATABASE=aisearchscore" >> "/Users/Shared/.env"
             
             if [ -f "/Users/Shared/.env" ]; then
                 echo "   ✅ .env file created at /Users/Shared/.env"
