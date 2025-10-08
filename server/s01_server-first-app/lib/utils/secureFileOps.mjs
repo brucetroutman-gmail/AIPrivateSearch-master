@@ -68,5 +68,11 @@ export const secureFs = {
         const safePath = validatePath(dirPath);
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.rmdir(safePath, options);
+    },
+    
+    async mkdir(dirPath, options) {
+        const safePath = validatePath(dirPath);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        return fs.mkdir(safePath, options);
     }
 };

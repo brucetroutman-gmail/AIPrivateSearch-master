@@ -6,6 +6,41 @@ import path from 'path';
 const router = express.Router();
 const embeddingService = new UnifiedEmbeddingService();
 
+// Create new collection
+router.post('/collections/create', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ success: false, error: 'Collection name is required' });
+    }
+    
+    if (!/^[a-zA-Z0-9-_]+$/.test(name)) {
+      return res.status(400).json({ success: false, error: 'Collection name can only contain letters, numbers, hyphens, and underscores' });
+    }
+    
+    const collectionPath = path.join('../../sources/local-documents', name);
+    
+    // Check if collection already exists
+    try {
+      await secureFs.stat(collectionPath);
+      return res.status(409).json({ success: false, error: 'Collection already exists' });
+    } catch (error) {
+      // Collection doesn't exist, continue with creation
+    }
+    
+    // Create collection directory
+    await secureFs.mkdir(collectionPath, { recursive: true });
+    
+    res.json({ success: true, message: `Collection '${name}' created successfully` });
+  } catch (error) {
+    if (error.message.includes('Path traversal')) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get files in a collection
 router.get('/collections/:collection/files', async (req, res) => {
   try {
