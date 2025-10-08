@@ -242,7 +242,12 @@ if [ $? -eq 0 ] && [ -f aisearchscore.zip ]; then
         fi
         
         echo "📝 Creating .env configuration file..."
-        echo "# Database Configuration" > "/Users/Shared/.env"
+        echo "# API Keys" > "/Users/Shared/.env"
+        echo "API_KEY=dev-key" >> "/Users/Shared/.env"
+        echo "ADMIN_KEY=admin-key" >> "/Users/Shared/.env"
+        echo "NODE_ENV=development" >> "/Users/Shared/.env"
+        echo "" >> "/Users/Shared/.env"
+        echo "# Database Configuration" >> "/Users/Shared/.env"
         echo "DB_HOST=92.112.184.206" >> "/Users/Shared/.env"
         echo "DB_PORT=3306" >> "/Users/Shared/.env"
         echo "DB_DATABASE=aisearchscore" >> "/Users/Shared/.env"
