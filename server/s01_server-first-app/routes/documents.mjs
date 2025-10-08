@@ -1,10 +1,19 @@
 import express from 'express';
+import multer from 'multer';
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import { UnifiedEmbeddingService } from '../lib/documents/unifiedEmbeddingService.mjs';
 import path from 'path';
 
 const router = express.Router();
 const embeddingService = new UnifiedEmbeddingService();
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 // Create new collection
 router.post('/collections/create', async (req, res) => {
@@ -37,6 +46,87 @@ router.post('/collections/create', async (req, res) => {
     if (error.message.includes('Path traversal')) {
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload file to collection
+router.post('/collections/:collection/upload', upload.single('file'), async (req, res) => {
+  try {
+    const { collection } = req.params;
+    
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file provided' });
+    }
+    
+    const filename = req.file.originalname;
+    const collectionPath = path.join('../../sources/local-documents', collection);
+    const filePath = path.join(collectionPath, filename);
+    
+    // Ensure collection directory exists
+    await secureFs.mkdir(collectionPath, { recursive: true });
+    
+    // Write file to disk
+    await secureFs.writeFile(filePath, req.file.buffer);
+    
+    res.json({ success: true, message: `File '${filename}' uploaded successfully` });
+  } catch (error) {
+    if (error.message.includes('Path traversal')) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Convert selected documents to markdown
+router.post('/convert-selected', async (req, res) => {
+  try {
+    const { collection, files } = req.body;
+    
+    if (!collection || !files || !Array.isArray(files)) {
+      return res.status(400).json({ success: false, error: 'Collection and files array required' });
+    }
+    
+    let converted = 0;
+    const errors = [];
+    
+    for (const filename of files) {
+      try {
+        const ext = filename.split('.').pop().toLowerCase();
+        
+        // Skip files that are already markdown
+        if (ext === 'md') {
+          continue;
+        }
+        
+        const sourcePath = path.join('../../sources/local-documents', collection, filename);
+        const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.md'));
+        
+        // Read source file
+        const content = await secureFs.readFile(sourcePath, 'utf8');
+        
+        // Simple conversion - just wrap in markdown code block for non-text files
+        let markdownContent;
+        if (ext === 'txt') {
+          markdownContent = content;
+        } else {
+          markdownContent = `# ${filename}\n\n\`\`\`\n${content}\n\`\`\``;
+        }
+        
+        // Write markdown file
+        await secureFs.writeFile(targetPath, markdownContent, 'utf8');
+        converted++;
+      } catch (error) {
+        errors.push(`${filename}: ${error.message}`);
+      }
+    }
+    
+    if (errors.length > 0) {
+      return res.json({ success: true, converted, errors });
+    }
+    
+    res.json({ success: true, converted });
+  } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
