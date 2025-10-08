@@ -194,47 +194,6 @@ else
     fi
 fi
 
-# Check for Command Line Developer Tools (required for native Node.js modules)
-echo "🔍 Checking for Command Line Developer Tools..."
-if ! xcode-select -p &> /dev/null; then
-    echo "❌ Command Line Developer Tools not found."
-    echo "   AISearchScore requires these tools to compile native dependencies."
-    echo ""
-    read -p "Would you like to install Command Line Developer Tools now? (y/n): " -n 1 -r
-    echo ""
-    
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "📦 Installing Command Line Developer Tools..."
-        echo "   This will open a dialog - please click 'Install' and wait for completion."
-        echo "   Installation may take 5-15 minutes depending on your internet connection."
-        echo ""
-        
-        # Trigger the installation dialog
-        xcode-select --install 2>/dev/null
-        
-        echo "⏳ Waiting for Command Line Developer Tools installation..."
-        echo "   Please complete the installation dialog that appeared."
-        echo "   The installer will download and install the tools automatically."
-        echo ""
-        
-        # Wait for installation to complete
-        while ! xcode-select -p &> /dev/null; do
-            echo "   Still waiting for installation to complete..."
-            sleep 10
-        done
-        
-        echo "✅ Command Line Developer Tools installed successfully"
-    else
-        echo "❌ Installation cancelled. Command Line Developer Tools are required."
-        echo "   Please install manually by running: xcode-select --install"
-        echo "   Then run this installer again."
-        read -p "Press Enter to close..."
-        exit 1
-    fi
-else
-    echo "✅ Command Line Developer Tools found"
-fi
-
 echo "✅ All prerequisites checked and installed"
 echo ""
 
