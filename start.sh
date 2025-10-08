@@ -185,7 +185,7 @@ echo "🧹 Cleaning previous installation..."
 rm -rf node_modules package-lock.json 2>/dev/null || true
 
 echo "📦 Installing dependencies (pure JavaScript - no compilation needed)..."
-if npm install; then
+if npm install --silent --no-audit --no-fund; then
     echo "✅ Dependencies installed successfully"
 else
     echo "❌ npm install failed!"
@@ -194,7 +194,7 @@ else
     echo ""
     echo "Retrying npm install..."
     
-    if npm install --no-optional; then
+    if npm install --no-optional --silent --no-audit --no-fund; then
         echo "✅ Dependencies installed after retry"
     else
         echo "❌ npm install still failing. Please check your internet connection."

@@ -11,7 +11,7 @@ export class FullTextSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null } = options;
+    const { collection = null, useWildcards = false } = options;
     
     try {
       await this.buildIndex(collection);
@@ -24,17 +24,17 @@ export class FullTextSearch {
       this.lastQueryTerms = this.parseQueryTerms(query);
       
       // Convert query to wildcard format if enabled
-      const searchQuery = options.useWildcards ? this.buildWildcardQuery(query) : query;
+      const searchQuery = useWildcards ? this.buildWildcardQuery(query) : query;
       const searchResults = this.index.search(searchQuery);
       const results = searchResults.map((result, index) => {
         const doc = this.documents.get(result.ref);
         const matchedTerms = this.extractMatchedTerms(result) || this.lastQueryTerms;
-        const matchData = this.findMatchesInDocument(doc.content, matchedTerms);
+        const matchData = this.findMatchesInDocument(doc.content, matchedTerms, useWildcards);
         
         return {
           id: result.ref,
           title: doc.filename,
-          excerpt: this.formatMatchedLine(matchData),
+          excerpt: this.formatMatchedLine(matchData, useWildcards),
           score: result.score,
           source: `Document Search - ${doc.filename}`,
           documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view?line=${matchData.lineNumber}`
@@ -147,21 +147,22 @@ export class FullTextSearch {
     return { lineNumber: 1, line: lines[0] || '', matchedTerm: allTerms[0] || '', actualMatch: '' };
   }
   
-  findActualMatchInLine(line, term) {
+  findActualMatchInLine(line, term, useWildcards = false) {
     const words = line.match(/\b\w+\b/g) || [];
     const termLower = term.toLowerCase();
     
-    // First try exact word match
-    const exactMatch = words.find(word => word.toLowerCase() === termLower);
-    if (exactMatch) return exactMatch;
-    
-    // Then try substring match for longer terms
-    const containsMatch = words.find(word => {
-      const wordLower = word.toLowerCase();
-      return wordLower.includes(termLower) && termLower.length > 1;
-    });
-    
-    return containsMatch || null;
+    if (useWildcards) {
+      // For wildcards, find any word containing the term
+      const containsMatch = words.find(word => {
+        const wordLower = word.toLowerCase();
+        return wordLower.includes(termLower);
+      });
+      return containsMatch || null;
+    } else {
+      // For exact matching, only match whole words
+      const exactMatch = words.find(word => word.toLowerCase() === termLower);
+      return exactMatch || null;
+    }
   }
   
   formatAsLineSearchResult(matchData, filename, collection, resultIndex) {

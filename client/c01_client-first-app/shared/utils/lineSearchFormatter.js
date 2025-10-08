@@ -1,12 +1,5 @@
 // Common Line Search result formatting utility
 
-// Decode HTML entities
-function decodeHtmlEntities(text) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
-    return doc.body.textContent || '';
-}
-
 // Convert markdown to HTML with safe link handling
 function convertMarkdownToHTML(markdown) {
     // Don't decode HTML entities to preserve search highlighting marks

@@ -9,7 +9,7 @@ export class ExactMatchSearch {
   }
 
   async search(query, options = {}) {
-    const { caseSensitive = false, wholeWords = false, collection = null } = options;
+    const { caseSensitive = false, wholeWords = false, collection = null, useWildcards = false } = options;
     const results = [];
     
     try {
@@ -21,7 +21,7 @@ export class ExactMatchSearch {
       }
       
       for (const coll of collections) {
-        const collectionResults = await this.searchInCollection(coll, query, { caseSensitive, wholeWords });
+        const collectionResults = await this.searchInCollection(coll, query, { caseSensitive, wholeWords, useWildcards });
         results.push(...collectionResults);
       }
       
@@ -155,7 +155,9 @@ export class ExactMatchSearch {
       return this.wildcardMatch(searchText, searchQuery);
     }
     
-    return searchText.includes(searchQuery);
+    // Use word boundaries for exact matching when wildcards are disabled
+    const regex = new RegExp(`\\b${this.escapeRegex(searchQuery)}\\b`, 'i');
+    return regex.test(searchText);
   }
   
   hasBooleanOperators(query) {
@@ -218,7 +220,9 @@ export class ExactMatchSearch {
       return this.wildcardMatch(text, term);
     }
     
-    return text.includes(term);
+    // Use word boundaries for exact matching when wildcards are disabled
+    const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, 'i');
+    return regex.test(text);
   }
 
   calculateRelevanceScore(text, query) {
@@ -228,12 +232,14 @@ export class ExactMatchSearch {
     // Exact match gets highest score
     if (textLower === queryLower) return 1.0;
     
-    // Count occurrences
-    const occurrences = (textLower.match(new RegExp(this.escapeRegex(queryLower), 'g')) || []).length;
+    // Count word boundary occurrences for exact matching
+    const regex = new RegExp(`\\b${this.escapeRegex(queryLower)}\\b`, 'g');
+    const occurrences = (textLower.match(regex) || []).length;
     const maxScore = Math.min(occurrences * 0.3, 0.9);
     
-    // Bonus for query at start of line
-    if (textLower.startsWith(queryLower)) {
+    // Bonus for query at start of line (with word boundary)
+    const startRegex = new RegExp(`^\\b${this.escapeRegex(queryLower)}\\b`, 'i');
+    if (startRegex.test(textLower)) {
       return Math.min(maxScore + 0.1, 1.0);
     }
     
@@ -275,9 +281,9 @@ export class ExactMatchSearch {
     const queryTerms = this.parseQueryTerms(query);
     let highlightedText = text;
     
-    // Highlight all query terms
+    // Highlight all query terms using word boundaries for exact matching
     queryTerms.forEach(term => {
-      const regex = new RegExp(`(${this.escapeRegex(term)})`, 'gi');
+      const regex = new RegExp(`\\b(${this.escapeRegex(term)})\\b`, 'gi');
       highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
     });
     
@@ -316,18 +322,10 @@ export class ExactMatchSearch {
   }
   
   wildcardMatch(text, pattern) {
-    // Convert wildcard pattern to regex
-    const regexPattern = pattern
-      .replace(/\*/g, '.*') // Replace * with .*
-      .replace(/\?/g, '.'); // Replace ? with .
-    
-    try {
-      const regex = new RegExp(regexPattern, 'i');
-      return regex.test(text);
-    } catch (e) {
-      // Fallback to simple substring match if regex fails
-      return text.toLowerCase().includes(pattern.replace(/\*/g, '').toLowerCase());
-    }
+    // For wildcard searches, use simple substring matching
+    // Remove any wildcard characters that were added by applyWildcards
+    const cleanPattern = pattern.replace(/\*/g, '').toLowerCase();
+    return text.toLowerCase().includes(cleanPattern);
   }
   
   parseQueryTerms(query) {
