@@ -203,13 +203,11 @@ specs-3-scoring
 
 97. Changed from sqllite3 to sql.js to remove Command line tools requirement on mac. --done
 
-98. Add version to he ader fileer
+98. Add version to header filee. --done
 
+99. Check on widlcards in both line and document search
 
-
-
-
-
+100. Remove unneeded debug code.  --done
 
 
 

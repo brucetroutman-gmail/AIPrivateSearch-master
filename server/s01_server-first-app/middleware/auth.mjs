@@ -44,11 +44,7 @@ function rateLimit(maxRequests = 100, windowMs = 60000) {
 // Authorization middleware
 export function requireAuth(req, res, next) {
   // TEMPORARY: Allow all requests in development mode for testing
-  console.log('DEBUG AUTH: NODE_ENV =', process.env.NODE_ENV);
-  console.log('DEBUG AUTH: Headers =', req.headers);
-  
   if (process.env.NODE_ENV === 'development') {
-    console.log('DEBUG AUTH: Development mode - allowing request');
     return next();
   }
   

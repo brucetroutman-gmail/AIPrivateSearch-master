@@ -412,14 +412,11 @@
     async function loadTestData() {
       try {
         const userEmail = localStorage.getItem('userEmail');
-        console.log('DEBUG: userEmail from localStorage:', userEmail);
         
         if (!userEmail) {
           showError('Please enter your email on the main page first');
           return;
         }
-        
-        console.log('DEBUG: Making request to /api/database/tests with email:', userEmail);
         
         const response = await fetch('http://localhost:3001/api/database/tests', {
           method: 'GET',
@@ -429,22 +426,16 @@
           }
         });
         
-        console.log('DEBUG: Response status:', response.status);
-        console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
-        
         const data = await response.json();
-        console.log('DEBUG: Response data:', data);
         
         if (data.success) {
           testData = data.tests;
-          console.log('DEBUG: Loaded', testData.length, 'tests');
           populateFilters();
           loadAnalysis();
         } else {
           showError('Failed to load test data: ' + data.error);
         }
       } catch (error) {
-        console.error('DEBUG: Error details:', error);
         showError('Error loading test data: ' + error.message);
       }
     }

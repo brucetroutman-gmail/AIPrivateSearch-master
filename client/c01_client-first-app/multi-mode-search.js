@@ -333,15 +333,9 @@ async function performAllSearches() {
     const contextEl = document.getElementById('contextSelect');
     const tokensEl = document.getElementById('tokensSelect');
     
-    console.log('Temperature element:', temperatureEl, temperatureEl?.value);
-    console.log('Context element:', contextEl, contextEl?.value);
-    console.log('Tokens element:', tokensEl, tokensEl?.value);
-    
     const temperature = parseFloat(temperatureEl?.value || '0.3');
     const contextSize = parseInt(contextEl?.value || '1024');
     const tokenLimit = tokensEl?.value || 'No Limit';
-    
-    console.log('Final values:', { temperature, contextSize, tokenLimit });
     
     if (!query) {
         window.showUserMessage('Please enter a search query', 'error');

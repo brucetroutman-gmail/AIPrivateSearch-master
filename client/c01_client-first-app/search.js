@@ -242,14 +242,14 @@ loadScoringOptions();
 async function loadTemperatureOptions() {
   const data = await loadConfig('temperature.json', { temperature: [] });
   populateSelect(temperatureEl, data.temperature, 'value', 'name', 'lastTemperature');
-  console.log('Loaded temperature, restored value:', temperatureEl.value);
+
 }
 
 // Load context options from JSON file
 async function loadContextOptions() {
   const data = await loadConfig('context.json', { context: [] });
   populateSelect(contextEl, data.context, 'name', 'name', 'lastContext');
-  console.log('Loaded context, restored value:', contextEl.value);
+
 }
 
 // Load vectorDB options from JSON file
@@ -358,13 +358,13 @@ modelEl.addEventListener('change', () => {
 // Save temperature selection
 temperatureEl.addEventListener('change', () => {
   localStorage.setItem('lastTemperature', temperatureEl.value);
-  console.log('Saved temperature:', temperatureEl.value);
+
 });
 
 // Save context selection
 contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
-  console.log('Saved context:', contextEl.value);
+
 });
 
 // Save source type selection and handle visibility
@@ -672,7 +672,7 @@ async function loadScoringOptions() {
 // Save tokens selection
 tokensEl.addEventListener('change', () => {
   localStorage.setItem('lastTokens', tokensEl.value);
-  console.log('Saved tokens:', tokensEl.value);
+
 });
 
 // Save prompt text
@@ -686,7 +686,7 @@ queryEl.addEventListener('input', () => {
 async function loadTokensOptions() {
   const data = await loadConfig('tokens.json', { tokens: [] });
   populateSelect(tokensEl, data.tokens, 'name', 'name', 'lastTokens');
-  console.log('Loaded tokens, restored value:', tokensEl.value);
+
 }
 
 // Generate TestCode based on current form selections
@@ -772,21 +772,18 @@ function render(result) {
   const answerP = document.createElement('div');
   
   // Check if this is Line Search or Document Search results with formatted results
-  console.log('Result searchType:', result.searchType);
-  console.log('Response includes **Result:', result.response.includes('**Result '));
-  console.log('Response includes ---:', result.response.includes('---'));
+
   
   // Debug: Check for HTML-encoded mark elements
   if (result.response.includes('&lt;mark')) {
-    console.log('Found HTML-encoded mark elements in response');
-    console.log('Sample:', result.response.substring(result.response.indexOf('&lt;mark'), result.response.indexOf('&lt;mark') + 100));
+
     
     // Decode HTML entities and apply highlighting
     setTimeout(() => {
       const allElements = answerP.querySelectorAll('*');
       allElements.forEach(el => {
         if (el.innerHTML.includes('&lt;mark')) {
-          console.log('Decoding HTML entities in element:', el.tagName);
+
           const safeContent = el.innerHTML
             .replace(/&lt;mark class=&quot;search-highlight&quot;&gt;/g, '<mark class="search-highlight">')
             .replace(/&lt;\/mark&gt;/g, '</mark>');
@@ -1110,11 +1107,8 @@ function render(result) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  console.log('Form submitted');
-  
   // Check authorization - require email for access
   const userEmail = localStorage.getItem('userEmail');
-  console.log('User email:', userEmail);
   if (!userEmail || userEmail.trim() === '') {
     outputEl.textContent = 'Please provide your email address to use this service.';
     return;
@@ -1181,16 +1175,8 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     
-    console.log('About to call search API with:', {
-      query: queryEl.value,
-      searchType,
-      collection,
-      sourceType: sourceTypeEl.value
-    });
-    
     updateProgress('Searching');
     const trimmedQuery = queryEl.value.trim();
-    console.log('Calling search with trimmed query:', trimmedQuery);
     const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
     let result;
     if (searchType === 'fulltext') {
@@ -1286,7 +1272,7 @@ form.addEventListener('submit', async (e) => {
     } else {
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
     }
-    console.log('Search result:', result);
+
     
     // Extract chunks from nested result structure if present
     if (result.results && result.results.length > 0 && result.results[0].chunks) {
