@@ -139,9 +139,9 @@
                 <label><input type="checkbox" id="selectAll"> Select All</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Line Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Document Search</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="vector"> Smart Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="rag"> AI Document Chat</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="vector"> AI Concept</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
             </div>
@@ -171,6 +171,14 @@
                 </div>
             </div>
 
+            <div class="result-column" id="vector-results">
+                <h3>Smart Search</h3>
+                <div class="method-description">Finds conceptually related content using AI understanding</div>
+                <div class="results-container" id="vector-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
             <div class="result-column" id="ai-direct-results">
                 <h3>AI Direct Search</h3>
                 <div class="method-description">Question-answering models for contextual understanding</div>
@@ -183,14 +191,6 @@
                 <h3>AI Document Chat</h3>
                 <div class="method-description">Chunked documents with AI retrieval</div>
                 <div class="results-container" id="rag-container">
-                    <div class="no-results">Click "Search All Methods" to see results</div>
-                </div>
-            </div>
-
-            <div class="result-column" id="vector-results">
-                <h3>AI Concept</h3>
-                <div class="method-description">Semantic similarity using embeddings</div>
-                <div class="results-container" id="vector-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>

@@ -23,8 +23,8 @@
     },
     {
       "value": "vector",
-      "name": "AI Concept",
-      "description": "Semantic similarity using embeddings"
+      "name": "Smart Search",
+      "description": "Finds conceptually related content using AI understanding"
     },
     {
       "value": "hybrid",

@@ -11,6 +11,11 @@
       "description": "Document-wide search with ranking and Boolean logic"
     },
     {
+      "value": "vector",
+      "name": "Smart Search",
+      "description": "Semantic similarity using embeddings"
+    },
+    {
       "value": "ai-direct",
       "name": "AI Direct",
       "description": "Question-answering models for contextual understanding"

@@ -42,9 +42,9 @@ const searchMethods = {
     },
 
     vector: {
-        name: 'Vector Database',
+        name: 'Smart Search',
         endpoint: '/api/search/vector',
-        description: 'Semantic similarity using embeddings'
+        description: 'Finds conceptually related content using AI understanding'
     },
     hybrid: {
         name: 'Hybrid',
@@ -219,12 +219,44 @@ function renderResults(containerId, searchResult) {
     
     container.innerHTML = '';
     
-    // Special formatting for Line Search (exact-match) and Document Search (fulltext) using common utilities
+    // Special formatting for Line Search (exact-match), Smart Search (vector), and Document Search (fulltext) using common utilities
     if (searchResult.method === 'exact-match') {
         const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
         const parser = new DOMParser();
         const doc = parser.parseFromString(formattedHTML, 'text/html');
         container.appendChild(doc.body.firstElementChild);
+        return;
+    }
+    
+    if (searchResult.method === 'vector') {
+        // Format Smart Search results with markdown conversion for consistent link styling
+        searchResult.results.forEach((result, index) => {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const title = document.createElement('h4');
+            title.textContent = result.title;
+            
+            const score = document.createElement('span');
+            score.className = 'score';
+            score.textContent = `${Math.round(result.score * 100)}%`;
+            
+            header.appendChild(title);
+            header.appendChild(score);
+            
+            const excerpt = document.createElement('div');
+            excerpt.className = 'result-excerpt';
+            // Use Line Search markdown converter for consistent link styling
+            excerpt.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            
+            div.appendChild(header);
+            div.appendChild(excerpt);
+            
+            container.appendChild(div);
+        });
         return;
     }
     
