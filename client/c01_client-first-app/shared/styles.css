@@ -59,6 +59,10 @@ body {
   text-decoration: none;
 }
 
+.logo .version {
+  font-size: 0.7em;
+}
+
 .nav-menu {
   display: flex;
   gap: 2rem;
