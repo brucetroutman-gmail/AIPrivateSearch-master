@@ -88,6 +88,24 @@ Test local document search:
 - Analyze results in the database for performance trends
 - Review detailed specifications in `system-documentation/specs/`
 
+## Development Workflow
+
+### Amazon Q Release Command
+For developers using Amazon Q Developer, use the **"release"** command to streamline version management:
+
+```
+release
+```
+
+This command automatically:
+1. Bumps version by 0.01 (e.g., 18.03 → 18.04)
+2. Generates commit message in format: `vX.XX: [description of changes]`
+
+**Setup in new chat sessions:**
+```
+I have a 'release' command that bumps version by 0.01 and creates a commit message
+```
+
 ---
 
-**Version**: 17.0 | **License**: MIT | **Website**: aisearch-n-score.com
+**Version**: 18.04 | **License**: MIT | **Website**: aisearch-n-score.com

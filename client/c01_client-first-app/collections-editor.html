@@ -851,12 +851,12 @@
       
       const vectorDB = 'lanceDB'; // Always use LanceDB
       
-      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files in unified SQLite storage?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files?`)) {
         return;
       }
       
       clearLog();
-      showLog(`Removing embeddings from ${selectedMD.length} selected source files in unified SQLite storage...`);
+      showLog(`Removing embeddings from ${selectedMD.length} selected source files...`);
       
       for (let i = 0; i < selectedMD.length; i++) {
         const filename = selectedMD[i];

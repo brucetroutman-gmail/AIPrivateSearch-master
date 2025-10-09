@@ -209,6 +209,8 @@ specs-3-scoring
 
 100. Remove unneeded debug code.  --done
 
+101. added commit message and auto version bump
+
 
 
 
