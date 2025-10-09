@@ -28,7 +28,7 @@
     },
     {
       "value": "hybrid",
-      "name": "Hybrid",
+      "name": "Hybrid Search",
       "description": "Combined traditional and vector methods"
     },
     {

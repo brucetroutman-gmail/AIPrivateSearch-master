@@ -97,9 +97,10 @@ For developers using Amazon Q Developer, use the **"release"** command to stream
 release
 ```
 
-This command automatically:
+This command:
 1. Bumps version by 0.01 (e.g., 18.03 → 18.04)
 2. Generates commit message in format: `vX.XX: [description of changes]`
+3. **Note**: Does not automatically commit - you must manually commit the changes
 
 **Setup in new chat sessions:**
 ```
@@ -108,4 +109,4 @@ I have a 'release' command that bumps version by 0.01 and creates a commit messa
 
 ---
 
-**Version**: 18.05 | **License**: MIT | **Website**: aisearch-n-score.com
+**Version**: 18.06 | **License**: MIT | **Website**: aisearch-n-score.com

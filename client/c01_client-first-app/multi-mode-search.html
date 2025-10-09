@@ -140,9 +140,9 @@
                 <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Line Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Document Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="vector"> Smart Search</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="rag"> AI Document Chat</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
             </div>
             <div id="wildcardOption" style="display: none; margin-top: 10px;">
@@ -179,6 +179,14 @@
                 </div>
             </div>
 
+            <div class="result-column" id="hybrid-results">
+                <h3>Hybrid Search</h3>
+                <div class="method-description">Combined traditional and vector methods</div>
+                <div class="results-container" id="hybrid-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
             <div class="result-column" id="ai-direct-results">
                 <h3>AI Direct Search</h3>
                 <div class="method-description">Question-answering models for contextual understanding</div>
@@ -191,14 +199,6 @@
                 <h3>AI Document Chat</h3>
                 <div class="method-description">Chunked documents with AI retrieval</div>
                 <div class="results-container" id="rag-container">
-                    <div class="no-results">Click "Search All Methods" to see results</div>
-                </div>
-            </div>
-
-            <div class="result-column" id="hybrid-results">
-                <h3>Hybrid Search</h3>
-                <div class="method-description">Combined traditional and vector methods</div>
-                <div class="results-container" id="hybrid-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>

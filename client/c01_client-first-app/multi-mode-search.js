@@ -47,7 +47,7 @@ const searchMethods = {
         description: 'Finds conceptually related content using AI understanding'
     },
     hybrid: {
-        name: 'Hybrid',
+        name: 'Hybrid Search',
         endpoint: '/api/search/hybrid',
         description: 'Combined traditional and vector methods'
     },
@@ -230,6 +230,38 @@ function renderResults(containerId, searchResult) {
     
     if (searchResult.method === 'vector') {
         // Format Smart Search results with markdown conversion for consistent link styling
+        searchResult.results.forEach((result, index) => {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const title = document.createElement('h4');
+            title.textContent = result.title;
+            
+            const score = document.createElement('span');
+            score.className = 'score';
+            score.textContent = `${Math.round(result.score * 100)}%`;
+            
+            header.appendChild(title);
+            header.appendChild(score);
+            
+            const excerpt = document.createElement('div');
+            excerpt.className = 'result-excerpt';
+            // Use Line Search markdown converter for consistent link styling
+            excerpt.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            
+            div.appendChild(header);
+            div.appendChild(excerpt);
+            
+            container.appendChild(div);
+        });
+        return;
+    }
+    
+    if (searchResult.method === 'hybrid') {
+        // Format Hybrid Search results with markdown conversion for consistent link styling
         searchResult.results.forEach((result, index) => {
             const div = document.createElement('div');
             div.className = 'result-item';

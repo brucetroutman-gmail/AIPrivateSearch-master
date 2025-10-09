@@ -37,18 +37,27 @@ export class HybridSearch {
       );
       
       return {
-        results: combinedResults.slice(0, topK).map(doc => ({
-          id: doc.id,
-          title: doc.filename,
-          excerpt: doc.content.substring(0, 200) + '...',
-          score: doc.hybridScore,
-          source: doc.filename,
-          breakdown: {
-            keyword: doc.keywordScore,
-            semantic: doc.semanticScore,
-            weights: { keywordWeight, semanticWeight }
-          }
-        })),
+        results: combinedResults.slice(0, topK).map(doc => {
+          const documentPath = `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view`;
+          const scoreBreakdown = `**Hybrid Score: ${Math.round(doc.hybridScore * 100)}%**\n` +
+            `Keyword: ${Math.round(doc.keywordScore * 100)}% × ${keywordWeight} + ` +
+            `Semantic: ${Math.round(doc.semanticScore * 100)}% × ${semanticWeight}`;
+          const contentExcerpt = doc.content.substring(0, 200) + '...';
+          const formattedExcerpt = `${scoreBreakdown}\n\n${contentExcerpt}\n\n[View Document](${documentPath})`;
+          
+          return {
+            id: doc.id,
+            title: doc.filename.replace('.md', '').replace(/[_-]/g, ' '),
+            excerpt: formattedExcerpt,
+            score: doc.hybridScore,
+            source: '',
+            breakdown: {
+              keyword: doc.keywordScore,
+              semantic: doc.semanticScore,
+              weights: { keywordWeight, semanticWeight }
+            }
+          };
+        }),
         method: 'hybrid',
         total: combinedResults.length
       };

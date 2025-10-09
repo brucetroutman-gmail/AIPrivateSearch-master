@@ -175,7 +175,7 @@ export class UnifiedEmbeddingService {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'all-minilm',
+        model: 'nomic-embed-text',
         prompt: text
       })
     });

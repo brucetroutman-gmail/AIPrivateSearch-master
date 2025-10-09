@@ -16,6 +16,11 @@
       "description": "Semantic similarity using embeddings"
     },
     {
+      "value": "hybrid",
+      "name": "Hybrid Search",
+      "description": "Combined traditional and vector methods"
+    },
+    {
       "value": "ai-direct",
       "name": "AI Direct",
       "description": "Question-answering models for contextual understanding"
