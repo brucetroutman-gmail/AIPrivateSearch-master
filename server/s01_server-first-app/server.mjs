@@ -44,6 +44,17 @@ app.get('/api/system-info', async (req, res) => {
   }
 });
 
+// Version endpoint (no auth required)
+app.get('/api/version', async (req, res) => {
+  try {
+    const fs = await import('fs/promises');
+    const packageJson = JSON.parse(await fs.readFile('../../package.json', 'utf8'));
+    res.json({ version: packageJson.version });
+  } catch (error) {
+    res.status(500).json({ version: 'Unknown' });
+  }
+});
+
 // Apply origin validation and CSRF protection to all API routes
 app.use('/api', validateOrigin);
 app.use('/api', validateCSRFToken);

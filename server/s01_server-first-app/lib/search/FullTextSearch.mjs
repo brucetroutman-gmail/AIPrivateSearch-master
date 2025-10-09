@@ -25,7 +25,21 @@ export class FullTextSearch {
       
       // Convert query to wildcard format if enabled
       const searchQuery = useWildcards ? this.buildWildcardQuery(query) : query;
-      const searchResults = this.index.search(searchQuery);
+      let searchResults = this.index.search(searchQuery);
+      
+      // For wildcard searches, also do manual substring matching to catch cases like "rifle" in "trifle"
+      if (useWildcards) {
+        const manualResults = this.performManualWildcardSearch(this.lastQueryTerms[0]);
+        // Combine and deduplicate results
+        const combinedResults = new Map();
+        searchResults.forEach(result => combinedResults.set(result.ref, result));
+        manualResults.forEach(result => {
+          if (!combinedResults.has(result.ref)) {
+            combinedResults.set(result.ref, result);
+          }
+        });
+        searchResults = Array.from(combinedResults.values());
+      }
       const results = searchResults.map((result, index) => {
         const doc = this.documents.get(result.ref);
         const matchedTerms = this.extractMatchedTerms(result) || this.lastQueryTerms;
@@ -120,18 +134,18 @@ export class FullTextSearch {
     return collections;
   }
 
-  findMatchesInDocument(content, matchedTerms) {
+  findMatchesInDocument(content, matchedTerms, useWildcards = false) {
     const lines = content.split('\n');
     
-    // Use both matched terms and original query terms
-    const allTerms = [...new Set([...matchedTerms, ...this.lastQueryTerms])];
+    // For wildcard searches, prioritize original query terms over Lunr's matched terms
+    const allTerms = useWildcards ? this.lastQueryTerms : [...new Set([...matchedTerms, ...this.lastQueryTerms])];
     
     // Find all matches and return the best one
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
       for (const term of allTerms) {
-        const actualMatch = this.findActualMatchInLine(line, term);
+        const actualMatch = this.findActualMatchInLine(line, term, useWildcards);
         
         if (actualMatch) {
           return {
@@ -176,12 +190,19 @@ export class FullTextSearch {
     return `**Result ${resultIndex}: ${filename}**\n${matchData.lineNumber}: ${highlightedLine}\n`;
   }
   
-  formatMatchedLine(matchData) {
+  formatMatchedLine(matchData, useWildcards = false) {
     // Highlight the actual matched word
     let highlightedLine = matchData.line;
     if (matchData.actualMatch) {
-      const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
-      highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+      if (useWildcards) {
+        // For wildcards, highlight the entire matched word
+        const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
+        highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+      } else {
+        // For exact matching, use word boundaries
+        const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
+        highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+      }
     }
     
     return `${matchData.lineNumber}: ${highlightedLine}`;
@@ -206,7 +227,7 @@ export class FullTextSearch {
 
   
   buildWildcardQuery(query) {
-    // Parse the original query to handle Boolean operators
+    // For wildcard searches, use a simpler approach that works better with Lunr
     const terms = query
       .replace(/[+\-"~]/g, ' ')
       .split(/\s+/)
@@ -221,8 +242,11 @@ export class FullTextSearch {
       if (/^(AND|OR|NOT)$/i.test(term)) {
         wildcardTerms.push(term);
       } else {
-        // Add wildcards around each word for substring matching
-        wildcardTerms.push(`*${term}*`);
+        // Use prefix wildcard which works reliably in Lunr
+        // This will match words starting with the term
+        wildcardTerms.push(`${term}*`);
+        // Also search for the exact term
+        wildcardTerms.push(`OR ${term}`);
       }
     }
     
@@ -230,11 +254,13 @@ export class FullTextSearch {
   }
   
   parseQueryTerms(query) {
+    // For the original query, just extract the main search terms
+    // Don't process the wildcard-expanded query
     return query
-      .replace(/[+\-"~*]/g, ' ')
+      .replace(/[+\-"~*()]/g, ' ')
       .replace(/\b(AND|OR|NOT)\b/gi, ' ')
       .split(/\s+/)
-      .filter(term => term.length > 0)
+      .filter(term => term.length > 1 && !/^(and|or|not)$/i.test(term))
       .slice(0, 5);
   }
   
@@ -246,5 +272,30 @@ export class FullTextSearch {
   
   escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  
+  performManualWildcardSearch(searchTerm) {
+    const results = [];
+    const termLower = searchTerm.toLowerCase();
+    
+    // Search through all documents for substring matches
+    for (const [docId, doc] of this.documents) {
+      const content = doc.content.toLowerCase();
+      const words = content.match(/\b\w+\b/g) || [];
+      
+      // Check if any word contains the search term as substring
+      const hasSubstringMatch = words.some(word => 
+        word.includes(termLower) && word !== termLower
+      );
+      
+      if (hasSubstringMatch) {
+        results.push({
+          ref: docId,
+          score: 0.5 // Lower score than exact matches
+        });
+      }
+    }
+    
+    return results;
   }
 }

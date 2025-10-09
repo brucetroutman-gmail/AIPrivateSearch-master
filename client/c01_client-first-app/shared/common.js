@@ -163,6 +163,21 @@ function secureConfirm(message) {
   });
 }
 
+// Load version from API
+async function loadVersion() {
+  try {
+    const response = await fetch('http://localhost:3001/api/version');
+    const data = await response.json();
+    const versionEl = document.getElementById('version-display');
+    if (versionEl && data.version) {
+      versionEl.textContent = `(v${data.version})`;
+      document.title = `AISearch-n-Score v${data.version}`;
+    }
+  } catch (error) {
+    // Silently fail - version display is not critical
+  }
+}
+
 // Load shared header and footer
 async function loadSharedComponents() {
   try {
@@ -177,6 +192,8 @@ async function loadSharedComponents() {
       const headerContent = doc.body.firstElementChild;
       if (headerContent) {
         headerEl.appendChild(headerContent);
+        // Load version after header is loaded
+        loadVersion();
       }
     }
     

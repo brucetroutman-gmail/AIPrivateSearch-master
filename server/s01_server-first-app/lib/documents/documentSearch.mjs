@@ -11,12 +11,9 @@ export class DocumentSearch {
   }
 
   async searchDocuments(query, limit = 5) {
-    console.log(`DocumentSearch: Searching for "${query}" in collection "${this.collection}"`);
     const results = await this.embeddingService.findSimilarChunks(query, this.collection, limit);
-    console.log(`DocumentSearch: Found ${results.length} chunks`);
     
     if (results.length === 0) {
-      console.log(`No embeddings found for collection "${this.collection}" in unified SQLite system`);
       return [{
         filename: 'System Message',
         content: `No embeddings found for collection "${this.collection}". Please use the Collections Editor to embed documents first by clicking "Embed Source MDs".`,
@@ -24,9 +21,6 @@ export class DocumentSearch {
       }];
     }
     
-    if (results.length > 0) {
-      console.log('First result:', results[0].filename, results[0].similarity);
-    }
     return results;
   }
   
