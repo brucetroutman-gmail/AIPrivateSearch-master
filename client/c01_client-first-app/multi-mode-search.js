@@ -52,7 +52,7 @@ const searchMethods = {
         description: 'Combined traditional and vector methods'
     },
     metadata: {
-        name: 'Metadata',
+        name: 'Document Index',
         endpoint: '/api/search/metadata',
         description: 'Structured queries using document metadata'
     },
@@ -300,6 +300,56 @@ function renderResults(containerId, searchResult) {
         return;
     }
     
+    if (searchResult.method === 'metadata') {
+        // Format Document Index results with View Document links
+        searchResult.results.forEach((result, index) => {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const title = document.createElement('h4');
+            title.textContent = result.title;
+            
+            const score = document.createElement('span');
+            score.className = 'score';
+            score.textContent = `${Math.round(result.score * 100)}%`;
+            
+            header.appendChild(title);
+            header.appendChild(score);
+            
+            const excerpt = document.createElement('div');
+            excerpt.className = 'result-excerpt';
+            excerpt.textContent = result.excerpt;
+            
+            const meta = document.createElement('div');
+            meta.className = 'result-meta';
+            
+            const source = document.createElement('span');
+            source.className = 'source';
+            source.textContent = result.source;
+            
+            // Add View Document link
+            const link = document.createElement('a');
+            link.href = `http://localhost:3001/api/documents/${document.getElementById('collectionSelect').value}/${result.source}`;
+            link.textContent = ' [View Document]';
+            link.target = '_blank';
+            link.style.marginLeft = '10px';
+            link.style.color = '#007bff';
+            
+            meta.appendChild(source);
+            meta.appendChild(link);
+            
+            div.appendChild(header);
+            div.appendChild(excerpt);
+            div.appendChild(meta);
+            
+            container.appendChild(div);
+        });
+        return;
+    }
+    
     // Standard formatting for other search methods
     searchResult.results.forEach(result => {
         const div = document.createElement('div');
@@ -430,7 +480,7 @@ async function performAllSearches() {
     }
     
     // Clear previous results for all containers
-    ['exact-match-container', 'ai-direct-container', 'rag-container', 'vector-container', 'hybrid-container', 'metadata-container', 'fulltext-container'].forEach(id => {
+    ['metadata-container', 'exact-match-container', 'fulltext-container', 'vector-container', 'hybrid-container', 'ai-direct-container', 'rag-container'].forEach(id => {
         const container = document.getElementById(id);
         const notSelectedDiv = document.createElement('div');
         notSelectedDiv.className = 'no-results';

@@ -137,13 +137,13 @@
             <h3>Select Search Methods:</h3>
             <div class="method-checkboxes">
                 <label><input type="checkbox" id="selectAll"> Select All</label>
+                <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Document Index</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="exact-match"> Line Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="fulltext"> Document Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="vector"> Smart Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="hybrid"> Hybrid Search</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
                 <label><input type="checkbox" class="method-checkbox" data-method="rag"> AI Document Chat</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="metadata"> Metadata</label>
             </div>
             <div id="wildcardOption" style="display: none; margin-top: 10px;">
                 <label><input type="checkbox" id="useWildcardsMulti"> Use wildcards for substring matching</label>
@@ -155,6 +155,14 @@
 
         <!-- Results Grid -->
         <div class="results-grid">
+            <div class="result-column" id="metadata-results">
+                <h3>Document Index</h3>
+                <div class="method-description">Structured queries using document metadata</div>
+                <div class="results-container" id="metadata-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
             <div class="result-column" id="exact-match-results">
                 <h3>Line Search</h3>
                 <div class="method-description">Line-by-line search with context and Boolean logic</div>
@@ -203,13 +211,7 @@
                 </div>
             </div>
 
-            <div class="result-column" id="metadata-results">
-                <h3>Metadata Search</h3>
-                <div class="method-description">Structured queries using document metadata</div>
-                <div class="results-container" id="metadata-container">
-                    <div class="no-results">Click "Search All Methods" to see results</div>
-                </div>
-            </div>
+
         </div>
 
         <!-- Performance Comparison -->

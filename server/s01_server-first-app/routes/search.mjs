@@ -61,11 +61,12 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
       }
       
-      // Get the search response - for exact-match and fulltext, return all results with context
-      if (searchType === 'exact-match' || searchType === 'fulltext') {
+      // Get the search response - for exact-match, fulltext, and metadata, return all results with context
+      if (searchType === 'exact-match' || searchType === 'fulltext' || searchType === 'metadata') {
         // Use common formatting logic
         searchResponse = methodResult.results.map((result, index) => {
-          const docLink = result.documentPath ? `[View Document](${result.documentPath})` : '';
+          const docLink = result.documentPath ? `[View Document](${result.documentPath})` : 
+                         `[View Document](http://localhost:3001/api/documents/${collection}/${result.source})`;
           return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
         }).join('\n---\n\n');
       } else {

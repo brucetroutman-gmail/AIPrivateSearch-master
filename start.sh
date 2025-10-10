@@ -53,6 +53,7 @@ pull_model_safe() {
     
     if ollama pull "$model" 2>/dev/null; then
         echo "✅ $model ready"
+        MODELS_UPDATED=true
         return 0
     else
         echo "⚠️  Failed to pull $model - you can update it later via Models page"
@@ -80,87 +81,12 @@ for model in $REQUIRED_MODELS; do
 done
 
 echo "💡 To update or install additional models, use the Models page in the application"
-# Check and pull required models
-echo "Checking model status..."
-LAST_PULL_FILE=".last_model_pull"
-CURRENT_TIME=$(date +%s)
-SHOULD_UPDATE=false
-MISSING_MODELS=()
 
-# Get list of required models
-REQUIRED_MODELS=$(grep '"modelName"' client/c01_client-first-app/config/models-list.json | cut -d'"' -f4 | sort -u)
-
-# Get list of installed models
-INSTALLED_MODELS=$(ollama list | tail -n +2 | awk '{print $1}' | sed 's/:latest$//')
-
-# Check for missing models
-echo "🔍 Checking for missing models..."
-for model in $REQUIRED_MODELS; do
-    if ! echo "$INSTALLED_MODELS" | grep -q "^${model}$"; then
-        MISSING_MODELS+=("$model")
-        echo "❌ Missing: $model"
-    fi
-done
-
-# Auto-update control flag (set to false to disable automatic updates)
-AUTO_UPDATE_MODELS=true
-
-# Check if we need to update (7 day check)
-if [ "$AUTO_UPDATE_MODELS" = true ]; then
-    if [ -f "$LAST_PULL_FILE" ]; then
-        LAST_PULL_TIME=$(cat "$LAST_PULL_FILE")
-        TIME_DIFF=$((CURRENT_TIME - LAST_PULL_TIME))
-        # 604800 seconds = 7 days
-        if [ $TIME_DIFF -gt 604800 ]; then
-            SHOULD_UPDATE=true
-            echo "⏰ Last model update was over 7 days ago"
-        fi
-    else
-        SHOULD_UPDATE=true
-        echo "📥 First time setup detected"
-    fi
-else
-    echo "🚫 Automatic model updates disabled"
-fi
-
-# Pull missing models immediately (M4-safe: one at a time)
-if [ ${#MISSING_MODELS[@]} -gt 0 ]; then
-    echo "📥 Pulling missing models (one at a time for M4 compatibility)..."
-    for model in "${MISSING_MODELS[@]}"; do
-        echo "📥 Pulling $model..."
-        if ollama pull "$model" 2>/dev/null; then
-            echo "✅ $model ready"
-        else
-            echo "❌ Failed to pull $model (timeout or error)"
-        fi
-        sleep 3  # Prevent overwhelming Ollama on M4 Macs
-    done
-fi
-
-# Update all models if needed (7 day check) - M4-safe
-if [ "$SHOULD_UPDATE" = true ] && [ ${#MISSING_MODELS[@]} -eq 0 ]; then
-    echo "🔄 Updating all models (one at a time for M4 compatibility)..."
-    for model in $REQUIRED_MODELS; do
-        echo "🔄 Updating $model..."
-        if ollama pull "$model" 2>/dev/null; then
-            echo "✅ $model updated"
-        else
-            echo "❌ Failed to update $model (timeout or error)"
-        fi
-        sleep 3  # Prevent overwhelming Ollama on M4 Macs
-    done
-    echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
-    echo "✅ All models updated"
-elif [ ${#MISSING_MODELS[@]} -gt 0 ]; then
-    # Update timestamp after pulling missing models
-    echo "$CURRENT_TIME" > "$LAST_PULL_FILE"
-    echo "✅ Missing models installed"
-else
-    echo "✅ All models ready (using cached versions)"
-fi
+# Track if we updated any models
+MODELS_UPDATED=false
 
 # Start backend server in background
-echo "Installing backend dependencies..."
+echo "Preparing backend server..."
 cd server/s01_server-first-app
 
 # Check for .env file in /Users/Shared
@@ -180,26 +106,36 @@ else
     echo "✅ .env file found in /Users/Shared"
 fi
 
-# Clean install to avoid any cached issues
-echo "🧹 Cleaning previous installation..."
-rm -rf node_modules package-lock.json 2>/dev/null || true
-
-echo "📦 Installing dependencies (pure JavaScript - no compilation needed)..."
-if npm install --silent --no-audit --no-fund; then
-    echo "✅ Dependencies installed successfully"
-else
-    echo "❌ npm install failed!"
-    echo "🔍 Debug: Node version: $(node --version)"
-    echo "🔍 Debug: npm version: $(npm --version)"
-    echo ""
-    echo "Retrying npm install..."
-    
-    if npm install --no-optional --silent --no-audit --no-fund; then
-        echo "✅ Dependencies installed after retry"
+# Only clean and install dependencies if models were updated or node_modules doesn't exist
+if [ "$MODELS_UPDATED" = true ] || [ ! -d "node_modules" ]; then
+    if [ "$MODELS_UPDATED" = true ]; then
+        echo "🧹 Models were updated - cleaning and reinstalling dependencies..."
     else
-        echo "❌ npm install still failing. Please check your internet connection."
-        exit 1
+        echo "📦 First time setup - installing dependencies..."
     fi
+    
+    # Clean install to avoid any cached issues
+    rm -rf node_modules package-lock.json 2>/dev/null || true
+    
+    echo "📦 Installing dependencies (pure JavaScript - no compilation needed)..."
+    if npm install --silent --no-audit --no-fund; then
+        echo "✅ Dependencies installed successfully"
+    else
+        echo "❌ npm install failed!"
+        echo "🔍 Debug: Node version: $(node --version)"
+        echo "🔍 Debug: npm version: $(npm --version)"
+        echo ""
+        echo "Retrying npm install..."
+        
+        if npm install --no-optional --silent --no-audit --no-fund; then
+            echo "✅ Dependencies installed after retry"
+        else
+            echo "❌ npm install still failing. Please check your internet connection."
+            exit 1
+        fi
+    fi
+else
+    echo "✅ Using existing dependencies (no model updates detected)"
 fi
 
 echo "Starting backend server..."

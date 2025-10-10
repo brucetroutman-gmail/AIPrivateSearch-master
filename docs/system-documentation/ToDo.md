@@ -205,11 +205,14 @@ specs-3-scoring
 
 98. Add version to header filee. --done
 
-99. Check on widlcards in both line and document search
+99. Check on widlcards in both line and document search  --done
 
 100. Remove unneeded debug code.  --done
 
 101. added commit message and auto version bump  --done
+
+102. metadata search (document Index) - fixed to use sql.js and proper error messaging --done
+
 
 
 

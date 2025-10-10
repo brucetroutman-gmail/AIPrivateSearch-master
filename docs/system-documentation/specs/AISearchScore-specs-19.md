@@ -60,7 +60,7 @@ DB_PASSWORD=FormR!1234
 ### 3. Installation Simplification
 **Command Line Tools Removal:**
 - **Eliminated Xcode Dependency**: Removed requirement for Xcode Command Line Tools installation
-- **Pure JavaScript Dependencies**: Transitioned from native dependencies (better-sqlite3, hnswlib-node) to pure JavaScript alternatives (sql.js)
+- **Pure JavaScript Dependencies**: Uses sql.js for SQLite database operations without native dependencies
 - **Simplified Installation Flow**: Streamlined installer without complex compilation requirements
 - **Reduced Installation Time**: Faster deployment without waiting for developer tools
 

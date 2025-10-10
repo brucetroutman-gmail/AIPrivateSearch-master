@@ -68,7 +68,7 @@ server/s01_server-first-app/lib/search/
 - `lunr` - Lightweight full-text search
 - `natural` - Text processing utilities
 - `@xenova/transformers` - Local AI models (optional)
-- `better-sqlite3` - Enhanced metadata storage
+- `sql.js` - JavaScript SQLite for metadata storage
 
 ## Phase 5: Implementation Order
 

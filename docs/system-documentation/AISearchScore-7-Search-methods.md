@@ -127,7 +127,7 @@ export class AIDirectSearch {
 - Text chunking: `langchain` or custom implementation
 - Embedding models: `@xenova/transformers` or `openai`
 - Vector similarity: `ml-distance` or `@tensorflow/tfjs`
-- Chunk storage: `better-sqlite3` or `mongodb`
+- Chunk storage: `sql.js` (JavaScript SQLite)
 
 **Coding Strategy:**
 ```javascript
@@ -212,7 +212,7 @@ export class RAGSearch {
 **Software Requirements:**
 - Vector databases: `chromadb` (Python bridge), `faiss-node`, or `hnswlib-node`
 - Embeddings: `@xenova/transformers` or `openai`
-- Database: `better-sqlite3` for metadata
+- Database: `sql.js` for metadata
 - Vector operations: `ml-matrix` for mathematical operations
 
 **Coding Strategy:**
@@ -420,7 +420,7 @@ export class HybridSearch {
 ## 6. Metadata-Based Search
 
 **Software Requirements:**
-- `better-sqlite3` for structured queries
+- `sql.js` for structured queries
 - `date-fns` for date handling
 - `mime-types` for file type detection
 - JSON schema validation: `ajv`
@@ -428,14 +428,21 @@ export class HybridSearch {
 **Coding Strategy:**
 ```javascript
 // services/metadataSearch.js
-import Database from 'better-sqlite3';
+import SQL from 'sql.js';
+import fs from 'fs';
 import { parseISO, isAfter, isBefore } from 'date-fns';
 import mime from 'mime-types';
 
 export class MetadataSearch {
-  constructor(dbPath = './metadata.db') {
-    this.db = new Database(dbPath);
+  constructor(dbPath = './collection.db') {
+    this.dbPath = dbPath;
+    this.db = null;
     this.setupDatabase();
+  }
+
+  async setupDatabase() {
+    const dbBuffer = fs.existsSync(this.dbPath) ? fs.readFileSync(this.dbPath) : null;
+    this.db = new SQL.Database(dbBuffer);
   }
 
   setupDatabase() {

@@ -664,8 +664,8 @@ json
     "gray-matter": "^4.0.0",
     "flexsearch": "^0.7.0",
     "axios": "^1.6.0",
-    "sqlite3": "^5.1.0",
-    "better-sqlite3": "^9.0.0"
+    "sql.js": "^1.8.0",
+    "sql.js": "^1.8.0"
   },
   "type": "module"
 }
@@ -704,7 +704,7 @@ Core Infrastructure
 Node.js Runtime: Version 18+ for ES6 module support
 Express.js: Web framework for API endpoints
 Chokidar: File system monitoring for document changes
-Better-sqlite3: High-performance SQLite database for metadata and caching
+sql.js: JavaScript SQLite database for metadata and caching
 
 Document Processing & Text Analysis
 
@@ -792,7 +792,7 @@ code
 - Chokidar
 - Marked + Gray-matter
 - FlexSearch
-- Better-sqlite3
+- sql.js
 - Axios
 - Natural
 

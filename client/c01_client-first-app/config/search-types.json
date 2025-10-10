@@ -1,5 +1,10 @@
 {
   "search_types": [
+   {
+      "value": "metadata",
+      "name": "Document Index",
+      "description": "Structured queries using document metadata"
+    },
     {
       "value": "exact-match",
       "name": "Line Search",

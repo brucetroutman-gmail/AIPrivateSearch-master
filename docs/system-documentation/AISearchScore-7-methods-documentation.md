@@ -829,7 +829,7 @@ Structured document property search using database queries on document metadata,
 #### **Step 3: Database Initialization**
 **Process**: MetadataSearch.mjs initializes metadata storage
 **Tools Used**: 
-- SQLite database (`metadata.db`)
+- JavaScript SQLite database using sql.js (collection.db)
 - Node.js `fs/promises` for file operations
 - `mime-types` library for file type detection
 **Actions**:
