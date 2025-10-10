@@ -1,15 +1,4 @@
 
-// Security: HTML sanitization function
-function sanitizeHtml(html) {
-    const div = document.createElement('div');
-    div.textContent = html;
-    return div.innerHTML;
-}
-
-
-
-
- 
 // Multi-mode search functionality
 
 // DOM elements
@@ -23,44 +12,15 @@ const methodCheckboxes = document.querySelectorAll('.method-checkbox');
 const wildcardOption = document.getElementById('wildcardOption');
 const useWildcardsMulti = document.getElementById('useWildcardsMulti');
 
-// Search methods configuration
+// Search methods configuration (names only - endpoints are hardcoded in functions)
 const searchMethods = {
-    'exact-match': {
-        name: 'Line Search',
-        endpoint: '/api/search/exact-match',
-        description: 'Line-by-line search with context and Boolean logic'
-    },
-    'ai-direct': {
-        name: 'AI Direct',
-        endpoint: '/api/search/ai-direct',
-        description: 'Question-answering models for contextual understanding'
-    },
-    rag: {
-        name: 'RAG Search',
-        endpoint: '/api/search/rag',
-        description: 'Chunked documents with AI retrieval'
-    },
-
-    vector: {
-        name: 'Smart Search',
-        endpoint: '/api/search/vector',
-        description: 'Finds conceptually related content using AI understanding'
-    },
-    hybrid: {
-        name: 'Hybrid Search',
-        endpoint: '/api/search/hybrid',
-        description: 'Combined traditional and vector methods'
-    },
-    metadata: {
-        name: 'Document Index',
-        endpoint: '/api/search/metadata',
-        description: 'Structured queries using document metadata'
-    },
-    fulltext: {
-        name: 'Document Search',
-        endpoint: '/api/search/fulltext',
-        description: 'Document-wide search with ranking and Boolean logic'
-    }
+    'exact-match': { name: 'Line Search' },
+    'ai-direct': { name: 'AI Direct' },
+    rag: { name: 'RAG Search' },
+    vector: { name: 'Smart Search' },
+    hybrid: { name: 'Hybrid Search' },
+    metadata: { name: 'Document Index' },
+    fulltext: { name: 'Document Search' }
 };
 
 // Real API search functions
@@ -132,287 +92,26 @@ async function performRAGSearch(query, collection, model, temperature, contextSi
 
 
 async function performVectorSearch(query, collection) {
-    const startTime = Date.now();
-    
-    try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/vector', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, topK: 5 } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'vector' 
-        };
-    } catch (error) {
-        console.error('Vector search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'vector' };
-    }
+    return await window.smartSearchCommon.performSmartSearch(query, collection, 5);
 }
 
 async function performHybridSearch(query, collection) {
-    const startTime = Date.now();
-    
-    try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/hybrid', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'hybrid' 
-        };
-    } catch (error) {
-        console.error('Hybrid search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'hybrid' };
-    }
+    return await window.hybridSearchCommon.performHybridSearch(query, collection, 5);
 }
 
 async function performMetadataSearch(query, collection = null) {
-    const startTime = Date.now();
-    
-    try {
-        const options = { query };
-        if (collection) options.collection = collection;
-        
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/metadata', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'metadata' 
-        };
-    } catch (error) {
-        console.error('Metadata search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'metadata' };
-    }
+    return await window.metadataSearchCommon.performMetadataSearch(query, collection);
 }
 
 async function performFullTextSearch(query, collection, useWildcards = false) {
     return await window.documentSearchCommon.performDocumentSearch(query, collection, useWildcards);
 }
 
-// Render results for a specific method
+// Render results for a specific method using common utility
 function renderResults(containerId, searchResult) {
     const container = document.getElementById(containerId);
-    
-    if (!searchResult.results || searchResult.results.length === 0) {
-        const noResultsDiv = document.createElement('div');
-        noResultsDiv.className = 'no-results';
-        noResultsDiv.textContent = 'No results found';
-        container.innerHTML = '';
-        container.appendChild(noResultsDiv);
-        return;
-    }
-    
-    container.innerHTML = '';
-    
-    // Special formatting for Line Search (exact-match), Smart Search (vector), and Document Search (fulltext) using common utilities
-    if (searchResult.method === 'exact-match') {
-        const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(formattedHTML, 'text/html');
-        container.appendChild(doc.body.firstElementChild);
-        return;
-    }
-    
-    if (searchResult.method === 'vector') {
-        // Format Smart Search results with markdown conversion for consistent link styling
-        searchResult.results.forEach((result, index) => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            
-            const header = document.createElement('div');
-            header.className = 'result-header';
-            
-            const title = document.createElement('h4');
-            title.textContent = result.title;
-            
-            const score = document.createElement('span');
-            score.className = 'score';
-            score.textContent = `${Math.round(result.score * 100)}%`;
-            
-            header.appendChild(title);
-            header.appendChild(score);
-            
-            const excerpt = document.createElement('div');
-            excerpt.className = 'result-excerpt';
-            // Use Line Search markdown converter for consistent link styling
-            const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(sanitizedHTML, 'text/html');
-            while (doc.body.firstChild) {
-                excerpt.appendChild(doc.body.firstChild);
-            }
-            
-            div.appendChild(header);
-            div.appendChild(excerpt);
-            
-            container.appendChild(div);
-        });
-        return;
-    }
-    
-    if (searchResult.method === 'hybrid') {
-        // Format Hybrid Search results with markdown conversion for consistent link styling
-        searchResult.results.forEach((result, index) => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            
-            const header = document.createElement('div');
-            header.className = 'result-header';
-            
-            const title = document.createElement('h4');
-            title.textContent = result.title;
-            
-            const score = document.createElement('span');
-            score.className = 'score';
-            score.textContent = `${Math.round(result.score * 100)}%`;
-            
-            header.appendChild(title);
-            header.appendChild(score);
-            
-            const excerpt = document.createElement('div');
-            excerpt.className = 'result-excerpt';
-            // Use Line Search markdown converter for consistent link styling
-            const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(sanitizedHTML, 'text/html');
-            while (doc.body.firstChild) {
-                excerpt.appendChild(doc.body.firstChild);
-            }
-            
-            div.appendChild(header);
-            div.appendChild(excerpt);
-            
-            container.appendChild(div);
-        });
-        return;
-    }
-    
-    if (searchResult.method === 'fulltext') {
-        const formattedHTML = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(formattedHTML, 'text/html');
-        container.appendChild(doc.body.firstElementChild);
-        return;
-    }
-    
-    if (searchResult.method === 'metadata') {
-        // Format Document Index results with View Document links
-        searchResult.results.forEach((result, index) => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            
-            const header = document.createElement('div');
-            header.className = 'result-header';
-            
-            const title = document.createElement('h4');
-            title.textContent = result.title;
-            
-            const score = document.createElement('span');
-            score.className = 'score';
-            score.textContent = `${Math.round(result.score * 100)}%`;
-            
-            header.appendChild(title);
-            header.appendChild(score);
-            
-            const excerpt = document.createElement('div');
-            excerpt.className = 'result-excerpt';
-            excerpt.textContent = result.excerpt;
-            
-            const meta = document.createElement('div');
-            meta.className = 'result-meta';
-            
-            const source = document.createElement('span');
-            source.className = 'source';
-            source.textContent = result.source;
-            
-            // Add View Document link
-            const link = document.createElement('a');
-            link.href = `http://localhost:3001/api/documents/${document.getElementById('collectionSelect').value}/${result.source}`;
-            link.textContent = ' [View Document]';
-            link.target = '_blank';
-            link.style.marginLeft = '10px';
-            link.style.color = '#007bff';
-            
-            meta.appendChild(source);
-            meta.appendChild(link);
-            
-            div.appendChild(header);
-            div.appendChild(excerpt);
-            div.appendChild(meta);
-            
-            container.appendChild(div);
-        });
-        return;
-    }
-    
-    // Standard formatting for other search methods
-    searchResult.results.forEach(result => {
-        const div = document.createElement('div');
-        div.className = 'result-item';
-        
-        const header = document.createElement('div');
-        header.className = 'result-header';
-        
-        const title = document.createElement('h4');
-        title.textContent = result.title;
-        
-        const score = document.createElement('span');
-        score.className = 'score';
-        score.textContent = `${Math.round(result.score * 100)}%`;
-        
-        header.appendChild(title);
-        header.appendChild(score);
-        
-        const excerpt = document.createElement('p');
-        excerpt.className = 'result-excerpt';
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(result.excerpt, 'text/html');
-        while (doc.body.firstChild) {
-            excerpt.appendChild(doc.body.firstChild);
-        }
-        
-        const meta = document.createElement('div');
-        meta.className = 'result-meta';
-        
-        const source = document.createElement('span');
-        source.className = 'source';
-        source.textContent = result.source;
-        
-        meta.appendChild(source);
-        
-        // Add document link if available
-        if (result.documentPath) {
-            const link = document.createElement('a');
-            // Handle both full URLs and relative paths
-            link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
-            link.textContent = ' [View Document]';
-            link.target = '_blank';
-            link.style.marginLeft = '10px';
-            link.style.color = '#007bff';
-            meta.appendChild(link);
-        }
-        
-        div.appendChild(header);
-        div.appendChild(excerpt);
-        div.appendChild(meta);
-        
-        container.appendChild(div);
-    });
+    const collection = document.getElementById('collectionSelect').value;
+    window.responseDisplayCommon.renderSearchResults(container, searchResult, collection);
 }
 
 

@@ -766,115 +766,16 @@ function render(result) {
   // Store result for export
   window.currentResult = result;
 
-  // 1. the raw answer
+  // 1. the answer using multi-mode format
   const answerH = document.createElement('h3');
   answerH.textContent = 'Answer';
-  const answerP = document.createElement('div');
+  const answerDiv = document.createElement('div');
   
-  // Check if this is Line Search or Document Search results with formatted results
-
+  // Convert result to multi-mode format and render
+  const multiModeResult = window.responseDisplayCommon.convertToMultiModeFormat(result, result.searchType);
+  window.responseDisplayCommon.renderSearchResults(answerDiv, multiModeResult, result.collection);
   
-  // Debug: Check for HTML-encoded mark elements
-  if (result.response.includes('&lt;mark')) {
-
-    
-    // Decode HTML entities and apply highlighting
-    setTimeout(() => {
-      const allElements = answerP.querySelectorAll('*');
-      allElements.forEach(el => {
-        if (el.innerHTML.includes('&lt;mark')) {
-
-          const safeContent = el.innerHTML
-            .replace(/&lt;mark class=&quot;search-highlight&quot;&gt;/g, '<mark class="search-highlight">')
-            .replace(/&lt;\/mark&gt;/g, '</mark>');
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(`<div>${safeContent}</div>`, 'text/html');
-          const newContent = doc.body.firstElementChild;
-          if (newContent) {
-            el.replaceChildren(...newContent.childNodes);
-          }
-        }
-      });
-    }, 100);
-  }
-  if (result.searchType === 'exact-match' && result.response.includes('**Result ') && result.response.includes('---')) {
-    // Use same Line Search formatter as multi-mode
-    const formattedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.response);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(`<div>${formattedHTML}</div>`, 'text/html');
-    const content = doc.body.firstElementChild;
-    if (content) {
-      while (content.firstChild) {
-        answerP.appendChild(content.firstChild);
-      }
-    }
-  } else if (result.searchType === 'fulltext' && result.response.includes('**Result ') && result.response.includes('---')) {
-    // Parse fulltext response and render as HTML (preserving mark tags)
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(`<div>${result.response}</div>`, 'text/html');
-    const content = doc.body.firstElementChild;
-    if (content) {
-      // Decode HTML entities in the content safely
-      const safeContent = content.innerHTML
-        .replace(/&lt;mark class=&quot;search-highlight&quot;&gt;/g, '<mark class="search-highlight">')
-        .replace(/&lt;\/mark&gt;/g, '</mark>')
-        .replace(/&amp;/g, '&');
-      const parser2 = new DOMParser();
-      const doc2 = parser2.parseFromString(`<div>${safeContent}</div>`, 'text/html');
-      const newContent = doc2.body.firstElementChild;
-      if (newContent) {
-        content.replaceChildren(...newContent.childNodes);
-      }
-      
-      while (content.firstChild) {
-        answerP.appendChild(content.firstChild);
-      }
-    }
-  } else if (result.searchType === 'ai-direct' && result.response.includes('**Result ') && result.response.includes('---')) {
-    // Format AI Direct response similar to other search types
-    const lines = result.response.split('\n');
-    lines.forEach((line, index) => {
-      if (index > 0) {
-        answerP.appendChild(document.createElement('br'));
-      }
-      answerP.appendChild(document.createTextNode(line));
-    });
-  } else {
-    // Standard response formatting for other search types
-    const lines = result.response.split('\n');
-    lines.forEach((line, index) => {
-      if (index > 0) {
-        answerP.appendChild(document.createElement('br'));
-      }
-      
-      // Check for markdown links
-      const linkMatch = line.match(/\[([^\]]+)\]\(([^\)]+)\)/);
-      if (linkMatch) {
-        const beforeLink = line.substring(0, linkMatch.index);
-        const afterLink = line.substring(linkMatch.index + linkMatch[0].length);
-        
-        if (beforeLink) {
-          answerP.appendChild(document.createTextNode(beforeLink));
-        }
-        
-        const link = document.createElement('a');
-        link.href = linkMatch[2];
-        link.target = '_blank';
-        link.style.color = 'var(--link-color, #0066cc)';
-        link.style.textDecoration = 'underline';
-        link.textContent = linkMatch[1];
-        answerP.appendChild(link);
-        
-        if (afterLink) {
-          answerP.appendChild(document.createTextNode(afterLink));
-        }
-      } else {
-        answerP.appendChild(document.createTextNode(line));
-      }
-    });
-  }
-  
-  outputEl.append(answerH, answerP);
+  outputEl.append(answerH, answerDiv);
 
   // 1.5. (optional) source chunks
   if (result.chunks && result.chunks.length > 0) {
@@ -1241,6 +1142,83 @@ form.addEventListener('submit', async (e) => {
     } else if (searchType === 'rag') {
       // Use main search endpoint for RAG searches to support scoring
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
+    } else if (searchType === 'metadata') {
+      // Use metadata search common utility
+      const searchStartTime = Date.now();
+      const searchResult = await window.metadataSearchCommon.performMetadataSearch(trimmedQuery, collection);
+      const searchEndTime = Date.now();
+      
+      const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
+      result = {
+        response: responseText,
+        searchType: 'metadata',
+        query: trimmedQuery,
+        collection,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString(),
+        metrics: {
+          search: {
+            model: 'Document Index',
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 10000000,
+            eval_count: Math.floor(responseText.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 10) * 1000000,
+            context_size: 'N/A',
+            temperature: 'N/A'
+          }
+        }
+      };
+    } else if (searchType === 'vector') {
+      // Use Smart Search common utility
+      const searchStartTime = Date.now();
+      const searchResult = await window.smartSearchCommon.performSmartSearch(trimmedQuery, collection, 5);
+      const searchEndTime = Date.now();
+      
+      const convertedResult = window.smartSearchCommon.convertToSearchPageFormat(searchResult, collection);
+      result = {
+        ...convertedResult,
+        query: trimmedQuery,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString(),
+        metrics: {
+          search: {
+            model: 'Smart Search (Vector)',
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 100000000,
+            eval_count: Math.floor(convertedResult.response.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 100) * 1000000,
+            context_size: 'N/A',
+            temperature: 'N/A'
+          }
+        }
+      };
+    } else if (searchType === 'hybrid') {
+      // Use Hybrid Search common utility
+      const searchStartTime = Date.now();
+      const searchResult = await window.hybridSearchCommon.performHybridSearch(trimmedQuery, collection, 5);
+      const searchEndTime = Date.now();
+      
+      const convertedResult = window.hybridSearchCommon.convertToSearchPageFormat(searchResult, collection);
+      result = {
+        ...convertedResult,
+        query: trimmedQuery,
+        sourceType: sourceTypeEl.value,
+        testCode,
+        createdAt: new Date().toISOString(),
+        metrics: {
+          search: {
+            model: 'Hybrid Search (Keyword + Vector)',
+            total_duration: (searchEndTime - searchStartTime) * 1000000,
+            load_duration: 150000000,
+            eval_count: Math.floor(convertedResult.response.length / 4) || 0,
+            eval_duration: (searchEndTime - searchStartTime - 150) * 1000000,
+            context_size: 'N/A',
+            temperature: 'N/A'
+          }
+        }
+      };
     } else if (searchType === 'ai-direct') {
       // Use AI Direct common utility
       const searchStartTime = Date.now();

@@ -109,4 +109,4 @@ I have a 'release' command that bumps version by 0.01 and creates a commit messa
 
 ---
 
-**Version**: 18.06 | **License**: MIT | **Website**: aisearch-n-score.com
+**Version**: 18.07 | **License**: MIT | **Website**: aisearch-n-score.com
