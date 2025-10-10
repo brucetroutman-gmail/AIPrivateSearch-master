@@ -2,15 +2,15 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
-import { ExactMatchSearch } from './ExactMatchSearch.mjs';
-import { VectorSearchSimple } from './VectorSearchSimple.mjs';
+import { LineSearch } from './LineSearch.mjs';
+import { SmartSearch } from './SmartSearch.mjs';
 
 export class HybridSearch {
   constructor() {
     this.name = 'Hybrid Search';
     this.description = 'Combined traditional and vector methods';
-    this.traditionalSearch = new ExactMatchSearch();
-    this.vectorSearch = new VectorSearchSimple();
+    this.traditionalSearch = new LineSearch();
+    this.vectorSearch = new SmartSearch();
     this.tfidf = new TfIdf();
     this.documents = new Map();
     this.initialized = false;
@@ -58,7 +58,7 @@ export class HybridSearch {
             }
           };
         }),
-        method: 'hybrid',
+        method: 'hybrid-search',
         total: combinedResults.length
       };
     } catch (error) {

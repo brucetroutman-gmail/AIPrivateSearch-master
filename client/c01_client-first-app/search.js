@@ -58,7 +58,9 @@ async function loadCollections() {
       collections = data.collections || [];
     }
     
-    collectionEl.innerHTML = '';
+    while (collectionEl.firstChild) {
+        collectionEl.removeChild(collectionEl.firstChild);
+    }
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Select a collection...';
@@ -88,7 +90,13 @@ async function loadCollections() {
       }, 100);
     }
   } catch (error) {
-    collectionEl.innerHTML = '<option value="">Error loading collections</option>';
+    while (collectionEl.firstChild) {
+        collectionEl.removeChild(collectionEl.firstChild);
+    }
+    const errorOption = document.createElement('option');
+    errorOption.value = '';
+    errorOption.textContent = 'Error loading collections';
+    collectionEl.appendChild(errorOption);
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load collections:', error);
   }
@@ -100,7 +108,9 @@ async function loadSourceTypes() {
     const response = await fetch('./config/source-types.json');
     const data = await response.json();
     
-    sourceTypeEl.innerHTML = '';
+    while (sourceTypeEl.firstChild) {
+        sourceTypeEl.removeChild(sourceTypeEl.firstChild);
+    }
     data.source_types.forEach(source => {
       const option = document.createElement('option');
       option.value = source.name;
@@ -117,7 +127,13 @@ async function loadSourceTypes() {
     }
     return Promise.resolve();
   } catch (error) {
-    sourceTypeEl.innerHTML = '<option value="">Error loading source types</option>';
+    while (sourceTypeEl.firstChild) {
+        sourceTypeEl.removeChild(sourceTypeEl.firstChild);
+    }
+    const errorOption = document.createElement('option');
+    errorOption.value = '';
+    errorOption.textContent = 'Error loading source types';
+    sourceTypeEl.appendChild(errorOption);
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load source types:', error);
     return Promise.reject(error);
@@ -140,7 +156,9 @@ async function loadConfig(configFile, defaultValue = []) {
 function populateSelect(element, options, valueKey, textKey, storageKey = null, defaultValue = null) {
   if (!element) return;
   
-  element.innerHTML = '';
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
   options.forEach(option => {
     const optionEl = document.createElement('option');
     optionEl.value = option[valueKey] || option;
@@ -185,7 +203,13 @@ async function loadModels() {
   )].sort();
   
   if (searchModels.length === 0) {
-    modelEl.innerHTML = '<option value="">No search models available</option>';
+    while (modelEl.firstChild) {
+      modelEl.removeChild(modelEl.firstChild);
+    }
+    const noModelsOption = document.createElement('option');
+    noModelsOption.value = '';
+    noModelsOption.textContent = 'No search models available';
+    modelEl.appendChild(noModelsOption);
     return;
   }
   
@@ -263,7 +287,7 @@ loadVectorDBOptions();
 // Load search types from JSON file
 async function loadSearchTypes() {
   const data = await loadConfig('search-types.json', { search_types: [] });
-  populateSelect(searchTypeEl, data.search_types, 'value', 'name', 'lastSearchType', 'rag');
+  populateSelect(searchTypeEl, data.search_types, 'value', 'name', 'lastSearchType', 'ai-document-chat');
 }
 
 // Load system prompts from JSON file
@@ -275,7 +299,13 @@ async function loadSystemPrompts() {
     
     filterAssistantTypes();
   } catch (error) {
-    assistantTypeEl.innerHTML = '<option value="">Error loading system prompts</option>';
+    while (assistantTypeEl.firstChild) {
+      assistantTypeEl.removeChild(assistantTypeEl.firstChild);
+    }
+    const errorOption = document.createElement('option');
+    errorOption.value = '';
+    errorOption.textContent = 'Error loading system prompts';
+    assistantTypeEl.appendChild(errorOption);
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load system prompts:', error);
   }
@@ -295,7 +325,9 @@ function filterAssistantTypes() {
     filteredPrompts = systemPrompts.filter(prompt => prompt.name !== 'Documents Only');
   }
   
-  assistantTypeEl.innerHTML = '';
+  while (assistantTypeEl.firstChild) {
+    assistantTypeEl.removeChild(assistantTypeEl.firstChild);
+  }
   filteredPrompts.forEach(prompt => {
     const option = document.createElement('option');
     option.value = prompt.name;
@@ -318,7 +350,9 @@ async function loadUserPrompts() {
     const response = await fetch('./config/user-prompts.json');
     const data = await response.json();
     
-    userPromptsEl.innerHTML = '';
+    while (userPromptsEl.firstChild) {
+      userPromptsEl.removeChild(userPromptsEl.firstChild);
+    }
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Select a prompt...';
@@ -331,7 +365,13 @@ async function loadUserPrompts() {
       userPromptsEl.appendChild(option);
     });
   } catch (error) {
-    userPromptsEl.innerHTML = '<option value="">Error loading user prompts</option>';
+    while (userPromptsEl.firstChild) {
+      userPromptsEl.removeChild(userPromptsEl.firstChild);
+    }
+    const errorOption = document.createElement('option');
+    errorOption.value = '';
+    errorOption.textContent = 'Error loading user prompts';
+    userPromptsEl.appendChild(errorOption);
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load user prompts:', error);
   }
@@ -417,7 +457,7 @@ function updateFieldVisibility() {
   }
   
   const sourceType = sourceTypeEl.value;
-  const searchType = sourceType === 'Local Model Only' ? '' : (searchTypeEl.value || 'exact-match');
+  const searchType = sourceType === 'Local Model Only' ? '' : (searchTypeEl.value || 'line-search');
   
   // Get visibility rules for current combination
   const rules = visibilityConfig[sourceType]?.[searchType];
@@ -502,7 +542,7 @@ function updateFieldVisibilityFallback() {
   const hasModel = isLocalModelOnly || isLocalModelAndDocs;
   
   // Determine search type categories
-  const isNonModelSearch = searchType === 'exact-match' || searchType === 'fulltext';
+  const isNonModelSearch = searchType === 'line-search' || searchType === 'document-search';
   const needsModel = hasModel && !isNonModelSearch;
   
   // Collection and Search Type sections
@@ -512,7 +552,7 @@ function updateFieldVisibilityFallback() {
   
   // Wildcard checkbox
   if (wildcardSection) {
-    const showWildcard = hasDocuments && (searchType === 'exact-match' || searchType === 'fulltext');
+    const showWildcard = hasDocuments && (searchType === 'line-search' || searchType === 'document-search');
     wildcardSection.style.display = showWildcard ? 'block' : 'none';
     if (!showWildcard && useWildcardsEl) {
       useWildcardsEl.checked = false;
@@ -551,7 +591,7 @@ function updateFieldVisibilityFallback() {
   
   // Generate Scores visibility
   const scoreLabel = scoreTglEl.parentElement;
-  const showScores = hasDocuments && searchType === 'rag';
+  const showScores = hasDocuments && searchType === 'ai-document-chat';
   if (scoreLabel) {
     scoreLabel.style.display = showScores ? 'flex' : 'none';
     if (!showScores) {
@@ -761,7 +801,9 @@ function generateTestCode() {
 
 function render(result) {
   // clear then build markup
-  outputEl.innerHTML = '';
+  while (outputEl.firstChild) {
+    outputEl.removeChild(outputEl.firstChild);
+  }
   
   // Store result for export
   window.currentResult = result;
@@ -1017,7 +1059,7 @@ form.addEventListener('submit', async (e) => {
   
   // Only require model for AI-based searches
   const searchType = (sourceTypeEl.value.includes('Docu')) ? searchTypeEl.value : null;
-  const isNonModelSearch = searchType === 'exact-match' || searchType === 'fulltext';
+  const isNonModelSearch = searchType === 'line-search' || searchType === 'document-search';
   
   if (!isNonModelSearch && !modelEl.value) {
     outputEl.textContent = 'Please select a model first.';
@@ -1080,8 +1122,8 @@ form.addEventListener('submit', async (e) => {
     const trimmedQuery = queryEl.value.trim();
     const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
     let result;
-    if (searchType === 'fulltext') {
-      // Use same endpoint as multi-mode for fulltext searches
+    if (searchType === 'document-search') {
+      // Use same endpoint as multi-mode for document-search searches
       const searchStartTime = Date.now();
       const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection, useWildcards);
       const searchEndTime = Date.now();
@@ -1089,7 +1131,7 @@ form.addEventListener('submit', async (e) => {
       const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
       result = {
         response: responseText,
-        searchType: 'fulltext',
+        searchType: 'document-search',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,
@@ -1107,10 +1149,10 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'exact-match') {
-      // Use same endpoint as multi-mode for exact-match searches
+    } else if (searchType === 'line-search') {
+      // Use same endpoint as multi-mode for line-search searches
       const searchStartTime = Date.now();
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
+      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/line-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: trimmedQuery, options: { collection, useWildcards } })
@@ -1121,7 +1163,7 @@ form.addEventListener('submit', async (e) => {
       const responseText = data.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
       result = {
         response: responseText,
-        searchType: 'exact-match',
+        searchType: 'line-search',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,
@@ -1139,10 +1181,10 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'rag') {
-      // Use main search endpoint for RAG searches to support scoring
+    } else if (searchType === 'ai-document-chat') {
+      // Use main search endpoint for AI Document Chat searches to support scoring
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
-    } else if (searchType === 'metadata') {
+    } else if (searchType === 'document-index') {
       // Use metadata search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.metadataSearchCommon.performMetadataSearch(trimmedQuery, collection);
@@ -1151,7 +1193,7 @@ form.addEventListener('submit', async (e) => {
       const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
       result = {
         response: responseText,
-        searchType: 'metadata',
+        searchType: 'document-index',
         query: trimmedQuery,
         collection,
         sourceType: sourceTypeEl.value,
@@ -1169,7 +1211,7 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'vector') {
+    } else if (searchType === 'smart-search') {
       // Use Smart Search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.smartSearchCommon.performSmartSearch(trimmedQuery, collection, 5);
@@ -1194,7 +1236,7 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'hybrid') {
+    } else if (searchType === 'hybrid-search') {
       // Use Hybrid Search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.hybridSearchCommon.performHybridSearch(trimmedQuery, collection, 5);

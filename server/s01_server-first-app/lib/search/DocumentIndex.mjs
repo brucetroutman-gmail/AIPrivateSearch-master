@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import initSqlJs from 'sql.js';
 
-export class MetadataSearch {
+export class DocumentIndex {
   constructor() {
     this.name = 'Metadata Search';
     this.description = 'Structured queries using document metadata';

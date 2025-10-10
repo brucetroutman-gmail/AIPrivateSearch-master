@@ -1,6 +1,6 @@
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
 
-export class VectorSearchSimple {
+export class SmartSearch {
   constructor() {
     this.name = 'Smart Search';
     this.description = 'Finds conceptually related content using AI understanding';

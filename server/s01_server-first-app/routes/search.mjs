@@ -61,8 +61,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
       }
       
-      // Get the search response - for exact-match, fulltext, and metadata, return all results with context
-      if (searchType === 'exact-match' || searchType === 'fulltext' || searchType === 'metadata') {
+      // Get the search response - for line-search, document-search, and document-index, return all results with context
+      if (searchType === 'line-search' || searchType === 'document-search' || searchType === 'document-index') {
         // Use common formatting logic
         searchResponse = methodResult.results.map((result, index) => {
           const docLink = result.documentPath ? `[View Document](${result.documentPath})` : 
@@ -74,8 +74,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
       }
       
-      // Extract chunks if available (for RAG searches)
-      if (searchType === 'rag' && methodResult.results && methodResult.results[0] && methodResult.results[0].chunks) {
+      // Extract chunks if available (for AI Document Chat searches)
+      if (searchType === 'ai-document-chat' && methodResult.results && methodResult.results[0] && methodResult.results[0].chunks) {
         chunks = methodResult.results[0].chunks;
       }
       
@@ -174,11 +174,11 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
 });
 
 // Exact Match Search endpoint
-router.post('/exact-match', async (req, res) => {
+router.post('/line-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['exact-match'], options);
-    res.json(result.results['exact-match']);
+    const result = await searchOrchestrator.search(query, ['line-search'], options);
+    res.json(result.results['line-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

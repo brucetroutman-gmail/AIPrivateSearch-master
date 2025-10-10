@@ -33,51 +33,51 @@ router.post('/multi-method', async (req, res) => {
 });
 
 // Individual method endpoints
-router.post('/exact-match', async (req, res) => {
+router.post('/line-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['exact-match'], options);
-    res.json(result.results['exact-match']);
+    const result = await searchOrchestrator.search(query, ['line-search'], options);
+    res.json(result.results['line-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/metadata', async (req, res) => {
+router.post('/document-index', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['metadata'], options);
-    res.json(result.results.metadata);
+    const result = await searchOrchestrator.search(query, ['document-index'], options);
+    res.json(result.results['document-index']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/fulltext', async (req, res) => {
+router.post('/document-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['fulltext'], options);
-    res.json(result.results.fulltext);
+    const result = await searchOrchestrator.search(query, ['document-search'], options);
+    res.json(result.results['document-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/vector', async (req, res) => {
+router.post('/smart-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['vector'], options);
-    res.json(result.results.vector);
+    const result = await searchOrchestrator.search(query, ['smart-search'], options);
+    res.json(result.results['smart-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/hybrid', async (req, res) => {
+router.post('/hybrid-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['hybrid'], options);
-    res.json(result.results.hybrid);
+    const result = await searchOrchestrator.search(query, ['hybrid-search'], options);
+    res.json(result.results['hybrid-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -93,11 +93,11 @@ router.post('/ai-direct', async (req, res) => {
   }
 });
 
-router.post('/rag', async (req, res) => {
+router.post('/ai-document-chat', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
-    const result = await searchOrchestrator.search(query, ['rag'], options);
-    res.json(result.results.rag);
+    const result = await searchOrchestrator.search(query, ['ai-document-chat'], options);
+    res.json(result.results['ai-document-chat']);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -110,13 +110,13 @@ router.get('/methods', (req, res) => {
   res.json({
     methods: searchOrchestrator.getAvailableMethods(),
     descriptions: {
-      'exact-match': 'Exact match search for precise text matching',
-      metadata: 'Structured queries using document metadata',
-      fulltext: 'Indexed search with ranking and stemming',
-      vector: 'Semantic similarity using embeddings',
-      hybrid: 'Combined traditional and vector methods',
+      'line-search': 'Line-by-line search with context and Boolean logic',
+      'document-index': 'Structured queries using document metadata',
+      'document-search': 'Indexed search with ranking and stemming',
+      'smart-search': 'Semantic similarity using embeddings',
+      'hybrid-search': 'Combined keyword and semantic methods',
       'ai-direct': 'Question-answering models for contextual understanding',
-      rag: 'Chunked documents with AI retrieval',
+      'ai-document-chat': 'Chunked documents with AI retrieval',
 
     }
   });
@@ -192,7 +192,7 @@ router.post('/metadata-view', async (req, res) => {
     const result = await searchOrchestrator.getDocumentMetadata(collection, filename);
     res.json({
       success: true,
-      metadata: result
+      'document-index': result
     });
   } catch (error) {
     console.error('Metadata view error:', error);

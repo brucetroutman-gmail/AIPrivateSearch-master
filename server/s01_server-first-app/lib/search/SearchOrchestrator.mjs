@@ -1,23 +1,23 @@
 
-import { ExactMatchSearch } from './ExactMatchSearch.mjs';
-import { MetadataSearch } from './MetadataSearch.mjs';
-import { FullTextSearch } from './FullTextSearch.mjs';
-import { VectorSearchSimple } from './VectorSearchSimple.mjs';
+import { LineSearch } from './LineSearch.mjs';
+import { DocumentIndex } from './DocumentIndex.mjs';
+import { DocumentSearch } from './DocumentSearch.mjs';
+import { SmartSearch } from './SmartSearch.mjs';
 import { HybridSearch } from './HybridSearch.mjs';
 import { AIDirectSearch } from './AIDirectSearch.mjs';
-import { RAGSearch } from './RAGSearch.mjs';
+import { AIDocumentChat } from './AIDocumentChat.mjs';
 
 
 export class SearchOrchestrator {
   constructor() {
     this.searchMethods = {
-      'exact-match': new ExactMatchSearch(),
-      metadata: new MetadataSearch(),
-      fulltext: new FullTextSearch(),
-      vector: new VectorSearchSimple(),
-      hybrid: new HybridSearch(),
+      'line-search': new LineSearch(),
+      'document-index': new DocumentIndex(),
+      'document-search': new DocumentSearch(),
+      'smart-search': new SmartSearch(),
+      'hybrid-search': new HybridSearch(),
       'ai-direct': new AIDirectSearch(),
-      rag: new RAGSearch(),
+      'ai-document-chat': new AIDocumentChat(),
     };
   }
 
@@ -55,7 +55,7 @@ export class SearchOrchestrator {
   async getAvailableCollections() {
     try {
       const documentsPath = '../../sources/local-documents';
-      const collections = await this.searchMethods['exact-match'].getCollections(documentsPath);
+      const collections = await this.searchMethods['line-search'].getCollections(documentsPath);
       return collections.map(c => c.name);
     } catch (error) {
       console.error('Error loading collections:', error.message);

@@ -15,7 +15,7 @@ window.responseDisplayCommon = {
         container.innerHTML = '';
         
         // Use existing formatters for specific search types
-        if (searchResult.method === 'exact-match') {
+        if (searchResult.method === 'line-search') {
             const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
             const parser = new DOMParser();
             const doc = parser.parseFromString(formattedHTML, 'text/html');
@@ -23,7 +23,7 @@ window.responseDisplayCommon = {
             return;
         }
         
-        if (searchResult.method === 'fulltext') {
+        if (searchResult.method === 'document-search') {
             const formattedHTML = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
             const parser = new DOMParser();
             const doc = parser.parseFromString(formattedHTML, 'text/html');
@@ -53,7 +53,7 @@ window.responseDisplayCommon = {
             excerpt.className = 'result-excerpt';
             
             // Handle markdown conversion for vector and hybrid searches
-            if (searchResult.method === 'vector' || searchResult.method === 'hybrid') {
+            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
                 const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(sanitizedHTML, 'text/html');

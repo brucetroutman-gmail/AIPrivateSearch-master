@@ -1,8 +1,8 @@
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
 
-export class RAGSearch {
+export class AIDocumentChat {
   constructor() {
-    this.name = 'RAG Search';
+    this.name = 'AI Document Chat';
     this.description = 'Chunked documents with AI retrieval';
     this.embeddingService = new UnifiedEmbeddingService();
   }
@@ -11,7 +11,7 @@ export class RAGSearch {
     const { collection = null, model, topK = 5, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
-      console.log(`RAG search for query: "${query}" in collection: ${collection}`);
+      console.log(`AI Document Chat search for query: "${query}" in collection: ${collection}`);
       
       // Check if embeddings exist - no auto-embedding
       
@@ -21,13 +21,13 @@ export class RAGSearch {
       if (relevantChunks.length === 0) {
         return { 
           results: [{
-            id: 'rag_no_embeddings',
+            id: 'ai_document_chat_no_embeddings',
             title: 'No Embeddings Found',
             excerpt: 'No embeddings found for this collection. Please use the Collections Editor to embed documents first by clicking "Embed Source MDs".',
             score: 0,
             source: 'System message'
           }], 
-          method: 'rag', 
+          method: 'ai-document-chat', 
           total: 1
         };
       }
@@ -42,13 +42,13 @@ export class RAGSearch {
       
       const result = {
         results: [{
-          id: `rag_${Date.now()}`,
+          id: `ai_document_chat_${Date.now()}`,
           title: 'Chat Analysis',
           excerpt: aiResponse,
           score: 0.8,
           source: `${relevantChunks.length} relevant chunks`
         }],
-        method: 'rag',
+        method: 'ai-document-chat',
         total: 1
       };
       
@@ -63,8 +63,8 @@ export class RAGSearch {
       
       return result;
     } catch (error) {
-      console.error('RAG search error:', error);
-      throw new Error(`RAG search failed: ${error.message}`);
+      console.error('AI Document Chat search error:', error);
+      throw new Error(`AI Document Chat search failed: ${error.message}`);
     }
   }
   

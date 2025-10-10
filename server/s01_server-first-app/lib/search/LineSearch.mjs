@@ -2,7 +2,7 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import { createInterface } from 'readline';
 
-export class ExactMatchSearch {
+export class LineSearch {
   constructor() {
     this.name = 'Line Search';
     this.description = 'Line-by-line search with context and Boolean logic';

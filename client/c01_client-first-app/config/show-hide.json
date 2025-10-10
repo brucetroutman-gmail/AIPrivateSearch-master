@@ -13,7 +13,7 @@
       }
     },
     "Local Documents Only": {
-      "exact-match": {
+      "line-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "Y",
@@ -23,7 +23,7 @@
         "showChunks": "N",
         "generateScores": "N"
       },
-      "fulltext": {
+      "document-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "Y",
@@ -43,7 +43,7 @@
         "showChunks": "N",
         "generateScores": "N"
       },
-      "rag": {
+      "ai-document-chat": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -53,7 +53,7 @@
         "showChunks": "Y",
         "generateScores": "Y"
       },
-      "vector": {
+      "smart-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -63,7 +63,7 @@
         "showChunks": "Y",
         "generateScores": "N"
       },
-      "hybrid": {
+      "hybrid-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -73,7 +73,7 @@
         "showChunks": "Y",
         "generateScores": "N"
       },
-      "metadata": {
+      "document-index": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -85,7 +85,7 @@
       }
     },
     "Local Model and Documents": {
-      "exact-match": {
+      "line-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "Y",
@@ -95,7 +95,7 @@
         "showChunks": "N",
         "generateScores": "N"
       },
-      "fulltext": {
+      "document-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "Y",
@@ -115,7 +115,7 @@
         "showChunks": "Y",
         "generateScores": "N"
       },
-      "rag": {
+      "ai-document-chat": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -125,7 +125,7 @@
         "showChunks": "Y",
         "generateScores": "Y"
       },
-      "vector": {
+      "smart-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -135,7 +135,7 @@
         "showChunks": "Y",
         "generateScores": "N"
       },
-      "hybrid": {
+      "hybrid-search": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",
@@ -145,7 +145,7 @@
         "showChunks": "Y",
         "generateScores": "N"
       },
-      "metadata": {
+      "document-index": {
         "collectionSection": "Y",
         "searchTypeSection": "Y",
         "wildcardCheckbox": "N",

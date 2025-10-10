@@ -13,8 +13,8 @@ class SearchResultFormatter {
 
     return results.map((result, index) => {
       const docLink = result.documentPath ? `[View Document](${result.documentPath})` : '';
-      // Preserve HTML for fulltext to maintain highlighting
-      const excerpt = searchType === 'fulltext' ? result.excerpt : result.excerpt;
+      // Preserve HTML for document-search to maintain highlighting
+      const excerpt = searchType === 'document-search' ? result.excerpt : result.excerpt;
       return `**Result ${index + 1}: ${result.title}**\n${excerpt}\n${docLink}\n`;
     }).join('\n---\n\n');
   }
@@ -25,11 +25,11 @@ class SearchResultFormatter {
       return '<div class="no-results">No results found</div>';
     }
 
-    if (searchType === 'exact-match') {
+    if (searchType === 'line-search') {
       return window.lineSearchFormatter.formatLineSearchResults(results);
     }
 
-    if (searchType === 'fulltext') {
+    if (searchType === 'document-search') {
       return window.documentSearchCommon.formatDocumentSearchResults(results);
     }
 

@@ -6,7 +6,7 @@ window.hybridSearchCommon = {
         const startTime = Date.now();
         
         try {
-            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/hybrid', {
+            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/hybrid-search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, options: { collection, topK } })
@@ -16,11 +16,11 @@ window.hybridSearchCommon = {
             return { 
                 results: data.results || [], 
                 time: Date.now() - startTime, 
-                method: 'hybrid' 
+                method: 'hybrid-search' 
             };
         } catch (error) {
             console.error('Hybrid Search error:', error);
-            return { results: [], time: Date.now() - startTime, method: 'hybrid' };
+            return { results: [], time: Date.now() - startTime, method: 'hybrid-search' };
         }
     },
 

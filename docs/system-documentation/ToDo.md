@@ -213,6 +213,32 @@ specs-3-scoring
 
 102. metadata search (document Index) - fixed to use sql.js and proper error messaging --done
 
+103. Clean up response vews
+
+103. Change supporting files, functiond to be consistent with  titles . i.e. line search = exactMatch
+
+104. change names meta -> Index, create metadata -> create Indexes
+
+105. create user prompts based on source Type and collection and search type
+
+106. Rename RAG/RagSearch references to "AI Document Chat" for consistency --done
+
+107. Reverted "Document Text Search" back to "Document Search" --done
+
+108. Rename FullTextSearch class to DocumentSearch --done
+
+109. Change all "fulltext" references to "document-search" --done
+
+110. Change "hybrid" to "hybrid-search" for consistency --done
+
+111. Fix multi-mode HTML container IDs for hybrid-search and document-search --done
+
+112. Replace innerHTML with secure DOM methods to prevent XSS --done
+
+113. Fix hybrid search endpoint URL from /hybrid to /hybrid-search --done
+
+114. 
+
 
 
 

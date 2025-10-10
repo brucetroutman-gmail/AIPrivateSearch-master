@@ -6,7 +6,7 @@ window.smartSearchCommon = {
         const startTime = Date.now();
         
         try {
-            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/vector', {
+            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/smart-search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, options: { collection, topK } })
@@ -16,11 +16,11 @@ window.smartSearchCommon = {
             return { 
                 results: data.results || [], 
                 time: Date.now() - startTime, 
-                method: 'vector' 
+                method: 'smart-search' 
             };
         } catch (error) {
             console.error('Smart Search error:', error);
-            return { results: [], time: Date.now() - startTime, method: 'vector' };
+            return { results: [], time: Date.now() - startTime, method: 'smart-search' };
         }
     },
 
@@ -29,7 +29,7 @@ window.smartSearchCommon = {
         if (!searchResult.results || searchResult.results.length === 0) {
             return {
                 response: 'No relevant documents found using Smart Search.',
-                searchType: 'vector',
+                searchType: 'smart-search',
                 collection
             };
         }
@@ -67,7 +67,7 @@ window.smartSearchCommon = {
 
         return {
             response: responseText,
-            searchType: 'vector',
+            searchType: 'smart-search',
             collection,
             results: searchResult.results.map(r => ({ ...r, score: r.score || 0.5 })) // Ensure scores are valid
         };

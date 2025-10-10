@@ -6,7 +6,7 @@ window.metadataSearchCommon = {
         const startTime = Date.now();
         
         try {
-            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/metadata', {
+            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/document-index', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, options: { collection } })
@@ -16,11 +16,11 @@ window.metadataSearchCommon = {
             return { 
                 results: data.results || [], 
                 time: Date.now() - startTime, 
-                method: 'metadata' 
+                method: 'document-index' 
             };
         } catch (error) {
             console.error('Metadata search error:', error);
-            return { results: [], time: Date.now() - startTime, method: 'metadata' };
+            return { results: [], time: Date.now() - startTime, method: 'document-index' };
         }
     },
 

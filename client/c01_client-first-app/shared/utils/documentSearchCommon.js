@@ -5,12 +5,12 @@ class DocumentSearchCommon {
     this.name = 'DocumentSearchCommon';
   }
 
-  // Perform document search using the fulltext endpoint
+  // Perform document search using the document-search endpoint
   async performDocumentSearch(query, collection, useWildcards = false) {
     const startTime = Date.now();
     
     try {
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/fulltext', {
+      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/document-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -26,11 +26,11 @@ class DocumentSearchCommon {
       return { 
         results: data.results || [], 
         time: Date.now() - startTime, 
-        method: 'fulltext' 
+        method: 'document-search' 
       };
     } catch (error) {
       console.error('Document search error:', error);
-      return { results: [], time: Date.now() - startTime, method: 'fulltext' };
+      return { results: [], time: Date.now() - startTime, method: 'document-search' };
     }
   }
 
@@ -69,11 +69,11 @@ class DocumentSearchCommon {
     if (!searchTypeElement) return;
     
     // Check if option already exists
-    const existingOption = Array.from(searchTypeElement.options).find(opt => opt.value === 'fulltext');
+    const existingOption = Array.from(searchTypeElement.options).find(opt => opt.value === 'document-search');
     if (existingOption) return;
     
     const option = document.createElement('option');
-    option.value = 'fulltext';
+    option.value = 'document-search';
     option.textContent = 'Document Search';
     searchTypeElement.appendChild(option);
   }

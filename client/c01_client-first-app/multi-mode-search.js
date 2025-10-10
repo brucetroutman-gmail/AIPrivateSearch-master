@@ -14,13 +14,13 @@ const useWildcardsMulti = document.getElementById('useWildcardsMulti');
 
 // Search methods configuration (names only - endpoints are hardcoded in functions)
 const searchMethods = {
-    'exact-match': { name: 'Line Search' },
+    'line-search': { name: 'Line Search' },
     'ai-direct': { name: 'AI Direct' },
-    rag: { name: 'RAG Search' },
-    vector: { name: 'Smart Search' },
-    hybrid: { name: 'Hybrid Search' },
-    metadata: { name: 'Document Index' },
-    fulltext: { name: 'Document Search' }
+    'ai-document-chat': { name: 'AI Document Chat' },
+    'smart-search': { name: 'Smart Search' },
+    'hybrid-search': { name: 'Hybrid Search' },
+    'document-index': { name: 'Document Index' },
+    'document-search': { name: 'Document Search' }
 };
 
 // Real API search functions
@@ -31,7 +31,7 @@ async function performExactMatchSearch(query, collection = null, useWildcards = 
         const options = { query, useWildcards };
         if (collection) options.collection = collection;
         
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/exact-match', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/line-search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, options })
@@ -41,11 +41,11 @@ async function performExactMatchSearch(query, collection = null, useWildcards = 
         return { 
             results: data.results || [], 
             time: Date.now() - startTime, 
-            method: 'exact-match' 
+            method: 'line-search' 
         };
     } catch (error) {
         console.error('Exact match search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'exact-match' };
+        return { results: [], time: Date.now() - startTime, method: 'line-search' };
     }
 }
 
@@ -67,11 +67,11 @@ async function performAIDirectSearch(query, collection, model, temperature, cont
     }
 }
 
-async function performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit) {
+async function performAIDocumentChatSearch(query, collection, model, temperature, contextSize, tokenLimit) {
     const startTime = Date.now();
     
     try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/rag', {
+        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-document-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, options: { collection, model, topK: 3, temperature, contextSize, tokenLimit } })
@@ -81,11 +81,11 @@ async function performRAGSearch(query, collection, model, temperature, contextSi
         return { 
             results: data.results || [], 
             time: Date.now() - startTime, 
-            method: 'rag' 
+            method: 'ai-document-chat' 
         };
     } catch (error) {
-        console.error('RAG search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'rag' };
+        console.error('AI Document Chat search error:', error);
+        return { results: [], time: Date.now() - startTime, method: 'ai-document-chat' };
     }
 }
 
@@ -118,7 +118,9 @@ function renderResults(containerId, searchResult) {
 
 // Update performance table
 function updatePerformanceTable(results) {
-    performanceTableBody.innerHTML = '';
+    while (performanceTableBody.firstChild) {
+        performanceTableBody.removeChild(performanceTableBody.firstChild);
+    }
     Object.entries(results).forEach(([method, data]) => {
         const row = document.createElement('tr');
         const avgScore = data.results.length > 0 
@@ -189,12 +191,14 @@ async function performAllSearches() {
     }
     
     // Clear previous results for all containers
-    ['metadata-container', 'exact-match-container', 'fulltext-container', 'vector-container', 'hybrid-container', 'ai-direct-container', 'rag-container'].forEach(id => {
+    ['document-index-container', 'line-search-container', 'document-search-container', 'smart-search-container', 'hybrid-search-container', 'ai-direct-container', 'ai-document-chat-container'].forEach(id => {
         const container = document.getElementById(id);
         const notSelectedDiv = document.createElement('div');
         notSelectedDiv.className = 'no-results';
         notSelectedDiv.textContent = 'Not selected';
-        container.innerHTML = '';
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
         container.appendChild(notSelectedDiv);
     });
     
@@ -204,7 +208,9 @@ async function performAllSearches() {
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading';
         loadingDiv.textContent = 'Searching...';
-        container.innerHTML = '';
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
         container.appendChild(loadingDiv);
     });
     
@@ -213,33 +219,33 @@ async function performAllSearches() {
         const searchPromises = [];
         const methodMap = {};
         
-        if (selectedMethods.includes('exact-match')) {
+        if (selectedMethods.includes('line-search')) {
             searchPromises.push(performExactMatchSearch(query, collection, useWildcards));
-            methodMap['exact-match'] = searchPromises.length - 1;
+            methodMap['line-search'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('ai-direct')) {
             searchPromises.push(performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit));
             methodMap['ai-direct'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('rag')) {
-            searchPromises.push(performRAGSearch(query, collection, model, temperature, contextSize, tokenLimit));
-            methodMap['rag'] = searchPromises.length - 1;
+        if (selectedMethods.includes('ai-document-chat')) {
+            searchPromises.push(performAIDocumentChatSearch(query, collection, model, temperature, contextSize, tokenLimit));
+            methodMap['ai-document-chat'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('vector')) {
+        if (selectedMethods.includes('smart-search')) {
             searchPromises.push(performVectorSearch(query, collection));
-            methodMap['vector'] = searchPromises.length - 1;
+            methodMap['smart-search'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('hybrid')) {
+        if (selectedMethods.includes('hybrid-search')) {
             searchPromises.push(performHybridSearch(query, collection));
-            methodMap['hybrid'] = searchPromises.length - 1;
+            methodMap['hybrid-search'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('metadata')) {
+        if (selectedMethods.includes('document-index')) {
             searchPromises.push(performMetadataSearch(query, collection));
-            methodMap['metadata'] = searchPromises.length - 1;
+            methodMap['document-index'] = searchPromises.length - 1;
         }
-        if (selectedMethods.includes('fulltext')) {
+        if (selectedMethods.includes('document-search')) {
             searchPromises.push(performFullTextSearch(query, collection, useWildcards));
-            methodMap['fulltext'] = searchPromises.length - 1;
+            methodMap['document-search'] = searchPromises.length - 1;
         }
         
         const results = await Promise.all(searchPromises);
@@ -304,7 +310,7 @@ methodCheckboxes.forEach(checkbox => {
 // Function to show/hide wildcard option based on selected methods
 function updateWildcardVisibility() {
     const selectedMethods = getSelectedMethods();
-    const hasSearchMethods = selectedMethods.includes('exact-match') || selectedMethods.includes('fulltext');
+    const hasSearchMethods = selectedMethods.includes('line-search') || selectedMethods.includes('document-search');
     
     if (wildcardOption) {
         wildcardOption.style.display = hasSearchMethods ? 'block' : 'none';

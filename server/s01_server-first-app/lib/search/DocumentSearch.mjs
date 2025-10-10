@@ -2,7 +2,7 @@ import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import lunr from 'lunr';
 
-export class FullTextSearch {
+export class DocumentSearch {
   constructor() {
     this.name = 'Document Search';
     this.description = 'Document-wide search with ranking and Boolean logic';
@@ -17,7 +17,7 @@ export class FullTextSearch {
       await this.buildIndex(collection);
       
       if (!this.index) {
-        return { results: [], method: 'fulltext', total: 0 };
+        return { results: [], method: 'document-search', total: 0 };
       }
       
       // Store original query terms for highlighting (before wildcard conversion)
@@ -57,7 +57,7 @@ export class FullTextSearch {
       
       return {
         results,
-        method: 'fulltext',
+        method: 'document-search',
         total: results.length
       };
     } catch (error) {
