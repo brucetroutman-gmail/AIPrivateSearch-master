@@ -250,7 +250,12 @@ function renderResults(containerId, searchResult) {
             const excerpt = document.createElement('div');
             excerpt.className = 'result-excerpt';
             // Use Line Search markdown converter for consistent link styling
-            excerpt.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(sanitizedHTML, 'text/html');
+            while (doc.body.firstChild) {
+                excerpt.appendChild(doc.body.firstChild);
+            }
             
             div.appendChild(header);
             div.appendChild(excerpt);
@@ -282,7 +287,12 @@ function renderResults(containerId, searchResult) {
             const excerpt = document.createElement('div');
             excerpt.className = 'result-excerpt';
             // Use Line Search markdown converter for consistent link styling
-            excerpt.innerHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(sanitizedHTML, 'text/html');
+            while (doc.body.firstChild) {
+                excerpt.appendChild(doc.body.firstChild);
+            }
             
             div.appendChild(header);
             div.appendChild(excerpt);
