@@ -102,46 +102,71 @@ export class AIDirectSearch {
       options.num_predict = parseInt(tokenLimit);
     }
     
-    // Enhanced prompt for better relevance assessment
-    const enhancedPrompt = `Document: ${filename}
-Content: ${documentContent.substring(0, 1500)}
+    // Simple, clear prompt
+    const enhancedPrompt = `Text from ${filename}:
 
-Question: ${query}
+${documentContent.substring(0, 800)}
 
-Instructions: Analyze this document and answer the question. If the document contains relevant information, provide a detailed answer. If the document does not contain relevant information, respond with "NO_MATCH: This document does not contain information about ${query}."
+Question: Does this text contain information about "${query}"?
 
 Answer:`;
     
-    const response = await fetch('http://localhost:11434/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: model,
-        prompt: enhancedPrompt,
-        stream: false,
-        options: options
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
+    try {
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: model,
+          prompt: enhancedPrompt,
+          stream: false,
+          options: options
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Ollama API error: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      let aiResponse = result.response || 'No response generated';
+      
+      // Check if document actually contains the query terms
+      const queryWords = query.toLowerCase().split(/\s+/);
+      const contentLower = documentContent.toLowerCase();
+      const hasDirectMatch = queryWords.some(word => contentLower.includes(word));
+      
+      // Determine match based on actual content, not AI response
+      const isNoMatch = !hasDirectMatch;
+      
+      // If document has the terms but AI said no, override
+      if (hasDirectMatch && (aiResponse.toLowerCase().includes('no') || aiResponse.length < 10)) {
+        const matchedWords = queryWords.filter(word => contentLower.includes(word));
+        aiResponse = `This document contains: ${matchedWords.join(', ')}`;
+      }
+      
+      const relevanceScore = this.calculateRelevanceScore(query, documentContent, aiResponse, isNoMatch);
+      
+      return {
+        id: `ai_${filename}_${Date.now()}`,
+        title: isNoMatch ? `${filename} (No Match)` : `${filename}`,
+        excerpt: aiResponse,
+        score: relevanceScore,
+        source: `Ollama ${model} analysis of ${filename}`,
+        hasMatch: !isNoMatch
+      };
+    } catch (error) {
+      
+      return {
+        id: `ai_${filename}_${Date.now()}`,
+        title: `${filename} (Error)`,
+        excerpt: `Error: ${error.message}`,
+        score: 0.1,
+        source: `Error - ${model}`,
+        hasMatch: false
+      };
     }
-    
-    const result = await response.json();
-    const aiResponse = result.response || 'No response generated';
-    
-    // Determine if this is a match or no-match
-    const isNoMatch = aiResponse.startsWith('NO_MATCH:');
-    const relevanceScore = this.calculateRelevanceScore(query, documentContent, aiResponse, isNoMatch);
-    
-    return {
-      id: `ai_${filename}_${Date.now()}`,
-      title: isNoMatch ? `${filename} (No Match)` : `${filename}`,
-      excerpt: aiResponse,
-      score: relevanceScore,
-      source: `Ollama ${model} analysis of ${filename}`,
-      hasMatch: !isNoMatch
-    };
+
+
   }
 
   generateAIResponse(query, context) {

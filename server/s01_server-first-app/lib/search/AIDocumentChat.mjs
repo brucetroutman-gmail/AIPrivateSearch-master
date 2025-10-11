@@ -8,7 +8,7 @@ export class AIDocumentChat {
   }
 
   async search(query, options = {}) {
-    const { collection = null, model, topK = 5, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
+    const { collection = null, model, topK = 10, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
       console.log(`AI Document Chat search for query: "${query}" in collection: ${collection}`);
@@ -105,21 +105,15 @@ export class AIDocumentChat {
       options.num_predict = parseInt(tokenLimit);
     }
     
-    const enhancedPrompt = `You are an AI assistant analyzing documents to answer user questions. Use the provided document excerpts to give accurate, well-structured responses.
+    const enhancedPrompt = `You have access to multiple document excerpts. Use ALL relevant information to provide a comprehensive answer.
 
-**DOCUMENT EXCERPTS:**
 ${context}
 
-**USER QUESTION:** ${query}
+Question: ${query}
 
-**INSTRUCTIONS:**
-- Answer based primarily on the provided document excerpts
-- Structure your response clearly with headings or bullet points when appropriate
-- If the documents contain specific details (names, dates, numbers, policies), include them
-- If the answer spans multiple documents, synthesize the information coherently
-- If the documents don't fully answer the question, acknowledge what information is available
+Instructions: Review ALL the document excerpts above and synthesize the information. If multiple documents are relevant, mention information from each one. Provide a complete answer that covers all relevant details found in the documents.
 
-**RESPONSE:**`;
+Answer:`;
     
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',

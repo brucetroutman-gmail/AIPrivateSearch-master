@@ -23,7 +23,7 @@ export class DocumentIndex {
           results: [],
           method: 'metadata',
           total: 0,
-          message: `No metadata database found for collection: ${collection}. Use Collections Editor to create metadata first.`
+          message: `No Doc Index database found for collection: ${collection}. Use Collections Editor to create Doc Indexes first.`
         };
       }
 
@@ -49,7 +49,7 @@ export class DocumentIndex {
             results: [],
             method: 'metadata',
             total: 0,
-            message: `No metadata found for collection: ${collection}. Use Collections Editor to create metadata first.`
+            message: `No Doc Index found for collection: ${collection}. Use Collections Editor to create Doc Indexes first.`
           };
         }
         
@@ -64,7 +64,7 @@ export class DocumentIndex {
           results: [],
           method: 'metadata',
           total: 0,
-          message: `Metadata table not found in collection database`
+          message: `Doc Index table not found in collection database`
         };
       }
       
@@ -129,7 +129,7 @@ export class DocumentIndex {
     const collectionPath = path.join(documentsPath, collection);
     const dbPath = path.join(collectionPath, 'collection.db');
     
-    console.log(`Creating metadata database for collection: ${collection}`);
+    console.log(`Creating Doc Index database for collection: ${collection}`);
     
     try {
       const files = fs.readdirSync(collectionPath);
@@ -201,8 +201,83 @@ export class DocumentIndex {
   }
 
   async getDocumentMetadata(collection, filename) {
-    // Stub method - not implemented for simple metadata search
-    return null;
+    try {
+      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'collection.db');
+      
+      if (!fs.existsSync(dbPath)) {
+        console.log(`[DocumentIndex] Database file does not exist: ${dbPath}`);
+        return null;
+      }
+
+      const dbBuffer = fs.readFileSync(dbPath);
+      const SQL = await initSqlJs();
+      const db = new SQL.Database(dbBuffer);
+      
+      try {
+        const results = db.exec("SELECT docid, filename, content FROM metadata WHERE filename = ?", [filename]);
+        db.close();
+        
+        if (!results || results.length === 0 || !results[0].values || results[0].values.length === 0) {
+          console.log(`[DocumentIndex] No document index found for ${filename} in ${collection}`);
+          return null;
+        }
+        
+        const row = results[0].values[0];
+        const content = row[2] || '';
+        
+        return {
+          id: row[0], // docid
+          doc_id: row[0],
+          collection: collection,
+          filename: row[1],
+          content: content,
+          // Add other fields that might be expected by the UI
+          file_type: filename.split('.').pop(),
+          file_size: content.length,
+          created_date: new Date().toISOString(),
+          last_modified_date: new Date().toISOString(),
+          generated_date: new Date().toISOString(),
+          word_count: content ? content.split(/\s+/).length : 0,
+          character_count: content.length,
+          // Initialize empty fields for the editor
+          file_path: '',
+          title: '',
+          author: '',
+          language: '',
+          source: '',
+          version: '',
+          access_level: '',
+          license: '',
+          category: '',
+          metadata_version: '',
+          summary: '',
+          topics: '',
+          keywords: '',
+          key_phrases: '',
+          sentiment: '',
+          entities: '',
+          tags: '',
+          geolocation: '',
+          complexity_score: '',
+          readability_score: '',
+          reading_time: Math.ceil((content ? content.split(/\s+/).length : 0) / 200), // Assume 200 words per minute
+          paragraphs: content ? content.split(/\n\s*\n/).length : 0,
+          sentences: content ? content.split(/[.!?]+/).length - 1 : 0,
+          unique_word_count: 0,
+          average_sentence_length: 0,
+          links_count: 0,
+          image_count: 0,
+          our_comments: ''
+        };
+      } catch (error) {
+        db.close();
+        console.error(`[DocumentIndex] Error querying metadata:`, error);
+        return null;
+      }
+    } catch (error) {
+      console.error(`[DocumentIndex] Error getting document metadata:`, error);
+      return null;
+    }
   }
 
   async updateMetadataComments(id, comments) {
@@ -211,8 +286,37 @@ export class DocumentIndex {
   }
 
   async getMetadataStatus(collection) {
-    // Stub method - not implemented for simple metadata search
-    return [];
+    try {
+      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'collection.db');
+      
+      if (!fs.existsSync(dbPath)) {
+        return [];
+      }
+      
+      const dbBuffer = fs.readFileSync(dbPath);
+      const SQL = await initSqlJs();
+      const db = new SQL.Database(dbBuffer);
+      
+      try {
+        const results = db.exec("SELECT docid, filename FROM metadata");
+        db.close();
+        
+        if (!results || results.length === 0 || !results[0].values) {
+          return [];
+        }
+        
+        return results[0].values.map(row => ({
+          docid: row[0],
+          filename: row[1]
+        }));
+      } catch (error) {
+        db.close();
+        return [];
+      }
+    } catch (error) {
+      console.error('Error getting metadata status:', error);
+      return [];
+    }
   }
 
   async updateAllMetadata(metadata) {

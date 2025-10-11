@@ -139,15 +139,9 @@
         <!-- Method Selection -->
         <div class="method-selection">
             <h3>Select Search Methods:</h3>
-            <div class="method-checkboxes">
+            <div class="method-checkboxes" id="methodCheckboxes">
                 <label><input type="checkbox" id="selectAll"> Select All</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="document-index"> Document Index</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="line-search"> Line Search</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="document-search"> Document Search</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="smart-search"> Smart Search</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="hybrid-search"> Hybrid Search</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="ai-direct"> AI Direct</label>
-                <label><input type="checkbox" class="method-checkbox" data-method="ai-document-chat"> AI Document Chat</label>
+                <!-- Checkboxes will be dynamically generated from search-types.json -->
             </div>
             <div id="wildcardOption" style="display: none; margin-top: 10px;">
                 <label><input type="checkbox" id="useWildcardsMulti"> Use wildcards for substring matching</label>

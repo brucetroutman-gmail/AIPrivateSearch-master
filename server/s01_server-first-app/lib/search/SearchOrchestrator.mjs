@@ -64,26 +64,26 @@ export class SearchOrchestrator {
   }
 
   async indexCollectionMetadata(collection) {
-    return await this.searchMethods.metadata.indexCollection(collection);
+    return await this.searchMethods['document-index'].indexCollection(collection);
   }
 
   async cleanupMetaFiles(collection) {
-    return await this.searchMethods.metadata.cleanupMetaFiles(collection);
+    return await this.searchMethods['document-index'].cleanupMetaFiles(collection);
   }
 
   async getDocumentMetadata(collection, filename) {
-    return await this.searchMethods.metadata.getDocumentMetadata(collection, filename);
+    return await this.searchMethods['document-index'].getDocumentMetadata(collection, filename);
   }
 
   async updateMetadataComments(id, comments) {
-    return await this.searchMethods.metadata.updateMetadataComments(id, comments);
+    return await this.searchMethods['document-index'].updateMetadataComments(id, comments);
   }
 
   async getMetadataStatus(collection) {
-    return await this.searchMethods.metadata.getMetadataStatus(collection);
+    return await this.searchMethods['document-index'].getMetadataStatus(collection);
   }
 
   async updateAllMetadata(metadata) {
-    return await this.searchMethods.metadata.updateAllMetadata(metadata);
+    return await this.searchMethods['document-index'].updateAllMetadata(metadata);
   }
 }

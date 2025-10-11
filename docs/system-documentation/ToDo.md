@@ -237,7 +237,15 @@ specs-3-scoring
 
 113. Fix hybrid search endpoint URL from /hybrid to /hybrid-search --done
 
-114. 
+114. Create comprehensive user manual (AISearchScore-User-Manual.md) --done
+
+115. Change "Create Metadata" button to "Create Doc Indexes" and "Meta" badge to "Index" --done
+
+116. Fix SearchOrchestrator metadata method calls and implement getMetadataStatus --done
+
+117. Change user-facing "metadata" messages to "Doc Index" terminology --done
+
+118. metadata model is not working where is model coming from.
 
 
 

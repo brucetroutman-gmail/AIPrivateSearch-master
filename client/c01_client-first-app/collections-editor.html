@@ -239,7 +239,7 @@
                 <th>Source</th>
                 <th>Converted</th>
                 <th>Embedded</th>
-                <th>MetaData</th>
+                <th>Index</th>
               </tr>
             </thead>
             <tbody id="documentTableBody">
@@ -253,7 +253,7 @@
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
           <button class="btn btn-warning" onclick="convertDocuments()">Convert to MD</button>
-          <button class="btn btn-info" onclick="generateMetadata()">Create Metadata</button>
+          <button class="btn btn-info" onclick="generateMetadata()">Create Doc Index Cards</button>
           <button class="btn btn-primary" onclick="processDocuments()">Embed Source MDs</button>
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
@@ -310,10 +310,10 @@
     
     async function loadDocuments() {
       try {
-        const [filesResponse, indexedResponse, metadataResponse] = await Promise.all([
+        const [filesResponse, indexedResponse, documentIndexResponse] = await Promise.all([
           fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files?t=${Date.now()}`),
           fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/indexed`),
-          fetch(`http://localhost:3001/api/multi-search/metadata-status`, {
+          fetch(`http://localhost:3001/api/multi-search/document-index-status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ collection: currentCollection })
@@ -322,11 +322,11 @@
         
         const filesData = await filesResponse.json();
         const indexedData = await indexedResponse.json();
-        const metadataData = await metadataResponse.json();
+        const documentIndexData = await documentIndexResponse.json();
         
         documents = filesData.files || [];
         indexedDocuments = indexedData.documents || [];
-        metadataDocuments = metadataData.documents || [];
+        metadataDocuments = documentIndexData.documents || [];
         renderDocuments();
       } catch (error) {
         console.error('Error loading documents:', error);
@@ -426,10 +426,10 @@
           mdContent = `<span class="status-badge status-no">○</span>`;
         }
         
-        // Create Meta link or status (based on SQLite database)
-        const hasMetadata = group.mdFile && metadataDocuments.some(doc => doc.filename === group.mdFile);
-        const metaContent = hasMetadata ? 
-          `<a href="#" onclick="viewMetadata('${group.mdFile}')" class="ext-badge">META</a>` :
+        // Create Index link or status (based on SQLite database)
+        const hasDocumentIndex = group.mdFile && metadataDocuments.some(doc => doc.filename === group.mdFile);
+        const indexContent = hasDocumentIndex ? 
+          `<a href="#" onclick="viewDocumentIndex('${group.mdFile}')" class="ext-badge">Card</a>` :
           `<span class="status-badge status-no">○</span>`;
         
         // Check if this is a collection meta file to show dash in Embedded column
@@ -460,7 +460,7 @@
             ${isCollectionMeta ? '-' : `<span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">${isEmbedded ? '✓' : '○'}</span>`}
           </td>
           <td>
-            ${metaContent}
+            ${indexContent}
           </td>
         `;
         
@@ -700,21 +700,21 @@
     }
     
     async function generateMetadata() {
-      if (!await secureConfirm(`Generate AI metadata for collection '${currentCollection}'?\n\nThis will:\n• Create SQLite database entries with comprehensive metadata\n• Add DocIDs to source documents if missing`)) {
+      if (!await secureConfirm(`Generate AI Doc Indexes for collection '${currentCollection}'?\n\nThis will:\n• Create SQLite database entries with comprehensive document indexes\n• Add DocIDs to source documents if missing`)) {
         return;
       }
       
       setProcessingState(true);
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Generating AI metadata for collection: ${currentCollection}...`, 'processing');
+      showLog(`Generating AI Doc Indexes for collection: ${currentCollection}...`, 'processing');
       
       try {
         // Generate SQLite metadata database
-        showLog(`Generating SQLite metadata database...`);
+        showLog(`Generating SQLite document index database...`);
         const dbStartTime = Date.now();
         
-        const dbResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/metadata-index`, {
+        const dbResponse = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection })
@@ -733,7 +733,7 @@
         showLog(`\nTotal Time: ${totalElapsed}s`, 'info');
         loadDocuments(); // Refresh to show updated document list
       } catch (error) {
-        showLog(`✗ Error generating metadata: ${error.message}`, 'error');
+        showLog(`✗ Error generating Doc Indexes: ${error.message}`, 'error');
       } finally {
         setProcessingState(false);
       }
@@ -937,9 +937,9 @@
       loadDocuments(); // Refresh the document list
     }
     
-    async function viewMetadata(filename) {
+    async function viewDocumentIndex(filename) {
       try {
-        const response = await fetch(`http://localhost:3001/api/multi-search/metadata-view`, {
+        const response = await fetch(`http://localhost:3001/api/multi-search/document-index-view`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection, filename })
@@ -947,17 +947,17 @@
         
         const result = await response.json();
         
-        if (result.success && result.metadata) {
-          showMetadataEditor(result.metadata);
+        if (result.success && result.documentIndex) {
+          showDocumentIndexEditor(result.documentIndex);
         } else {
-          showLog(`✗ No metadata found for ${filename}`, 'error');
+          showLog(`✗ No Doc Index found for ${filename}`, 'error');
         }
       } catch (error) {
-        showLog(`✗ Error loading metadata: ${error.message}`, 'error');
+        showLog(`✗ Error loading Doc Index: ${error.message}`, 'error');
       }
     }
     
-    function showMetadataEditor(metadata) {
+    function showDocumentIndexEditor(documentIndex) {
       const modal = document.createElement('div');
       modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
       
@@ -968,45 +968,45 @@
       const textareaStyle = 'width: 100%; height: 60px; padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); resize: vertical;';
       
       const fields = [
-        ['DocID', metadata.doc_id, 'text', true],
-        ['Collection', metadata.collection, 'text', true],
-        ['Filename', metadata.filename, 'text', true],
-        ['File Type', metadata.file_type, 'text', true],
-        ['File Size', metadata.file_size, 'number', true],
-        ['File Path', metadata.file_path, 'text', false, 'metaFilePath'],
-        ['Title', metadata.title, 'text', false, 'metaTitle'],
-        ['Author', metadata.author, 'text', false, 'metaAuthor'],
-        ['Language', metadata.language, 'text', false, 'metaLanguage'],
-        ['Source', metadata.source, 'text', false, 'metaSource'],
-        ['Version', metadata.version, 'text', false, 'metaVersion'],
-        ['Access Level', metadata.access_level, 'text', false, 'metaAccessLevel'],
-        ['License', metadata.license, 'text', false, 'metaLicense'],
-        ['Category', metadata.category, 'text', false, 'metaCategory'],
-        ['Metadata Version', metadata.metadata_version, 'text', false, 'metaMetadataVersion'],
-        ['Topics', metadata.topics, 'text', false, 'metaTopics'],
-        ['Keywords', metadata.keywords, 'text', false, 'metaKeywords'],
-        ['Key Phrases', metadata.key_phrases, 'text', false, 'metaKeyPhrases'],
-        ['Sentiment', metadata.sentiment, 'text', false, 'metaSentiment'],
-        ['Entities', metadata.entities, 'text', false, 'metaEntities'],
-        ['Tags', metadata.tags, 'text', false, 'metaTags'],
-        ['Geolocation', metadata.geolocation, 'text', false, 'metaGeolocation'],
-        ['Complexity Score', metadata.complexity_score, 'number', false, 'metaComplexityScore'],
-        ['Readability Score', metadata.readability_score, 'text', false, 'metaReadabilityScore'],
-        ['Word Count', metadata.word_count, 'number', true],
-        ['Reading Time', metadata.reading_time, 'number', true],
-        ['Paragraphs', metadata.paragraphs, 'number', true],
-        ['Sentences', metadata.sentences, 'number', true],
-        ['Character Count', metadata.character_count, 'number', true],
-        ['Unique Words', metadata.unique_word_count, 'number', true],
-        ['Avg Sentence Length', metadata.average_sentence_length, 'number', true],
-        ['Links Count', metadata.links_count, 'number', true],
-        ['Image Count', metadata.image_count, 'number', true],
-        ['Created Date', metadata.created_date, 'text', true],
-        ['Modified Date', metadata.last_modified_date, 'text', true],
-        ['Generated Date', metadata.generated_date, 'text', true]
+        ['DocID', documentIndex.doc_id, 'text', true],
+        ['Collection', documentIndex.collection, 'text', true],
+        ['Filename', documentIndex.filename, 'text', true],
+        ['File Type', documentIndex.file_type, 'text', true],
+        ['File Size', documentIndex.file_size, 'number', true],
+        ['File Path', documentIndex.file_path, 'text', false, 'indexFilePath'],
+        ['Title', documentIndex.title, 'text', false, 'indexTitle'],
+        ['Author', documentIndex.author, 'text', false, 'indexAuthor'],
+        ['Language', documentIndex.language, 'text', false, 'indexLanguage'],
+        ['Source', documentIndex.source, 'text', false, 'indexSource'],
+        ['Version', documentIndex.version, 'text', false, 'indexVersion'],
+        ['Access Level', documentIndex.access_level, 'text', false, 'indexAccessLevel'],
+        ['License', documentIndex.license, 'text', false, 'indexLicense'],
+        ['Category', documentIndex.category, 'text', false, 'indexCategory'],
+        ['Index Version', documentIndex.metadata_version, 'text', false, 'indexMetadataVersion'],
+        ['Topics', documentIndex.topics, 'text', false, 'indexTopics'],
+        ['Keywords', documentIndex.keywords, 'text', false, 'indexKeywords'],
+        ['Key Phrases', documentIndex.key_phrases, 'text', false, 'indexKeyPhrases'],
+        ['Sentiment', documentIndex.sentiment, 'text', false, 'indexSentiment'],
+        ['Entities', documentIndex.entities, 'text', false, 'indexEntities'],
+        ['Tags', documentIndex.tags, 'text', false, 'indexTags'],
+        ['Geolocation', documentIndex.geolocation, 'text', false, 'indexGeolocation'],
+        ['Complexity Score', documentIndex.complexity_score, 'number', false, 'indexComplexityScore'],
+        ['Readability Score', documentIndex.readability_score, 'text', false, 'indexReadabilityScore'],
+        ['Word Count', documentIndex.word_count, 'number', true],
+        ['Reading Time', documentIndex.reading_time, 'number', true],
+        ['Paragraphs', documentIndex.paragraphs, 'number', true],
+        ['Sentences', documentIndex.sentences, 'number', true],
+        ['Character Count', documentIndex.character_count, 'number', true],
+        ['Unique Words', documentIndex.unique_word_count, 'number', true],
+        ['Avg Sentence Length', documentIndex.average_sentence_length, 'number', true],
+        ['Links Count', documentIndex.links_count, 'number', true],
+        ['Image Count', documentIndex.image_count, 'number', true],
+        ['Created Date', documentIndex.created_date, 'text', true],
+        ['Modified Date', documentIndex.last_modified_date, 'text', true],
+        ['Generated Date', documentIndex.generated_date, 'text', true]
       ];
       
-      let html = '<h3>All 39 Metadata Fields: ' + (metadata.filename || 'Unknown') + '</h3>';
+      let html = '<h3>All 39 Doc Index Fields: ' + (documentIndex.filename || 'Unknown') + '</h3>';
       html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin: 1rem 0; font-size: 0.9rem;">';
       
       fields.forEach(function(field) {
@@ -1023,12 +1023,12 @@
       });
       
       html += '</div>';
-      html += '<div><label><strong>Summary:</strong></label><br><textarea id="metaSummary" style="' + textareaStyle + '">' + (metadata.summary || '') + '</textarea></div>';
-      html += '<div><label><strong>Comments:</strong></label><br><textarea id="metaComments" style="' + textareaStyle + '">' + (metadata.our_comments || '') + '</textarea></div>';
+      html += '<div><label><strong>Summary:</strong></label><br><textarea id="indexSummary" style="' + textareaStyle + '">' + (documentIndex.summary || '') + '</textarea></div>';
+      html += '<div><label><strong>Comments:</strong></label><br><textarea id="indexComments" style="' + textareaStyle + '">' + (documentIndex.our_comments || '') + '</textarea></div>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">';
-      html += '<button type="button" onclick="exportMetadata()" class="btn btn-info">Save and Export</button>';
-      html += '<button type="button" onclick="saveAllMetadata(\'' + metadata.id + '\')" class="btn btn-primary">Save All</button>';
-      html += '<button type="button" onclick="closeMetadataEditor()" class="btn btn-secondary">Close</button>';
+      html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info">Save and Export</button>';
+      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save All</button>';
+      html += '<button type="button" onclick="closeDocumentIndexEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
       
       editor.innerHTML = html;
@@ -1036,97 +1036,97 @@
       modal.appendChild(editor);
       document.body.appendChild(modal);
       
-      window.currentMetadataModal = modal;
-      window.currentMetadata = metadata;
+      window.currentDocumentIndexModal = modal;
+      window.currentDocumentIndex = documentIndex;
     }
     
-    async function saveAllMetadata(metadataId) {
-      const updatedMetadata = {
-        id: metadataId,
-        file_path: document.getElementById('metaFilePath') ? document.getElementById('metaFilePath').value : '',
-        title: document.getElementById('metaTitle') ? document.getElementById('metaTitle').value : '',
-        author: document.getElementById('metaAuthor') ? document.getElementById('metaAuthor').value : '',
-        language: document.getElementById('metaLanguage') ? document.getElementById('metaLanguage').value : '',
-        source: document.getElementById('metaSource') ? document.getElementById('metaSource').value : '',
-        version: document.getElementById('metaVersion') ? document.getElementById('metaVersion').value : '',
-        access_level: document.getElementById('metaAccessLevel') ? document.getElementById('metaAccessLevel').value : '',
-        license: document.getElementById('metaLicense') ? document.getElementById('metaLicense').value : '',
-        category: document.getElementById('metaCategory') ? document.getElementById('metaCategory').value : '',
-        metadata_version: document.getElementById('metaMetadataVersion') ? document.getElementById('metaMetadataVersion').value : '',
-        summary: document.getElementById('metaSummary') ? document.getElementById('metaSummary').value : '',
-        topics: document.getElementById('metaTopics') ? document.getElementById('metaTopics').value : '',
-        keywords: document.getElementById('metaKeywords') ? document.getElementById('metaKeywords').value : '',
-        key_phrases: document.getElementById('metaKeyPhrases') ? document.getElementById('metaKeyPhrases').value : '',
-        sentiment: document.getElementById('metaSentiment') ? document.getElementById('metaSentiment').value : '',
-        entities: document.getElementById('metaEntities') ? document.getElementById('metaEntities').value : '',
-        tags: document.getElementById('metaTags') ? document.getElementById('metaTags').value : '',
-        geolocation: document.getElementById('metaGeolocation') ? document.getElementById('metaGeolocation').value : '',
-        complexity_score: document.getElementById('metaComplexityScore') ? document.getElementById('metaComplexityScore').value : '',
-        readability_score: document.getElementById('metaReadabilityScore') ? document.getElementById('metaReadabilityScore').value : '',
-        our_comments: document.getElementById('metaComments') ? document.getElementById('metaComments').value : ''
+    async function saveAllDocumentIndex(documentIndexId) {
+      const updatedDocumentIndex = {
+        id: documentIndexId,
+        file_path: document.getElementById('indexFilePath') ? document.getElementById('indexFilePath').value : '',
+        title: document.getElementById('indexTitle') ? document.getElementById('indexTitle').value : '',
+        author: document.getElementById('indexAuthor') ? document.getElementById('indexAuthor').value : '',
+        language: document.getElementById('indexLanguage') ? document.getElementById('indexLanguage').value : '',
+        source: document.getElementById('indexSource') ? document.getElementById('indexSource').value : '',
+        version: document.getElementById('indexVersion') ? document.getElementById('indexVersion').value : '',
+        access_level: document.getElementById('indexAccessLevel') ? document.getElementById('indexAccessLevel').value : '',
+        license: document.getElementById('indexLicense') ? document.getElementById('indexLicense').value : '',
+        category: document.getElementById('indexCategory') ? document.getElementById('indexCategory').value : '',
+        metadata_version: document.getElementById('indexMetadataVersion') ? document.getElementById('indexMetadataVersion').value : '',
+        summary: document.getElementById('indexSummary') ? document.getElementById('indexSummary').value : '',
+        topics: document.getElementById('indexTopics') ? document.getElementById('indexTopics').value : '',
+        keywords: document.getElementById('indexKeywords') ? document.getElementById('indexKeywords').value : '',
+        key_phrases: document.getElementById('indexKeyPhrases') ? document.getElementById('indexKeyPhrases').value : '',
+        sentiment: document.getElementById('indexSentiment') ? document.getElementById('indexSentiment').value : '',
+        entities: document.getElementById('indexEntities') ? document.getElementById('indexEntities').value : '',
+        tags: document.getElementById('indexTags') ? document.getElementById('indexTags').value : '',
+        geolocation: document.getElementById('indexGeolocation') ? document.getElementById('indexGeolocation').value : '',
+        complexity_score: document.getElementById('indexComplexityScore') ? document.getElementById('indexComplexityScore').value : '',
+        readability_score: document.getElementById('indexReadabilityScore') ? document.getElementById('indexReadabilityScore').value : '',
+        our_comments: document.getElementById('indexComments') ? document.getElementById('indexComments').value : ''
       };
       
       try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/metadata-update-all`, {
+        const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-update-all`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedMetadata)
+          body: JSON.stringify(updatedDocumentIndex)
         });
         
         const result = await response.json();
         
         if (result.success) {
-          showLog(`✓ Metadata saved successfully`, 'success');
-          closeMetadataEditor();
+          showLog(`✓ Doc Index saved successfully`, 'success');
+          closeDocumentIndexEditor();
         } else {
-          showLog(`✗ Failed to save metadata: ${result.error}`, 'error');
+          showLog(`✗ Failed to save Doc Index: ${result.error}`, 'error');
         }
       } catch (error) {
-        showLog(`✗ Error saving metadata: ${error.message}`, 'error');
+        showLog(`✗ Error saving Doc Index: ${error.message}`, 'error');
       }
     }
     
-    function exportMetadata() {
-      // Get current metadata from form
+    function exportDocumentIndex() {
+      // Get current document index from form
       const exportData = {
-        doc_id: window.currentMetadata.doc_id,
-        collection: window.currentMetadata.collection,
-        filename: window.currentMetadata.filename,
-        file_type: window.currentMetadata.file_type,
-        file_size: window.currentMetadata.file_size,
-        file_path: document.getElementById('metaFilePath') ? document.getElementById('metaFilePath').value : window.currentMetadata.file_path,
-        created_date: window.currentMetadata.created_date,
-        last_modified_date: window.currentMetadata.last_modified_date,
-        author: document.getElementById('metaAuthor') ? document.getElementById('metaAuthor').value : window.currentMetadata.author,
-        language: document.getElementById('metaLanguage') ? document.getElementById('metaLanguage').value : window.currentMetadata.language,
-        source: document.getElementById('metaSource') ? document.getElementById('metaSource').value : window.currentMetadata.source,
-        version: document.getElementById('metaVersion') ? document.getElementById('metaVersion').value : window.currentMetadata.version,
-        word_count: window.currentMetadata.word_count,
-        access_level: document.getElementById('metaAccessLevel') ? document.getElementById('metaAccessLevel').value : window.currentMetadata.access_level,
-        license: document.getElementById('metaLicense') ? document.getElementById('metaLicense').value : window.currentMetadata.license,
-        title: document.getElementById('metaTitle') ? document.getElementById('metaTitle').value : window.currentMetadata.title,
-        summary: document.getElementById('metaSummary') ? document.getElementById('metaSummary').value : window.currentMetadata.summary,
-        topics: document.getElementById('metaTopics') ? document.getElementById('metaTopics').value : window.currentMetadata.topics,
-        keywords: document.getElementById('metaKeywords') ? document.getElementById('metaKeywords').value : window.currentMetadata.keywords,
-        key_phrases: document.getElementById('metaKeyPhrases') ? document.getElementById('metaKeyPhrases').value : window.currentMetadata.key_phrases,
-        category: document.getElementById('metaCategory') ? document.getElementById('metaCategory').value : window.currentMetadata.category,
-        sentiment: document.getElementById('metaSentiment') ? document.getElementById('metaSentiment').value : window.currentMetadata.sentiment,
-        entities: document.getElementById('metaEntities') ? document.getElementById('metaEntities').value : window.currentMetadata.entities,
-        complexity_score: document.getElementById('metaComplexityScore') ? document.getElementById('metaComplexityScore').value : window.currentMetadata.complexity_score,
-        readability_score: document.getElementById('metaReadabilityScore') ? document.getElementById('metaReadabilityScore').value : window.currentMetadata.readability_score,
-        reading_time: window.currentMetadata.reading_time,
-        paragraphs: window.currentMetadata.paragraphs,
-        sentences: window.currentMetadata.sentences,
-        character_count: window.currentMetadata.character_count,
-        unique_word_count: window.currentMetadata.unique_word_count,
-        average_sentence_length: window.currentMetadata.average_sentence_length,
-        links_count: window.currentMetadata.links_count,
-        image_count: window.currentMetadata.image_count,
-        generated_date: window.currentMetadata.generated_date,
-        metadata_version: document.getElementById('metaMetadataVersion') ? document.getElementById('metaMetadataVersion').value : window.currentMetadata.metadata_version,
-        tags: document.getElementById('metaTags') ? document.getElementById('metaTags').value : window.currentMetadata.tags,
-        geolocation: document.getElementById('metaGeolocation') ? document.getElementById('metaGeolocation').value : window.currentMetadata.geolocation,
-        our_comments: document.getElementById('metaComments') ? document.getElementById('metaComments').value : window.currentMetadata.our_comments
+        doc_id: window.currentDocumentIndex.doc_id,
+        collection: window.currentDocumentIndex.collection,
+        filename: window.currentDocumentIndex.filename,
+        file_type: window.currentDocumentIndex.file_type,
+        file_size: window.currentDocumentIndex.file_size,
+        file_path: document.getElementById('indexFilePath') ? document.getElementById('indexFilePath').value : window.currentDocumentIndex.file_path,
+        created_date: window.currentDocumentIndex.created_date,
+        last_modified_date: window.currentDocumentIndex.last_modified_date,
+        author: document.getElementById('indexAuthor') ? document.getElementById('indexAuthor').value : window.currentDocumentIndex.author,
+        language: document.getElementById('indexLanguage') ? document.getElementById('indexLanguage').value : window.currentDocumentIndex.language,
+        source: document.getElementById('indexSource') ? document.getElementById('indexSource').value : window.currentDocumentIndex.source,
+        version: document.getElementById('indexVersion') ? document.getElementById('indexVersion').value : window.currentDocumentIndex.version,
+        word_count: window.currentDocumentIndex.word_count,
+        access_level: document.getElementById('indexAccessLevel') ? document.getElementById('indexAccessLevel').value : window.currentDocumentIndex.access_level,
+        license: document.getElementById('indexLicense') ? document.getElementById('indexLicense').value : window.currentDocumentIndex.license,
+        title: document.getElementById('indexTitle') ? document.getElementById('indexTitle').value : window.currentDocumentIndex.title,
+        summary: document.getElementById('indexSummary') ? document.getElementById('indexSummary').value : window.currentDocumentIndex.summary,
+        topics: document.getElementById('indexTopics') ? document.getElementById('indexTopics').value : window.currentDocumentIndex.topics,
+        keywords: document.getElementById('indexKeywords') ? document.getElementById('indexKeywords').value : window.currentDocumentIndex.keywords,
+        key_phrases: document.getElementById('indexKeyPhrases') ? document.getElementById('indexKeyPhrases').value : window.currentDocumentIndex.key_phrases,
+        category: document.getElementById('indexCategory') ? document.getElementById('indexCategory').value : window.currentDocumentIndex.category,
+        sentiment: document.getElementById('indexSentiment') ? document.getElementById('indexSentiment').value : window.currentDocumentIndex.sentiment,
+        entities: document.getElementById('indexEntities') ? document.getElementById('indexEntities').value : window.currentDocumentIndex.entities,
+        complexity_score: document.getElementById('indexComplexityScore') ? document.getElementById('indexComplexityScore').value : window.currentDocumentIndex.complexity_score,
+        readability_score: document.getElementById('indexReadabilityScore') ? document.getElementById('indexReadabilityScore').value : window.currentDocumentIndex.readability_score,
+        reading_time: window.currentDocumentIndex.reading_time,
+        paragraphs: window.currentDocumentIndex.paragraphs,
+        sentences: window.currentDocumentIndex.sentences,
+        character_count: window.currentDocumentIndex.character_count,
+        unique_word_count: window.currentDocumentIndex.unique_word_count,
+        average_sentence_length: window.currentDocumentIndex.average_sentence_length,
+        links_count: window.currentDocumentIndex.links_count,
+        image_count: window.currentDocumentIndex.image_count,
+        generated_date: window.currentDocumentIndex.generated_date,
+        metadata_version: document.getElementById('indexMetadataVersion') ? document.getElementById('indexMetadataVersion').value : window.currentDocumentIndex.metadata_version,
+        tags: document.getElementById('indexTags') ? document.getElementById('indexTags').value : window.currentDocumentIndex.tags,
+        geolocation: document.getElementById('indexGeolocation') ? document.getElementById('indexGeolocation').value : window.currentDocumentIndex.geolocation,
+        our_comments: document.getElementById('indexComments') ? document.getElementById('indexComments').value : window.currentDocumentIndex.our_comments
       };
       
       // Create filename with timestamp
@@ -1152,14 +1152,14 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showLog(`✓ Metadata exported to ${filename}`, 'success');
+      showLog(`✓ Doc Index exported to ${filename}`, 'success');
     }
     
-    function closeMetadataEditor() {
-      if (window.currentMetadataModal) {
-        document.body.removeChild(window.currentMetadataModal);
-        window.currentMetadataModal = null;
-        window.currentMetadata = null;
+    function closeDocumentIndexEditor() {
+      if (window.currentDocumentIndexModal) {
+        document.body.removeChild(window.currentDocumentIndexModal);
+        window.currentDocumentIndexModal = null;
+        window.currentDocumentIndex = null;
       }
     }
   </script>

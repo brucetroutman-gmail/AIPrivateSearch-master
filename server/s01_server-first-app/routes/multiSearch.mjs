@@ -132,8 +132,8 @@ router.get('/collections', async (req, res) => {
   }
 });
 
-// Index collection metadata into SQLite database
-router.post('/metadata-index', async (req, res) => {
+// Index collection document indexes into SQLite database
+router.post('/document-index-create', async (req, res) => {
   try {
     const { collection } = req.body;
     
@@ -148,9 +148,9 @@ router.post('/metadata-index', async (req, res) => {
       documentsProcessed: result.documentsProcessed
     });
   } catch (error) {
-    console.error('Metadata indexing error:', error);
+    console.error('Document index creation error:', error);
     res.status(500).json({ 
-      error: 'Metadata indexing failed', 
+      error: 'Doc Index creation failed', 
       message: error.message 
     });
   }
@@ -180,8 +180,8 @@ router.post('/cleanup-meta-files', async (req, res) => {
   }
 });
 
-// View metadata for a specific document
-router.post('/metadata-view', async (req, res) => {
+// View document index for a specific document
+router.post('/document-index-view', async (req, res) => {
   try {
     const { collection, filename } = req.body;
     
@@ -191,25 +191,25 @@ router.post('/metadata-view', async (req, res) => {
     
     const result = await searchOrchestrator.getDocumentMetadata(collection, filename);
     res.json({
-      success: true,
-      'document-index': result
+      success: !!result,
+      documentIndex: result
     });
   } catch (error) {
-    console.error('Metadata view error:', error);
+    console.error('Document index view error:', error);
     res.status(500).json({ 
-      error: 'Failed to load metadata', 
+      error: 'Failed to load Doc Index', 
       message: error.message 
     });
   }
 });
 
-// Update metadata comments
-router.post('/metadata-update', async (req, res) => {
+// Update document index comments
+router.post('/document-index-update', async (req, res) => {
   try {
     const { id, comments } = req.body;
     
     if (!id) {
-      return res.status(400).json({ error: 'Metadata ID is required' });
+      return res.status(400).json({ error: 'Document Index ID is required' });
     }
     
     const result = await searchOrchestrator.updateMetadataComments(id, comments);
@@ -218,39 +218,39 @@ router.post('/metadata-update', async (req, res) => {
       updated: result.updated
     });
   } catch (error) {
-    console.error('Metadata update error:', error);
+    console.error('Document index update error:', error);
     res.status(500).json({ 
-      error: 'Failed to update metadata', 
+      error: 'Failed to update Doc Index', 
       message: error.message 
     });
   }
 });
 
-// Update all metadata fields
-router.post('/metadata-update-all', async (req, res) => {
+// Update all document index fields
+router.post('/document-index-update-all', async (req, res) => {
   try {
-    const metadata = req.body;
+    const documentIndex = req.body;
     
-    if (!metadata.id) {
-      return res.status(400).json({ error: 'Metadata ID is required' });
+    if (!documentIndex.id) {
+      return res.status(400).json({ error: 'Document Index ID is required' });
     }
     
-    const result = await searchOrchestrator.updateAllMetadata(metadata);
+    const result = await searchOrchestrator.updateAllMetadata(documentIndex);
     res.json({
       success: true,
       updated: result.updated
     });
   } catch (error) {
-    console.error('Metadata update all error:', error);
+    console.error('Document index update all error:', error);
     res.status(500).json({ 
-      error: 'Failed to update metadata', 
+      error: 'Failed to update Doc Index', 
       message: error.message 
     });
   }
 });
 
-// Get metadata status for collection
-router.post('/metadata-status', async (req, res) => {
+// Get document index status for collection
+router.post('/document-index-status', async (req, res) => {
   try {
     const { collection } = req.body;
     
@@ -264,9 +264,9 @@ router.post('/metadata-status', async (req, res) => {
       documents: result
     });
   } catch (error) {
-    console.error('Metadata status error:', error);
+    console.error('Document index status error:', error);
     res.status(500).json({ 
-      error: 'Failed to get metadata status', 
+      error: 'Failed to get Doc Index status', 
       message: error.message 
     });
   }

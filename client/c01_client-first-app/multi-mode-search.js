@@ -272,7 +272,8 @@ async function performAllSearches() {
 // Get selected search methods
 function getSelectedMethods() {
     const selected = [];
-    methodCheckboxes.forEach(checkbox => {
+    const checkboxes = document.querySelectorAll('.method-checkbox');
+    checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
             selected.push(checkbox.dataset.method);
         }
@@ -282,29 +283,12 @@ function getSelectedMethods() {
 
 // Select All functionality
 selectAllCheckbox.addEventListener('change', function() {
-    methodCheckboxes.forEach(checkbox => {
+    const checkboxes = document.querySelectorAll('.method-checkbox');
+    checkboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });
     updateResultColumnVisibility();
     updateWildcardVisibility();
-});
-
-// Individual checkbox change handler
-methodCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        // Update Select All checkbox state
-        const allChecked = Array.from(methodCheckboxes).every(cb => cb.checked);
-        const noneChecked = Array.from(methodCheckboxes).every(cb => !cb.checked);
-        
-        selectAllCheckbox.checked = allChecked;
-        selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
-        
-        // Update column visibility
-        updateResultColumnVisibility();
-        
-        // Update wildcard option visibility
-        updateWildcardVisibility();
-    });
 });
 
 // Function to show/hide wildcard option based on selected methods
@@ -397,8 +381,56 @@ async function loadModels() {
     }
 }
 
+// Load search types and generate checkboxes
+async function loadSearchTypes() {
+    try {
+        const response = await fetch('config/search-types.json');
+        const data = await response.json();
+        const container = document.getElementById('methodCheckboxes');
+        
+        // Keep the Select All checkbox
+        const selectAllLabel = container.querySelector('label');
+        
+        // Clear existing checkboxes except Select All
+        while (container.children.length > 1) {
+            container.removeChild(container.lastChild);
+        }
+        
+        // Generate checkboxes from search-types.json
+        data.search_types.forEach(searchType => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'method-checkbox';
+            checkbox.dataset.method = searchType.value;
+            
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(' ' + searchType.name));
+            container.appendChild(label);
+            
+            // Add event listener for the new checkbox
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(document.querySelectorAll('.method-checkbox')).every(cb => cb.checked);
+                const noneChecked = Array.from(document.querySelectorAll('.method-checkbox')).every(cb => !cb.checked);
+                
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+                
+                updateResultColumnVisibility();
+                updateWildcardVisibility();
+            });
+        });
+        
+    } catch (error) {
+        console.error('Failed to load search types:', error);
+    }
+}
+
 // Initialize page
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load search types first
+    await loadSearchTypes();
+    
     // Hide all columns initially (show only when methods are selected)
     updateResultColumnVisibility();
     

@@ -69,6 +69,11 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
                          `[View Document](http://localhost:3001/api/documents/${collection}/${result.source})`;
           return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
         }).join('\n---\n\n');
+      } else if (searchType === 'ai-direct') {
+        // For AI Direct, format all results
+        searchResponse = methodResult.results.map((result, index) => {
+          return `**${result.title}**\n${result.excerpt}\n---\n`;
+        }).join('\n');
       } else {
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';

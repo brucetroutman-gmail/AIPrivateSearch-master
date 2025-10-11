@@ -2,7 +2,7 @@
   "search_types": [
     {
       "value": "document-index",
-      "name": "Document Index",
+      "name": "Document Index Cards",
       "description": "Structured queries using document metadata"
     },
     {
