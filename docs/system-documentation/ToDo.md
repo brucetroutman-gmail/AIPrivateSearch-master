@@ -213,11 +213,11 @@ specs-3-scoring
 
 102. metadata search (document Index) - fixed to use sql.js and proper error messaging --done
 
-103. Clean up response vews
+103. Clean up response vews  --done
 
-103. Change supporting files, functiond to be consistent with  titles . i.e. line search = exactMatch
+103. Change supporting files, functiond to be consistent with  titles . i.e. line search = exactMatch  --done
 
-104. change names meta -> Index, create metadata -> create Indexes
+104. change names meta -> Index, create metadata -> create Indexes  --done
 
 105. create user prompts based on source Type and collection and search type
 
@@ -245,7 +245,11 @@ specs-3-scoring
 
 117. Change user-facing "metadata" messages to "Doc Index" terminology --done
 
-118. metadata model is not working where is model coming from.
+118. metadata model is not working where is model coming from.  --done
+
+119. remove all timeouts  --done
+
+120. create user prompts based on source Type and collection and search type
 
 
 

@@ -141,7 +141,7 @@ router.post('/document-index-create', async (req, res) => {
       return res.status(400).json({ error: 'Collection parameter is required' });
     }
     
-    const result = await searchOrchestrator.indexCollectionMetadata(collection);
+    const result = await searchOrchestrator.indexCollectionDocumentIndex(collection);
     res.json({
       success: true,
       collection,
@@ -151,6 +151,32 @@ router.post('/document-index-create', async (req, res) => {
     console.error('Document index creation error:', error);
     res.status(500).json({ 
       error: 'Doc Index creation failed', 
+      message: error.message 
+    });
+  }
+});
+
+// Index single document for real-time progress
+router.post('/document-index-create-single', async (req, res) => {
+  try {
+    const { collection, filename } = req.body;
+    
+    if (!collection || !filename) {
+      return res.status(400).json({ error: 'Collection and filename parameters are required' });
+    }
+    
+    const result = await searchOrchestrator.indexSingleDocument(collection, filename);
+    res.json({
+      success: true,
+      collection,
+      filename,
+      docId: result.docId,
+      updated: result.updated
+    });
+  } catch (error) {
+    console.error('Single document index creation error:', error);
+    res.status(500).json({ 
+      error: 'Single Doc Index creation failed', 
       message: error.message 
     });
   }
@@ -189,7 +215,7 @@ router.post('/document-index-view', async (req, res) => {
       return res.status(400).json({ error: 'Collection and filename parameters are required' });
     }
     
-    const result = await searchOrchestrator.getDocumentMetadata(collection, filename);
+    const result = await searchOrchestrator.getDocumentIndex(collection, filename);
     res.json({
       success: !!result,
       documentIndex: result
@@ -212,7 +238,7 @@ router.post('/document-index-update', async (req, res) => {
       return res.status(400).json({ error: 'Document Index ID is required' });
     }
     
-    const result = await searchOrchestrator.updateMetadataComments(id, comments);
+    const result = await searchOrchestrator.updateDocumentIndexComments(id, comments);
     res.json({
       success: true,
       updated: result.updated
@@ -235,7 +261,7 @@ router.post('/document-index-update-all', async (req, res) => {
       return res.status(400).json({ error: 'Document Index ID is required' });
     }
     
-    const result = await searchOrchestrator.updateAllMetadata(documentIndex);
+    const result = await searchOrchestrator.updateAllDocumentIndex(documentIndex);
     res.json({
       success: true,
       updated: result.updated
@@ -258,7 +284,7 @@ router.post('/document-index-status', async (req, res) => {
       return res.status(400).json({ error: 'Collection parameter is required' });
     }
     
-    const result = await searchOrchestrator.getMetadataStatus(collection);
+    const result = await searchOrchestrator.getDocumentIndexStatus(collection);
     res.json({
       success: true,
       documents: result

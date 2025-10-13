@@ -1,5 +1,5 @@
 ---
-DocID: usa_902337
+DocID: USA_1760216076565_1
 ---
 
 # The Articles of Confederation

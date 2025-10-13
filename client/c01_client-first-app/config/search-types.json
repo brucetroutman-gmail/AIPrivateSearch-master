@@ -3,7 +3,7 @@
     {
       "value": "document-index",
       "name": "Document Index Cards",
-      "description": "Structured queries using document metadata"
+      "description": "Structured queries using document index cards"
     },
     {
       "value": "line-search",

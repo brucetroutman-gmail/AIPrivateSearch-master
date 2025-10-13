@@ -1187,7 +1187,7 @@ form.addEventListener('submit', async (e) => {
     } else if (searchType === 'document-index') {
       // Use metadata search common utility
       const searchStartTime = Date.now();
-      const searchResult = await window.metadataSearchCommon.performMetadataSearch(trimmedQuery, collection);
+      const searchResult = await window.documentIndexSearchCommon.performDocumentIndexSearch(trimmedQuery, collection);
       const searchEndTime = Date.now();
       
       const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');

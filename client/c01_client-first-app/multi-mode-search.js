@@ -99,8 +99,8 @@ async function performHybridSearch(query, collection) {
     return await window.hybridSearchCommon.performHybridSearch(query, collection, 5);
 }
 
-async function performMetadataSearch(query, collection = null) {
-    return await window.metadataSearchCommon.performMetadataSearch(query, collection);
+async function performDocumentIndexSearch(query, collection = null) {
+    return await window.documentIndexSearchCommon.performDocumentIndexSearch(query, collection);
 }
 
 async function performFullTextSearch(query, collection, useWildcards = false) {
@@ -240,7 +240,7 @@ async function performAllSearches() {
             methodMap['hybrid-search'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('document-index')) {
-            searchPromises.push(performMetadataSearch(query, collection));
+            searchPromises.push(performDocumentIndexSearch(query, collection));
             methodMap['document-index'] = searchPromises.length - 1;
         }
         if (selectedMethods.includes('document-search')) {

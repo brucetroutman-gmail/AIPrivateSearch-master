@@ -63,27 +63,31 @@ export class SearchOrchestrator {
     }
   }
 
-  async indexCollectionMetadata(collection) {
+  async indexCollectionDocumentIndex(collection) {
     return await this.searchMethods['document-index'].indexCollection(collection);
+  }
+
+  async indexSingleDocument(collection, filename) {
+    return await this.searchMethods['document-index'].indexSingleDocument(collection, filename);
   }
 
   async cleanupMetaFiles(collection) {
     return await this.searchMethods['document-index'].cleanupMetaFiles(collection);
   }
 
-  async getDocumentMetadata(collection, filename) {
-    return await this.searchMethods['document-index'].getDocumentMetadata(collection, filename);
+  async getDocumentIndex(collection, filename) {
+    return await this.searchMethods['document-index'].getDocumentIndex(collection, filename);
   }
 
-  async updateMetadataComments(id, comments) {
-    return await this.searchMethods['document-index'].updateMetadataComments(id, comments);
+  async updateDocumentIndexComments(id, comments) {
+    return await this.searchMethods['document-index'].updateDocumentIndexComments(id, comments);
   }
 
-  async getMetadataStatus(collection) {
-    return await this.searchMethods['document-index'].getMetadataStatus(collection);
+  async getDocumentIndexStatus(collection) {
+    return await this.searchMethods['document-index'].getDocumentIndexStatus(collection);
   }
 
-  async updateAllMetadata(metadata) {
-    return await this.searchMethods['document-index'].updateAllMetadata(metadata);
+  async updateAllDocumentIndex(documentIndex) {
+    return await this.searchMethods['document-index'].updateAllDocumentIndex(documentIndex);
   }
 }

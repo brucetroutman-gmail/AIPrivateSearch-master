@@ -11,7 +11,7 @@
       "size": "2.0 GB"
     },
     {
-      "category": "metadata",
+      "category": "document-index",
       "modelName": "llama3.2:3b",
       "size": "2.0 GB"
     },
