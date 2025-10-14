@@ -1,6 +1,6 @@
 {
   "name": "aisearchscore",
-  "version": "18.11",
+  "version": "19.00",
   "scripts": {
     "lint": "eslint .",
     "lint:security": "eslint . --config security/eslint.security.config.mjs",
