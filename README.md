@@ -93,20 +93,28 @@ Test local document search:
 ### Amazon Q Release Command
 For developers using Amazon Q Developer, use the **"release"** command to streamline version management:
 
+**Minor Version Bump:**
 ```
 release
 ```
 
+**Major Version Bump:**
+```
+release 19
+```
+
 This command:
-1. Bumps version by 0.01 (e.g., 18.03 → 18.04)
-2. Generates commit message in format: `vX.XX: [description of changes]`
-3. **Note**: Does not automatically commit - you must manually commit the changes
+1. **Minor bump** (`release`): Increments version by 0.01 (e.g., 18.03 → 18.04)
+2. **Major bump** (`release N`): Sets version to N.00 (e.g., `release 19` → 19.00)
+3. Updates version in README.md and both package.json files
+4. Generates commit message in format: `vX.XX: [description of changes]`
+5. **Note**: Does not automatically commit - you must manually commit the changes
 
 **Setup in new chat sessions:**
 ```
-I have a 'release' command that bumps version by 0.01 and creates a commit message
+I have a 'release' command that bumps version by 0.01, or 'release N' for major version N.00
 ```
 
 ---
 
-**Version**: 18.10 | **License**: MIT | **Website**: aisearch-n-score.com
+**Version**: 18.11 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: aisearch-n-score.com

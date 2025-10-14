@@ -194,6 +194,39 @@ else
     fi
 fi
 
+# Check for Rosetta on Apple Silicon Macs
+echo "🔍 Checking for Rosetta (Apple Silicon compatibility)..."
+if [[ $(uname -m) == "arm64" ]]; then
+    # Check if Rosetta is installed
+    if /usr/bin/pgrep -q oahd 2>/dev/null || arch -x86_64 /usr/bin/true 2>/dev/null; then
+        echo "✅ Rosetta found (Apple Silicon compatibility enabled)"
+    else
+        echo "❌ Rosetta not found."
+        echo "   Chrome and some other applications require Rosetta on Apple Silicon Macs."
+        echo ""
+        read -p "Would you like to install Rosetta now? (y/n): " -n 1 -r
+        echo ""
+        
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "📦 Installing Rosetta..."
+            echo "   This may take a few minutes and requires admin password..."
+            
+            if sudo softwareupdate --install-rosetta --agree-to-license 2>/dev/null; then
+                echo "   ✅ Rosetta installed successfully"
+            else
+                echo "   ⚠️  Rosetta installation may have failed or was cancelled"
+                echo "   You can install it manually later with:"
+                echo "   sudo softwareupdate --install-rosetta --agree-to-license"
+            fi
+        else
+            echo "⚠️  Continuing without Rosetta installation."
+            echo "   Some applications may show compatibility warnings."
+        fi
+    fi
+else
+    echo "✅ Intel Mac detected - Rosetta not needed"
+fi
+
 echo "✅ All prerequisites checked and installed"
 echo ""
 

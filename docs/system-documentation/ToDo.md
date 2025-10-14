@@ -249,8 +249,24 @@ specs-3-scoring
 
 119. remove all timeouts  --done
 
+-------------- for version 19 -------------------
+
 120. create user prompts based on source Type and collection and search type
 
+121. focus on display and layout
+
+122. review processing of each search type. creaate 3 prompts for sourcetype, collection,
+searchtype. Store prompts in .json configs
+
+123. We need to place source documents outside of repo. 
+
+124. Create a quick start guide.
+
+125. Connect with SecureAccess create roles Admin, User, Developer (start with user) pay for admin, developer
+
+126. enhance database saving add documents only
+
+127. 
 
 
 
