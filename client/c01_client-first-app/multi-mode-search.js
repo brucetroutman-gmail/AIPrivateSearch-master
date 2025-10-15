@@ -14,13 +14,13 @@ const useWildcardsMulti = document.getElementById('useWildcardsMulti');
 
 // Search methods configuration (names only - endpoints are hardcoded in functions)
 const searchMethods = {
+    'document-index': { name: 'Document Index Cards' },
     'line-search': { name: 'Line Search' },
-    'ai-direct': { name: 'AI Direct' },
-    'ai-document-chat': { name: 'AI Document Chat' },
+    'document-search': { name: 'Document Search' },
     'smart-search': { name: 'Smart Search' },
     'hybrid-search': { name: 'Hybrid Search' },
-    'document-index': { name: 'Document Index' },
-    'document-search': { name: 'Document Search' }
+    'ai-direct': { name: 'AI Direct' },
+    'ai-document-chat': { name: 'AI Document Chat' }
 };
 
 // Real API search functions
@@ -121,30 +121,36 @@ function updatePerformanceTable(results) {
     while (performanceTableBody.firstChild) {
         performanceTableBody.removeChild(performanceTableBody.firstChild);
     }
-    Object.entries(results).forEach(([method, data]) => {
-        const row = document.createElement('tr');
-        const avgScore = data.results.length > 0 
-            ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length).toFixed(2)
-            : '0.00';
-        
-        const nameCell = document.createElement('td');
-        nameCell.textContent = searchMethods[method].name;
-        
-        const countCell = document.createElement('td');
-        countCell.textContent = data.results.length;
-        
-        const timeCell = document.createElement('td');
-        timeCell.textContent = `${(data.time / 1000).toFixed(2)}s`;
-        
-        const scoreCell = document.createElement('td');
-        scoreCell.textContent = avgScore;
-        
-        row.appendChild(nameCell);
-        row.appendChild(countCell);
-        row.appendChild(timeCell);
-        row.appendChild(scoreCell);
-        
-        performanceTableBody.appendChild(row);
+    
+    // Maintain the correct order based on searchMethods object
+    const orderedMethods = Object.keys(searchMethods);
+    orderedMethods.forEach(method => {
+        if (results[method]) {
+            const data = results[method];
+            const row = document.createElement('tr');
+            const avgScore = data.results.length > 0 
+                ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length).toFixed(2)
+                : '0.00';
+            
+            const nameCell = document.createElement('td');
+            nameCell.textContent = searchMethods[method].name;
+            
+            const countCell = document.createElement('td');
+            countCell.textContent = data.results.length;
+            
+            const timeCell = document.createElement('td');
+            timeCell.textContent = `${(data.time / 1000).toFixed(2)}s`;
+            
+            const scoreCell = document.createElement('td');
+            scoreCell.textContent = avgScore;
+            
+            row.appendChild(nameCell);
+            row.appendChild(countCell);
+            row.appendChild(timeCell);
+            row.appendChild(scoreCell);
+            
+            performanceTableBody.appendChild(row);
+        }
     });
     performanceSection.style.display = 'block';
 }

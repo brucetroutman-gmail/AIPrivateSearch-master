@@ -115,11 +115,11 @@
         <div class="collections-header">
           <div class="collections-title">Create New Collection</div>
         </div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-          <input type="text" id="newCollectionName" placeholder="Enter collection name" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--card-bg); color: var(--text-color);">
+        <div class="flex-gap-center">
+          <input type="text" id="newCollectionName" placeholder="Enter collection name" class="collection-name-input">
           <button class="btn btn-primary" onclick="createNewCollection()">Create Collection</button>
         </div>
-        <div id="createMessage" style="margin-top: 1rem; padding: 0.5rem; border-radius: 4px; display: none;"></div>
+        <div id="createMessage" class="create-message hidden"></div>
       </div>
       
       <div class="collections-section">

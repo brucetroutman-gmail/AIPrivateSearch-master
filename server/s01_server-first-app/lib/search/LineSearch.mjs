@@ -1,6 +1,7 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import path from 'path';
 import { createInterface } from 'readline';
+import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 
 export class LineSearch {
   constructor() {
@@ -119,7 +120,7 @@ export class LineSearch {
         results.push({
           id: `${path.basename(filePath)}_${line.number}`,
           title: path.basename(filePath),
-          excerpt: this.highlightQueryTerms(contextLines.join('\n'), query, options),
+          excerpt: ExcerptFormatter.highlightMatches(contextLines.join('\n'), query),
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,

@@ -41,12 +41,7 @@ window.documentIndexSearchCommon = {
                     </div>
                     <div class="result-excerpt">${result.excerpt}</div>
                     <div class="result-meta">
-                        <span class="source">${result.source}</span>
-                        <a href="http://localhost:3001/api/documents/${collection}/${result.source}" 
-                           target="_blank" 
-                           style="margin-left: 10px; color: #007bff;">
-                           [View Document]
-                        </a>
+                        ${window.documentViewerCommon.createViewDocumentLink(collection, result.source)}
                     </div>
                 </div>
             `;

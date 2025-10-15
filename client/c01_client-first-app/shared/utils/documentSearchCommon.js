@@ -53,8 +53,7 @@ class DocumentSearchCommon {
             ${result.excerpt}
           </div>
           <div class="result-meta">
-            <span class="source">${this.escapeHtml(result.source)}</span>
-            ${result.documentPath ? `<a href="${result.documentPath}" target="_blank" style="margin-left: 10px; color: #007bff;">[View Document]</a>` : ''}
+            ${result.documentPath ? window.documentViewerCommon.createViewDocumentLink(result.collection || 'default', result.filename || result.title) : ''}
           </div>
         </div>
       `;

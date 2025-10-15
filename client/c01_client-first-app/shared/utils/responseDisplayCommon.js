@@ -31,6 +31,14 @@ window.responseDisplayCommon = {
             return;
         }
         
+        if (searchResult.method === 'document-index') {
+            const formattedHTML = window.documentIndexSearchCommon.formatDocumentIndexSearchResults(searchResult.results, collection);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(formattedHTML, 'text/html');
+            container.appendChild(doc.body.firstElementChild);
+            return;
+        }
+        
         // Format other search types with consistent styling
         searchResult.results.forEach((result) => {
             const div = document.createElement('div');
@@ -71,27 +79,18 @@ window.responseDisplayCommon = {
             const meta = document.createElement('div');
             meta.className = 'result-meta';
             
-            const source = document.createElement('span');
-            source.className = 'source';
-            source.textContent = result.source;
-            meta.appendChild(source);
-            
             // Add View Document link
             if (result.source && collection) {
-                const link = document.createElement('a');
-                link.href = `http://localhost:3001/api/documents/${collection}/${result.source}`;
-                link.textContent = ' [View Document]';
-                link.target = '_blank';
-                link.style.marginLeft = '10px';
-                link.style.color = '#007bff';
-                meta.appendChild(link);
+                const linkHtml = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(linkHtml, 'text/html');
+                meta.appendChild(doc.body.firstElementChild);
             } else if (result.documentPath) {
                 const link = document.createElement('a');
                 link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
-                link.textContent = ' [View Document]';
+                link.textContent = 'View Document';
                 link.target = '_blank';
-                link.style.marginLeft = '10px';
-                link.style.color = '#007bff';
+                link.className = 'view-document-link';
                 meta.appendChild(link);
             }
             

@@ -141,14 +141,24 @@ router.post('/convert-selected', async (req, res) => {
         } else {
           const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.md'));
           
-          // Read source file
-          const content = await secureFs.readFile(sourcePath, 'utf8');
-          
-          // Simple conversion - just wrap in markdown code block for non-text files
           let markdownContent;
+          
           if (ext === 'txt') {
+            const content = await secureFs.readFile(sourcePath, 'utf8');
             markdownContent = content;
+          } else if (ext === 'docx' || ext === 'doc') {
+            try {
+              const mammoth = await import('mammoth');
+              const buffer = await secureFs.readFile(sourcePath);
+              const result = await mammoth.extractRawText({ buffer });
+              const baseFilename = filename.replace(/\.[^.]+$/, '');
+              markdownContent = `# ${baseFilename}\nDocID: ${baseFilename.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now().toString().slice(-6)}_${Math.random().toString(36).slice(2, 11)}\n\n${result.value.trim()}`;
+            } catch (docxError) {
+              markdownContent = `# ${filename}\n\n[Error converting DOCX: ${docxError.message}]`;
+            }
           } else {
+            // For other file types, read as text and wrap in code block
+            const content = await secureFs.readFile(sourcePath, 'utf8');
             markdownContent = `# ${filename}\n\n\`\`\`\n${content}\n\`\`\``;
           }
           

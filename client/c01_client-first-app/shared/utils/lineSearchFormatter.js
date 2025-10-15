@@ -18,7 +18,7 @@ function convertMarkdownToHTML(markdown) {
             const afterLink = line.substring(linkMatch.index + linkMatch[0].length);
             
             html += beforeLink;
-            html += `<a href="${linkMatch[2]}" target="_blank" style="color: #007bff; text-decoration: underline;">${linkMatch[1]}</a>`;
+            html += `<a href="${linkMatch[2]}" target="_blank" class="view-document-link">${linkMatch[1]}</a>`;
             html += afterLink;
         } else if (line.startsWith('**') && line.endsWith('**')) {
             // Handle bold headers
@@ -26,7 +26,7 @@ function convertMarkdownToHTML(markdown) {
             html += `<strong>${boldText}</strong>`;
         } else if (line === '---') {
             // Handle separators
-            html += '<hr style="margin: 1rem 0; border: 1px solid var(--border-color);">';
+            html += '<hr class="result-separator">';
         } else {
             html += line;
         }

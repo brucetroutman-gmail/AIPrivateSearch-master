@@ -347,8 +347,8 @@
       documents.forEach(doc => {
         const fileName = typeof doc === 'string' ? doc : doc.name;
         
-        // Skip collection.db file
-        if (fileName === 'collection.db') {
+        // Skip database files
+        if (fileName === 'index-cards.db' || fileName === 'embeddings.db') {
           return;
         }
         

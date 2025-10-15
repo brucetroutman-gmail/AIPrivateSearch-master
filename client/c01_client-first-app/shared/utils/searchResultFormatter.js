@@ -47,7 +47,7 @@ class SearchResultFormatter {
           </div>
           <div class="result-meta">
             <span class="source">${this.escapeHtml(result.source)}</span>
-            ${result.documentPath ? `<a href="${result.documentPath}" target="_blank" style="margin-left: 10px; color: #007bff;">[View Document]</a>` : ''}
+            ${result.documentPath ? `<a href="${result.documentPath}" target="_blank" class="view-document-link">View Document</a>` : ''}
           </div>
         </div>
       `;

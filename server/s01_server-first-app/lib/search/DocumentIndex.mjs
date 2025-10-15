@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import initSqlJs from 'sql.js';
 import { OllamaService } from '../services/OllamaService.mjs';
+import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 
 export class DocumentIndex {
   constructor() {
@@ -15,7 +16,7 @@ export class DocumentIndex {
     try {
       console.log(`[DocumentIndexSearch] Document Index search for: "${query}" in collection: "${collection}"`);
       
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'collection.db');
+      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
       console.log(`[DocumentIndexSearch] Database path: ${dbPath}`);
       
       if (!fs.existsSync(dbPath)) {
@@ -108,8 +109,8 @@ export class DocumentIndex {
       return {
         results: formattedResults.map(doc => ({
           id: doc.docid,
-          title: doc.filename.replace('.md', ''),
-          excerpt: doc.content.substring(0, 200) + '...',
+          title: doc.filename.replace('.md', '').replace('.json', ''),
+          excerpt: ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, query),
           score: doc.score,
           source: doc.filename
         })),
@@ -128,7 +129,7 @@ export class DocumentIndex {
   async indexCollection(collection) {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
-    const dbPath = path.join(collectionPath, 'collection.db');
+    const dbPath = path.join(collectionPath, 'index-cards.db');
     
     console.log(`Creating AI-powered Doc Index database for collection: ${collection}`);
     
@@ -373,7 +374,7 @@ ${content.substring(0, 4000)}`;
 
   async getDocumentIndex(collection, filename) {
     try {
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'collection.db');
+      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
       
       if (!fs.existsSync(dbPath)) {
         console.log(`[DocumentIndex] Database file does not exist: ${dbPath}`);
@@ -462,7 +463,7 @@ ${content.substring(0, 4000)}`;
 
   async getDocumentIndexStatus(collection) {
     try {
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'collection.db');
+      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
       
       if (!fs.existsSync(dbPath)) {
         return [];
@@ -502,7 +503,7 @@ ${content.substring(0, 4000)}`;
   async indexSingleDocument(collection, filename) {
     const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
-    const dbPath = path.join(collectionPath, 'collection.db');
+    const dbPath = path.join(collectionPath, 'index-cards.db');
     const filePath = path.join(collectionPath, filename);
     
     console.log(`Processing single document: ${filename} in collection: ${collection}`);
@@ -656,7 +657,7 @@ ${content.substring(0, 4000)}`;
           let jsonStr = jsonMatch[0]
             .replace(/'/g, '"')  // Replace single quotes with double quotes
             .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')  // Quote unquoted keys
-            .replace(/:\s*([^"\[\{][^,}\]]*[^,}\]\s])([,}])/g, ': "$1"$2');  // Quote unquoted string values
+            .replace(/:\s*([^"[\{][^,}\]]*[^,}\]\s])([,}])/g, ': "$1"$2');  // Quote unquoted string values
           
           analysis = JSON.parse(jsonStr);
         } catch (parseError) {

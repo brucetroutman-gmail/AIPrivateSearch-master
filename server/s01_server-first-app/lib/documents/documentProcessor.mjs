@@ -6,7 +6,7 @@ import { Ollama } from 'ollama';
 
 export class DocumentProcessor {
   constructor() {
-    this.supportedFormats = ['.txt', '.pdf'];
+    this.supportedFormats = ['.txt', '.pdf', '.docx', '.doc'];
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.metadataModel = null;
     this.docIdCounter = 1;
@@ -118,6 +118,9 @@ export class DocumentProcessor {
         return await this.processText(filePath);
       case '.pdf':
         return await this.processPDF(filePath);
+      case '.docx':
+      case '.doc':
+        return await this.processDocx(filePath);
       default:
         throw new Error(`Unsupported file format: ${ext}`);
     }
@@ -141,6 +144,20 @@ export class DocumentProcessor {
       return `# ${filename}\n\n${stdout.trim()}`;
     } catch (error) {
       return `# ${filename}\n\n[Error extracting PDF content: ${error.message}]`;
+    }
+  }
+
+  async processDocx(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const mammoth = await import('mammoth');
+      const buffer = await secureFs.readFile(filePath);
+      const result = await mammoth.extractRawText({ buffer });
+      return `# ${filename}\n\n${result.value.trim()}`;
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting DOCX content: ${error.message}]`;
     }
   }
 

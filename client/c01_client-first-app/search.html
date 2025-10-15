@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="shared/styles.css?v=20241003">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
+  <script src="shared/utils/documentViewerCommon.js"></script>
   <script src="shared/utils/lineSearchFormatter.js"></script>
   <script src="shared/utils/documentSearchCommon.js"></script>
   <script src="shared/utils/documentIndexSearchCommon.js"></script>
@@ -293,21 +294,21 @@
               </select>
             </div>
             
-            <div id="collectionSection" class="field" style="display: none;">
+            <div id="collectionSection" class="field hidden">
               <label for="collection">Collection</label>
               <select id="collection">
                 <option value="">Loading collections...</option>
               </select>
             </div>
             
-            <div id="searchTypeSection" class="field" style="display: none;">
+            <div id="searchTypeSection" class="field hidden">
               <label for="searchType">Search Type</label>
               <select id="searchType">
                 <option value="">Loading search types...</option>
               </select>
             </div>
             
-            <div id="wildcardSection" class="field" style="display: none;">
+            <div id="wildcardSection" class="field hidden">
               <label class="checkbox-label">
                 <input type="checkbox" id="useWildcards" />
                 Use wildcards for substring matching
@@ -358,10 +359,10 @@
             </div>
             
             <div class="field">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div class="flex-between">
                 <label for="userPrompts">User Prompts</label>
-                <label class="checkbox-label" style="margin: 0; font-size: 0.9rem;">
-                  <input type="checkbox" id="addMetaPrompt" style="margin-right: 0.3rem;" />
+                <label class="checkbox-label small-label">
+                  <input type="checkbox" id="addMetaPrompt" class="checkbox-input" />
                   Add Meta Prompt
                 </label>
               </div>
@@ -390,7 +391,7 @@
                 Auto Export to Database
               </label>
               
-              <label id="showChunksLabel" class="checkbox-label adv-only" style="display: none;">
+              <label id="showChunksLabel" class="checkbox-label adv-only hidden">
                 <input type="checkbox" id="showChunksToggle" />
                 Show source chunks
               </label>
@@ -398,7 +399,7 @@
           </fieldset>
 
           <!-- Scoring Section -->
-          <fieldset id="scoringSection" class="form-group" style="display: none;">
+          <fieldset id="scoringSection" class="form-group hidden">
             <legend>📊 Scoring</legend>
             <div class="field">
               <label for="scoreModel">Score Model</label>

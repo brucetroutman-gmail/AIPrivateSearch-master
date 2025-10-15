@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 const collectionPath = '../../sources/local-documents/Family-Documents';
-const dbPath = path.join(collectionPath, 'collection.db');
+const dbPath = path.join(collectionPath, 'index-cards.db');
 
 // Initialize SQL.js
 const SQL = await initSqlJs();

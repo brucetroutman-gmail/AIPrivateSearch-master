@@ -1,0 +1,307 @@
+[
+DocID: Med_1760555267972_pmov5zt7n
+  {
+    "patient_id": "P001",
+    "medical_history_item": "Osteosarcoma diagnosed in 2023"
+  },
+  {
+    "patient_id": "P001",
+    "medical_history_item": "Right femur fracture (2018)"
+  },
+  {
+    "patient_id": "P001",
+    "medical_history_item": "Hypertension"
+  },
+  {
+    "patient_id": "P001",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P002",
+    "medical_history_item": "Osteoarthritis"
+  },
+  {
+    "patient_id": "P002",
+    "medical_history_item": "Type 2 diabetes"
+  },
+  {
+    "patient_id": "P002",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P003",
+    "medical_history_item": "Lung cancer with bone metastasis (2024)"
+  },
+  {
+    "patient_id": "P003",
+    "medical_history_item": "Hypertension"
+  },
+  {
+    "patient_id": "P003",
+    "medical_history_item": "Allergic to penicillin"
+  },
+  {
+    "patient_id": "P004",
+    "medical_history_item": "Tibial fracture (2025)"
+  },
+  {
+    "patient_id": "P004",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P004",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P005",
+    "medical_history_item": "Chondrosarcoma"
+  },
+  {
+    "patient_id": "P005",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P005",
+    "medical_history_item": "Allergic to sulfa drugs"
+  },
+  {
+    "patient_id": "P006",
+    "medical_history_item": "Knee osteoarthritis"
+  },
+  {
+    "patient_id": "P006",
+    "medical_history_item": "Hyperlipidemia"
+  },
+  {
+    "patient_id": "P006",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P007",
+    "medical_history_item": "Ewing sarcoma"
+  },
+  {
+    "patient_id": "P007",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P007",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P008",
+    "medical_history_item": "Spinal tumor"
+  },
+  {
+    "patient_id": "P008",
+    "medical_history_item": "Hypothyroidism"
+  },
+  {
+    "patient_id": "P008",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P009",
+    "medical_history_item": "Recurrent shoulder dislocation"
+  },
+  {
+    "patient_id": "P009",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P009",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P010",
+    "medical_history_item": "Osteosarcoma"
+  },
+  {
+    "patient_id": "P010",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P010",
+    "medical_history_item": "Allergic to latex"
+  },
+  {
+    "patient_id": "P011",
+    "medical_history_item": "Ankle fracture"
+  },
+  {
+    "patient_id": "P011",
+    "medical_history_item": "Hypertension"
+  },
+  {
+    "patient_id": "P011",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P012",
+    "medical_history_item": "Bone cyst"
+  },
+  {
+    "patient_id": "P012",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P012",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P013",
+    "medical_history_item": "Hip fracture"
+  },
+  {
+    "patient_id": "P013",
+    "medical_history_item": "Type 2 diabetes"
+  },
+  {
+    "patient_id": "P013",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P014",
+    "medical_history_item": "Multiple myeloma"
+  },
+  {
+    "patient_id": "P014",
+    "medical_history_item": "Osteoporosis"
+  },
+  {
+    "patient_id": "P014",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P015",
+    "medical_history_item": "Rotator cuff tear"
+  },
+  {
+    "patient_id": "P015",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P015",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P016",
+    "medical_history_item": "Osteosarcoma"
+  },
+  {
+    "patient_id": "P016",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P016",
+    "medical_history_item": "Allergic to penicillin"
+  },
+  {
+    "patient_id": "P017",
+    "medical_history_item": "Knee osteoarthritis"
+  },
+  {
+    "patient_id": "P017",
+    "medical_history_item": "Hypertension"
+  },
+  {
+    "patient_id": "P017",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P018",
+    "medical_history_item": "Breast cancer with bone metastasis"
+  },
+  {
+    "patient_id": "P018",
+    "medical_history_item": "Osteoporosis"
+  },
+  {
+    "patient_id": "P018",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P019",
+    "medical_history_item": "Femoral fracture"
+  },
+  {
+    "patient_id": "P019",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P019",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P020",
+    "medical_history_item": "Chondrosarcoma"
+  },
+  {
+    "patient_id": "P020",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P020",
+    "medical_history_item": "Allergic to sulfa drugs"
+  },
+  {
+    "patient_id": "P021",
+    "medical_history_item": "Elbow dislocation"
+  },
+  {
+    "patient_id": "P021",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P021",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P022",
+    "medical_history_item": "Osteosarcoma"
+  },
+  {
+    "patient_id": "P022",
+    "medical_history_item": "No other conditions"
+  },
+  {
+    "patient_id": "P022",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P023",
+    "medical_history_item": "Hip osteoarthritis"
+  },
+  {
+    "patient_id": "P023",
+    "medical_history_item": "Hypertension"
+  },
+  {
+    "patient_id": "P023",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P024",
+    "medical_history_item": "Bone tumor"
+  },
+  {
+    "patient_id": "P024",
+    "medical_history_item": "Hypothyroidism"
+  },
+  {
+    "patient_id": "P024",
+    "medical_history_item": "No known allergies"
+  },
+  {
+    "patient_id": "P025",
+    "medical_history_item": "Clavicle fracture"
+  },
+  {
+    "patient_id": "P025",
+    "medical_history_item": "No chronic conditions"
+  },
+  {
+    "patient_id": "P025",
+    "medical_history_item": "No known allergies"
+  }
+]

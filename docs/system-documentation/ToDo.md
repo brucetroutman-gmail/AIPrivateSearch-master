@@ -270,6 +270,10 @@ searchtype. Store prompts in .json configs
 
 128. Make View Documnet consistent across all types, Add View Index Card to Doc Index Cards response
 
+129. review doc index card creation add  remove fields change models overall improve.
+
+
+
 
 
 

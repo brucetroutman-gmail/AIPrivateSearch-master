@@ -89,6 +89,7 @@
     </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
+    <script src="shared/utils/documentViewerCommon.js"></script>
     <script src="shared/utils/lineSearchFormatter.js"></script>
     <script src="shared/utils/documentSearchCommon.js"></script>
     <script src="shared/utils/documentIndexSearchCommon.js"></script>
@@ -143,7 +144,7 @@
                 <label><input type="checkbox" id="selectAll"> Select All</label>
                 <!-- Checkboxes will be dynamically generated from search-types.json -->
             </div>
-            <div id="wildcardOption" style="display: none; margin-top: 10px;">
+            <div id="wildcardOption" class="wildcard-option hidden">
                 <label><input type="checkbox" id="useWildcardsMulti"> Use wildcards for substring matching</label>
             </div>
             <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
@@ -154,8 +155,8 @@
         <!-- Results Grid -->
         <div class="results-grid">
             <div class="result-column" id="document-index-results">
-                <h3>Document Index</h3>
-                <div class="method-description">Structured queries using document metadata</div>
+                <h3>Document Index Cards</h3>
+                <div class="method-description">Structured queries using document index cards</div>
                 <div class="results-container" id="document-index-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
@@ -179,7 +180,7 @@
 
             <div class="result-column" id="smart-search-results">
                 <h3>Smart Search</h3>
-                <div class="method-description">Finds conceptually related content using AI understanding</div>
+                <div class="method-description">Semantic similarity using embeddings</div>
                 <div class="results-container" id="smart-search-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
@@ -187,14 +188,14 @@
 
             <div class="result-column" id="hybrid-search-results">
                 <h3>Hybrid Search</h3>
-                <div class="method-description">Combined keyword and semantic methods</div>
+                <div class="method-description">Combined traditional and vector methods</div>
                 <div class="results-container" id="hybrid-search-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>
 
             <div class="result-column" id="ai-direct-results">
-                <h3>AI Direct Search</h3>
+                <h3>AI Direct</h3>
                 <div class="method-description">Question-answering models for contextual understanding</div>
                 <div class="results-container" id="ai-direct-container">
                     <div class="no-results">Click "Search All Methods" to see results</div>
@@ -208,12 +209,10 @@
                     <div class="no-results">Click "Search All Methods" to see results</div>
                 </div>
             </div>
-
-
         </div>
 
         <!-- Performance Comparison -->
-        <div class="performance-section" id="performanceSection" style="display: none;">
+        <div class="performance-section hidden" id="performanceSection">
             <h3>Performance Comparison</h3>
             <table class="performance-table">
                 <thead>
