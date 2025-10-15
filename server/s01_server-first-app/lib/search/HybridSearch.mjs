@@ -79,7 +79,8 @@ export class HybridSearch {
     
     const files = await secureFs.readdir(collectionPath);
     const documentFiles = files.filter(file => 
-      file.endsWith('.md') && !file.startsWith('META_')
+      !file.startsWith('DOCIDX_') && 
+      (file.endsWith('.md') || file.endsWith('.json'))
     );
     
     console.log(`Indexing ${documentFiles.length} documents for hybrid search`);

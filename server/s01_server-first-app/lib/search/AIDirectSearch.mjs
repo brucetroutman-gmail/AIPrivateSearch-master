@@ -49,8 +49,8 @@ export class AIDirectSearch {
         const collectionPath = path.join(documentsPath, entry.name);
         const files = await secureFs.readdir(collectionPath);
         const documentFiles = files.filter(file => 
-          !file.startsWith('META_') && 
-          file.endsWith('.md')
+          !file.startsWith('DOCIDX_') && 
+          (file.endsWith('.md') || file.endsWith('.json'))
         );
         
         collections.push({

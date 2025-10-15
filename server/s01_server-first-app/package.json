@@ -1,6 +1,6 @@
 {
   "name": "ai-search-score-server",
-  "version": "19.00",
+  "version": "19.01",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
@@ -20,7 +20,8 @@
     "natural": "^8.1.0",
     "ollama": "^0.5.0",
     "sql.js": "^1.10.3",
-    "stopword": "^3.1.5"
+    "stopword": "^3.1.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.0",

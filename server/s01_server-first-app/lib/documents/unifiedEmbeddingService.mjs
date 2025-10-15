@@ -1,18 +1,33 @@
 import { SqlJsWrapper } from '../utils/SqlJsWrapper.mjs';
 import crypto from 'crypto';
+import path from 'path';
 
 export class UnifiedEmbeddingService {
   constructor() {
-    this.db = new SqlJsWrapper('./data/databases/unified_embeddings.db');
-    this.initialized = false;
+    this.dbs = new Map(); // Cache for collection databases
+    this.initialized = new Set(); // Track initialized collections
+  }
+  
+  getCollectionDbPath(collection) {
+    return path.join(process.cwd(), '../../sources/local-documents', collection, 'embeddings.db');
+  }
+  
+  async getCollectionDb(collection) {
+    if (!this.dbs.has(collection)) {
+      const dbPath = this.getCollectionDbPath(collection);
+      this.dbs.set(collection, new SqlJsWrapper(dbPath));
+    }
+    return this.dbs.get(collection);
   }
 
-  async setupDatabase() {
-    if (!this.initialized) {
-      await this.db.init();
-      this.initialized = true;
+  async setupDatabase(collection) {
+    if (!this.initialized.has(collection)) {
+      const db = await this.getCollectionDb(collection);
+      await db.init();
+      this.initialized.add(collection);
     }
-    this.db.exec(`
+    const db = await this.getCollectionDb(collection);
+    db.exec(`
       CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY,
         filename TEXT,
@@ -36,15 +51,11 @@ export class UnifiedEmbeddingService {
       );
       
       CREATE TABLE IF NOT EXISTS collection_documents (
-        collection TEXT,
-        document_id TEXT,
+        document_id TEXT PRIMARY KEY,
         filename TEXT,
         added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY(collection, document_id),
         FOREIGN KEY(document_id) REFERENCES documents(id)
       );
-      
-      CREATE INDEX IF NOT EXISTS idx_collection ON collection_documents(collection);
       CREATE INDEX IF NOT EXISTS idx_document_chunks ON chunks(document_id);
       CREATE INDEX IF NOT EXISTS idx_content_hash ON documents(content_hash);
     `);
@@ -55,16 +66,17 @@ export class UnifiedEmbeddingService {
   }
 
   async processDocument(filename, content, collection) {
-    await this.setupDatabase();
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
     const contentHash = this.generateContentHash(content);
     const documentId = `doc_${contentHash}`;
     
     // Check if document already exists
-    const existingDoc = this.db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
+    const existingDoc = db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
     
     if (!existingDoc) {
       // Document doesn't exist, create it with embeddings
-      const docStmt = this.db.prepare(`
+      const docStmt = db.prepare(`
         INSERT INTO documents (id, filename, content_hash, full_content, document_embedding)
         VALUES (?, ?, ?, ?, ?)
       `);
@@ -74,7 +86,7 @@ export class UnifiedEmbeddingService {
       
       // Create chunks
       const chunks = this.semanticChunking(content);
-      const chunkStmt = this.db.prepare(`
+      const chunkStmt = db.prepare(`
         INSERT INTO chunks (id, document_id, chunk_index, content, embedding, start_char, end_char, chunk_type)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
@@ -97,14 +109,14 @@ export class UnifiedEmbeddingService {
     }
     
     // Link document to collection (if not already linked)
-    const linkStmt = this.db.prepare(`
-      INSERT OR IGNORE INTO collection_documents (collection, document_id, filename)
-      VALUES (?, ?, ?)
+    const linkStmt = db.prepare(`
+      INSERT OR IGNORE INTO collection_documents (document_id, filename)
+      VALUES (?, ?)
     `);
-    await linkStmt.run(collection, documentId, filename);
+    await linkStmt.run(documentId, filename);
     
     // Get chunk count
-    const chunkCount = this.db.prepare('SELECT COUNT(*) as count FROM chunks WHERE document_id = ?').get(documentId);
+    const chunkCount = db.prepare('SELECT COUNT(*) as count FROM chunks WHERE document_id = ?').get(documentId);
     
     return { success: true, chunks: chunkCount.count, reused: !!existingDoc };
   }
@@ -147,16 +159,16 @@ export class UnifiedEmbeddingService {
   }
 
   async findSimilarChunks(query, collection, topK = 5) {
-    await this.setupDatabase();
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
     const queryEmbedding = await this.createEmbedding(query);
     
-    const stmt = this.db.prepare(`
-      SELECT c.*, cd.filename, cd.collection
+    const stmt = db.prepare(`
+      SELECT c.*, cd.filename
       FROM chunks c
       JOIN collection_documents cd ON c.document_id = cd.document_id
-      WHERE cd.collection = ?
     `);
-    const chunks = stmt.all(collection);
+    const chunks = stmt.all();
     
     const similarities = chunks.map(chunk => {
       const chunkEmbedding = JSON.parse(chunk.embedding);
@@ -167,7 +179,8 @@ export class UnifiedEmbeddingService {
     
     return similarities
       .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, topK);
+      .slice(0, topK)
+      .map(chunk => ({ ...chunk, collection }));
   }
 
   async createEmbedding(text) {
@@ -196,64 +209,57 @@ export class UnifiedEmbeddingService {
   }
 
   async removeDocument(collection, filename) {
-    await this.setupDatabase();
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
     // Find document ID for this collection/filename
-    const docStmt = this.db.prepare(`
+    const docStmt = db.prepare(`
       SELECT document_id FROM collection_documents 
-      WHERE collection = ? AND filename = ?
+      WHERE filename = ?
     `);
-    const doc = docStmt.get(collection, filename);
+    const doc = docStmt.get(filename);
     
     if (!doc) {
       return { success: true, message: 'Document not found' };
     }
     
-    // Remove from collection
-    const removeFromCollection = this.db.prepare(`
+    // Remove from collection (always remove since it's per-collection)
+    const removeFromCollection = db.prepare(`
       DELETE FROM collection_documents 
-      WHERE collection = ? AND filename = ?
+      WHERE filename = ?
     `);
-    await removeFromCollection.run(collection, filename);
+    await removeFromCollection.run(filename);
     
-    // Check if document is used in other collections
-    const otherCollections = this.db.prepare(`
-      SELECT COUNT(*) as count FROM collection_documents 
-      WHERE document_id = ?
-    `).get(doc.document_id);
+    // Remove document and chunks (no need to check other collections)
+    const deleteChunks = db.prepare('DELETE FROM chunks WHERE document_id = ?');
+    const deleteDoc = db.prepare('DELETE FROM documents WHERE id = ?');
     
-    // If not used elsewhere, remove document and chunks
-    if (otherCollections.count === 0) {
-      const deleteChunks = this.db.prepare('DELETE FROM chunks WHERE document_id = ?');
-      const deleteDoc = this.db.prepare('DELETE FROM documents WHERE id = ?');
-      
-      await deleteChunks.run(doc.document_id);
-      await deleteDoc.run(doc.document_id);
-    }
+    await deleteChunks.run(doc.document_id);
+    await deleteDoc.run(doc.document_id);
     
     return { success: true };
   }
 
   async listDocuments(collection) {
-    await this.setupDatabase();
-    const stmt = this.db.prepare(`
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
+    const stmt = db.prepare(`
       SELECT cd.filename, d.processed_at
       FROM collection_documents cd
       JOIN documents d ON cd.document_id = d.id
-      WHERE cd.collection = ?
     `);
-    return stmt.all(collection);
+    return stmt.all();
   }
 
   async getChunkCounts(collection) {
-    await this.setupDatabase();
-    const stmt = this.db.prepare(`
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
+    const stmt = db.prepare(`
       SELECT cd.filename, COUNT(c.id) as chunks 
       FROM collection_documents cd
       JOIN chunks c ON cd.document_id = c.document_id
-      WHERE cd.collection = ?
       GROUP BY cd.filename
     `);
-    const results = stmt.all(collection);
+    const results = stmt.all();
     
     const counts = {};
     results.forEach(row => {
@@ -263,16 +269,16 @@ export class UnifiedEmbeddingService {
     return counts;
   }
 
-  async getStats() {
-    await this.setupDatabase();
-    const totalDocs = this.db.prepare('SELECT COUNT(*) as count FROM documents').get();
-    const totalChunks = this.db.prepare('SELECT COUNT(*) as count FROM chunks').get();
-    const totalCollections = this.db.prepare('SELECT COUNT(DISTINCT collection) as count FROM collection_documents').get();
+  async getStats(collection) {
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
+    const totalDocs = db.prepare('SELECT COUNT(*) as count FROM documents').get();
+    const totalChunks = db.prepare('SELECT COUNT(*) as count FROM chunks').get();
     
     return {
       documents: totalDocs.count,
       chunks: totalChunks.count,
-      collections: totalCollections.count
+      collection: collection
     };
   }
 }

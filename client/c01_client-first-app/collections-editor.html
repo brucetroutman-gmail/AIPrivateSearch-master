@@ -252,9 +252,9 @@
         
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
-          <button class="btn btn-warning" onclick="convertDocuments()">Convert to MD</button>
+          <button class="btn btn-warning" onclick="convertDocuments()">Convert Source Files</button>
           <button class="btn btn-info" onclick="generateDocumentIndex()">Create Doc Index Cards</button>
-          <button class="btn btn-primary" onclick="processDocuments()">Embed Converted MDs</button>
+          <button class="btn btn-primary" onclick="processDocuments()">Embed Converted Files</button>
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
@@ -386,7 +386,7 @@
         
         const group = docGroups.get(baseName);
         
-        if (ext === 'md') {
+        if (ext === 'md' || ext === 'json') {
           group.mdFile = fileName;
         } else {
           group.sourceFiles.push({ fileName, ext, size: typeof doc === 'string' ? 0 : doc.size });
@@ -416,14 +416,17 @@
         const hasSource = nonMdSources.length > 0;
         const hasMd = !!group.mdFile;
         
-        // Create MD link or status
+        // Create MD/JSON link or status
         let mdContent;
         if (hasMd) {
           // Check if this is a collection file (xxx-xxx_Collection.md or xxx-xxx_collections.md pattern)
           if (group.mdFile && group.mdFile.match(/.*-.*_[Cc]ollections?\.md$/)) {
             mdContent = '-';
           } else {
-            mdContent = `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">MD</a>`;
+            // Show appropriate badge based on file extension
+            const fileExt = group.mdFile.split('.').pop().toLowerCase();
+            const badgeText = fileExt === 'json' ? 'JSON' : 'MD';
+            mdContent = `<a href="#" onclick="openFile('${group.mdFile}')" class="ext-badge">${badgeText}</a>`;
           }
         } else if (group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/)) {
           // Show dash for META collection files in Converted column when no regular MD file exists
@@ -609,24 +612,24 @@
     
     async function processDocuments() {
       const selected = getSelectedDocuments();
-      const selectedMD = selected.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
+      const selectedFiles = selected.filter(file => (file.endsWith('.md') || file.endsWith('.json')) && !file.startsWith('META_'));
       
-      if (selectedMD.length === 0) {
-        showUserMessage('Please select at least one source MD file to embed (META files are excluded)', 'error');
+      if (selectedFiles.length === 0) {
+        showUserMessage('Please select at least one converted file (MD or JSON) to embed (META files are excluded)', 'error');
         return;
       }
       
       setProcessingState(true);
       const totalStartTime = Date.now();
       clearLog();
-      showLog(`Processing ${selectedMD.length} selected source MD files to unified SQLite embeddings...`, 'processing');
+      showLog(`Processing ${selectedFiles.length} selected converted files to unified SQLite embeddings...`, 'processing');
       
       try {
       
       // Show progress for each file
-      for (let i = 0; i < selectedMD.length; i++) {
-        const filename = selectedMD[i];
-        const progress = `${i + 1}/${selectedMD.length}`;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const filename = selectedFiles[i];
+        const progress = `${i + 1}/${selectedFiles.length}`;
         const fileStartTime = Date.now();
         
         try {
@@ -656,7 +659,7 @@
       }
       
       const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-      showLog(`✓ Processing complete: ${selectedMD.length} files processed`, 'success');
+      showLog(`✓ Processing complete: ${selectedFiles.length} files processed`, 'success');
       showLog(`Total elapsed time: ${formatTime(totalElapsed)}`, 'info');
       
       // Force refresh of indexed documents status
@@ -707,14 +710,14 @@
     
     async function generateDocumentIndex() {
       const selected = getSelectedDocuments();
-      const selectedMD = selected.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
+      const selectedFiles = selected.filter(file => (file.endsWith('.md') || file.endsWith('.json')) && !file.startsWith('META_'));
       
-      if (selectedMD.length === 0) {
-        showUserMessage('Please select at least one source MD file to create Doc Index cards (META files are excluded)', 'error');
+      if (selectedFiles.length === 0) {
+        showUserMessage('Please select at least one converted file (MD or JSON) to create Doc Index cards (META files are excluded)', 'error');
         return;
       }
       
-      if (!await secureConfirm(`Generate AI Doc Indexes for ${selectedMD.length} selected files?\n\nThis will:\n• Create SQLite database entries with comprehensive document indexes\n• Add DocIDs to source documents if missing`)) {
+      if (!await secureConfirm(`Generate AI Doc Indexes for ${selectedFiles.length} selected files?\n\nThis will:\n• Create SQLite database entries with comprehensive document indexes\n• Add DocIDs to source documents if missing`)) {
         return;
       }
       
@@ -723,12 +726,12 @@
       clearLog();
       
       try {
-        showLog(`Processing ${selectedMD.length} selected source MD files to AI Doc Index database...`, 'processing');
+        showLog(`Processing ${selectedFiles.length} selected converted files to AI Doc Index database...`, 'processing');
         
         // Process each file individually with real-time progress
-        for (let i = 0; i < selectedMD.length; i++) {
-          const fileName = selectedMD[i];
-          const progress = `${i + 1}/${selectedMD.length}`;
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const fileName = selectedFiles[i];
+          const progress = `${i + 1}/${selectedFiles.length}`;
           const fileStartTime = Date.now();
           
           try {
@@ -758,7 +761,7 @@
         }
         
         const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
-        showLog(`✓ Processing complete: ${selectedMD.length} files processed`, 'success');
+        showLog(`✓ Processing complete: ${selectedFiles.length} files processed`, 'success');
         showLog(`Total elapsed time: ${totalElapsed}s`, 'info');
         
         loadDocuments(); // Refresh to show updated document list
@@ -872,25 +875,25 @@
     
     async function removeEmbeddings() {
       const selected = getSelectedDocuments();
-      const selectedMD = selected.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
+      const selectedFiles = selected.filter(file => (file.endsWith('.md') || file.endsWith('.json')) && !file.startsWith('META_'));
       
-      if (selectedMD.length === 0) {
-        showUserMessage('Please select at least one source MD file to remove embeddings from (META files are not embedded)', 'error');
+      if (selectedFiles.length === 0) {
+        showUserMessage('Please select at least one converted file (MD or JSON) to remove embeddings from (META files are not embedded)', 'error');
         return;
       }
       
       const vectorDB = 'lanceDB'; // Always use LanceDB
       
-      if (!await secureConfirm(`Remove embeddings from ${selectedMD.length} selected source files?`)) {
+      if (!await secureConfirm(`Remove embeddings from ${selectedFiles.length} selected converted files?`)) {
         return;
       }
       
       clearLog();
-      showLog(`Removing embeddings from ${selectedMD.length} selected source files...`);
+      showLog(`Removing embeddings from ${selectedFiles.length} selected converted files...`);
       
-      for (let i = 0; i < selectedMD.length; i++) {
-        const filename = selectedMD[i];
-        const progress = `${i + 1}/${selectedMD.length}`;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const filename = selectedFiles[i];
+        const progress = `${i + 1}/${selectedFiles.length}`;
         
         try {
           const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
@@ -911,7 +914,7 @@
         }
       }
       
-      showLog(`✓ Embedding removal complete: ${selectedMD.length} files processed`, 'success');
+      showLog(`✓ Embedding removal complete: ${selectedFiles.length} files processed`, 'success');
       loadDocuments();
     }
     

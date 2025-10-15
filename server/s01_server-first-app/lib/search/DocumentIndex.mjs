@@ -134,7 +134,7 @@ export class DocumentIndex {
     
     try {
       const files = fs.readdirSync(collectionPath);
-      const documentFiles = files.filter(file => file.endsWith('.md') && !file.startsWith('META_'));
+      const documentFiles = files.filter(file => !file.startsWith('DOCIDX_') && (file.endsWith('.md') || file.endsWith('.json')));
       
       console.log(`Processing ${documentFiles.length} documents with AI analysis`);
       

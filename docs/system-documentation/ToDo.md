@@ -262,11 +262,13 @@ searchtype. Store prompts in .json configs
 
 124. Create a quick start guide.
 
-125. Connect with SecureAccess create roles Admin, User, Developer (start with user) pay for admin, developer
+125. Connect with SecureAccess create roles Free 1 computer, Pro 5 computers $199/yr, Developer 25 computers $2999 (Register with Free) pay for admin, pay for developer.
 
 126. enhance database saving add documents only
 
-127. 
+127. high matched words in all.
+
+128. Make View Documnet consistent across all types, Add View Index Card to Doc Index Cards response
 
 
 

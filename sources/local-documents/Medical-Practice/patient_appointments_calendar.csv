@@ -1,0 +1,69 @@
+"Date","Time","Patient ID","Patient Name","Provider","Purpose","Appointment Type","Duration (min)"
+"2025-10-20","10:00 AM","P001","John A. Smith","Dr. Emily Carter, MD","Oncology consultation","Consultation",30
+"2025-10-21","11:00 AM","P002","Maria L. Gonzalez","Sarah Johnson, NP","Pre-op assessment","Pre-Operative",45
+"2025-10-22","02:00 PM","P001","John A. Smith","Sarah Johnson, NP","Chemotherapy administration","Chemotherapy",120
+"2025-10-23","09:00 AM","P003","James R. Brown","Michael Lee, NP","Pain management consultation","Consultation",30
+"2025-10-24","10:30 AM","P004","Emily T. Wilson","Dr. Emily Carter, MD","Fracture assessment","Follow-up",30
+"2025-10-25","08:00 AM","P002","Maria L. Gonzalez","Dr. Emily Carter, MD","Hip replacement surgery","Surgery",180
+"2025-10-25","09:00 AM","P005","David K. Patel","Sarah Johnson, NP","Chemotherapy session","Chemotherapy",90
+"2025-10-26","11:30 AM","P006","Sarah M. Lee","Michael Lee, NP","Knee evaluation","Consultation",30
+"2025-10-27","10:00 AM","P007","Michael J. Chen","Dr. Emily Carter, MD","Oncology consultation","Consultation",45
+"2025-10-27","03:00 PM","P003","James R. Brown","Dr. Emily Carter, MD","Oncology review","Consultation",45
+"2025-10-28","01:30 PM","P004","Emily T. Wilson","Sarah Johnson, NP","Cast check","Follow-up",20
+"2025-10-28","02:00 PM","P008","Linda R. Davis","Sarah Johnson, NP","Pre-radiation planning","Pre-Treatment",30
+"2025-10-29","09:30 AM","P009","Robert E. Kim","Michael Lee, NP","Pre-op evaluation","Pre-Operative",30
+"2025-10-29","01:00 PM","P007","Michael J. Chen","Sarah Johnson, NP","Chemotherapy","Chemotherapy",90
+"2025-10-30","02:00 PM","P005","David K. Patel","Dr. Emily Carter, MD","Oncology review","Consultation",45
+"2025-10-31","09:00 AM","P006","Sarah M. Lee","Dr. Emily Carter, MD","Treatment planning","Consultation",45
+"2025-10-31","11:00 AM","P011","Thomas G. White","Sarah Johnson, NP","Fracture evaluation","Consultation",30
+"2025-11-01","09:30 AM","P001","John A. Smith","Michael Lee, NP","Post-chemotherapy follow-up","Follow-up",30
+"2025-11-01","10:00 AM","P008","Linda R. Davis","Dr. Emily Carter, MD","Oncology consultation","Consultation",45
+"2025-11-01","10:30 AM","P012","Jessica N. Harris","Michael Lee, NP","Imaging review","Consultation",30
+"2025-11-01","02:00 PM","P010","Anna B. Taylor","Sarah Johnson, NP","Chemotherapy","Chemotherapy",90
+"2025-11-02","09:00 AM","P013","William C. Adams","Dr. Emily Carter, MD","Post-op review","Follow-up",30
+"2025-11-03","02:00 PM","P014","Karen P. Young","Sarah Johnson, NP","Chemotherapy","Chemotherapy",90
+"2025-11-03","08:00 AM","P009","Robert E. Kim","Dr. Emily Carter, MD","Arthroscopic surgery","Surgery",120
+"2025-11-03","10:30 AM","P003","James R. Brown","Sarah Johnson, NP","Follow-up","Follow-up",30
+"2025-11-04","09:30 AM","P015","Steven L. Moore","Michael Lee, NP","Pre-op evaluation","Pre-Operative",30
+"2025-11-05","01:00 PM","P002","Maria L. Gonzalez","Michael Lee, NP","Post-op follow-up","Follow-up",30
+"2025-11-05","09:00 AM","P011","Thomas G. White","Dr. Emily Carter, MD","Surgical consultation","Consultation",45
+"2025-11-05","10:00 AM","P016","Rachel F. Clark","Dr. Emily Carter, MD","Oncology consultation","Consultation",45
+"2025-11-06","11:00 AM","P017","Daniel S. Lewis","Sarah Johnson, NP","Pre-op evaluation","Pre-Operative",45
+"2025-11-06","02:00 PM","P012","Jessica N. Harris","Dr. Emily Carter, MD","Surgical planning","Consultation",45
+"2025-11-07","01:00 PM","P013","William C. Adams","Sarah Johnson, NP","Physical therapy planning","Consultation",30
+"2025-11-07","11:00 AM","P004","Emily T. Wilson","Michael Lee, NP","Physical therapy planning","Consultation",30
+"2025-11-07","02:00 PM","P016","Rachel F. Clark","Sarah Johnson, NP","Chemotherapy","Chemotherapy",90
+"2025-11-07","10:00 AM","P018","Laura E. Walker","Michael Lee, NP","Pain management consultation","Consultation",30
+"2025-11-08","10:00 AM","P014","Karen P. Young","Dr. Emily Carter, MD","Oncology review","Consultation",45
+"2025-11-08","09:00 AM","P019","Paul R. Hall","Dr. Emily Carter, MD","Post-op review","Follow-up",30
+"2025-11-09","10:00 AM","P020","Nancy T. King","Sarah Johnson, NP","Chemotherapy session","Chemotherapy",90
+"2025-11-10","08:00 AM","P015","Steven L. Moore","Dr. Emily Carter, MD","Arthroscopic surgery","Surgery",120
+"2025-11-10","10:00 AM","P005","David K. Patel","Michael Lee, NP","Blood work review","Follow-up",30
+"2025-11-10","02:00 PM","P018","Laura E. Walker","Dr. Emily Carter, MD","Oncology review","Consultation",45
+"2025-11-11","10:00 AM","P022","Susan B. Scott","Dr. Emily Carter, MD","Oncology consultation","Consultation",45
+"2025-11-12","08:00 AM","P017","Daniel S. Lewis","Dr. Emily Carter, MD","Knee replacement surgery","Surgery",180
+"2025-11-12","01:30 PM","P019","Paul R. Hall","Sarah Johnson, NP","Physical therapy planning","Consultation",30
+"2025-11-12","02:30 PM","P006","Sarah M. Lee","Sarah Johnson, NP","Follow-up","Follow-up",30
+"2025-11-13","02:00 PM","P022","Susan B. Scott","Sarah Johnson, NP","Chemotherapy","Chemotherapy",90
+"2025-11-14","02:00 PM","P020","Nancy T. King","Dr. Emily Carter, MD","Oncology review","Consultation",45
+"2025-11-15","09:00 AM","P007","Michael J. Chen","Michael Lee, NP","Post-chemotherapy review","Follow-up",30
+"2025-11-15","01:00 PM","P009","Robert E. Kim","Sarah Johnson, NP","Post-op follow-up","Follow-up",30
+"2025-11-15","11:00 AM","P021","George M. Wright","Dr. Emily Carter, MD","Follow-up imaging","Diagnostic",20
+"2025-11-18","08:00 AM","P023","Charles D. Green","Dr. Emily Carter, MD","Hip replacement surgery","Surgery",180
+"2025-11-18","01:30 PM","P004","Emily T. Wilson","Sarah Johnson, NP","Cast check","Follow-up",20
+"2025-11-18","09:00 AM","P010","Anna B. Taylor","Michael Lee, NP","Follow-up","Follow-up",30
+"2025-11-20","09:30 AM","P012","Jessica N. Harris","Sarah Johnson, NP","Follow-up","Follow-up",30
+"2025-11-20","11:00 AM","P008","Linda R. Davis","Michael Lee, NP","Follow-up","Follow-up",30
+"2025-11-22","10:00 AM","P013","William C. Adams","Michael Lee, NP","Follow-up","Follow-up",30
+"2025-11-22","09:00 AM","P016","Rachel F. Clark","Michael Lee, NP","Follow-up","Follow-up",30
+"2025-11-25","11:00 AM","P014","Karen P. Young","Michael Lee, NP","Blood work review","Follow-up",30
+"2025-11-25","01:00 PM","P015","Steven L. Moore","Sarah Johnson, NP","Post-op follow-up","Follow-up",30
+"2025-11-25","01:30 PM","P011","Thomas G. White","Michael Lee, NP","Post-op follow-up","Follow-up",30
+"2025-11-27","01:00 PM","P017","Daniel S. Lewis","Michael Lee, NP","Post-op follow-up","Follow-up",30
+"2025-11-28","09:00 AM","P018","Laura E. Walker","Sarah Johnson, NP","Follow-up","Follow-up",30
+"2025-11-30","10:00 AM","P019","Paul R. Hall","Michael Lee, NP","Follow-up","Follow-up",30
+"2025-12-01","09:00 AM","P020","Nancy T. King","Michael Lee, NP","Blood work review","Follow-up",30
+"2025-12-01","01:30 PM","P021","George M. Wright","Sarah Johnson, NP","Physical therapy planning","Consultation",30
+"2025-12-01","09:00 AM","P022","Susan B. Scott","Michael Lee, NP","Pre-surgical evaluation","Pre-Operative",45
+"2025-12-03","01:00 PM","P023","Charles D. Green","Michael Lee, NP","Post-op follow-up","Follow-up",30
+"2025-12-10","10:00 AM","P025","Edward J. Allen","Michael Lee, NP","Physical therapy planning","Consultation",30

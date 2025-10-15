@@ -3,6 +3,7 @@ import multer from 'multer';
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import { UnifiedEmbeddingService } from '../lib/documents/unifiedEmbeddingService.mjs';
 import path from 'path';
+import XLSX from 'xlsx';
 
 const router = express.Router();
 const embeddingService = new UnifiedEmbeddingService();
@@ -94,27 +95,66 @@ router.post('/convert-selected', async (req, res) => {
       try {
         const ext = filename.split('.').pop().toLowerCase();
         
-        // Skip files that are already markdown
-        if (ext === 'md') {
+        // Skip files that are already markdown or json (treat json like md)
+        if (ext === 'md' || ext === 'json') {
           continue;
         }
         
         const sourcePath = path.join('../../sources/local-documents', collection, filename);
-        const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.md'));
         
-        // Read source file
-        const content = await secureFs.readFile(sourcePath, 'utf8');
-        
-        // Simple conversion - just wrap in markdown code block for non-text files
-        let markdownContent;
-        if (ext === 'txt') {
-          markdownContent = content;
+        // Convert CSV/Excel files to JSON, others to MD
+        if (ext === 'csv' || ext === 'xls' || ext === 'xlsx') {
+          const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.json'));
+          
+          let jsonContent;
+          
+          if (ext === 'csv') {
+            // Simple CSV to JSON conversion
+            const content = await secureFs.readFile(sourcePath, 'utf8');
+            const lines = content.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const rows = lines.slice(1).map(line => {
+              const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+              const obj = {};
+              headers.forEach((header, index) => {
+                obj[header] = values[index] || '';
+              });
+              return obj;
+            });
+            jsonContent = JSON.stringify(rows, null, 2);
+          } else {
+            // For XLS/XLSX, use xlsx library to parse
+            const buffer = await secureFs.readFile(sourcePath);
+            const workbook = XLSX.read(buffer, { type: 'buffer' });
+            const result = {};
+            
+            workbook.SheetNames.forEach(sheetName => {
+              const worksheet = workbook.Sheets[sheetName];
+              const jsonData = XLSX.utils.sheet_to_json(worksheet);
+              result[sheetName] = jsonData;
+            });
+            
+            jsonContent = JSON.stringify(result, null, 2);
+          }
+          
+          await secureFs.writeFile(targetPath, jsonContent, 'utf8');
         } else {
-          markdownContent = `# ${filename}\n\n\`\`\`\n${content}\n\`\`\``;
+          const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.md'));
+          
+          // Read source file
+          const content = await secureFs.readFile(sourcePath, 'utf8');
+          
+          // Simple conversion - just wrap in markdown code block for non-text files
+          let markdownContent;
+          if (ext === 'txt') {
+            markdownContent = content;
+          } else {
+            markdownContent = `# ${filename}\n\n\`\`\`\n${content}\n\`\`\``;
+          }
+          
+          // Write markdown file
+          await secureFs.writeFile(targetPath, markdownContent, 'utf8');
         }
-        
-        // Write markdown file
-        await secureFs.writeFile(targetPath, markdownContent, 'utf8');
         converted++;
       } catch (error) {
         errors.push(`${filename}: ${error.message}`);
@@ -358,7 +398,7 @@ router.get('/:collection/:filename', async (req, res) => {
     
     // Get file extension
     const ext = filename.split('.').pop().toLowerCase();
-    const allowedExtensions = ['md', 'txt', 'pdf', 'doc', 'docx'];
+    const allowedExtensions = ['md', 'txt', 'json', 'csv', 'xls', 'xlsx', 'pdf', 'doc', 'docx'];
     
     if (!allowedExtensions.includes(ext)) {
       return res.status(400).json({ error: 'File type not supported' });
@@ -367,9 +407,12 @@ router.get('/:collection/:filename', async (req, res) => {
     const filePath = path.join('../../sources/local-documents', collection, filename);
     
     // Set appropriate content type and read method based on file type
-    if (ext === 'md' || ext === 'txt') {
+    if (ext === 'md' || ext === 'txt' || ext === 'json' || ext === 'csv') {
       const content = await secureFs.readFile(filePath, 'utf8');
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      let contentType = 'text/plain; charset=utf-8';
+      if (ext === 'json') contentType = 'application/json; charset=utf-8';
+      if (ext === 'csv') contentType = 'text/csv; charset=utf-8';
+      res.setHeader('Content-Type', contentType);
       res.send(content);
     } else {
       // Binary files (PDF, DOC, DOCX)
@@ -378,7 +421,9 @@ router.get('/:collection/:filename', async (req, res) => {
       const contentTypes = {
         pdf: 'application/pdf',
         doc: 'application/msword',
-        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        xls: 'application/vnd.ms-excel',
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       };
       
       res.setHeader('Content-Type', contentTypes[ext]);
