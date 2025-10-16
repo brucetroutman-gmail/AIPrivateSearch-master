@@ -60,12 +60,12 @@ Application Structure
 
 #### Professional Branding v13
 - **Page Titles**: 
-  - Landing: "AISearch-n-Score - AI Model Evaluation Platform"
+  - Landing: "AIPrivateSearch - AI Model Evaluation Platform"
   - Search: "Search-n-Score – Demo"
   - Test: "Test-n-Save"
-- **Logo**: Gold "AISearch-n-Score" clickable logo linking to home
+- **Logo**: Gold "AIPrivateSearch" clickable logo linking to home
 - **Navigation**: Search | Test | Analyze | Login icon
-- **Copyright**: "© 2025 AISearch-n-Score Group. All rights reserved."
+- **Copyright**: "© 2025 AIPrivateSearch Group. All rights reserved."
 - **License**: Creative Commons Attribution-NonCommercial (CC BY-NC)
 
 ## Landing Page Features v13
@@ -134,7 +134,7 @@ body {
 ### License & Legal v13
 - **License**: Creative Commons Attribution-NonCommercial (CC BY-NC)
 - **Link**: http://creativecommons.org/licenses/by-nc/4.0/
-- **Copyright**: AISearch-n-Score Group
+- **Copyright**: AIPrivateSearch Group
 - **Footer Links**: Privacy Policy, Terms of Service, Contact
 
 ## File Structure Changes v13

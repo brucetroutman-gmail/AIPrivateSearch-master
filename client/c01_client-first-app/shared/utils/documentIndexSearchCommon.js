@@ -24,30 +24,52 @@ window.documentIndexSearchCommon = {
         }
     },
 
-    // Format document index search results for display
+    // Format document index search results for display (safe DOM creation)
     formatDocumentIndexSearchResults(results, collection = 'default') {
+        const container = document.createElement('div');
+        
         if (!results || results.length === 0) {
-            return '<div class="no-results">No results found</div>';
+            container.className = 'no-results';
+            container.textContent = 'No results found';
+            return container;
         }
 
-        let html = '<div class="search-results">';
+        container.className = 'search-results';
         
         results.forEach((result, index) => {
-            html += `
-                <div class="result-item">
-                    <div class="result-header">
-                        <h4>Result ${index + 1}: ${result.title}</h4>
-                        <span class="score">${Math.round(result.score * 100)}%</span>
-                    </div>
-                    <div class="result-excerpt">${result.excerpt}</div>
-                    <div class="result-meta">
-                        ${window.documentViewerCommon.createViewDocumentLink(collection, result.source)}
-                    </div>
-                </div>
-            `;
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const title = document.createElement('h4');
+            title.textContent = `Result ${index + 1}: ${result.title || ''}`;
+            
+            const score = document.createElement('span');
+            score.className = 'score';
+            score.textContent = `${Math.round((result.score || 0) * 100)}%`;
+            
+            header.appendChild(title);
+            header.appendChild(score);
+            
+            const excerpt = document.createElement('div');
+            excerpt.className = 'result-excerpt';
+            excerpt.textContent = result.excerpt || '';
+            
+            const meta = document.createElement('div');
+            meta.className = 'result-meta';
+            if (window.documentViewerCommon) {
+                const link = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
+                if (link) meta.appendChild(link);
+            }
+            
+            item.appendChild(header);
+            item.appendChild(excerpt);
+            item.appendChild(meta);
+            container.appendChild(item);
         });
         
-        html += '</div>';
-        return html;
+        return container;
     }
 };

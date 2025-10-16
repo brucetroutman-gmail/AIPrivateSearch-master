@@ -17,14 +17,8 @@ function showUserMessage(message, type = 'info') {
   if (messageCallCount >= 10) return;
   messageCallCount++;
   
-  // Sanitize input
-  if (typeof message !== 'string') {
-    message = String(message);
-  }
-  const sanitizedMessage = message.replace(/[<>"'&]/g, (char) => {
-    const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
-    return entities[char];
-  }).substring(0, 200);
+  // Sanitize input using DOMSanitizer
+  const sanitizedMessage = DOMSanitizer.sanitizeText(message).substring(0, 200);
   
   const validTypes = ['info', 'success', 'error'];
   const safeType = validTypes.includes(type) ? type : 'info';
@@ -34,21 +28,12 @@ function showUserMessage(message, type = 'info') {
   if (!messageEl) {
     messageEl = document.createElement('div');
     messageEl.id = 'user-message';
-    messageEl.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 10px; border-radius: 4px; z-index: 1000; max-width: 300px; word-wrap: break-word;';
+    messageEl.className = 'user-message';
     document.body.appendChild(messageEl);
   }
   
   messageEl.textContent = sanitizedMessage;
-  if (isDark) {
-    messageEl.style.background = safeType === 'error' ? '#5f2c2c' : safeType === 'success' ? '#2d5a2d' : '#333';
-    messageEl.style.borderColor = safeType === 'error' ? '#f44336' : safeType === 'success' ? '#4caf50' : '#666';
-    messageEl.style.color = '#fff';
-  } else {
-    messageEl.style.background = safeType === 'error' ? '#ffebee' : safeType === 'success' ? '#e8f5e8' : '#f0f0f0';
-    messageEl.style.borderColor = safeType === 'error' ? '#f44336' : safeType === 'success' ? '#4caf50' : '#ccc';
-    messageEl.style.color = '#333';
-  }
-  messageEl.style.border = '1px solid';
+  messageEl.className = `user-message ${safeType}`;
   
   setTimeout(() => {
     if (messageEl && messageEl.parentNode) {
@@ -68,16 +53,18 @@ function securePrompt(message, defaultValue = '') {
   if (promptCallCount >= 5) return Promise.resolve(null);
   promptCallCount++;
   
-  // Basic sanitization
-  const sanitizedMessage = String(message).replace(/[<>&"']/g, '').substring(0, 500);
+  // Sanitize message using DOMSanitizer
+  const sanitizedMessage = DOMSanitizer.sanitizeText(message).substring(0, 500);
   
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const themeClass = isDark ? 'dark' : 'light';
+    
     const modal = document.createElement('div');
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+    modal.className = 'modal-overlay';
     
     const dialog = document.createElement('div');
-    dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
+    dialog.className = `modal-dialog ${themeClass}`;
     
     const messageEl = document.createElement('p');
     messageEl.textContent = sanitizedMessage;
@@ -85,21 +72,25 @@ function securePrompt(message, defaultValue = '') {
     const input = document.createElement('input');
     input.type = 'text';
     input.value = defaultValue;
-    input.style.cssText = `width: 100%; padding: 8px; margin: 10px 0; border: 1px solid ${isDark ? '#555' : '#ccc'}; border-radius: 4px; background: ${isDark ? '#333' : 'white'}; color: ${isDark ? '#fff' : '#333'};`;
+    input.className = `modal-input ${themeClass}`;
     
     const buttons = document.createElement('div');
-    buttons.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;';
+    buttons.className = 'modal-buttons';
     
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = `padding: 8px 16px; border: 1px solid ${isDark ? '#555' : '#ccc'}; background: ${isDark ? '#444' : '#f5f5f5'}; color: ${isDark ? '#fff' : '#333'}; border-radius: 4px; cursor: pointer;`;
+    cancelBtn.className = `modal-button cancel ${themeClass}`;
     
     const okBtn = document.createElement('button');
     okBtn.textContent = 'OK';
-    okBtn.style.cssText = 'padding: 8px 16px; border: none; background: #007cba; color: white; border-radius: 4px; cursor: pointer;';
+    okBtn.className = 'modal-button ok';
     
     cancelBtn.onclick = () => { document.body.removeChild(modal); resolve(null); };
-    okBtn.onclick = () => { document.body.removeChild(modal); resolve(input.value); };
+    okBtn.onclick = () => { 
+      const sanitizedValue = DOMSanitizer.sanitizeText(input.value);
+      document.body.removeChild(modal); 
+      resolve(sanitizedValue); 
+    };
     
     buttons.appendChild(cancelBtn);
     buttons.appendChild(okBtn);
@@ -125,31 +116,33 @@ function secureConfirm(message) {
   if (promptCallCount >= 5) return Promise.resolve(false);
   promptCallCount++;
   
-  // Basic sanitization
-  const sanitizedMessage = String(message).replace(/[<>&"']/g, '').substring(0, 500);
+  // Sanitize message using DOMSanitizer
+  const sanitizedMessage = DOMSanitizer.sanitizeText(message).substring(0, 500);
   
   return new Promise((resolve) => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const themeClass = isDark ? 'dark' : 'light';
+    
     const modal = document.createElement('div');
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+    modal.className = 'modal-overlay';
     
     const dialog = document.createElement('div');
-    dialog.style.cssText = `background: ${isDark ? '#2a2a2a' : 'white'}; color: ${isDark ? '#fff' : '#333'}; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;`;
+    dialog.className = `modal-dialog ${themeClass}`;
     
     const messageEl = document.createElement('p');
     messageEl.textContent = sanitizedMessage;
-    messageEl.style.whiteSpace = 'pre-line';
+    messageEl.className = 'modal-message';
     
     const buttons = document.createElement('div');
-    buttons.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;';
+    buttons.className = 'modal-buttons';
     
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = `padding: 8px 16px; border: 1px solid ${isDark ? '#555' : '#ccc'}; background: ${isDark ? '#444' : '#f5f5f5'}; color: ${isDark ? '#fff' : '#333'}; border-radius: 4px; cursor: pointer;`;
+    cancelBtn.className = `modal-button cancel ${themeClass}`;
     
     const okBtn = document.createElement('button');
     okBtn.textContent = 'OK';
-    okBtn.style.cssText = 'padding: 8px 16px; border: none; background: #007cba; color: white; border-radius: 4px; cursor: pointer;';
+    okBtn.className = 'modal-button ok';
     
     cancelBtn.onclick = () => { document.body.removeChild(modal); resolve(false); };
     okBtn.onclick = () => { document.body.removeChild(modal); resolve(true); };
@@ -171,7 +164,7 @@ async function loadVersion() {
     const versionEl = document.getElementById('version-display');
     if (versionEl && data.version) {
       versionEl.textContent = `(v${data.version})`;
-      document.title = `AISearch-n-Score v${data.version}`;
+      document.title = `AIPrivateSearch v${data.version}`;
     }
   } catch (error) {
     // Silently fail - version display is not critical
@@ -284,7 +277,7 @@ function checkUserEmail() {
 async function promptForEmail() {
   let email;
   do {
-    email = await securePrompt('Welcome to AISearch-n-Score!\n\nPlease enter your email address to continue:');
+    email = await securePrompt('Welcome to AIPrivateSearch!\n\nPlease enter your email address to continue:');
     if (email === null) {
       // User clicked cancel
       showUserMessage('Email is required to use this application.', 'error');
@@ -300,8 +293,8 @@ async function promptForEmail() {
 }
 
 function validateEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
+  const sanitized = DOMSanitizer.sanitizeEmail(email);
+  return sanitized !== '';
 }
 
 function getUserEmail() {
@@ -311,8 +304,9 @@ function getUserEmail() {
 async function updateUserEmail() {
   const currentEmail = getUserEmail();
   const newEmail = await securePrompt('Enter your email address:', currentEmail);
-  if (newEmail !== null && newEmail && validateEmail(newEmail)) {
-    localStorage.setItem('userEmail', newEmail);
+  const sanitizedEmail = DOMSanitizer.sanitizeEmail(newEmail || '');
+  if (newEmail !== null && sanitizedEmail) {
+    localStorage.setItem('userEmail', sanitizedEmail);
     showUserMessage('Email updated successfully!', 'success');
   } else if (newEmail) {
     showUserMessage('Please enter a valid email address.', 'error');
@@ -415,7 +409,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     TestCode: result.testCode || '',
     TestCategory: testCategory || null,
     TestDescription: testDescription || null,
-    UserEmail: localStorage.getItem('userEmail') || null,
+    UserEmail: DOMSanitizer.sanitizeEmail(localStorage.getItem('userEmail') || '') || null,
     PcCode: result.pcCode || null,
     PcCPU: result.systemInfo?.chip || null,
     PcGraphics: result.systemInfo?.graphics || null,

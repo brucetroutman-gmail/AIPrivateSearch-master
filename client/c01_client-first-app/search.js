@@ -380,8 +380,9 @@ async function loadUserPrompts() {
 // Handle user prompt selection
 userPromptsEl.addEventListener('change', () => {
   if (userPromptsEl.value) {
-    queryEl.value = userPromptsEl.value;
-    localStorage.setItem('lastPrompt', userPromptsEl.value);
+    const sanitizedValue = DOMSanitizer.sanitizeText(userPromptsEl.value);
+    queryEl.value = sanitizedValue;
+    localStorage.setItem('lastPrompt', sanitizedValue);
   }
 });
 
@@ -717,7 +718,11 @@ tokensEl.addEventListener('change', () => {
 
 // Save prompt text
 queryEl.addEventListener('input', () => {
-  localStorage.setItem('lastPrompt', queryEl.value);
+  const sanitizedValue = DOMSanitizer.sanitizeText(queryEl.value);
+  localStorage.setItem('lastPrompt', sanitizedValue);
+  if (queryEl.value !== sanitizedValue) {
+    queryEl.value = sanitizedValue;
+  }
 });
 
 
@@ -828,25 +833,19 @@ function render(result) {
     result.chunks.forEach((chunk, index) => {
       const chunkDiv = document.createElement('div');
       chunkDiv.className = 'chunk-item';
-      chunkDiv.style.marginBottom = '1rem';
-      chunkDiv.style.padding = '0.5rem';
-      chunkDiv.style.border = '1px solid #ddd';
-      chunkDiv.style.borderRadius = '4px';
       
       const chunkTitle = document.createElement('h4');
+      chunkTitle.className = 'chunk-title';
       chunkTitle.textContent = `Chunk ${index + 1}: ${chunk.filename}`;
-      chunkTitle.style.margin = '0 0 0.5rem 0';
-      chunkTitle.style.fontSize = '0.9rem';
       
       const chunkContent = document.createElement('p');
+      chunkContent.className = 'chunk-content';
       chunkContent.textContent = chunk.content;
-      chunkContent.style.margin = '0';
-      chunkContent.style.fontSize = '0.85rem';
       
       if (chunk.similarity) {
         const similarity = document.createElement('small');
+        similarity.className = 'chunk-similarity';
         similarity.textContent = `Similarity: ${(chunk.similarity * 100).toFixed(1)}%`;
-        similarity.style.color = '#666';
         chunkTitle.appendChild(document.createTextNode(' '));
         chunkTitle.appendChild(similarity);
       }
@@ -1051,9 +1050,9 @@ function render(result) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   // Check authorization - require email for access
-  const userEmail = localStorage.getItem('userEmail');
-  if (!userEmail || userEmail.trim() === '') {
-    outputEl.textContent = 'Please provide your email address to use this service.';
+  const userEmail = DOMSanitizer.sanitizeEmail(localStorage.getItem('userEmail') || '');
+  if (!userEmail) {
+    outputEl.textContent = 'Please provide a valid email address to use this service.';
     return;
   }
   
@@ -1119,7 +1118,7 @@ form.addEventListener('submit', async (e) => {
     }
     
     updateProgress('Searching');
-    const trimmedQuery = queryEl.value.trim();
+    const trimmedQuery = DOMSanitizer.sanitizeText(queryEl.value.trim());
     const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
     let result;
     if (searchType === 'document-search') {
@@ -1370,10 +1369,10 @@ form.addEventListener('submit', async (e) => {
 // Export handler function
 async function handleExport() {
   // Check authorization - require email for export access
-  const userEmail = localStorage.getItem('userEmail');
-  if (!userEmail || userEmail.trim() === '') {
+  const userEmail = DOMSanitizer.sanitizeEmail(localStorage.getItem('userEmail') || '');
+  if (!userEmail) {
     logger.warn('Export blocked: No email provided');
-    outputEl.textContent = 'Please provide your email address to export results.';
+    outputEl.textContent = 'Please provide a valid email address to export results.';
     return;
   }
   

@@ -97,13 +97,21 @@
             const breakdownDiv = document.getElementById('breakdown');
             
             if (!testCode) {
-                breakdownDiv.innerHTML = '<div class="error">Please enter a testcode</div>';
+                breakdownDiv.textContent = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = 'Please enter a testcode';
+                breakdownDiv.appendChild(errorDiv);
                 resultsDiv.style.display = 'block';
                 return;
             }
             
             if (testCode.length !== 8 || !testCode.startsWith('t')) {
-                breakdownDiv.innerHTML = '<div class="error">TestCode must be 8 characters starting with "t" (e.g., t1112310)</div>';
+                breakdownDiv.textContent = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = 'TestCode must be 8 characters starting with "t" (e.g., t1112310)';
+                breakdownDiv.appendChild(errorDiv);
                 resultsDiv.style.display = 'block';
                 return;
             }
@@ -199,7 +207,14 @@
             });
             
             html += '</div>';
-            breakdownDiv.innerHTML = html;
+            
+            // Safe DOM creation instead of innerHTML
+            breakdownDiv.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            while (doc.body.firstChild) {
+                breakdownDiv.appendChild(doc.body.firstChild);
+            }
         }
         
         // Allow Enter key to trigger check

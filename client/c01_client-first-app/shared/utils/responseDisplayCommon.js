@@ -7,35 +7,29 @@ window.responseDisplayCommon = {
             const noResultsDiv = document.createElement('div');
             noResultsDiv.className = 'no-results';
             noResultsDiv.textContent = 'No results found';
-            container.innerHTML = '';
+            container.textContent = '';
             container.appendChild(noResultsDiv);
             return;
         }
         
-        container.innerHTML = '';
+        container.textContent = '';
         
         // Use existing formatters for specific search types
         if (searchResult.method === 'line-search') {
-            const formattedHTML = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(formattedHTML, 'text/html');
-            container.appendChild(doc.body.firstElementChild);
+            const formattedElement = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+            container.appendChild(formattedElement);
             return;
         }
         
         if (searchResult.method === 'document-search') {
-            const formattedHTML = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(formattedHTML, 'text/html');
-            container.appendChild(doc.body.firstElementChild);
+            const formattedElement = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
+            container.appendChild(formattedElement);
             return;
         }
         
         if (searchResult.method === 'document-index') {
-            const formattedHTML = window.documentIndexSearchCommon.formatDocumentIndexSearchResults(searchResult.results, collection);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(formattedHTML, 'text/html');
-            container.appendChild(doc.body.firstElementChild);
+            const formattedElement = window.documentIndexSearchCommon.formatDocumentIndexSearchResults(searchResult.results, collection);
+            container.appendChild(formattedElement);
             return;
         }
         

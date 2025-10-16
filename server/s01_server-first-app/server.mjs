@@ -16,11 +16,36 @@ import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
 const app = express();
+
+// Security headers
+app.use((req, res, next) => {
+  // Content Security Policy
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data:; " +
+    "connect-src 'self' http://localhost:11434; " +
+    "font-src 'self'; " +
+    "object-src 'none'; " +
+    "base-uri 'self'; " +
+    "form-action 'self'"
+  );
+  
+  // Additional security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  next();
+});
+
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Serve static files from client
 app.use(express.static(path.join(process.cwd(), '../../client/c01_client-first-app')));

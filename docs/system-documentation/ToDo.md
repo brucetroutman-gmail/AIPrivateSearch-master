@@ -272,6 +272,10 @@ searchtype. Store prompts in .json configs
 
 129. review doc index card creation add  remove fields change models overall improve.
 
+130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources
+
+131. create app for load-aiss-1013.command
+
 
 
 

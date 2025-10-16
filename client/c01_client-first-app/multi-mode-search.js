@@ -24,88 +24,7 @@ const searchMethods = {
 };
 
 // Real API search functions
-async function performExactMatchSearch(query, collection = null, useWildcards = false) {
-    const startTime = Date.now();
-    
-    try {
-        const options = { query, useWildcards };
-        if (collection) options.collection = collection;
-        
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/line-search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'line-search' 
-        };
-    } catch (error) {
-        console.error('Exact match search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'line-search' };
-    }
-}
-
-async function performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit) {
-    const startTime = Date.now();
-    
-    try {
-        const searchResult = await window.aiDirectCommon.performAIDirectSearch(query, collection, {
-            model, temperature, contextSize, tokenLimit
-        });
-        return { 
-            results: searchResult.results || [], 
-            time: Date.now() - startTime, 
-            method: 'ai-direct' 
-        };
-    } catch (error) {
-        console.error('AI Direct search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'ai-direct' };
-    }
-}
-
-async function performAIDocumentChatSearch(query, collection, model, temperature, contextSize, tokenLimit) {
-    const startTime = Date.now();
-    
-    try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-document-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, options: { collection, model, topK: 3, temperature, contextSize, tokenLimit } })
-        });
-        
-        const data = await response.json();
-        return { 
-            results: data.results || [], 
-            time: Date.now() - startTime, 
-            method: 'ai-document-chat' 
-        };
-    } catch (error) {
-        console.error('AI Document Chat search error:', error);
-        return { results: [], time: Date.now() - startTime, method: 'ai-document-chat' };
-    }
-}
-
-
-
-async function performVectorSearch(query, collection) {
-    return await window.smartSearchCommon.performSmartSearch(query, collection, 5);
-}
-
-async function performHybridSearch(query, collection) {
-    return await window.hybridSearchCommon.performHybridSearch(query, collection, 5);
-}
-
-async function performDocumentIndexSearch(query, collection = null) {
-    return await window.documentIndexSearchCommon.performDocumentIndexSearch(query, collection);
-}
-
-async function performFullTextSearch(query, collection, useWildcards = false) {
-    return await window.documentSearchCommon.performDocumentSearch(query, collection, useWildcards);
-}
+// All search functions now use the unified search manager
 
 // Render results for a specific method using common utility
 function renderResults(containerId, searchResult) {
@@ -152,21 +71,22 @@ function updatePerformanceTable(results) {
             performanceTableBody.appendChild(row);
         }
     });
+    performanceSection.classList.remove('hidden');
     performanceSection.style.display = 'block';
 }
 
 // Main search function
 async function performAllSearches() {
-    const query = searchQueryEl.value.trim();
-    const collection = document.getElementById('collectionSelect').value;
-    const model = document.getElementById('modelSelect').value;
+    const query = DOMSanitizer.sanitizeText(searchQueryEl.value.trim());
+    const collection = DOMSanitizer.sanitizeText(document.getElementById('collectionSelect').value);
+    const model = DOMSanitizer.sanitizeText(document.getElementById('modelSelect').value);
     const temperatureEl = document.getElementById('temperatureSelect');
     const contextEl = document.getElementById('contextSelect');
     const tokensEl = document.getElementById('tokensSelect');
     
     const temperature = parseFloat(temperatureEl?.value || '0.3');
     const contextSize = parseInt(contextEl?.value || '1024');
-    const tokenLimit = tokensEl?.value || 'No Limit';
+    const tokenLimit = DOMSanitizer.sanitizeText(tokensEl?.value || 'No Limit');
     
     if (!query) {
         window.showUserMessage('Please enter a search query', 'error');
@@ -225,34 +145,11 @@ async function performAllSearches() {
         const searchPromises = [];
         const methodMap = {};
         
-        if (selectedMethods.includes('line-search')) {
-            searchPromises.push(performExactMatchSearch(query, collection, useWildcards));
-            methodMap['line-search'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('ai-direct')) {
-            searchPromises.push(performAIDirectSearch(query, collection, model, temperature, contextSize, tokenLimit));
-            methodMap['ai-direct'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('ai-document-chat')) {
-            searchPromises.push(performAIDocumentChatSearch(query, collection, model, temperature, contextSize, tokenLimit));
-            methodMap['ai-document-chat'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('smart-search')) {
-            searchPromises.push(performVectorSearch(query, collection));
-            methodMap['smart-search'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('hybrid-search')) {
-            searchPromises.push(performHybridSearch(query, collection));
-            methodMap['hybrid-search'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('document-index')) {
-            searchPromises.push(performDocumentIndexSearch(query, collection));
-            methodMap['document-index'] = searchPromises.length - 1;
-        }
-        if (selectedMethods.includes('document-search')) {
-            searchPromises.push(performFullTextSearch(query, collection, useWildcards));
-            methodMap['document-search'] = searchPromises.length - 1;
-        }
+        selectedMethods.forEach(method => {
+            const options = { collection, useWildcards, model, temperature, contextSize, tokenLimit };
+            searchPromises.push(window.searchManager.executeSearch(method, query, options));
+            methodMap[method] = searchPromises.length - 1;
+        });
         
         const results = await Promise.all(searchPromises);
         
@@ -352,39 +249,31 @@ searchQueryEl.addEventListener('keypress', (e) => {
 
 // Save query as user types
 searchQueryEl.addEventListener('input', (e) => {
-    localStorage.setItem('multiModeSearchQuery', e.target.value);
+    const sanitizedValue = DOMSanitizer.sanitizeText(e.target.value);
+    localStorage.setItem('multiModeSearchQuery', sanitizedValue);
+    if (e.target.value !== sanitizedValue) {
+        e.target.value = sanitizedValue;
+    }
 });
 
-// Load available collections and models
-function loadCollections() {
-    window.collectionsUtils.populateCollectionSelect('collectionSelect', false);
+// Load available collections and models using shared utilities
+async function loadCollections() {
+    const collections = await window.searchManager.loadCollections();
+    window.searchManager.populateSelect('collectionSelect', collections, 'selectedCollection');
 }
 
 async function loadModels() {
-    try {
-        const response = await fetch('http://localhost:3001/config/models-list.json');
-        const data = await response.json();
-        const select = document.getElementById('modelSelect');
-        
-        const models = data.models.filter(m => m.category === 'search').map(m => m.modelName).sort();
-        const savedModel = localStorage.getItem('selectedSearchModel');
-        
-        models.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            if (model === savedModel) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-        
-        select.addEventListener('change', function() {
-            localStorage.setItem('selectedSearchModel', this.value);
-        });
-    } catch (error) {
-        console.error('Failed to load models:', error);
-    }
+    const models = await window.searchManager.loadModels('search');
+    window.searchManager.populateSelect('modelSelect', models, 'selectedSearchModel');
+}
+
+// Setup parameter persistence using shared utility
+function setupParameterPersistence() {
+    window.parameterManager.setupPersistence([
+        { elementId: 'temperatureSelect', storageKey: 'multiModeTemperature' },
+        { elementId: 'contextSelect', storageKey: 'multiModeContext' },
+        { elementId: 'tokensSelect', storageKey: 'multiModeTokens' }
+    ]);
 }
 
 // Load search types and generate checkboxes
@@ -411,7 +300,8 @@ async function loadSearchTypes() {
             checkbox.dataset.method = searchType.value;
             
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(' ' + searchType.name));
+            const textNode = document.createTextNode(' ' + DOMSanitizer.sanitizeText(searchType.name || ''));
+            label.appendChild(textNode);
             container.appendChild(label);
             
             // Add event listener for the new checkbox
@@ -443,10 +333,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load saved query
     const savedQuery = localStorage.getItem('multiModeSearchQuery');
     if (savedQuery) {
-        searchQueryEl.value = savedQuery;
+        searchQueryEl.value = DOMSanitizer.sanitizeText(savedQuery);
     }
     
     // Load collections and models
     loadCollections();
     loadModels();
+    
+    // Setup parameter persistence
+    setupParameterPersistence();
 });

@@ -19,10 +19,14 @@ class SearchResultFormatter {
     }).join('\n---\n\n');
   }
 
-  // Format search results for HTML display (multi-mode page)
+  // Format search results for HTML display (multi-mode page) - safe DOM creation
   formatResultsAsHTML(results, searchType) {
+    const container = document.createElement('div');
+    
     if (!results || results.length === 0) {
-      return '<div class="no-results">No results found</div>';
+      container.className = 'no-results';
+      container.textContent = 'No results found';
+      return container;
     }
 
     if (searchType === 'line-search') {
@@ -34,33 +38,52 @@ class SearchResultFormatter {
     }
 
     // Standard formatting for other search types
-    let html = '<div class="search-results">';
+    container.className = 'search-results';
     results.forEach((result, index) => {
-      html += `
-        <div class="result-item">
-          <div class="result-header">
-            <h4>${this.escapeHtml(result.title)}</h4>
-            <span class="score">${Math.round(result.score * 100)}%</span>
-          </div>
-          <div class="result-excerpt">
-            ${result.excerpt}
-          </div>
-          <div class="result-meta">
-            <span class="source">${this.escapeHtml(result.source)}</span>
-            ${result.documentPath ? `<a href="${result.documentPath}" target="_blank" class="view-document-link">View Document</a>` : ''}
-          </div>
-        </div>
-      `;
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      
+      const header = document.createElement('div');
+      header.className = 'result-header';
+      
+      const title = document.createElement('h4');
+      title.textContent = result.title || '';
+      
+      const score = document.createElement('span');
+      score.className = 'score';
+      score.textContent = `${Math.round((result.score || 0) * 100)}%`;
+      
+      header.appendChild(title);
+      header.appendChild(score);
+      
+      const excerpt = document.createElement('div');
+      excerpt.className = 'result-excerpt';
+      excerpt.textContent = result.excerpt || '';
+      
+      const meta = document.createElement('div');
+      meta.className = 'result-meta';
+      
+      const source = document.createElement('span');
+      source.className = 'source';
+      source.textContent = result.source || '';
+      meta.appendChild(source);
+      
+      if (result.documentPath) {
+        const link = document.createElement('a');
+        link.href = result.documentPath;
+        link.target = '_blank';
+        link.className = 'view-document-link';
+        link.textContent = 'View Document';
+        meta.appendChild(link);
+      }
+      
+      item.appendChild(header);
+      item.appendChild(excerpt);
+      item.appendChild(meta);
+      container.appendChild(item);
     });
-    html += '</div>';
-    return html;
-  }
-
-  // Utility function to escape HTML
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    
+    return container;
   }
 }
 

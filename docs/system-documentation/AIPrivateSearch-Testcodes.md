@@ -641,7 +641,7 @@ Let me know how to proceed, and I can refine the plan or generate a chart with r
 
 The models are Category = search in
 
-AISearch-n-Score
+AIPrivateSearch
 Search
 Test
 Analyze
