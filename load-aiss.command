@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AIPrivateSearch Load Script v19.02
+# AIPrivateSearch Load Script v19.06
 # Enhanced installer with user confirmations and better error handling
 
 set -e  # Exit on any error
@@ -147,25 +147,48 @@ start_ollama() {
 clone_repository() {
     cd /Users/Shared
     
-    if [ -d "repos/aiprivatesearch" ]; then
+    # Create main project structure
+    mkdir -p AIPrivateSearch/repos
+    mkdir -p AIPrivateSearch/sources
+    
+    if [ -d "AIPrivateSearch/repos/aiprivatesearch" ]; then
         echo -e "${YELLOW}AIPrivateSearch directory already exists.${NC}"
         if confirm "Update existing installation?"; then
-            cd repos/aiprivatesearch
+            cd AIPrivateSearch/repos/aiprivatesearch
             git pull origin main
             echo -e "${GREEN}✓ Repository updated${NC}"
         fi
     else
         echo "Cloning AIPrivateSearch repository..."
-        mkdir -p repos
-        cd repos
+        cd AIPrivateSearch/repos
         git clone https://github.com/drbh/aiprivatesearch.git
         echo -e "${GREEN}✓ Repository cloned${NC}"
+    fi
+    
+    # Check and setup sources folder
+    setup_sources_folder
+}
+
+# Function to setup sources folder
+setup_sources_folder() {
+    echo "Checking sources folder..."
+    
+    if [ -z "$(ls -A /Users/Shared/AIPrivateSearch/sources 2>/dev/null)" ]; then
+        echo "Sources folder is empty, copying default files..."
+        if [ -d "/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/sources" ]; then
+            cp -R /Users/Shared/AIPrivateSearch/repos/aiprivatesearch/sources/* /Users/Shared/AIPrivateSearch/sources/
+            echo -e "${GREEN}✓ Default sources copied${NC}"
+        else
+            echo -e "${YELLOW}No default sources found in repository${NC}"
+        fi
+    else
+        echo -e "${GREEN}✓ Sources folder already contains files${NC}"
     fi
 }
 
 # Function to install dependencies and start services
 setup_application() {
-    cd /Users/Shared/repos/aiprivatesearch
+    cd /Users/Shared/AIPrivateSearch/repos/aiprivatesearch
     
     echo "Installing server dependencies..."
     cd server/s01_server-first-app
@@ -186,7 +209,7 @@ setup_application() {
 
 # Function to start the application
 start_application() {
-    cd /Users/Shared/repos/aiprivatesearch
+    cd /Users/Shared/AIPrivateSearch/repos/aiprivatesearch
     
     echo "Starting AIPrivateSearch servers..."
     
@@ -219,7 +242,7 @@ start_application() {
 
 # Main installation flow
 main() {
-    echo -e "${BLUE}AIPrivateSearch Installer v19.02${NC}"
+    echo -e "${BLUE}AIPrivateSearch Installer v19.06${NC}"
     echo "This will install AIPrivateSearch and all required dependencies."
     echo ""
     
