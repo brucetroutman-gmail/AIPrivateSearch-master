@@ -1,7 +1,7 @@
-# AISearchScore v11 Complete Application Specifications
+# AIPrivateSearch v11 Complete Application Specifications
 
 ## Application Overview
-AISearchScore is a comprehensive AI evaluation system featuring web frontend, Node.js backend, Ollama integration, and MySQL database for systematic testing and scoring of AI responses with centralized configuration management.
+AIPrivateSearch is a comprehensive AI evaluation system featuring web frontend, Node.js backend, Ollama integration, and MySQL database for systematic testing and scoring of AI responses with centralized configuration management.
 
 ## Architecture
 **4-Tier System**: Web Client → Node.js API → Ollama Service → MySQL Database
@@ -107,7 +107,7 @@ client/c01_client-first-app/
 ```
 
 ### Database Schema
-**MySQL Table**: `aisearchscore_results`
+**MySQL Table**: `aiprivatesearch_results`
 - TestCode, PcCode, System Info (CPU, Graphics, RAM, OS)
 - CreatedAt, SourceType, SystemPrompt, Prompt
 - Search metrics (Model, Context, Temperature, TokenLimit, Duration, Load, EvalRate)
@@ -282,4 +282,4 @@ ls client/c01_client-first-app/config/
 4. Backward compatible with existing TestCode data
 5. All export functionality preserved
 
-**Conclusion**: Version 11 enhances the AISearchScore application with centralized configuration management, improved error handling, and standardized naming conventions while maintaining full compatibility with the existing TestCode system and all core functionality.
+**Conclusion**: Version 11 enhances the AIPrivateSearch application with centralized configuration management, improved error handling, and standardized naming conventions while maintaining full compatibility with the existing TestCode system and all core functionality.

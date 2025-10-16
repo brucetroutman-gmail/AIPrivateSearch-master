@@ -1,11 +1,11 @@
 
 
 ----------------------------------------------------------------------------------------------------------------------
-First Pass: Please read AISearchScore-specs.md and then review this application and evaluate if it supports the specs.
+First Pass: Please read AIPrivateSearch-specs.md and then review this application and evaluate if it supports the specs.
 ----------------------------------------------------------------------------------------------------------------------
 
 Context
-I'll help you review the application against the AISearchScore specs. Let me first read the specifications document and then examine the application structure.
+I'll help you review the application against the AIPrivateSearch specs. Let me first read the specifications document and then examine the application structure.
 
 
 1 directory searched
@@ -18,7 +18,7 @@ Now let me examine the application structure to understand what's currently impl
 Let me examine the key implementation files to evaluate compliance with the specs:
 
 Evaluation Summary
-Based on my review of the AISearchScore specifications and the current application implementation, here's my assessment:
+Based on my review of the AIPrivateSearch specifications and the current application implementation, here's my assessment:
 
 ✅ Compliant Areas
 Architecture & Core Components:

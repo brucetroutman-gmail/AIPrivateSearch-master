@@ -18,7 +18,7 @@ This guide outlines the steps to convert the existing AI Search & Score web appl
 
 **Create Electron Project Structure:**
 ```
-AISearchScore-Electron/
+AIPrivateSearch-Electron/
 ├── package.json                 # Electron main package
 ├── main.js                     # Electron main process
 ├── preload.js                  # Preload script for security
@@ -255,7 +255,7 @@ npm install express cors ollama mysql2
 
 #### Current Structure:
 ```
-AISearchScore-bruce/
+AIPrivateSearch-bruce/
 ├── client/c01_client-first-app/     # Web frontend
 ├── server/s01_server-first-app/     # Backend API
 ├── documentation/
@@ -265,7 +265,7 @@ AISearchScore-bruce/
 
 #### Future Structure (Dual Development):
 ```
-AISearchScore-bruce/
+AIPrivateSearch-bruce/
 ├── web/                            # Original web app (renamed)
 │   ├── client/c01_client-first-app/
 │   ├── server/s01_server-first-app/
@@ -303,7 +303,7 @@ AISearchScore-bruce/
 
 **Option A: Shared Source (Recommended)**
 ```
-AISearchScore-bruce/
+AIPrivateSearch-bruce/
 ├── src/                           # Single source of truth
 │   ├── frontend/
 │   ├── backend/

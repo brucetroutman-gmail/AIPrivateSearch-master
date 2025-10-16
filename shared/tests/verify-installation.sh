@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔍 AISearchScore Installation Verification"
+echo "🔍 AIPrivateSearch Installation Verification"
 echo "=========================================="
 
 # Check directory structure

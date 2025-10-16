@@ -1,4 +1,4 @@
-# AISearchScore Coding Standards
+# AIPrivateSearch Coding Standards
 
 ## Security-First Development Standards
 

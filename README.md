@@ -1,8 +1,8 @@
-# AISearchScore
+# AIPrivateSearch
 
 ## Executive Summary
 
-AISearchScore is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring. The system enables users to test and compare different AI models using a weighted 1-3 scoring system across three key criteria: Accuracy (3x weight), Relevance (2x weight), and Organization (1x weight).
+AIPrivateSearch is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring. The system enables users to test and compare different AI models using a weighted 1-3 scoring system across three key criteria: Accuracy (3x weight), Relevance (2x weight), and Organization (1x weight).
 
 **Key Features:**
 - **Flexible Model Selection**: Choose any available Ollama model for search and scoring
@@ -28,7 +28,7 @@ AISearchScore is a comprehensive AI model evaluation platform that combines inte
 
 ### Quick Start (2 Minutes)
 
-#### 1. Run AISearchScore
+#### 1. Run AIPrivateSearch
 ```bash
 # Navigate to /Users/Shared and double-click:
 load-aiss.command
@@ -65,7 +65,7 @@ DB_HOST=your.database.host
 DB_PORT=3306
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
-DB_DATABASE=aisearchscore" > /Users/Shared/.env
+DB_DATABASE=aiprivatesearch" > /Users/Shared/.env
 ```
 
 ### Document Collections (Optional)
@@ -117,4 +117,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 19.03 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
+**Version**: 19.04 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch

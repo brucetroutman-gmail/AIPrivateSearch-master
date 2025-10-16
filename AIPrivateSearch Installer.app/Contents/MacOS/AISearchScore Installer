@@ -1,25 +1,25 @@
 #!/bin/bash
 
-# AISearchScore Installer App
+# AIPrivateSearch Installer App
 # Version 19.02
 
 # Set up logging
-LOG_FILE="/tmp/aisearchscore-installer.log"
+LOG_FILE="/tmp/aiprivatesearch-installer.log"
 exec 1> >(tee -a "$LOG_FILE")
 exec 2>&1
 
-echo "=== AISearchScore Installer Started ==="
+echo "=== AIPrivateSearch Installer Started ==="
 echo "Date: $(date)"
 echo "User: $(whoami)"
 
 # Function to show dialog
 show_dialog() {
-    osascript -e "display dialog \"$1\" with title \"AISearchScore Installer\" buttons {\"OK\"} default button \"OK\""
+    osascript -e "display dialog \"$1\" with title \"AIPrivateSearch Installer\" buttons {\"OK\"} default button \"OK\""
 }
 
 # Function to show confirmation dialog
 show_confirmation() {
-    result=$(osascript -e "display dialog \"$1\" with title \"AISearchScore Installer\" buttons {\"Cancel\", \"Continue\"} default button \"Continue\"" 2>/dev/null)
+    result=$(osascript -e "display dialog \"$1\" with title \"AIPrivateSearch Installer\" buttons {\"Cancel\", \"Continue\"} default button \"Continue\"" 2>/dev/null)
     if [[ $? -eq 0 ]]; then
         return 0
     else
@@ -28,15 +28,15 @@ show_confirmation() {
 }
 
 # Welcome message
-if ! show_confirmation "Welcome to AISearchScore Installer!
+if ! show_confirmation "Welcome to AIPrivateSearch Installer!
 
-This will install AISearchScore on your Mac with all required dependencies:
+This will install AIPrivateSearch on your Mac with all required dependencies:
 • Node.js (if needed)
 • Ollama AI platform
 • Chrome browser (if needed)
-• AISearchScore application
+• AIPrivateSearch application
 
-Installation location: /Users/Shared/repos/aisearchscore
+Installation location: /Users/Shared/repos/aiprivatesearch
 
 Continue with installation?"; then
     echo "Installation cancelled by user"
@@ -48,21 +48,21 @@ echo "Downloading installer script..."
 cd /Users/Shared
 
 # Download the load-aiss.command script
-if curl -L -o load-aiss.command "https://raw.githubusercontent.com/drbh/aisearchscore/main/load-aiss.command" 2>/dev/null; then
+if curl -L -o load-aiss.command "https://raw.githubusercontent.com/drbh/aiprivatesearch/main/load-aiss.command" 2>/dev/null; then
     echo "Downloaded installer script successfully"
     chmod +x load-aiss.command
     
     # Run the installer
-    echo "Running AISearchScore installer..."
+    echo "Running AIPrivateSearch installer..."
     ./load-aiss.command
     
     # Check if installation was successful
-    if [[ -d "/Users/Shared/repos/aisearchscore" ]]; then
-        show_dialog "AISearchScore installation completed successfully!
+    if [[ -d "/Users/Shared/repos/aiprivatesearch" ]]; then
+        show_dialog "AIPrivateSearch installation completed successfully!
 
 You can now:
 • Access the app at: http://localhost:3000
-• Find the installation at: /Users/Shared/repos/aisearchscore
+• Find the installation at: /Users/Shared/repos/aiprivatesearch
 • Run load-aiss.command anytime to restart
 
 The application should open automatically in your browser."
@@ -74,4 +74,4 @@ else
     exit 1
 fi
 
-echo "=== AISearchScore Installer Finished ==="
+echo "=== AIPrivateSearch Installer Finished ==="

@@ -12,8 +12,8 @@ function validatePath(filePath) {
     const normalizedPath = path.normalize(filePath);
     const resolvedPath = path.resolve(normalizedPath);
     
-    // Allow any path under the aisearchscore project directory
-    const projectRoot = '/Users/Shared/repos/aisearchscore';
+    // Allow any path under the aiprivatesearch project directory
+    const projectRoot = '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch';
     if (resolvedPath.startsWith(projectRoot)) {
         return resolvedPath;
     }

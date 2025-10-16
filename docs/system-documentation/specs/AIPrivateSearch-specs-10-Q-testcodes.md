@@ -107,7 +107,7 @@ The AI Search & Score application is a fully functional, production-ready evalua
 
 #### Database Integration (`MySQL`)
 - **Status**: ✅ Enhanced with TestCode storage and analytics capability
-- **Database**: aisearchscore on remote MySQL server
+- **Database**: aiprivatesearch on remote MySQL server
 - **Connection**: mysql2 with connection pooling
 - **Schema Updates**:
   - **ENHANCED**: TestCode field now populated with generated codes

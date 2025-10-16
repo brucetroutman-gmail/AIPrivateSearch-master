@@ -24,7 +24,12 @@ window.documentViewerCommon = {
     // Create a standardized View Document link
     createViewDocumentLink(collection, filename, options = {}) {
         const url = this.generateDocumentUrl(collection, filename, options);
-        return `<a href="${url}" target="_blank" class="view-document-link">View Document</a>`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.className = 'view-document-link';
+        link.textContent = 'View Document';
+        return link;
     },
 
     // Create View Document link for markdown format

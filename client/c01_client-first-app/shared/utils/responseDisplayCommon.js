@@ -75,10 +75,8 @@ window.responseDisplayCommon = {
             
             // Add View Document link
             if (result.source && collection) {
-                const linkHtml = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(linkHtml, 'text/html');
-                meta.appendChild(doc.body.firstElementChild);
+                const linkElement = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
+                meta.appendChild(linkElement);
             } else if (result.documentPath) {
                 const link = document.createElement('a');
                 link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;

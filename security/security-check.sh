@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Security validation script for AISearchScore
+# Security validation script for AIPrivateSearch
 
 echo "🔒 Running Security Validation..."
 

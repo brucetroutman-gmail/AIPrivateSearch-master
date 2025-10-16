@@ -1,4 +1,4 @@
-# AISearchScore Specs v15 - Local Document Search
+# AIPrivateSearch Specs v15 - Local Document Search
 
 ## Overview
 Local document search functionality that enables users to search their own document collections using AI-powered semantic search instead of internet sources.

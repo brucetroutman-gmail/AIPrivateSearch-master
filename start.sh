@@ -99,7 +99,7 @@ if [ ! -f /Users/Shared/.env ]; then
     echo "DB_PORT=3306"
     echo "DB_USERNAME=your_username"
     echo "DB_PASSWORD=your_password"
-    echo "DB_DATABASE=aisearchscore"
+    echo "DB_DATABASE=aiprivatesearch"
     echo ""
     read -p "Press Enter to continue without database functionality..."
 else

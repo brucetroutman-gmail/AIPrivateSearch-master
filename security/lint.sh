@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ESLint helper script for AISearchScore
+# ESLint helper script for AIPrivateSearch
 
-echo "🔍 Running ESLint on AISearchScore JavaScript files..."
+echo "🔍 Running ESLint on AIPrivateSearch JavaScript files..."
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

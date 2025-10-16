@@ -1,4 +1,4 @@
-Thank you for sharing the MySQL database schema for the `aisearchscore.searches` table, which is set up to automatically receive test results. This allows us to map the test results from the 7 models (all in the "search" category from `models-list.json`) to the database fields, using the TestCode system with **Source Type = Local Model Only**, **Detailed Assistant Type**, and your recommended settings (**Context = 8192**, **Tokens = No Limit**, **Temperature = 0.6**). The tests will run across 7 Mac-based hardware setups (M1, M2, M3, M4 variants, and one Intel i9), and I’ll ensure the test plan aligns with the database structure for seamless result storage.
+Thank you for sharing the MySQL database schema for the `aiprivatesearch.searches` table, which is set up to automatically receive test results. This allows us to map the test results from the 7 models (all in the "search" category from `models-list.json`) to the database fields, using the TestCode system with **Source Type = Local Model Only**, **Detailed Assistant Type**, and your recommended settings (**Context = 8192**, **Tokens = No Limit**, **Temperature = 0.6**). The tests will run across 7 Mac-based hardware setups (M1, M2, M3, M4 variants, and one Intel i9), and I’ll ensure the test plan aligns with the database structure for seamless result storage.
 
 ### Key Details
 - **Models**: The 7 models to test (from `models-list.json`, "search" category):
@@ -17,7 +17,7 @@ Thank you for sharing the MySQL database schema for the `aisearchscore.searches`
   - Context = 8192 (position 5 = 3)
   - Tokens = No Limit (position 6 = 1)
   - User Prompt: KNOWLEDGE-Quantum (position 4 = 1) for baseline tests; CREATE-AI-dialog and CODE-Pseudo for edge cases.
-- **Database**: Results will be stored in the `aisearchscore.searches` table, with fields like `TestCode`, `ModelName-search`, `ModelContextSize-search`, `ModelTemperature-search`, `ModelTokenLimit-search`, `Duration-search-s`, `Load-search-ms`, `EvalTokensPerSecond-ssearch`, and scoring metrics (`AccurateScore`, `RelevantScore`, `OrganizedScore`, `WeightedScore-pct`).
+- **Database**: Results will be stored in the `aiprivatesearch.searches` table, with fields like `TestCode`, `ModelName-search`, `ModelContextSize-search`, `ModelTemperature-search`, `ModelTokenLimit-search`, `Duration-search-s`, `Load-search-ms`, `EvalTokensPerSecond-ssearch`, and scoring metrics (`AccurateScore`, `RelevantScore`, `OrganizedScore`, `WeightedScore-pct`).
 - **Metrics**:
   - **Response Time**: `Duration-search-s` (seconds).
   - **Memory Usage**: Not explicitly in the schema, but can be derived or logged separately if needed.
@@ -55,7 +55,7 @@ For each test, populate the `searches` table as follows:
 - **TestCode**: e.g., t212310, t2144311.
 - **TestCategory**: Set to "search" (aligns with model category).
 - **TestDescription**: Descriptive string, e.g., "Baseline: qwen3:0.6b, KNOWLEDGE-Quantum" or "Edge: CREATE-AI-dialog, Max Context".
-- **UserEmail**: Set to a default or tester’s email (e.g., "test@aisearchscore.com").
+- **UserEmail**: Set to a default or tester’s email (e.g., "test@aiprivatesearch.com").
 - **PcCode**: Unique 6-character code for each hardware setup (e.g., "M1_001", "M2_002", ..., "I9_007"). Define these based on your setup.
 - **PcCPU**: e.g., "M1", "M2", "M3", "M4", "M1 Pro", "M2 Max", "i9".
 - **PcGraphics**: e.g., "Apple M1 GPU", "Apple M2 GPU", or "Intel Integrated" for i9.
@@ -94,13 +94,13 @@ For each test, populate the `searches` table as follows:
   4. Insert results into the `searches` table via MySQL.
 - **Database Insertion** (example SQL):
   ```sql
-  INSERT INTO aisearchscore.searches (
+  INSERT INTO aiprivatesearch.searches (
       TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt,
       SourceType, CollectionName, SystemPrompt, Prompt, ModelName-search, ModelContextSize-search,
       ModelTemperature-search, ModelTokenLimit-search, Duration-search-s, Load-search-ms,
       EvalTokensPerSecond-ssearch, Answer-search, AccurateScore, RelevantScore, OrganizedScore, WeightedScore-pct
   ) VALUES (
-      't212310', 'search', 'Baseline: qwen3:0.6b, KNOWLEDGE-Quantum', 'test@aisearchscore.com', 'M1_001', 'M1',
+      't212310', 'search', 'Baseline: qwen3:0.6b, KNOWLEDGE-Quantum', 'test@aiprivatesearch.com', 'M1_001', 'M1',
       'Apple M1 GPU', '8GB', 'macOS 15.1', '2025-08-25 15:49:00', 'Local Model', NULL,
       'You are a detailed assistant providing in-depth answers', 'Explain quantum computing principles',
       'qwen3:0.6b', 8192, 0.6, 'No Limit', 1.5, 500, 100.0, 'Quantum computing uses qubits...', NULL, NULL, NULL, NULL
@@ -224,7 +224,7 @@ For each test, populate the `searches` table as follows:
          conn = mysql.connector.connect(
              host="92.112.184.206",
              port=3306,
-             database="aisearchscore",
+             database="aiprivatesearch",
              user="nimdas",
              password="FormR!1234"
          )
@@ -237,7 +237,7 @@ For each test, populate the `searches` table as follows:
                  EvalTokensPerSecond-ssearch, Answer-search, AccurateScore, RelevantScore, OrganizedScore, WeightedScore-pct
              ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
          """, (
-             testcode, "search", f"{config['model']}: {config['prompt']}", "test@aisearchscore.com",
+             testcode, "search", f"{config['model']}: {config['prompt']}", "test@aiprivatesearch.com",
              hardware['PcCode'], hardware['PcCPU'], hardware['PcGraphics'], hardware['PcRAM'], hardware['PcOS'],
              datetime.now().strftime("%Y-%m-%d %H:%M:%S"), config['source_type'], None,
              "You are a detailed assistant providing in-depth answers", config['prompt'],
@@ -247,10 +247,10 @@ For each test, populate the `searches` table as follows:
          ))
  “
 
-System: I'm sorry, but I can't assist with executing or directly interacting with external databases, as it involves sensitive operations like connecting to a live server and handling credentials. However, I can help you refine the test plan, map the TestCodes to the `aisearchscore.searches` table, and provide a complete automation script to generate the SQL insert statements for the 63 tests, which you can execute locally or in your testing environment. I’ll also ensure the results align with the database schema and your requirements.
+System: I'm sorry, but I can't assist with executing or directly interacting with external databases, as it involves sensitive operations like connecting to a live server and handling credentials. However, I can help you refine the test plan, map the TestCodes to the `aiprivatesearch.searches` table, and provide a complete automation script to generate the SQL insert statements for the 63 tests, which you can execute locally or in your testing environment. I’ll also ensure the results align with the database schema and your requirements.
 
 ### Refined Test Plan
-Based on your input, we’re testing 7 models (all "search" category from `models-list.json`) with **Source Type = Local Model Only**, **Detailed Assistant Type**, **Context = 8192**, **Tokens = No Limit**, and **Temperature = 0.6** across 7 hardware setups (M1, M2, M3, M4 variants, and i9). The results will be stored in the `aisearchscore.searches` table. Here’s the detailed plan:
+Based on your input, we’re testing 7 models (all "search" category from `models-list.json`) with **Source Type = Local Model Only**, **Detailed Assistant Type**, **Context = 8192**, **Tokens = No Limit**, and **Temperature = 0.6** across 7 hardware setups (M1, M2, M3, M4 variants, and i9). The results will be stored in the `aiprivatesearch.searches` table. Here’s the detailed plan:
 
 #### Models
 1. qwen3:0.6b (522 MB)
@@ -297,7 +297,7 @@ For each test, populate the `searches` table as follows:
 - **TestCode**: e.g., t212310, t2144311.
 - **TestCategory**: "search".
 - **TestDescription**: e.g., "Baseline: qwen3:0.6b, KNOWLEDGE-Quantum" or "Edge: CREATE-AI-dialog, Max Context".
-- **UserEmail**: Default to "test@aisearchscore.com" (or specify your email).
+- **UserEmail**: Default to "test@aiprivatesearch.com" (or specify your email).
 - **PcCode**: Unique 6-character code, e.g., "M1_001", "M2_002", ..., "I9_007".
 - **PcCPU**: "M1", "M2", "M3", "M4", "M1 Pro", "M2 Max", "i9".
 - **PcGraphics**: e.g., "Apple M1 GPU", "Intel Integrated" for i9.
@@ -398,7 +398,7 @@ for hardware in hardware_setups:
         score_tokens = metrics["tokens_per_sec"] * 0.9 if test["Scoring"] else None  # Mock scoring tokens/sec
 
         sql = f"""
-        INSERT INTO aisearchscore.searches (
+        INSERT INTO aiprivatesearch.searches (
             TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt,
             SourceType, CollectionName, SystemPrompt, Prompt, ModelName-search, ModelContextSize-search,
             ModelTemperature-search, ModelTokenLimit-search, Duration-search-s, Load-search-ms,
@@ -406,7 +406,7 @@ for hardware in hardware_setups:
             ModelTemperature-score, Duration-score-s, Load-score-ms, EvalTokensPerSecond-score,
             AccurateScore, RelevantScore, OrganizedScore, WeightedScore-pct
         ) VALUES (
-            '{testcode}', 'search', '{test_description}', 'test@aisearchscore.com', '{hardware['PcCode']}',
+            '{testcode}', 'search', '{test_description}', 'test@aiprivatesearch.com', '{hardware['PcCode']}',
             '{hardware['PcCPU']}', '{hardware['PcGraphics']}', '{hardware['PcRAM']}', '{hardware['PcOS']}',
             '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 'Local Model', NULL,
             'You are a detailed assistant providing in-depth answers', '{test["Prompt"]}',
@@ -438,7 +438,7 @@ After running tests and inserting results, query the database to analyze:
   ```sql
   SELECT ModelName-search, PcCPU, AVG(Duration-search-s) as AvgDuration, AVG(Load-search-ms) as AvgLoad,
          AVG(EvalTokensPerSecond-ssearch) as AvgTokensPerSec
-  FROM aisearchscore.searches
+  FROM aiprivatesearch.searches
   WHERE TestCode = 't212310'
   GROUP BY ModelName-search, PcCPU
   ORDER BY PcCPU, ModelName-search;

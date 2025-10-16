@@ -1,9 +1,9 @@
-# AISearchScore Installer App
+# AIPrivateSearch Installer App
 
 ## Customer Installation Guide
 
 ### Option 1: Use the Installer App (Recommended)
-1. Download `AISearchScore Installer.app`
+1. Download `AIPrivateSearch Installer.app`
 2. Double-click to run the installer
 3. Follow the on-screen prompts
 4. The app will automatically open in your browser when complete
@@ -20,12 +20,12 @@ The installer will set up:
 - **Node.js** (if not already installed)
 - **Ollama AI Platform** (for running AI models)
 - **Google Chrome** (recommended browser)
-- **AISearchScore Application** (complete system)
+- **AIPrivateSearch Application** (complete system)
 - **Required AI Models** (qwen2:1.5b, llama3.2:1b)
 
 ## Installation Location
 
-- Main application: `/Users/Shared/repos/aisearchscore/`
+- Main application: `/Users/Shared/repos/aiprivatesearch/`
 - Installer script: `/Users/Shared/load-aiss.command`
 
 ## After Installation
@@ -36,7 +36,7 @@ The installer will set up:
 
 ## Restarting the Application
 
-To restart AISearchScore anytime:
+To restart AIPrivateSearch anytime:
 1. Navigate to `/Users/Shared/`
 2. Double-click `load-aiss.command`
 
@@ -56,5 +56,5 @@ To restart AISearchScore anytime:
 ## Support
 
 - **Website**: AIPrivateSearch
-- **Documentation**: Check `/Users/Shared/repos/aisearchscore/docs/`
-- **Logs**: Installation logs saved to `/tmp/aisearchscore-install.log`
+- **Documentation**: Check `/Users/Shared/repos/aiprivatesearch/docs/`
+- **Logs**: Installation logs saved to `/tmp/aiprivatesearch-install.log`

@@ -175,7 +175,7 @@ class CombinedSearchScorer {
 
 1. **Navigate to Server Directory**:
    ```bash
-   cd AISearchScore_/app01/server/s01_server-first-app
+   cd AIPrivateSearch_/app01/server/s01_server-first-app
    ```
 
 2. **Install Dependencies**:

@@ -1,11 +1,11 @@
 ** MySQL Connection info
 
 Server Host: 92.112.184.206  Port: 3306
-Database: aisearchscore
+Database: aiprivatesearch
 Username: nimdas
 Password: FormR!1234
 
-** aisearchscore.searches table definition
+** aiprivatesearch.searches table definition
 
 CREATE TABLE `searches` (
   `Id` int NOT NULL AUTO_INCREMENT,

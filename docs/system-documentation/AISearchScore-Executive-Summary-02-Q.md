@@ -1,8 +1,8 @@
-# AISearchScore Executive Summary v02
+# AIPrivateSearch Executive Summary v02
 
 ## Overview
 
-AISearchScore is a high-performance AI model evaluation platform that combines intelligent search capabilities with optimized automated response scoring. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Recent optimizations have achieved 80-95% performance improvements in scoring operations.
+AIPrivateSearch is a high-performance AI model evaluation platform that combines intelligent search capabilities with optimized automated response scoring. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Recent optimizations have achieved 80-95% performance improvements in scoring operations.
 
 ## Core Value Proposition
 
@@ -184,9 +184,9 @@ AISearchScore is a high-performance AI model evaluation platform that combines i
 
 ## Conclusion
 
-AISearchScore v16 represents a significant evolution in AI evaluation platforms, achieving remarkable performance improvements while enhancing user experience and system reliability. The 80-95% performance gains in scoring operations, combined with streamlined user interfaces and robust error handling, position the platform as a leading solution for AI model evaluation.
+AIPrivateSearch v16 represents a significant evolution in AI evaluation platforms, achieving remarkable performance improvements while enhancing user experience and system reliability. The 80-95% performance gains in scoring operations, combined with streamlined user interfaces and robust error handling, position the platform as a leading solution for AI model evaluation.
 
-The successful implementation of optimized models, simplified scoring scales, and enhanced user features demonstrates the platform's maturity and readiness for broader deployment. With continued focus on performance optimization, user experience enhancement, and scalability improvements, AISearchScore is well-positioned to serve as the definitive AI model evaluation and testing platform.
+The successful implementation of optimized models, simplified scoring scales, and enhanced user features demonstrates the platform's maturity and readiness for broader deployment. With continued focus on performance optimization, user experience enhancement, and scalability improvements, AIPrivateSearch is well-positioned to serve as the definitive AI model evaluation and testing platform.
 
 **Key Success Metrics:**
 - 95% reduction in scoring time (8-15s → 0.5-1s)

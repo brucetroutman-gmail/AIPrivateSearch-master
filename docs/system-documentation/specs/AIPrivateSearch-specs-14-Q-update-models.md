@@ -186,7 +186,7 @@ function formatTime(totalSeconds) {
 
 ### File Organization
 ```
-AISearchScore Application
+AIPrivateSearch Application
 ├── index.html (Landing Page)
 │   ├── Professional hero section
 │   ├── Feature grid showcase

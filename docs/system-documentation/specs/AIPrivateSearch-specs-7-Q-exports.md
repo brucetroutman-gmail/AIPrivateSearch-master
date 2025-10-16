@@ -62,7 +62,7 @@ The AI Search & Score application is a fully functional, production-ready evalua
 
 #### Database Integration (`MySQL`)
 - **Status**: ✅ Production-ready database connectivity
-- **Database**: aisearchscore on remote MySQL server
+- **Database**: aiprivatesearch on remote MySQL server
 - **Connection**: mysql2 with connection pooling
 - **Features**:
   - Real-time data insertion with error handling
@@ -333,7 +333,7 @@ const dbConfig = {
   port: 3306,
   user: 'nimdas',
   password: 'FormR!1234',
-  database: 'aisearchscore'
+  database: 'aiprivatesearch'
 };
 ```
 
@@ -486,7 +486,7 @@ curl -X POST http://localhost:3001/api/database/save \
   -d '{"TestCode": "", "CreatedAt": "2025-01-15-10-30-45"}'
 
 # Database connectivity check
-mysql -h 92.112.184.206 -P 3306 -u nimdas -p aisearchscore
+mysql -h 92.112.184.206 -P 3306 -u nimdas -p aiprivatesearch
 ```
 
 ## Future Enhancement Opportunities

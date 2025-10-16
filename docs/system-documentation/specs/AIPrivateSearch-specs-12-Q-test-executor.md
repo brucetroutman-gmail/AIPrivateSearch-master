@@ -137,7 +137,7 @@ function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temper
 #### Category Determination Logic
 ```javascript
 function getTestCategoryAndDescription(testCode) {
-    // Define test categories based on patterns from AISearchScore-Testcodes.md
+    // Define test categories based on patterns from AIPrivateSearch-Testcodes.md
     const baselineTests = ['t1111110', 't3554341', 't2323230', 't1452121', 't1234561', 't3521430', 't2143120', 't3415231'];
     const edgeCaseTests = ['t1111431', 't1413111', 't1544111', 't3254321', 't2135140'];
     const compatibilityTests = ['t1444331', 't5511111', 't1611111'];

@@ -1,8 +1,8 @@
-# AISearchScore Executive Summary v19.00
+# AIPrivateSearch Executive Summary v19.00
 
 ## Overview
 
-AISearchScore is a comprehensive AI model evaluation platform that combines seven distinct search methods with automated response scoring and advanced document collection management. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Version 19 introduces enhanced search capabilities, dynamic prompt management, and a unified user experience across all search methods.
+AIPrivateSearch is a comprehensive AI model evaluation platform that combines seven distinct search methods with automated response scoring and advanced document collection management. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Version 19 introduces enhanced search capabilities, dynamic prompt management, and a unified user experience across all search methods.
 
 ## Core Value Proposition
 
@@ -271,11 +271,11 @@ Network: Minimal - all processing local except AI model calls
 
 ## Conclusion
 
-AISearchScore v19.00 represents a revolutionary advancement in AI evaluation platforms, introducing a comprehensive seven-method search arsenal with dynamic prompt management and unified user experience. The platform successfully combines the speed of traditional search methods with the intelligence of AI-powered approaches, providing users with optimal tools for any search scenario.
+AIPrivateSearch v19.00 represents a revolutionary advancement in AI evaluation platforms, introducing a comprehensive seven-method search arsenal with dynamic prompt management and unified user experience. The platform successfully combines the speed of traditional search methods with the intelligence of AI-powered approaches, providing users with optimal tools for any search scenario.
 
 The implementation of dynamic prompt assembly, unified interface design, and enhanced security measures creates a robust and user-friendly platform that scales from simple keyword searches to complex AI-powered document analysis. The modular architecture and comprehensive performance metrics enable continuous optimization and expansion of capabilities.
 
-With its foundation of seven distinct search methods, flexible model selection, and advanced document management, AISearchScore v19.00 establishes itself as the definitive platform for AI model evaluation and intelligent document search. Future development will focus on advanced analytics, machine learning integration, and collaborative features, building upon this solid foundation to create an even more powerful and intelligent search platform.
+With its foundation of seven distinct search methods, flexible model selection, and advanced document management, AIPrivateSearch v19.00 establishes itself as the definitive platform for AI model evaluation and intelligent document search. Future development will focus on advanced analytics, machine learning integration, and collaborative features, building upon this solid foundation to create an even more powerful and intelligent search platform.
 
 **Key Success Metrics:**
 - Seven fully implemented search methods with 0.1s to 5s performance range

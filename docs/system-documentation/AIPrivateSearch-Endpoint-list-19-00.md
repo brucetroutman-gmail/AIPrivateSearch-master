@@ -1,7 +1,7 @@
-# AISearchScore API Endpoints v19.00
+# AIPrivateSearch API Endpoints v19.00
 
 ## Overview
-Complete list of REST API endpoints for AISearchScore platform with request/response specifications.
+Complete list of REST API endpoints for AIPrivateSearch platform with request/response specifications.
 
 ---
 

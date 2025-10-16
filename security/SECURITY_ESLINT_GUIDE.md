@@ -1,7 +1,7 @@
 # ESLint Security Configuration Guide
 
 ## Overview
-This guide explains how ESLint has been configured to mitigate security vulnerabilities in the AISearchScore application.
+This guide explains how ESLint has been configured to mitigate security vulnerabilities in the AIPrivateSearch application.
 
 ## Security Issues Addressed
 

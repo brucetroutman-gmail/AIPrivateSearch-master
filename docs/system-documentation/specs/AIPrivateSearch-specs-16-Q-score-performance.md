@@ -1,4 +1,4 @@
-# AISearchScore Specs v16 - Performance Optimizations & UI Enhancements
+# AIPrivateSearch Specs v16 - Performance Optimizations & UI Enhancements
 
 ## Overview
 This specification documents the performance optimizations, UI enhancements, and system improvements implemented after the initial document search functionality (v15).

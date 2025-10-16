@@ -1,4 +1,4 @@
-to do AISearchScore
+to do AIPrivateSearch
 
 1. Add dropdown for Model selection - done
 
@@ -22,7 +22,7 @@ specs-3-scoring
 
 10. move Temp Cont to under Model drop down --done
 
-11. Store the results in the MySQL db aisearchscore searches --done
+11. Store the results in the MySQL db aiprivatesearch searches --done
 
 12. add system propmts dropdown --done
 
@@ -237,7 +237,7 @@ specs-3-scoring
 
 113. Fix hybrid search endpoint URL from /hybrid to /hybrid-search --done
 
-114. Create comprehensive user manual (AISearchScore-User-Manual.md) --done
+114. Create comprehensive user manual (AIPrivateSearch-User-Manual.md) --done
 
 115. Change "Create Metadata" button to "Create Doc Indexes" and "Meta" badge to "Index" --done
 

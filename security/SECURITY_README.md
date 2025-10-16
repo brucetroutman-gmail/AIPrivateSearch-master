@@ -6,7 +6,7 @@ bash security-check.sh
 
 
 Summary
-I've successfully set up ESLint with comprehensive security rules to mitigate the security issues found in your AISearchScore application. Here's what was implemented:
+I've successfully set up ESLint with comprehensive security rules to mitigate the security issues found in your AIPrivateSearch application. Here's what was implemented:
 
 ✅ Security Configuration Added:
 ESLint Security Plugins: eslint-plugin-security and eslint-plugin-no-unsanitized

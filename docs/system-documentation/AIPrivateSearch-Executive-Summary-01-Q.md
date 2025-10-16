@@ -1,8 +1,8 @@
-# AISearchScore Executive Summary
+# AIPrivateSearch Executive Summary
 
 ## Overview
 
-AISearchScore is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics.
+AIPrivateSearch is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics.
 
 ## Core Value Proposition
 
@@ -150,4 +150,4 @@ AISearchScore is a comprehensive AI model evaluation platform that combines inte
 
 ## Conclusion
 
-AISearchScore represents a sophisticated AI evaluation platform that successfully combines search capabilities with automated quality assessment. The application demonstrates strong technical architecture, comprehensive feature set, and clear business value through systematic AI model evaluation and performance analytics. With continued development focus on user experience and performance optimization, the platform is well-positioned to serve as a comprehensive AI model evaluation solution.
+AIPrivateSearch represents a sophisticated AI evaluation platform that successfully combines search capabilities with automated quality assessment. The application demonstrates strong technical architecture, comprehensive feature set, and clear business value through systematic AI model evaluation and performance analytics. With continued development focus on user experience and performance optimization, the platform is well-positioned to serve as a comprehensive AI model evaluation solution.

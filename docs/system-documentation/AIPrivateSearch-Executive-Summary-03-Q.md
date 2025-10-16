@@ -1,8 +1,8 @@
-# AISearchScore Executive Summary v03
+# AIPrivateSearch Executive Summary v03
 
 ## Overview
 
-AISearchScore is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring and advanced document collection management. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Recent enhancements have focused on flexible scoring, enhanced collections management, and improved system stability across platforms.
+AIPrivateSearch is a comprehensive AI model evaluation platform that combines intelligent search capabilities with automated response scoring and advanced document collection management. The application provides systematic testing and performance analysis for AI models, enabling users to evaluate model quality across multiple dimensions while maintaining detailed performance metrics. Recent enhancements have focused on flexible scoring, enhanced collections management, and improved system stability across platforms.
 
 ## Core Value Proposition
 
@@ -73,7 +73,7 @@ AISearchScore is a comprehensive AI model evaluation platform that combines inte
 - **Apple Silicon Compatibility**: Enhanced support for M1/M4 Macs with lockup handling
 - **Database Configuration**: Removed invalid MySQL2 options eliminating startup warnings
 - **Security Scanner Updates**: Improved exclusions and reduced false positives
-- **Repository Management**: Renamed to aisearchscore-master with main branch as default
+- **Repository Management**: Renamed to aiprivatesearch-master with main branch as default
 - **Cache Optimization**: Aggressive cache-busting for reliable updates
 - **Authentication & Environment**: Fixed analyze-tests page authentication and .env file creation
 - **Cross-Platform Database**: Resolved remote MySQL connectivity issues on external Macs
@@ -224,9 +224,9 @@ AISearchScore is a comprehensive AI model evaluation platform that combines inte
 
 ## Conclusion
 
-AISearchScore v18 represents a significant advancement in AI evaluation platforms, introducing flexible model selection, enhanced collections management, and improved cross-platform stability. The ability to choose any available Ollama model for search and scoring operations provides unprecedented flexibility for model comparison and optimization. Enhanced collections management with visual status indicators streamlines document workflows, while improved system stability ensures reliable operation across different Mac architectures.
+AIPrivateSearch v18 represents a significant advancement in AI evaluation platforms, introducing flexible model selection, enhanced collections management, and improved cross-platform stability. The ability to choose any available Ollama model for search and scoring operations provides unprecedented flexibility for model comparison and optimization. Enhanced collections management with visual status indicators streamlines document workflows, while improved system stability ensures reliable operation across different Mac architectures.
 
-The systematic resolution of Git conflicts and syntax errors, combined with optimized database configuration and enhanced security scanning, creates a more robust and maintainable platform. These improvements, along with the enhanced user interface and cross-platform compatibility, position AISearchScore as a leading solution for AI model evaluation and document intelligence.
+The systematic resolution of Git conflicts and syntax errors, combined with optimized database configuration and enhanced security scanning, creates a more robust and maintainable platform. These improvements, along with the enhanced user interface and cross-platform compatibility, position AIPrivateSearch as a leading solution for AI model evaluation and document intelligence.
 
 Future development will focus on advanced analytics, automated model selection, and enhanced collaboration features, building upon the solid foundation established in v18 to create an even more powerful and user-friendly AI evaluation platform.
 

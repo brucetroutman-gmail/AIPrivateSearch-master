@@ -223,38 +223,25 @@ const showChunksToggle = document.getElementById('showChunksToggle');
 if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
 if (showChunksToggle) showChunksToggle.checked = false;
 
-loadSourceTypes().then(() => {
-  // Check source type after it's loaded and set checkbox visibility
-  const showChunksLabel = document.getElementById('showChunksLabel');
-  const showChunksToggle = document.getElementById('showChunksToggle');
+// Initialize page after all configs load
+Promise.all([
+  loadSourceTypes(),
+  loadVisibilityConfig()
+]).then(() => {
+  // Update field visibility after both configs are loaded
+  updateFieldVisibility();
   
-  if (sourceTypeEl.value === 'Local Documents Only' || sourceTypeEl.value === 'Local Model and Documents') {
-    if (showChunksLabel) showChunksLabel.classList.remove('hide-chunks-checkbox');
-  } else {
-    if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
-    if (showChunksToggle) showChunksToggle.checked = false;
-  }
-  
-  // Handle collection/searchType/vectorDB sections
+  // Handle collection loading if documents are involved
   if (sourceTypeEl.value.includes('Docu')) {
-    collectionSection.style.display = 'block';
-    searchTypeSection.style.display = 'block';
-    if (vectorDBSection) vectorDBSection.style.display = 'block';
     loadCollections();
-    // Check wildcard visibility after search type section is shown
-    setTimeout(() => toggleWildcardVisibility(), 10);
   }
 }).catch(() => {
-  // Fallback: keep checkbox hidden if source types fail to load
-  const showChunksLabel = document.getElementById('showChunksLabel');
-  const showChunksToggle = document.getElementById('showChunksToggle');
-  if (showChunksLabel) showChunksLabel.classList.add('hide-chunks-checkbox');
-  if (showChunksToggle) showChunksToggle.checked = false;
+  // Fallback: use default visibility
+  updateFieldVisibilityFallback();
 });
 loadModels();
 loadSystemPrompts();
 loadUserPrompts();
-loadVisibilityConfig();
 loadSearchTypes();
 
 loadTokensOptions();
@@ -460,15 +447,23 @@ function updateFieldVisibility() {
   const sourceType = sourceTypeEl.value;
   const searchType = sourceType === 'Local Model Only' ? '' : (searchTypeEl.value || 'line-search');
   
+  console.log('updateFieldVisibility - sourceType:', sourceType);
+  console.log('updateFieldVisibility - searchType:', searchType);
+  console.log('updateFieldVisibility - available rules:', Object.keys(visibilityConfig));
+  
   // Get visibility rules for current combination
   const rules = visibilityConfig[sourceType]?.[searchType];
+  console.log('updateFieldVisibility - rules found:', rules);
+  
   if (!rules) {
     logger.warn(`No visibility rules found for ${sourceType} + ${searchType}`);
     return;
   }
   
   // Apply visibility rules from JSON
+  console.log('Applying collectionSection rule:', rules.collectionSection, 'to element:', collectionSection);
   applyVisibilityRule('collectionSection', collectionSection, rules.collectionSection);
+  console.log('Applying searchTypeSection rule:', rules.searchTypeSection, 'to element:', searchTypeSection);
   applyVisibilityRule('searchTypeSection', searchTypeSection, rules.searchTypeSection);
   if (vectorDBSection) applyVisibilityRule('vectorDBSection', vectorDBSection, rules.searchTypeSection); // Same as searchType
   
@@ -489,7 +484,12 @@ function updateFieldVisibility() {
   // Model options (temperature, context, tokens)
   const modelOptions = document.querySelectorAll('.model-options');
   modelOptions.forEach(option => {
-    option.style.display = rules.modelOptions === 'Y' ? 'flex' : 'none';
+    if (rules.modelOptions === 'Y') {
+      option.classList.remove('hidden');
+      option.style.display = '';
+    } else {
+      option.classList.add('hidden');
+    }
   });
   
   // Assistant type field
@@ -513,10 +513,13 @@ function updateFieldVisibility() {
   // Generate Scores visibility
   const scoreLabel = scoreTglEl.parentElement;
   if (scoreLabel) {
-    scoreLabel.style.display = rules.generateScores === 'Y' ? 'flex' : 'none';
-    if (rules.generateScores === 'N') {
+    if (rules.generateScores === 'Y') {
+      scoreLabel.classList.remove('hidden');
+      scoreLabel.style.display = '';
+    } else {
+      scoreLabel.classList.add('hidden');
       scoreTglEl.checked = false;
-      document.getElementById('scoringSection').style.display = 'none';
+      document.getElementById('scoringSection').classList.add('hidden');
     }
   }
 }
@@ -527,7 +530,12 @@ function applyVisibilityRule(fieldName, element, rule) {
     logger.warn(`Element not found for field: ${fieldName}`);
     return;
   }
-  element.style.display = rule === 'Y' ? 'block' : 'none';
+  if (rule === 'Y') {
+    element.classList.remove('hidden');
+    element.style.display = '';
+  } else {
+    element.classList.add('hidden');
+  }
 }
 
 // Fallback function with original logic
@@ -635,8 +643,27 @@ if (vectorDBEl) {
 // Show/hide scoring section based on score toggle
 scoreTglEl.addEventListener('change', () => {
   const scoringSection = document.getElementById('scoringSection');
-  scoringSection.style.display = scoreTglEl.checked ? 'block' : 'none';
+  console.log('Before toggle - classes:', scoringSection.className);
+  console.log('Before toggle - computed style:', window.getComputedStyle(scoringSection).display);
+  
+  if (scoreTglEl.checked) {
+    scoringSection.classList.remove('hidden');
+    console.log('Removed hidden class');
+  } else {
+    scoringSection.classList.add('hidden');
+    console.log('Added hidden class');
+  }
+  
+  console.log('After toggle - classes:', scoringSection.className);
+  console.log('After toggle - computed style:', window.getComputedStyle(scoringSection).display);
+  console.log('All CSS rules for scoringSection:', window.getComputedStyle(scoringSection));
+  
+  // Force display block
+  scoringSection.style.display = 'block';
+  console.log('After forcing display block:', window.getComputedStyle(scoringSection).display);
+  
   localStorage.setItem('generateScores', scoreTglEl.checked);
+  updateFieldVisibility();
 });
 
 // Handle auto export toggle

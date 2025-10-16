@@ -1,4 +1,4 @@
-# AISearchScore - 7 Search Methods Documentation
+# AIPrivateSearch - 7 Search Methods Documentation
 
 ## Configuration
 - **Test Collection**: USA-History

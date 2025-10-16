@@ -54,7 +54,7 @@ export class SearchOrchestrator {
 
   async getAvailableCollections() {
     try {
-      const documentsPath = '../../sources/local-documents';
+      const documentsPath = '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/sources/local-documents';
       const collections = await this.searchMethods['line-search'].getCollections(documentsPath);
       return collections.map(c => c.name);
     } catch (error) {

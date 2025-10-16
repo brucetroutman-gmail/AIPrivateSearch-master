@@ -1,4 +1,4 @@
-# AISearchScore Specs v19 - Enhanced Search Methods & User Experience
+# AIPrivateSearch Specs v19 - Enhanced Search Methods & User Experience
 
 ## Overview
 This specification documents the enhanced search methods, improved user experience, and advanced prompt management implemented after the collections and UI improvements (v18).

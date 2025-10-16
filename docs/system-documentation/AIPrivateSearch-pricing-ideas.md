@@ -10,10 +10,10 @@ focus on lawyers
 
 
 
-# AISearchScore Pricing Strategy
+# AIPrivateSearch Pricing Strategy
 
 ## Overview
-Pricing strategy for AISearchScore platform with three-tier structure targeting different user segments from individual researchers to enterprise customers.
+Pricing strategy for AIPrivateSearch platform with three-tier structure targeting different user segments from individual researchers to enterprise customers.
 
 ---
 
@@ -45,7 +45,7 @@ Pricing strategy for AISearchScore platform with three-tier structure targeting 
 - **Features**: Full platform access + white-label rights
 - **API Access**: Complete REST API for integrations
 - **Customization**: Custom search methods and prompts
-- **Branding**: Remove AISearchScore branding, add your own
+- **Branding**: Remove AIPrivateSearch branding, add your own
 - **Reseller Rights**: License to market and resell the platform
 - **Database**: Enterprise database support (PostgreSQL, Oracle)
 - **Support**: Priority support with 4-hour response + phone support

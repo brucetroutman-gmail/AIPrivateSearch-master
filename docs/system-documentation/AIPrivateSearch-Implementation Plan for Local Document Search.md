@@ -1,4 +1,4 @@
-# AISearchScore - Implementation Plan for Local Document Search
+# AIPrivateSearch - Implementation Plan for Local Document Search
 
 ## Overview
 Integrate document collections into the search functionality to enable searching local processed documents instead of internet sources.

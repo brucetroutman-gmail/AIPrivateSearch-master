@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AISearchScore Load Script v19.02
+# AIPrivateSearch Load Script v19.02
 # Enhanced installer with user confirmations and better error handling
 
 set -e  # Exit on any error
@@ -13,11 +13,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Logging
-LOG_FILE="/tmp/aisearchscore-install.log"
+LOG_FILE="/tmp/aiprivatesearch-install.log"
 exec 1> >(tee -a "$LOG_FILE")
 exec 2>&1
 
-echo -e "${BLUE}=== AISearchScore Installation Started ===${NC}"
+echo -e "${BLUE}=== AIPrivateSearch Installation Started ===${NC}"
 echo "Date: $(date)"
 echo "User: $(whoami)"
 echo "Log file: $LOG_FILE"
@@ -66,7 +66,7 @@ install_xcode_tools() {
 # Function to install Node.js
 install_nodejs() {
     if ! command_exists node; then
-        echo -e "${YELLOW}Node.js is required for AISearchScore.${NC}"
+        echo -e "${YELLOW}Node.js is required for AIPrivateSearch.${NC}"
         if confirm "Install Node.js?"; then
             echo "Downloading and installing Node.js..."
             curl -o node-installer.pkg "https://nodejs.org/dist/v20.11.0/node-v20.11.0.pkg"
@@ -92,7 +92,7 @@ install_nodejs() {
 # Function to install Ollama
 install_ollama() {
     if ! command_exists ollama; then
-        echo -e "${YELLOW}Ollama AI platform is required for AISearchScore.${NC}"
+        echo -e "${YELLOW}Ollama AI platform is required for AIPrivateSearch.${NC}"
         if confirm "Install Ollama?"; then
             echo "Downloading and installing Ollama..."
             curl -fsSL https://ollama.ai/install.sh | sh
@@ -147,25 +147,25 @@ start_ollama() {
 clone_repository() {
     cd /Users/Shared
     
-    if [ -d "repos/aisearchscore" ]; then
-        echo -e "${YELLOW}AISearchScore directory already exists.${NC}"
+    if [ -d "repos/aiprivatesearch" ]; then
+        echo -e "${YELLOW}AIPrivateSearch directory already exists.${NC}"
         if confirm "Update existing installation?"; then
-            cd repos/aisearchscore
+            cd repos/aiprivatesearch
             git pull origin main
             echo -e "${GREEN}✓ Repository updated${NC}"
         fi
     else
-        echo "Cloning AISearchScore repository..."
+        echo "Cloning AIPrivateSearch repository..."
         mkdir -p repos
         cd repos
-        git clone https://github.com/drbh/aisearchscore.git
+        git clone https://github.com/drbh/aiprivatesearch.git
         echo -e "${GREEN}✓ Repository cloned${NC}"
     fi
 }
 
 # Function to install dependencies and start services
 setup_application() {
-    cd /Users/Shared/repos/aisearchscore
+    cd /Users/Shared/repos/aiprivatesearch
     
     echo "Installing server dependencies..."
     cd server/s01_server-first-app
@@ -186,9 +186,9 @@ setup_application() {
 
 # Function to start the application
 start_application() {
-    cd /Users/Shared/repos/aisearchscore
+    cd /Users/Shared/repos/aiprivatesearch
     
-    echo "Starting AISearchScore servers..."
+    echo "Starting AIPrivateSearch servers..."
     
     # Start backend server
     cd server/s01_server-first-app
@@ -207,7 +207,7 @@ start_application() {
         open http://localhost:3000
     fi
     
-    echo -e "${GREEN}=== AISearchScore Installation Complete ===${NC}"
+    echo -e "${GREEN}=== AIPrivateSearch Installation Complete ===${NC}"
     echo -e "${GREEN}Frontend: http://localhost:3000${NC}"
     echo -e "${GREEN}Backend: http://localhost:3001${NC}"
     echo ""
@@ -219,8 +219,8 @@ start_application() {
 
 # Main installation flow
 main() {
-    echo -e "${BLUE}AISearchScore Installer v19.02${NC}"
-    echo "This will install AISearchScore and all required dependencies."
+    echo -e "${BLUE}AIPrivateSearch Installer v19.02${NC}"
+    echo "This will install AIPrivateSearch and all required dependencies."
     echo ""
     
     if ! confirm "Continue with installation?"; then

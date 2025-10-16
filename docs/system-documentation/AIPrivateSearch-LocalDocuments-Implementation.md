@@ -8,7 +8,7 @@ This document outlines the implementation requirements for processing local docu
 
 ### Existing Structure
 ```
-AISearchScore-bruce/
+AIPrivateSearch-bruce/
 ├── sources/
 │   └── local-documents/
 │       └── my-literature/          # Target folder for document processing

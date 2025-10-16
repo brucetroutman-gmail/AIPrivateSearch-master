@@ -38,7 +38,10 @@ function convertMarkdownToHTML(markdown) {
 // Format Line Search results in consolidated format
 function formatLineSearchResults(results) {
     if (!results || results.length === 0) {
-        return '<div class="no-results">No results found</div>';
+        const div = document.createElement('div');
+        div.className = 'no-results';
+        div.textContent = 'No results found';
+        return div;
     }
     
     const formattedResults = results.map((result, index) => {
@@ -46,7 +49,15 @@ function formatLineSearchResults(results) {
         return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
     }).join('\n---\n\n');
     
-    return `<div class="result-item line-search-results">${convertMarkdownToHTML(formattedResults)}</div>`;
+    const div = document.createElement('div');
+    div.className = 'result-item line-search-results';
+    const htmlContent = convertMarkdownToHTML(formattedResults);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    while (doc.body.firstChild) {
+        div.appendChild(doc.body.firstChild);
+    }
+    return div;
 }
 
 // Export functions for use in other modules

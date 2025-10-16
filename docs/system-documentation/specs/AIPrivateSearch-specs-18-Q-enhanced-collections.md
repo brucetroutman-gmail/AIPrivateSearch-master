@@ -1,4 +1,4 @@
-# AISearchScore Specs v18 - Enhanced Collections & UI Improvements
+# AIPrivateSearch Specs v18 - Enhanced Collections & UI Improvements
 
 ## Overview
 This specification documents the enhanced collections management, improved user interface, and system stability improvements implemented after the flexible scoring enhancements (v17).
@@ -45,7 +45,7 @@ Document Groups:
 
 ### 3. Repository Management Improvements
 **Branch Structure Optimization:**
-- **Repository Rename**: Changed from `aisearchscore` to `aisearchscore-master`
+- **Repository Rename**: Changed from `aiprivatesearch` to `aiprivatesearch-master`
 - **Default Branch**: Updated from `master` to `main` for consistency
 - **Clean History**: Resolved merge conflicts and cleaned up commit history
 - **Security Scanning**: Updated exclusions for installer files and dependencies
@@ -80,7 +80,7 @@ const dbConfig = {
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_DATABASE || 'aisearchscore',
+  database: process.env.DB_DATABASE || 'aiprivatesearch',
   connectionLimit: 10,
   idleTimeout: 300000
   // Removed: acquireTimeout: 60000 (invalid option)
@@ -209,8 +209,8 @@ if (process.arch === 'arm64') {
 ```bash
 # Enhanced download with multiple cache-busting parameters
 curl -L -H "Cache-Control: no-cache" -H "Pragma: no-cache" \
-  --retry 3 -o aisearchscore.zip \
-  "https://github.com/brucetroutman-gmail/aisearchscore-master/archive/refs/heads/main.zip?v=$(date +%s)&r=$RANDOM"
+  --retry 3 -o aiprivatesearch.zip \
+  "https://github.com/brucetroutman-gmail/aiprivatesearch-master/archive/refs/heads/main.zip?v=$(date +%s)&r=$RANDOM"
 ```
 
 ## User Interface Enhancements

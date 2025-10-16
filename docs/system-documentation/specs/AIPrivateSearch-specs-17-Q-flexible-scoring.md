@@ -1,4 +1,4 @@
-# AISearchScore Specs v17 - Flexible Scoring & Security Enhancements
+# AIPrivateSearch Specs v17 - Flexible Scoring & Security Enhancements
 
 ## Overview
 This specification documents the flexible scoring model selection, security improvements, and user experience enhancements implemented after the performance optimizations (v16).

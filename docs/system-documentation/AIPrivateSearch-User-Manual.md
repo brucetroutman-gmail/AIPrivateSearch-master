@@ -1,4 +1,4 @@
-# AISearchScore User Manual
+# AIPrivateSearch User Manual
 
 **Version 18.08** | **AI Model Evaluation Platform**
 
@@ -254,4 +254,4 @@ Compare multiple search methods side-by-side to find the best approach for your 
 
 ---
 
-**© 2024 AISearchScore | Version 18.08 | MIT License**
+**© 2024 AIPrivateSearch | Version 18.08 | MIT License**

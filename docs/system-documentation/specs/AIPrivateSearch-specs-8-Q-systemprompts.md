@@ -80,7 +80,7 @@ The AI Search & Score application is a fully functional, production-ready evalua
 
 #### Database Integration (`MySQL`)
 - **Status**: ✅ Enhanced with system prompt name storage
-- **Database**: aisearchscore on remote MySQL server
+- **Database**: aiprivatesearch on remote MySQL server
 - **Connection**: mysql2 with connection pooling
 - **Features**:
   - Real-time data insertion with error handling

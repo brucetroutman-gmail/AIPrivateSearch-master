@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>AISearchScore Installer</string>
+    <string>AIPrivateSearch Installer</string>
     <key>CFBundleIdentifier</key>
-    <string>com.aisearchscore.installer</string>
+    <string>com.aiprivatesearch.installer</string>
     <key>CFBundleName</key>
-    <string>AISearchScore Installer</string>
+    <string>AIPrivateSearch Installer</string>
     <key>CFBundleVersion</key>
     <string>19.02</string>
     <key>CFBundleShortVersionString</key>

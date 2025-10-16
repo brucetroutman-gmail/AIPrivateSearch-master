@@ -93,7 +93,7 @@ The AI Search & Score application is a fully functional, production-ready evalua
 
 #### Database Integration (`MySQL`)
 - **Status**: ✅ Enhanced with source type and token limit storage
-- **Database**: aisearchscore on remote MySQL server
+- **Database**: aiprivatesearch on remote MySQL server
 - **Connection**: mysql2 with connection pooling
 - **Schema Updates**:
   - **NEW**: SourceType field (char(25))
