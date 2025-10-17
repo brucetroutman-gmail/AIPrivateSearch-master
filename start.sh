@@ -102,15 +102,15 @@ else
     echo "✅ .env file found in /Users/Shared/AIPrivateSearch"
 fi
 
-# Only clean and install dependencies if models were updated or node_modules doesn't exist
-if [ "$MODELS_UPDATED" = true ] || [ ! -d "node_modules" ]; then
-    echo "📦 Installing dependencies..."
+# Always ensure dependencies are installed
+if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
+    echo "📦 Installing server dependencies..."
     
     # Clean install to avoid any cached issues
     rm -rf node_modules package-lock.json 2>/dev/null || true
     
     if npm install --silent --no-audit --no-fund; then
-        echo "✅ Dependencies ready"
+        echo "✅ Server dependencies ready"
     else
         echo "❌ npm install failed!"
         echo "🔍 Debug: Node version: $(node --version)"
@@ -119,23 +119,29 @@ if [ "$MODELS_UPDATED" = true ] || [ ! -d "node_modules" ]; then
         echo "Retrying npm install..."
         
         if npm install --no-optional --silent --no-audit --no-fund; then
-            echo "✅ Dependencies ready"
+            echo "✅ Server dependencies ready"
         else
             echo "❌ npm install still failing. Please check your internet connection."
             exit 1
         fi
     fi
+else
+    echo "✅ Server dependencies found"
 fi
 
-npm start >/dev/null 2>&1 &
+echo "🔧 Starting backend server..."
+npm start &
 BACKEND_PID=$!
 
 # Wait for backend to start and verify it's running
-sleep 3
+sleep 5
 if ! kill -0 $BACKEND_PID 2>/dev/null; then
     echo "❌ Backend server failed to start"
+    echo "🔍 Checking for errors..."
+    npm start
     exit 1
 fi
+echo "✅ Backend server started"
 
 # Start frontend client
 cd ../../client/c01_client-first-app
@@ -145,11 +151,17 @@ pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
 # Start frontend with the working command
+echo "🔧 Starting frontend server..."
 npx serve . -l 3000 >/dev/null 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for frontend to start
 sleep 3
+if kill -0 $FRONTEND_PID 2>/dev/null; then
+    echo "✅ Frontend server started"
+else
+    echo "❌ Frontend server failed to start"
+fi
 
 echo ""
 echo "✅ Application started successfully!"
