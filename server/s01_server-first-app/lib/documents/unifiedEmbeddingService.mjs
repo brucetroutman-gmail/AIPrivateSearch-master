@@ -9,7 +9,7 @@ export class UnifiedEmbeddingService {
   }
   
   getCollectionDbPath(collection) {
-    return path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents', collection, 'embeddings.db');
+    return path.join('/Users/Shared/AIPrivateSearch/sources/local-documents', collection, 'embeddings.db');
   }
   
   async getCollectionDb(collection) {
