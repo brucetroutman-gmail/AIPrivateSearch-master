@@ -12,10 +12,16 @@ function validatePath(filePath) {
     const normalizedPath = path.normalize(filePath);
     const resolvedPath = path.resolve(normalizedPath);
     
-    // Allow any path under the aiprivatesearch project directory
-    const projectRoot = '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch';
-    if (resolvedPath.startsWith(projectRoot)) {
-        return resolvedPath;
+    // Allow paths under the aiprivatesearch project directory and sources directory
+    const allowedRoots = [
+        '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch',
+        '/Users/Shared/AIPrivateSearch/sources'
+    ];
+    
+    for (const root of allowedRoots) {
+        if (resolvedPath.startsWith(root)) {
+            return resolvedPath;
+        }
     }
     
     throw new Error('Path traversal attempt detected: ' + filePath);

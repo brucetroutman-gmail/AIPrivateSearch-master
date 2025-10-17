@@ -2,11 +2,22 @@ import express from 'express';
 import multer from 'multer';
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import { UnifiedEmbeddingService } from '../lib/documents/unifiedEmbeddingService.mjs';
+import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
 import path from 'path';
 import XLSX from 'xlsx';
 
 const router = express.Router();
 const embeddingService = new UnifiedEmbeddingService();
+
+// Get all collections
+router.get('/collections', async (req, res) => {
+  try {
+    const collections = await CollectionsUtil.getCollectionNames();
+    res.json({ collections });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load collections' });
+  }
+});
 
 // Configure multer for file uploads
 const upload = multer({
@@ -29,7 +40,7 @@ router.post('/collections/create', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Collection name can only contain letters, numbers, hyphens, and underscores' });
     }
     
-    const collectionPath = path.join('../../sources/local-documents', name);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), name);
     
     // Check if collection already exists
     try {
@@ -61,7 +72,7 @@ router.post('/collections/:collection/upload', upload.single('file'), async (req
     }
     
     const filename = req.file.originalname;
-    const collectionPath = path.join('../../sources/local-documents', collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     const filePath = path.join(collectionPath, filename);
     
     // Ensure collection directory exists
@@ -100,11 +111,11 @@ router.post('/convert-selected', async (req, res) => {
           continue;
         }
         
-        const sourcePath = path.join('../../sources/local-documents', collection, filename);
+        const sourcePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
         
         // Convert CSV/Excel files to JSON, others to MD
         if (ext === 'csv' || ext === 'xls' || ext === 'xlsx') {
-          const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.json'));
+          const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.json'));
           
           let jsonContent;
           
@@ -139,7 +150,7 @@ router.post('/convert-selected', async (req, res) => {
           
           await secureFs.writeFile(targetPath, jsonContent, 'utf8');
         } else {
-          const targetPath = path.join('../../sources/local-documents', collection, filename.replace(/\.[^.]+$/, '.md'));
+          const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.md'));
           
           let markdownContent;
           
@@ -185,7 +196,7 @@ router.post('/convert-selected', async (req, res) => {
 router.get('/collections/:collection/files', async (req, res) => {
   try {
     const { collection } = req.params;
-    const collectionPath = path.join('../../sources/local-documents', collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     
     const files = await secureFs.readdir(collectionPath);
     const fileList = files.filter(file => !file.startsWith('.'));
@@ -225,7 +236,7 @@ router.post('/collections/:collection/index/:filename', async (req, res) => {
     const { collection, filename } = req.params;
     
     // Read the document content
-    const filePath = path.join('../../sources/local-documents', collection, filename);
+    const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     const content = await secureFs.readFile(filePath, 'utf8');
     
     // Process with embedding service
@@ -296,7 +307,7 @@ router.delete('/collections/:collection/files/:filename', async (req, res) => {
   try {
     const { collection, filename } = req.params;
     
-    const filePath = path.join('../../sources/local-documents', collection, filename);
+    const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     await secureFs.unlink(filePath);
     
     res.json({ success: true });
@@ -323,7 +334,7 @@ router.delete('/collections/:collection', async (req, res) => {
     }
     
     // Remove collection folder
-    const collectionPath = path.join('../../sources/local-documents', collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     await secureFs.rmdir(collectionPath, { recursive: true });
     
     res.json({ success: true });
@@ -341,7 +352,7 @@ router.get('/:collection/:filename/view', async (req, res) => {
     const { collection, filename } = req.params;
     const { line } = req.query;
     
-    const filePath = path.join('../../sources/local-documents', collection, filename);
+    const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     const content = await secureFs.readFile(filePath, 'utf8');
     
     const lines = content.split('\n');
@@ -414,7 +425,7 @@ router.get('/:collection/:filename', async (req, res) => {
       return res.status(400).json({ error: 'File type not supported' });
     }
     
-    const filePath = path.join('../../sources/local-documents', collection, filename);
+    const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     
     // Set appropriate content type and read method based on file type
     if (ext === 'md' || ext === 'txt' || ext === 'json' || ext === 'csv') {

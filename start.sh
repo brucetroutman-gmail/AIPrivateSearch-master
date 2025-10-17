@@ -51,7 +51,7 @@ pull_model_safe() {
     local model="$1"
     echo "📥 Pulling $model..."
     
-    if ollama pull "$model" 2>/dev/null; then
+    if ollama pull "$model" >/dev/null 2>&1; then
         echo "✅ $model ready"
         MODELS_UPDATED=true
         return 0
@@ -89,10 +89,10 @@ MODELS_UPDATED=false
 echo "Preparing backend server..."
 cd server/s01_server-first-app
 
-# Check for .env file in /Users/Shared
-if [ ! -f /Users/Shared/.env ]; then
-    echo "⚠️  .env file not found in /Users/Shared!"
-    echo "Please create /Users/Shared/.env with your database configuration."
+# Check for .env file in /Users/Shared/AIPrivateSearch
+if [ ! -f /Users/Shared/AIPrivateSearch/.env ]; then
+    echo "⚠️  .env file not found in /Users/Shared/AIPrivateSearch!"
+    echo "Please create /Users/Shared/AIPrivateSearch/.env with your database configuration."
     echo "Example .env file contents:"
     echo "NODE_ENV=development"
     echo "DB_HOST=your.database.host"
@@ -103,7 +103,7 @@ if [ ! -f /Users/Shared/.env ]; then
     echo ""
     read -p "Press Enter to continue without database functionality..."
 else
-    echo "✅ .env file found in /Users/Shared"
+    echo "✅ .env file found in /Users/Shared/AIPrivateSearch"
 fi
 
 # Only clean and install dependencies if models were updated or node_modules doesn't exist

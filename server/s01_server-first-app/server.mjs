@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '/Users/Shared/.env', quiet: true, debug: false });
+dotenv.config({ path: '/Users/Shared/AIPrivateSearch/.env', quiet: true, debug: false });
 import express from 'express';
 import cors from 'cors';
 import path from 'path';

@@ -74,7 +74,7 @@ export class HybridSearch {
   }
 
   async indexCollection(collection) {
-    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
     const files = await secureFs.readdir(collectionPath);

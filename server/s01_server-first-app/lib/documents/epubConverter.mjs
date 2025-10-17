@@ -21,7 +21,7 @@ class EpubConverter {
   async convertEpubToMarkdown(epubPath, outputDir = null) {
     try {
       // Validate input path
-      const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+      const baseDir = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
       const safeEpubPath = validatePath(epubPath, baseDir);
       
       if (!await secureFs.exists(safeEpubPath)) {
@@ -59,7 +59,7 @@ class EpubConverter {
 
   async convertAllEpubsInDirectory(dirPath) {
     try {
-      const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+      const baseDir = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
       const safeDirPath = validatePath(dirPath, baseDir);
       const files = await secureFs.readdir(safeDirPath);
       const epubFiles = files.filter(file => file.toLowerCase().endsWith('.epub'));

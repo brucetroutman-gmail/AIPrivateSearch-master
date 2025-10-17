@@ -274,7 +274,9 @@ searchtype. Store prompts in .json configs
 
 130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources
 
-131. create app for load-aiss-1013.command
+131. create app for load-aiss-1013.command  --started
+
+132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repos/aiprivatesearch/sources before release   --done
 
 
 

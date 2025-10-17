@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env from /Users/Shared
-const envPath = '/Users/Shared/.env';
+const envPath = '/Users/Shared/AIPrivateSearch/.env';
 dotenv.config({ path: envPath, quiet: true, debug: false });
 
 const router = express.Router();

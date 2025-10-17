@@ -47,7 +47,7 @@ async function processAllCollections() {
 }
 
 async function convertNonMarkdownFiles(collection, processor) {
-  const collectionPath = path.join(process.cwd(), '../../sources/local-documents', collection);
+  const collectionPath = path.join('/Users/Shared/AIPrivateSearch/sources/local-documents', collection);
   const allFiles = await secureFs.readdir(collectionPath);
   
   const nonMdFiles = allFiles.filter(file => {

@@ -8,7 +8,7 @@ import { VectorStore } from '../lib/documents/vectorStore.mjs';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
-const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+const documentsPath = '/Users/Shared/AIPrivateSearch/sources/local-documents';
 const embeddingsPath = path.join(process.cwd(), 'data', 'embeddings');
 
 async function reembedAllCollections(vectorDB = 'local') {

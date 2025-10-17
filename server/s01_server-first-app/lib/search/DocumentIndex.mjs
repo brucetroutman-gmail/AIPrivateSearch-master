@@ -127,7 +127,7 @@ export class DocumentIndex {
 
 
   async indexCollection(collection) {
-    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     const dbPath = path.join(collectionPath, 'index-cards.db');
     
@@ -355,7 +355,7 @@ ${content.substring(0, 4000)}`;
   }
 
   async cleanupMetaFiles(collection) {
-    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     
     const files = fs.readdirSync(collectionPath);
@@ -501,7 +501,7 @@ ${content.substring(0, 4000)}`;
   }
 
   async indexSingleDocument(collection, filename) {
-    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
     const collectionPath = path.join(documentsPath, collection);
     const dbPath = path.join(collectionPath, 'index-cards.db');
     const filePath = path.join(collectionPath, filename);

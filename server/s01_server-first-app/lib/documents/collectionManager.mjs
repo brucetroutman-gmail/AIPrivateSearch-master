@@ -1,11 +1,12 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import fs from 'fs-extra';
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 
 export class CollectionManager {
   constructor() {
-    this.basePath = path.join(process.cwd(), '../../sources/local-documents');
+    this.basePath = CollectionsUtil.getCollectionsPath();
   }
 
   getCollectionPath(collection) {

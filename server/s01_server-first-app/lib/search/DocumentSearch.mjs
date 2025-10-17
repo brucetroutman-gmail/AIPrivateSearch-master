@@ -66,7 +66,7 @@ export class DocumentSearch {
   }
 
   async buildIndex(collection) {
-    const documentsPath = path.join(process.cwd(), '../../sources/local-documents');
+    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
     let collections = await this.getCollections(documentsPath);
     
     if (collection) {

@@ -1,16 +1,26 @@
 #!/bin/bash
 
-# AIPrivateSearch Installer App
+# AIPrivateSearch Installer App with Embedded load-aiss.command
 # Version 19.06
 
-# Set up logging
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging
 LOG_FILE="/tmp/aiprivatesearch-installer.log"
 exec 1> >(tee -a "$LOG_FILE")
 exec 2>&1
 
-echo "=== AIPrivateSearch Installer Started ==="
+echo -e "${BLUE}=== AIPrivateSearch Installation Started ===${NC}"
 echo "Date: $(date)"
 echo "User: $(whoami)"
+echo "Log file: $LOG_FILE"
 
 # Function to show dialog
 show_dialog() {
@@ -27,51 +37,183 @@ show_confirmation() {
     fi
 }
 
-# Welcome message
-if ! show_confirmation "Welcome to AIPrivateSearch Installer!
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+
+
+# Function to install Node.js
+install_nodejs() {
+    if ! command_exists node; then
+        echo -e "${YELLOW}Installing Node.js...${NC}"
+        show_dialog "Downloading and installing Node.js. This may take a few minutes."
+        curl -o /tmp/node-installer.pkg "https://nodejs.org/dist/v20.11.0/node-v20.11.0.pkg"
+        sudo installer -pkg /tmp/node-installer.pkg -target /
+        rm /tmp/node-installer.pkg
+        
+        # Add Node.js to PATH
+        export PATH="/usr/local/bin:$PATH"
+        
+        if ! command_exists node; then
+            show_dialog "Node.js installation failed. Please install manually and try again."
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Node.js installed ($(node --version))${NC}"
+    else
+        echo -e "${GREEN}✓ Node.js already installed ($(node --version))${NC}"
+    fi
+}
+
+# Function to install Ollama
+install_ollama() {
+    if ! command_exists ollama; then
+        echo -e "${YELLOW}Installing Ollama AI platform...${NC}"
+        show_dialog "Downloading and installing Ollama. This may take a few minutes."
+        curl -fsSL https://ollama.ai/install.sh | sh
+        
+        if ! command_exists ollama; then
+            show_dialog "Ollama installation failed. Please install manually and try again."
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Ollama installed${NC}"
+    else
+        echo -e "${GREEN}✓ Ollama already installed${NC}"
+    fi
+}
+
+# Function to install Chrome
+install_chrome() {
+    if ! ls /Applications/Google\ Chrome.app >/dev/null 2>&1; then
+        echo -e "${YELLOW}Installing Google Chrome...${NC}"
+        show_dialog "Downloading and installing Google Chrome for the best experience."
+        curl -L -o /tmp/chrome.dmg "https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg"
+        hdiutil attach /tmp/chrome.dmg -quiet
+        cp -R "/Volumes/Google Chrome/Google Chrome.app" /Applications/
+        hdiutil detach "/Volumes/Google Chrome" -quiet
+        rm /tmp/chrome.dmg
+        echo -e "${GREEN}✓ Google Chrome installed${NC}"
+    else
+        echo -e "${GREEN}✓ Google Chrome already installed${NC}"
+    fi
+}
+
+# Function to start Ollama service
+start_ollama() {
+    echo "Starting Ollama service..."
+    ollama serve &
+    OLLAMA_PID=$!
+    sleep 3
+    
+    if ! pgrep -f "ollama serve" > /dev/null; then
+        echo -e "${RED}Failed to start Ollama service${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Ollama service started${NC}"
+}
+
+# Function to setup AIPrivateSearch
+setup_aiprivatesearch() {
+    # Use existing repository from installer location
+    INSTALLER_DIR="$(dirname "$(dirname "$(dirname "$0")")")" # Go up from MacOS/Contents/AIPrivateSearch Installer.app
+    SOURCE_DIR="$INSTALLER_DIR"
+    TARGET_DIR="/Users/Shared/AIPrivateSearch/repos/aiprivatesearch"
+    
+    echo "Setting up AIPrivateSearch from installer..."
+    mkdir -p "/Users/Shared/AIPrivateSearch/repos"
+    
+    if [ -d "$TARGET_DIR" ]; then
+        echo -e "${YELLOW}AIPrivateSearch directory already exists. Updating...${NC}"
+        # Copy updated files from installer
+        cp -R "$SOURCE_DIR/"* "$TARGET_DIR/" 2>/dev/null || true
+    else
+        echo "Copying AIPrivateSearch from installer..."
+        cp -R "$SOURCE_DIR" "$TARGET_DIR"
+    fi
+    
+    cd "$TARGET_DIR"
+    
+    echo "Installing server dependencies..."
+    cd server/s01_server-first-app
+    npm install
+    
+    echo "Installing client dependencies..."
+    cd ../../client/c01_client-first-app
+    npm install
+    
+    cd ../..
+    
+    echo "Pulling required AI models..."
+    ollama pull qwen2:1.5b
+    ollama pull llama3.2:1b
+    
+    echo -e "${GREEN}✓ AIPrivateSearch setup complete${NC}"
+}
+
+# Function to start the application
+start_application() {
+    cd /Users/Shared/AIPrivateSearch/repos/aiprivatesearch
+    
+    echo "Starting AIPrivateSearch servers..."
+    
+    # Start backend server
+    cd server/s01_server-first-app
+    npm start &
+    SERVER_PID=$!
+    
+    # Start frontend server
+    cd ../../client/c01_client-first-app
+    npm start &
+    CLIENT_PID=$!
+    
+    sleep 5
+    
+    # Open browser
+    if command_exists open; then
+        open http://localhost:3000
+    fi
+    
+    show_dialog "AIPrivateSearch installation completed successfully!
+
+The application is now running:
+• Frontend: http://localhost:3000
+• Backend: http://localhost:3001
+
+The browser should open automatically. If not, navigate to http://localhost:3000
+
+To restart later, run the load-aiss.command file in /Users/Shared/AIPrivateSearch/repos/aiprivatesearch/"
+    
+    echo -e "${GREEN}=== AIPrivateSearch Installation Complete ===${NC}"
+    echo -e "${GREEN}Frontend: http://localhost:3000${NC}"
+    echo -e "${GREEN}Backend: http://localhost:3001${NC}"
+}
+
+# Main installation flow
+main() {
+    if ! show_confirmation "Welcome to AIPrivateSearch Installer!
 
 This will install AIPrivateSearch on your Mac with all required dependencies:
+• Xcode Command Line Tools (if needed)
 • Node.js (if needed)
-• Ollama AI platform
+• Ollama AI platform (if needed)
 • Chrome browser (if needed)
 • AIPrivateSearch application
 
 Installation location: /Users/Shared/AIPrivateSearch/repos/aiprivatesearch
 
 Continue with installation?"; then
-    echo "Installation cancelled by user"
-    exit 0
-fi
-
-# Download and run the installer
-echo "Downloading installer script..."
-cd /Users/Shared
-
-# Download the load-aiss.command script
-if curl -L -o load-aiss.command "https://raw.githubusercontent.com/drbh/aiprivatesearch/main/load-aiss.command" 2>/dev/null; then
-    echo "Downloaded installer script successfully"
-    chmod +x load-aiss.command
-    
-    # Run the installer
-    echo "Running AIPrivateSearch installer..."
-    ./load-aiss.command
-    
-    # Check if installation was successful
-    if [[ -d "/Users/Shared/AIPrivateSearch/repos/aiprivatesearch" ]]; then
-        show_dialog "AIPrivateSearch installation completed successfully!
-
-You can now:
-• Access the app at: http://localhost:3000
-• Find the installation at: /Users/Shared/AIPrivateSearch/repos/aiprivatesearch
-• Run load-aiss.command anytime to restart
-
-The application should open automatically in your browser."
-    else
-        show_dialog "Installation may have encountered issues. Please check the Terminal for details or try running load-aiss.command manually from /Users/Shared/"
+        echo "Installation cancelled by user"
+        exit 0
     fi
-else
-    show_dialog "Failed to download installer. Please check your internet connection and try again."
-    exit 1
-fi
+    
+    install_nodejs
+    install_ollama
+    install_chrome
+    start_ollama
+    setup_aiprivatesearch
+    start_application
+}
 
-echo "=== AIPrivateSearch Installer Finished ==="
+# Run main function
+main "$@"

@@ -1,5 +1,5 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
-
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import path from 'path';
 import { validatePath, validateFilename } from '../utils/pathValidator.mjs';
 import { Ollama } from 'ollama';
@@ -162,7 +162,7 @@ export class DocumentProcessor {
   }
 
   async convertCollectionFiles(collection) {
-    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const baseDir = CollectionsUtil.getCollectionsPath();
     const collectionPath = validatePath(collection, baseDir);
     const files = await secureFs.readdir(collectionPath);
     const results = [];
@@ -191,7 +191,7 @@ export class DocumentProcessor {
   async generateDocumentMetadata(collection) {
     this.clearModelCache();
     
-    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const baseDir = CollectionsUtil.getCollectionsPath();
     const collectionPath = validatePath(collection, baseDir);
     const files = await secureFs.readdir(collectionPath);
     
@@ -391,7 +391,7 @@ ${response.response}
   }
   
   async loadMetadataContext(collection, currentFilename) {
-    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const baseDir = CollectionsUtil.getCollectionsPath();
     const collectionPath = validatePath(collection, baseDir);
     
     try {
@@ -502,7 +502,7 @@ Content: ${content}`;
   }
 
   async generateCollectionSummary(collection) {
-    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const baseDir = CollectionsUtil.getCollectionsPath();
     const collectionPath = validatePath(collection, baseDir);
     
     try {
@@ -688,7 +688,7 @@ ${metadata.documents.map(doc => `### ${doc.fileName}
 
 
   async concatenateMetaFiles(collection) {
-    const baseDir = path.join(process.cwd(), '../../sources/local-documents');
+    const baseDir = CollectionsUtil.getCollectionsPath();
     const collectionPath = validatePath(collection, baseDir);
     const files = await secureFs.readdir(collectionPath);
     

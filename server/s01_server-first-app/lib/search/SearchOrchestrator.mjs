@@ -6,6 +6,7 @@ import { SmartSearch } from './SmartSearch.mjs';
 import { HybridSearch } from './HybridSearch.mjs';
 import { AIDirectSearch } from './AIDirectSearch.mjs';
 import { AIDocumentChat } from './AIDocumentChat.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 
 
 export class SearchOrchestrator {
@@ -53,14 +54,7 @@ export class SearchOrchestrator {
   }
 
   async getAvailableCollections() {
-    try {
-      const documentsPath = '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/sources/local-documents';
-      const collections = await this.searchMethods['line-search'].getCollections(documentsPath);
-      return collections.map(c => c.name);
-    } catch (error) {
-      console.error('Error loading collections:', error.message);
-      return [];
-    }
+    return await CollectionsUtil.getCollectionNames();
   }
 
   async indexCollectionDocumentIndex(collection) {

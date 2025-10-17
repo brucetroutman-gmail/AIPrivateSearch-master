@@ -14,7 +14,7 @@ export class LineSearch {
     const results = [];
     
     try {
-      const documentsPath = '../../sources/local-documents';
+      const documentsPath = '/Users/Shared/AIPrivateSearch/sources/local-documents';
       let collections = await this.getCollections(documentsPath);
       
       if (collection) {
