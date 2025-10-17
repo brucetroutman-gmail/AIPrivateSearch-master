@@ -1,4 +1,5 @@
 import { logger } from './utils/logger.js';
+import { DOMSanitizer } from './utils/domSanitizer.js';
 
 // Simple rate limiting
 let messageCallCount = 0;

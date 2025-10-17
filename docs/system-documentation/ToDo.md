@@ -253,12 +253,12 @@ specs-3-scoring
 
 120. create user prompts based on source Type and collection and search type
 
-121. focus on display and layout
+121. focus on display and layout  --started
 
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection,
 searchtype. Store prompts in .json configs
 
-123. We need to place source documents outside of repo. 
+123. We need to place source documents outside of repo. --done
 
 124. Create a quick start guide.
 
@@ -266,15 +266,15 @@ searchtype. Store prompts in .json configs
 
 126. enhance database saving add documents only
 
-127. high matched words in all.
+127. highlight matched words in all.
 
 128. Make View Documnet consistent across all types, Add View Index Card to Doc Index Cards response
 
 129. review doc index card creation add  remove fields change models overall improve.
 
-130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources
+130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources  --done
 
-131. create app for load-aiss-1013.command  --started
+131. create app for load-aiss-1017.command  --started
 
 132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repos/aiprivatesearch/sources before release   --done
 
