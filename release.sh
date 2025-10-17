@@ -25,7 +25,9 @@ else
     # Minor version bump
     MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
     MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
-    NEW_MINOR=$(printf "%02d" $((MINOR + 1)))
+    # Remove leading zeros to avoid octal interpretation
+    MINOR_NUM=$((10#$MINOR))
+    NEW_MINOR=$(printf "%02d" $((MINOR_NUM + 1)))
     NEW_VERSION="$MAJOR.$NEW_MINOR"
     echo "🔢 Minor version bump to: $NEW_VERSION"
 fi

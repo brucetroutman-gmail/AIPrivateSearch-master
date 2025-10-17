@@ -94,3 +94,6 @@ class DOMSanitizer {
 
 // Make globally available
 window.DOMSanitizer = DOMSanitizer;
+
+// ES6 export
+export { DOMSanitizer };
