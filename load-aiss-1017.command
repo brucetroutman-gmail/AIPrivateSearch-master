@@ -293,7 +293,7 @@ if [ $? -eq 0 ] && [ -f AIPrivateSearch.zip ]; then
         echo "# Database Configuration" >> "/Users/Shared/AIPrivateSearch/.env"
         echo "DB_HOST=92.112.184.206" >> "/Users/Shared/AIPrivateSearch/.env"
         echo "DB_PORT=3306" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_DATABASE=AIPrivateSearch" >> "/Users/Shared/AIPrivateSearch/.env"
+        echo "DB_DATABASE=aiprivatesearch" >> "/Users/Shared/AIPrivateSearch/.env"
         echo "DB_USERNAME=nimdas" >> "/Users/Shared/AIPrivateSearch/.env"
         echo "DB_PASSWORD=FormR!1234" >> "/Users/Shared/AIPrivateSearch/.env"
         

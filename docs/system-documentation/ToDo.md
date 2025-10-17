@@ -278,6 +278,8 @@ searchtype. Store prompts in .json configs
 
 132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repos/aiprivatesearch/sources before release   --done
 
+133. Replace toggle advanced with 3 roles: standard, premium, developer  --started
+
 
 
 

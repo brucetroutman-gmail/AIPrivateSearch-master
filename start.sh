@@ -1,9 +1,8 @@
 #!/bin/bash
 
-echo "🚀 Starting AI Search & Score Application..."
+echo "🚀 Starting AIPrivateSearch..."
 
 # Kill any existing server processes to free up ports
-echo "Stopping any existing servers..."
 # Kill processes by port to ensure clean shutdown
 lsof -ti :3001 | xargs kill -9 2>/dev/null || true
 lsof -ti :3000 | xargs kill -9 2>/dev/null || true
@@ -21,7 +20,7 @@ echo "🔍 Checking Ollama service..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
     echo "🚀 Starting Ollama service..."
     if ! pgrep -f "ollama serve" > /dev/null; then
-        ollama serve &
+        ollama serve >/dev/null 2>&1 &
         sleep 3
     fi
     
@@ -69,24 +68,21 @@ else
     REQUIRED_MODELS="qwen2:0.5b gemma2:2b qwen2.5:3b"
 fi
 
-echo "🔍 Checking all required models..."
+echo "🔍 Checking required models..."
 for model in $REQUIRED_MODELS; do
     if ! ollama list 2>/dev/null | grep -q "^${model}"; then
-        echo "❌ Missing: $model"
         pull_model_safe "$model"
         sleep 2  # Brief pause between models
-    else
-        echo "✅ $model available"
     fi
 done
 
-echo "💡 To update or install additional models, use the Models page in the application"
+# Removed verbose model update message
 
 # Track if we updated any models
 MODELS_UPDATED=false
 
 # Start backend server in background
-echo "Preparing backend server..."
+echo "🔧 Starting servers..."
 cd server/s01_server-first-app
 
 # Check for .env file in /Users/Shared/AIPrivateSearch
@@ -108,18 +104,13 @@ fi
 
 # Only clean and install dependencies if models were updated or node_modules doesn't exist
 if [ "$MODELS_UPDATED" = true ] || [ ! -d "node_modules" ]; then
-    if [ "$MODELS_UPDATED" = true ]; then
-        echo "🧹 Models were updated - cleaning and reinstalling dependencies..."
-    else
-        echo "📦 First time setup - installing dependencies..."
-    fi
+    echo "📦 Installing dependencies..."
     
     # Clean install to avoid any cached issues
     rm -rf node_modules package-lock.json 2>/dev/null || true
     
-    echo "📦 Installing dependencies (pure JavaScript - no compilation needed)..."
     if npm install --silent --no-audit --no-fund; then
-        echo "✅ Dependencies installed successfully"
+        echo "✅ Dependencies ready"
     else
         echo "❌ npm install failed!"
         echo "🔍 Debug: Node version: $(node --version)"
@@ -128,18 +119,15 @@ if [ "$MODELS_UPDATED" = true ] || [ ! -d "node_modules" ]; then
         echo "Retrying npm install..."
         
         if npm install --no-optional --silent --no-audit --no-fund; then
-            echo "✅ Dependencies installed after retry"
+            echo "✅ Dependencies ready"
         else
             echo "❌ npm install still failing. Please check your internet connection."
             exit 1
         fi
     fi
-else
-    echo "✅ Using existing dependencies (no model updates detected)"
 fi
 
-echo "Starting backend server..."
-npm start &
+npm start >/dev/null 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to start and verify it's running
@@ -150,7 +138,6 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
 fi
 
 # Start frontend client
-echo "Starting frontend client..."
 cd ../../client/c01_client-first-app
 
 # Kill any existing serve processes
@@ -158,16 +145,11 @@ pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
 # Start frontend with the working command
-npx serve . -l 3000 &
+npx serve . -l 3000 >/dev/null 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for frontend to start
 sleep 3
-if kill -0 $FRONTEND_PID 2>/dev/null; then
-    echo "✅ Frontend server started successfully"
-else
-    echo "❌ Frontend server failed to start"
-fi
 
 echo ""
 echo "✅ Application started successfully!"

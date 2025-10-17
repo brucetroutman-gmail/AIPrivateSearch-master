@@ -235,13 +235,32 @@ function toggleMenu() {
   }
 }
 
-// Developer mode toggle
+// Role-based system
+function setUserRole(role) {
+  const validRoles = ['standard', 'premium', 'developer'];
+  if (!validRoles.includes(role)) return;
+  
+  localStorage.setItem('userRole', role);
+  applyUserRole(role);
+  
+  const roleNames = {
+    'standard': 'Standard',
+    'premium': 'Premium', 
+    'developer': 'Developer'
+  };
+  
+  showUserMessage(`Role set to ${roleNames[role]}`, 'info');
+}
+
+function getUserRole() {
+  return localStorage.getItem('userRole') || 'developer'; // Default to developer for existing users
+}
+
+// Legacy function for backward compatibility
 function toggleDeveloperMode() {
-  const isDeveloperMode = localStorage.getItem('developerMode') === 'true';
-  const newMode = !isDeveloperMode;
-  localStorage.setItem('developerMode', newMode);
-  applyDeveloperMode(newMode);
-  showUserMessage(`Advanced Mode ${newMode ? 'enabled' : 'disabled'}`, 'info');
+  const currentRole = getUserRole();
+  const newRole = currentRole === 'standard' ? 'developer' : 'standard';
+  setUserRole(newRole);
 }
 
 function toggleElementsByClass(className, isDeveloperMode) {
@@ -251,22 +270,48 @@ function toggleElementsByClass(className, isDeveloperMode) {
   });
 }
 
-function applyDeveloperMode(isDeveloperMode = null) {
-  if (isDeveloperMode === null) {
-    isDeveloperMode = localStorage.getItem('developerMode') === 'true';
+function applyUserRole(role = null) {
+  if (role === null) {
+    role = getUserRole();
   }
   
-  toggleElementsByClass('.dev-only', isDeveloperMode);
-  toggleElementsByClass('.adv-only', isDeveloperMode);
+  // Standard role: hide advanced features
+  // Premium and Developer roles: show advanced features
+  const showAdvanced = role !== 'standard';
+  
+  toggleElementsByClass('.dev-only', showAdvanced);
+  toggleElementsByClass('.adv-only', showAdvanced);
+}
+
+// Legacy function for backward compatibility
+function applyDeveloperMode(isDeveloperMode = null) {
+  if (isDeveloperMode === null) {
+    // Migrate from old developerMode to role system
+    const oldMode = localStorage.getItem('developerMode');
+    if (oldMode !== null) {
+      const role = oldMode === 'true' ? 'developer' : 'standard';
+      localStorage.setItem('userRole', role);
+      localStorage.removeItem('developerMode');
+    }
+  }
+  applyUserRole();
 }
 
 function loadDeveloperMode() {
-  // Default to developer mode enabled if not set
-  const isDeveloperMode = localStorage.getItem('developerMode');
-  if (isDeveloperMode === null) {
-    localStorage.setItem('developerMode', 'true');
+  // Migrate existing users from developerMode to role system
+  const oldMode = localStorage.getItem('developerMode');
+  if (oldMode !== null && !localStorage.getItem('userRole')) {
+    const role = oldMode === 'true' ? 'developer' : 'standard';
+    localStorage.setItem('userRole', role);
+    localStorage.removeItem('developerMode');
   }
-  applyDeveloperMode();
+  
+  // Default to developer role if not set (for existing users)
+  if (!localStorage.getItem('userRole')) {
+    localStorage.setItem('userRole', 'developer');
+  }
+  
+  applyUserRole();
 }
 
 // Email management
@@ -573,6 +618,8 @@ if (typeof window !== 'undefined') {
   window.secureConfirm = secureConfirm;
   window.toggleDarkMode = toggleDarkMode;
   window.toggleDeveloperMode = toggleDeveloperMode;
+  window.setUserRole = setUserRole;
+  window.getUserRole = getUserRole;
   window.toggleMenu = toggleMenu;
   window.collectionsUtils = collectionsUtils;
 }
