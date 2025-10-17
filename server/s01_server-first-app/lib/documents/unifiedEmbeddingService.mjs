@@ -1,4 +1,5 @@
 import { SqlJsWrapper } from '../utils/SqlJsWrapper.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -9,7 +10,7 @@ export class UnifiedEmbeddingService {
   }
   
   getCollectionDbPath(collection) {
-    return path.join('/Users/Shared/AIPrivateSearch/sources/local-documents', collection, 'embeddings.db');
+    return path.join(CollectionsUtil.getCollectionsPath(), collection, 'embeddings.db');
   }
   
   async getCollectionDb(collection) {

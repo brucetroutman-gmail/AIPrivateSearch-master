@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
+import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
 import path from 'path';
 import { EmbeddingService } from '../lib/documents/embeddingService.mjs';
 import { VectorStore } from '../lib/documents/vectorStore.mjs';
@@ -8,7 +9,7 @@ import { VectorStore } from '../lib/documents/vectorStore.mjs';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
-const documentsPath = '/Users/Shared/AIPrivateSearch/sources/local-documents';
+const documentsPath = CollectionsUtil.getCollectionsPath();
 const embeddingsPath = path.join(process.cwd(), 'data', 'embeddings');
 
 async function reembedAllCollections(vectorDB = 'local') {

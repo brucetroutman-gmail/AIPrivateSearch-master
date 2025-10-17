@@ -157,6 +157,22 @@ function secureConfirm(message) {
   });
 }
 
+// Load app config and update branding
+async function loadAppConfig() {
+  try {
+    const response = await fetch('./config/app.json');
+    const config = await response.json();
+    const logoEl = document.getElementById('app-logo');
+    if (logoEl && config['app-name']) {
+      const versionSpan = logoEl.querySelector('.version');
+      const versionText = versionSpan ? versionSpan.outerHTML : '';
+      logoEl.innerHTML = `${config['app-name']} ${versionText}`;
+    }
+  } catch (error) {
+    // Silently fail - app config is not critical
+  }
+}
+
 // Load version from API
 async function loadVersion() {
   try {
@@ -165,7 +181,6 @@ async function loadVersion() {
     const versionEl = document.getElementById('version-display');
     if (versionEl && data.version) {
       versionEl.textContent = `(v${data.version})`;
-      document.title = `AIPrivateSearch v${data.version}`;
     }
   } catch (error) {
     // Silently fail - version display is not critical
@@ -186,7 +201,8 @@ async function loadSharedComponents() {
       const headerContent = doc.body.firstElementChild;
       if (headerContent) {
         headerEl.appendChild(headerContent);
-        // Load version after header is loaded
+        // Load app config and version after header is loaded
+        loadAppConfig();
         loadVersion();
       }
     }

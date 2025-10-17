@@ -1,4 +1,5 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
@@ -74,8 +75,7 @@ export class HybridSearch {
   }
 
   async indexCollection(collection) {
-    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
-    const collectionPath = path.join(documentsPath, collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     
     const files = await secureFs.readdir(collectionPath);
     const documentFiles = files.filter(file => 

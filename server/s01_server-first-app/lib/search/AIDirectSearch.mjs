@@ -1,4 +1,5 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import path from 'path';
 
 export class AIDirectSearch {
@@ -12,8 +13,7 @@ export class AIDirectSearch {
     const results = [];
     
     try {
-      const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
-      let collections = await this.getCollections(documentsPath);
+      let collections = await this.getCollections(CollectionsUtil.getCollectionsPath());
       
       if (collection) {
         collections = collections.filter(c => c.name === collection);

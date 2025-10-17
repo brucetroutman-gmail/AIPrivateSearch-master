@@ -3,10 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIPrivateSearch - AI Private Searching Platform</title>
+  <title id="page-title">AI Private Search - AI Private Searching Platform</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
+  <script>
+    // Load app config and update title/heading
+    fetch('./config/app.json')
+      .then(response => response.json())
+      .then(config => {
+        document.getElementById('page-title').textContent = config['app-name'] + ' - AI Private Searching Platform';
+        document.title = config['app-name'] + ' - AI Private Searching Platform';
+        document.querySelector('.hero h1').textContent = config['app-name'];
+      })
+      .catch(error => console.error('Error loading app config:', error));
+  </script>
   <style>
     
     /* Main Content */
@@ -109,7 +120,7 @@
   <!-- Main Content -->
   <main class="main-content">
     <section class="hero">
-      <h1>AI Private Searching Platform</h1>
+      <h1>AI Private Search</h1>
       <p>Comprehensive testing and scoring system for AI models with systematic parameter evaluation, performance metrics, and detailed analytics.</p>
       <div class="cta-buttons">
         <a href="./search.html" class="btn btn-primary">Start Searching</a>

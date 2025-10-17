@@ -2,6 +2,11 @@
 import fs from 'fs-extra';
 import path from 'path';
 
+function getAppConfig() {
+    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+}
+
 const ALLOWED_DIRS = [
     path.resolve('../../sources'),
     path.resolve('./data'),
@@ -13,9 +18,10 @@ function validatePath(filePath) {
     const resolvedPath = path.resolve(normalizedPath);
     
     // Allow paths under the aiprivatesearch project directory and sources directory
+    const config = getAppConfig();
     const allowedRoots = [
         '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch',
-        '/Users/Shared/AIPrivateSearch/sources'
+        config['sources-location']
     ];
     
     for (const root of allowedRoots) {

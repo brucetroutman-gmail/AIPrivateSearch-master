@@ -280,6 +280,12 @@ searchtype. Store prompts in .json configs
 
 133. Replace toggle advanced with 3 roles: standard, premium, developer  --started
 
+134. Fix inconsistent path construction causing "File not found" errors in document indexing --done
+
+135. Create centralized app.json config file to eliminate hardcoded paths --done
+
+136. Use app.json config for app-name in index.html title and heading --done
+
 
 
 

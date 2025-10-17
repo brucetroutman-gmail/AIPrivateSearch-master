@@ -3,6 +3,7 @@ import path from 'path';
 import initSqlJs from 'sql.js';
 import { OllamaService } from '../services/OllamaService.mjs';
 import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 
 export class DocumentIndex {
   constructor() {
@@ -16,7 +17,7 @@ export class DocumentIndex {
     try {
       console.log(`[DocumentIndexSearch] Document Index search for: "${query}" in collection: "${collection}"`);
       
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
+      const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
       console.log(`[DocumentIndexSearch] Database path: ${dbPath}`);
       
       if (!fs.existsSync(dbPath)) {
@@ -127,8 +128,7 @@ export class DocumentIndex {
 
 
   async indexCollection(collection) {
-    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
-    const collectionPath = path.join(documentsPath, collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     const dbPath = path.join(collectionPath, 'index-cards.db');
     
     console.log(`Creating AI-powered Doc Index database for collection: ${collection}`);
@@ -355,8 +355,7 @@ ${content.substring(0, 4000)}`;
   }
 
   async cleanupMetaFiles(collection) {
-    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
-    const collectionPath = path.join(documentsPath, collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     
     const files = fs.readdirSync(collectionPath);
     const metaFiles = files.filter(file => file.startsWith('META_'));
@@ -374,7 +373,7 @@ ${content.substring(0, 4000)}`;
 
   async getDocumentIndex(collection, filename) {
     try {
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
+      const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
       
       if (!fs.existsSync(dbPath)) {
         console.log(`[DocumentIndex] Database file does not exist: ${dbPath}`);
@@ -463,7 +462,7 @@ ${content.substring(0, 4000)}`;
 
   async getDocumentIndexStatus(collection) {
     try {
-      const dbPath = path.join(process.cwd(), '../../sources', 'local-documents', collection, 'index-cards.db');
+      const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
       
       if (!fs.existsSync(dbPath)) {
         return [];
@@ -501,8 +500,7 @@ ${content.substring(0, 4000)}`;
   }
 
   async indexSingleDocument(collection, filename) {
-    const documentsPath = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
-    const collectionPath = path.join(documentsPath, collection);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     const dbPath = path.join(collectionPath, 'index-cards.db');
     const filePath = path.join(collectionPath, filename);
     

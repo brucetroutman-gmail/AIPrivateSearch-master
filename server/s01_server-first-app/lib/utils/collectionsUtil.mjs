@@ -1,9 +1,16 @@
 import { secureFs } from './secureFileOps.mjs';
 import path from 'path';
+import fs from 'fs';
 
 export class CollectionsUtil {
+  static getAppConfig() {
+    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  }
+
   static getCollectionsPath() {
-    return '/Users/Shared/AIPrivateSearch/sources/local-documents';
+    const config = this.getAppConfig();
+    return path.join(config['sources-location'], 'local-documents');
   }
 
   static async getAvailableCollections() {

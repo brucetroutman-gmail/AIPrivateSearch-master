@@ -1,4 +1,5 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { logger } from '../../../../shared/utils/logger.mjs';
@@ -21,7 +22,7 @@ class EpubConverter {
   async convertEpubToMarkdown(epubPath, outputDir = null) {
     try {
       // Validate input path
-      const baseDir = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
+      const baseDir = CollectionsUtil.getCollectionsPath();
       const safeEpubPath = validatePath(epubPath, baseDir);
       
       if (!await secureFs.exists(safeEpubPath)) {
@@ -59,7 +60,7 @@ class EpubConverter {
 
   async convertAllEpubsInDirectory(dirPath) {
     try {
-      const baseDir = path.join(process.cwd(), '/Users/Shared/AIPrivateSearch/sources/local-documents');
+      const baseDir = CollectionsUtil.getCollectionsPath();
       const safeDirPath = validatePath(dirPath, baseDir);
       const files = await secureFs.readdir(safeDirPath);
       const epubFiles = files.filter(file => file.toLowerCase().endsWith('.epub'));

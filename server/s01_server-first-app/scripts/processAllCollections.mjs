@@ -1,6 +1,7 @@
 import { CollectionManager } from '../lib/documents/collectionManager.mjs';
 import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
+import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
 import { logger } from '../../../shared/utils/logger.mjs';
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import path from 'path';
@@ -47,7 +48,7 @@ async function processAllCollections() {
 }
 
 async function convertNonMarkdownFiles(collection, processor) {
-  const collectionPath = path.join('/Users/Shared/AIPrivateSearch/sources/local-documents', collection);
+  const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
   const allFiles = await secureFs.readdir(collectionPath);
   
   const nonMdFiles = allFiles.filter(file => {
