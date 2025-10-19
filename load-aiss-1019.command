@@ -255,27 +255,27 @@ cd AIPrivateSearch/repos
 echo "📂 Changed to: $(pwd)"
 
 # Remove existing installation
-if [ -d "AIPrivateSearch" ]; then
-    echo "🗑️  Removing existing AIPrivateSearch directory..."
-    rm -rf AIPrivateSearch
+if [ -d "aiprivatesearch" ]; then
+    echo "🗑️  Removing existing aiprivatesearch directory..."
+    rm -rf aiprivatesearch
 fi
 
 # Download fresh copy using curl with cache-busting
 echo "📥 Downloading latest version from GitHub..."
-curl -L -H "Cache-Control: no-cache" -H "Pragma: no-cache" --retry 3 -o AIPrivateSearch.zip "https://github.com/brucetroutman-gmail/AIPrivateSearch-master/archive/refs/heads/main.zip?v=$(date +%s)&r=$RANDOM" 2>/dev/null
+curl -L -H "Cache-Control: no-cache" -H "Pragma: no-cache" --retry 3 -o aiprivatesearch.zip "https://github.com/brucetroutman-gmail/AIPrivateSearch-master/archive/refs/heads/main.zip?v=$(date +%s)&r=$RANDOM" 2>/dev/null
 
-if [ $? -eq 0 ] && [ -f AIPrivateSearch.zip ]; then
+if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
     echo "   Extracting repository..."
-    unzip -q AIPrivateSearch.zip 2>/dev/null
+    unzip -q aiprivatesearch.zip 2>/dev/null
     # Try different possible directory names
     if [ -d "AIPrivateSearch-master-main" ]; then
-        mv AIPrivateSearch-master-main AIPrivateSearch
+        mv AIPrivateSearch-master-main aiprivatesearch
     elif [ -d "AIPrivateSearch-master" ]; then
-        mv AIPrivateSearch-master AIPrivateSearch
+        mv AIPrivateSearch-master aiprivatesearch
     fi
-    rm -f AIPrivateSearch.zip
+    rm -f aiprivatesearch.zip
     
-    if [ -d "AIPrivateSearch" ]; then
+    if [ -d "aiprivatesearch" ]; then
         echo "   ✅ Repository downloaded successfully"
         
         # Delete existing .env file and create new one
@@ -306,15 +306,15 @@ if [ $? -eq 0 ] && [ -f AIPrivateSearch.zip ]; then
         
         # Check and copy local-documents if needed
         if [ ! -d "/Users/Shared/AIPrivateSearch/sources/local-documents" ]; then
-            if [ -d "AIPrivateSearch/sources/local-documents" ]; then
+            if [ -d "aiprivatesearch/sources/local-documents" ]; then
                 echo "📁 Copying sample documents to sources folder..."
-                cp -r "AIPrivateSearch/sources/local-documents" "/Users/Shared/AIPrivateSearch/sources/"
+                cp -r "aiprivatesearch/sources/local-documents" "/Users/Shared/AIPrivateSearch/sources/"
                 echo "   ✅ Sample documents copied"
             fi
         fi
         
         # Start the application
-        cd AIPrivateSearch
+        cd aiprivatesearch
         echo "🚀 Starting AIPrivateSearch..."
         ./start.sh
     else

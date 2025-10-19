@@ -3,8 +3,30 @@ import fs from 'fs-extra';
 import path from 'path';
 
 function getAppConfig() {
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
-    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const possiblePaths = [
+        '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/client/c01_client-first-app/config/app.json',
+        '/Users/Shared/AIPrivateSearch/repos/AIPrivateSearch/client/c01_client-first-app/config/app.json',
+        path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json')
+    ];
+    
+    for (const configPath of possiblePaths) {
+        try {
+            if (fs.existsSync(configPath)) {
+                const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+                console.log(`[SecureFileOps] Loaded config from: ${configPath}`);
+                return config;
+            }
+        } catch (error) {
+            console.warn(`[SecureFileOps] Failed to load config from ${configPath}:`, error.message);
+            continue;
+        }
+    }
+    
+    console.log(`[SecureFileOps] Using default config - no config file found`);
+    return {
+        'app-name': 'AI Private Search',
+        'sources-location': '/Users/Shared/AIPrivateSearch/sources'
+    };
 }
 
 const ALLOWED_DIRS = [

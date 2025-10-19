@@ -4,8 +4,32 @@ import fs from 'fs';
 
 export class CollectionsUtil {
   static getAppConfig() {
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
-    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    // Try multiple possible config paths
+    const possiblePaths = [
+      '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/client/c01_client-first-app/config/app.json',
+      '/Users/Shared/AIPrivateSearch/repos/AIPrivateSearch/client/c01_client-first-app/config/app.json',
+      path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json')
+    ];
+    
+    for (const configPath of possiblePaths) {
+      try {
+        if (fs.existsSync(configPath)) {
+          const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+          console.log(`[CollectionsUtil] Loaded config from: ${configPath}`);
+          return config;
+        }
+      } catch (error) {
+        console.warn(`[CollectionsUtil] Failed to load config from ${configPath}:`, error.message);
+        continue;
+      }
+    }
+    
+    // Fallback to default config
+    console.log(`[CollectionsUtil] Using default config - no config file found`);
+    return {
+      'app-name': 'AI Private Search',
+      'sources-location': '/Users/Shared/AIPrivateSearch/sources'
+    };
   }
 
   static getCollectionsPath() {

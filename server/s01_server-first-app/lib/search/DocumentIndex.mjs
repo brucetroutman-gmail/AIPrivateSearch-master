@@ -500,14 +500,20 @@ ${content.substring(0, 4000)}`;
   }
 
   async indexSingleDocument(collection, filename) {
-    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
+    const collectionsPath = CollectionsUtil.getCollectionsPath();
+    const collectionPath = path.join(collectionsPath, collection);
     const dbPath = path.join(collectionPath, 'index-cards.db');
     const filePath = path.join(collectionPath, filename);
     
     console.log(`Processing single document: ${filename} in collection: ${collection}`);
+    console.log(`Collections path: ${collectionsPath}`);
+    console.log(`Collection path: ${collectionPath}`);
+    console.log(`File path: ${filePath}`);
+    console.log(`File exists: ${fs.existsSync(filePath)}`);
     
     try {
       if (!fs.existsSync(filePath)) {
+        console.log(`Directory contents:`, fs.readdirSync(collectionPath).join(', '));
         throw new Error(`File not found: ${filename}`);
       }
       
