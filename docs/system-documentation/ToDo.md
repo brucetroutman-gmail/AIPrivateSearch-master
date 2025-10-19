@@ -286,6 +286,8 @@ searchtype. Store prompts in .json configs
 
 136. Use app.json config for app-name in index.html title and heading --done
 
+137. Refocus app from AI testing to private document search for professionals and families --done
+
 
 
 
