@@ -1,4 +1,5 @@
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
+import { SetupGuidance } from '../utils/setupGuidance.mjs';
 
 export class SmartSearch {
   constructor() {
@@ -11,7 +12,14 @@ export class SmartSearch {
     const { collection = null, topK = 5 } = options;
     
     try {
+      console.log(`[SmartSearch] Searching for "${query}" in collection: ${collection}`);
       const relevantChunks = await this.embeddingService.findSimilarChunks(query, collection, topK);
+      console.log(`[SmartSearch] Found ${relevantChunks.length} chunks`);
+      
+      if (relevantChunks.length === 0) {
+        console.log(`[SmartSearch] No embeddings found for collection: ${collection}`);
+        return SetupGuidance.createEmbeddingsRequiredResult(collection, 'smart-search', 'vector');
+      }
       
       const results = relevantChunks.map((chunk, index) => {
         const relevanceReason = this.explainRelevance(query, chunk.content, chunk.similarity);

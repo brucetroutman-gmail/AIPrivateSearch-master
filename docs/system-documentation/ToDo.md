@@ -288,6 +288,10 @@ searchtype. Store prompts in .json configs
 
 137. Refocus app from AI testing to private document search for professionals and families --done
 
+138. Add user-friendly alerts when embeddings or doc indexes are missing with setup instructions for all search types --done
+
+139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done
+
 
 
 

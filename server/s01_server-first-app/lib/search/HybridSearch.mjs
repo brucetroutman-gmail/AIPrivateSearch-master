@@ -1,5 +1,6 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
@@ -28,6 +29,11 @@ export class HybridSearch {
       // Get results from both methods
       const keywordResults = await this.getKeywordResults(query, collection, topK * 2);
       const semanticResults = await this.getSemanticResults(query, collection, topK * 2);
+      
+      // Check if no semantic results due to missing embeddings
+      if (semanticResults.length === 0 && keywordResults.length === 0) {
+        return SetupGuidance.createHybridEmbeddingsRequiredResult(collection);
+      }
       
       // Combine and rerank results
       const combinedResults = this.combineResults(
@@ -145,6 +151,11 @@ export class HybridSearch {
 
   async getSemanticResults(query, collection, limit) {
     const vectorResults = await this.vectorSearch.search(query, { collection, topK: limit });
+    
+    // Check if embeddings are missing
+    if (vectorResults.results.length === 1 && vectorResults.results[0].id === 'setup_embeddings') {
+      return []; // Return empty array so hybrid search can still work with keyword results
+    }
     
     return vectorResults.results.map(result => ({
       id: result.id,

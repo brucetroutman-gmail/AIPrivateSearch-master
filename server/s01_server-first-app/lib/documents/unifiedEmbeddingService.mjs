@@ -160,9 +160,14 @@ export class UnifiedEmbeddingService {
   }
 
   async findSimilarChunks(query, collection, topK = 5) {
+    console.log(`[UnifiedEmbeddingService] Finding similar chunks for "${query}" in collection: ${collection}`);
+    
     await this.setupDatabase(collection);
     const db = await this.getCollectionDb(collection);
+    
+    console.log(`[UnifiedEmbeddingService] Creating query embedding...`);
     const queryEmbedding = await this.createEmbedding(query);
+    console.log(`[UnifiedEmbeddingService] Query embedding created, length: ${queryEmbedding.length}`);
     
     const stmt = db.prepare(`
       SELECT c.*, cd.filename
@@ -170,6 +175,12 @@ export class UnifiedEmbeddingService {
       JOIN collection_documents cd ON c.document_id = cd.document_id
     `);
     const chunks = stmt.all();
+    console.log(`[UnifiedEmbeddingService] Found ${chunks.length} chunks in database`);
+    
+    if (chunks.length === 0) {
+      console.log(`[UnifiedEmbeddingService] No chunks found - embeddings may not be created yet`);
+      return [];
+    }
     
     const similarities = chunks.map(chunk => {
       const chunkEmbedding = JSON.parse(chunk.embedding);
@@ -178,13 +189,18 @@ export class UnifiedEmbeddingService {
       return { ...chunk, similarity };
     });
     
-    return similarities
+    const results = similarities
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, topK)
       .map(chunk => ({ ...chunk, collection }));
+      
+    console.log(`[UnifiedEmbeddingService] Returning ${results.length} results, top similarity: ${results[0]?.similarity || 'N/A'}`);
+    return results;
   }
 
   async createEmbedding(text) {
+    console.log(`[UnifiedEmbeddingService] Creating embedding for text: "${text.substring(0, 100)}..."`);
+    
     const response = await fetch('http://localhost:11434/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -195,10 +211,13 @@ export class UnifiedEmbeddingService {
     });
     
     if (!response.ok) {
-      throw new Error(`Ollama embedding error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[UnifiedEmbeddingService] Ollama embedding error: ${response.status} - ${errorText}`);
+      throw new Error(`Ollama embedding error: ${response.status} - ${errorText}`);
     }
     
     const result = await response.json();
+    console.log(`[UnifiedEmbeddingService] Embedding created successfully, length: ${result.embedding?.length || 'unknown'}`);
     return result.embedding;
   }
 

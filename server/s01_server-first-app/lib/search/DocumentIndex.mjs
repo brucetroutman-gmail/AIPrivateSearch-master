@@ -4,6 +4,7 @@ import initSqlJs from 'sql.js';
 import { OllamaService } from '../services/OllamaService.mjs';
 import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { SetupGuidance } from '../utils/setupGuidance.mjs';
 
 export class DocumentIndex {
   constructor() {
@@ -22,12 +23,7 @@ export class DocumentIndex {
       
       if (!fs.existsSync(dbPath)) {
         console.log(`[DocumentIndexSearch] Database file does not exist: ${dbPath}`);
-        return {
-          results: [],
-          method: 'document-index',
-          total: 0,
-          message: `No Doc Index database found for collection: ${collection}. Use Collections Editor to create Doc Indexes first.`
-        };
+        return SetupGuidance.createDocIndexRequiredResult(collection, 'document-index');
       }
 
       const dbBuffer = fs.readFileSync(dbPath);
@@ -48,12 +44,7 @@ export class DocumentIndex {
         if (!countResult || countResult.length === 0 || !countResult[0].values || countResult[0].values[0][0] === 0) {
           console.log(`[DocumentIndexSearch] No document index found for collection: ${collection}`);
           db.close();
-          return {
-            results: [],
-            method: 'document-index',
-            total: 0,
-            message: `No Doc Index found for collection: ${collection}. Use Collections Editor to create Doc Indexes first.`
-          };
+          return SetupGuidance.createEmptyDocIndexResult(collection, 'document-index');
         }
         
         // Show sample data for debugging

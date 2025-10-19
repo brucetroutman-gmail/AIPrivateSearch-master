@@ -1,4 +1,5 @@
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
+import { SetupGuidance } from '../utils/setupGuidance.mjs';
 
 export class AIDocumentChat {
   constructor() {
@@ -19,17 +20,7 @@ export class AIDocumentChat {
       console.log(`Found ${relevantChunks.length} relevant chunks`);
       
       if (relevantChunks.length === 0) {
-        return { 
-          results: [{
-            id: 'ai_document_chat_no_embeddings',
-            title: 'No Embeddings Found',
-            excerpt: 'No embeddings found for this collection. Please use the Collections Editor to embed documents first by clicking "Embed Source MDs".',
-            score: 0,
-            source: 'System message'
-          }], 
-          method: 'ai-document-chat', 
-          total: 1
-        };
+        return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
       }
       
       let aiResponse;
