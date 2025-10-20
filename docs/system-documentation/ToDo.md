@@ -292,10 +292,14 @@ searchtype. Store prompts in .json configs
 
 139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done
 
-140. 
+140. Change repos to repo load 
 
 
+Add license number: "CC-BY-4.0"
 
+Change author to: "Thomas Jefferson & Continental Congress"
+
+Add comments: "Historical founding document"
 
 
 

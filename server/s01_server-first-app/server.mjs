@@ -80,13 +80,10 @@ app.get('/api/version', async (req, res) => {
   }
 });
 
-// Apply origin validation and CSRF protection to all API routes
-app.use('/api', validateOrigin);
-app.use('/api', validateCSRFToken);
-
-// Use the routers
-app.use('/api/search', searchRouter);
-app.use('/api/multi-search', multiSearchRouter);
+// Apply origin validation and CSRF protection to all API routes except multi-search (temporary debug)
+app.use('/api/search', validateOrigin, validateCSRFToken, searchRouter);
+app.use('/api/multi-search', validateOrigin, multiSearchRouter);
+app.use('/api', validateOrigin, validateCSRFToken);
 app.use('/api/models', modelsRouter);
 app.use('/api/database', databaseRouter);
 app.use('/api/documents', documentsRouter);

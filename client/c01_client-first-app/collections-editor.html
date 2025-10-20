@@ -738,6 +738,7 @@
             showLog(`${progress} Processing: ${fileName}`, 'processing');
             
             // Process single document
+            await window.csrfManager.init(); // Ensure CSRF is initialized
             const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-create-single`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1006,25 +1007,25 @@
         ['Filename', documentIndex.filename, 'text', true],
         ['File Type', documentIndex.file_type, 'text', true],
         ['File Size', documentIndex.file_size, 'number', true],
-        ['File Path', documentIndex.file_path, 'text', false, 'indexFilePath'],
         ['Title', documentIndex.title, 'text', false, 'indexTitle'],
         ['Author', documentIndex.author, 'text', false, 'indexAuthor'],
+        ['Document Type', documentIndex.document_type, 'text', false, 'indexDocumentType'],
+        ['Category', documentIndex.category, 'text', false, 'indexCategory'],
         ['Language', documentIndex.language, 'text', false, 'indexLanguage'],
+        ['Topics', documentIndex.topics, 'text', false, 'indexTopics'],
+        ['Keywords', documentIndex.keywords, 'text', false, 'indexKeywords'],
+        ['Key Phrases', documentIndex.key_phrases, 'text', false, 'indexKeyPhrases'],
+        ['Entities', documentIndex.entities, 'text', false, 'indexEntities'],
+        ['Dates Mentioned', documentIndex.dates_mentioned, 'text', false, 'indexDatesMentioned'],
+        ['Amounts Mentioned', documentIndex.amounts_mentioned, 'text', false, 'indexAmountsMentioned'],
+        ['Action Items', documentIndex.action_items, 'text', false, 'indexActionItems'],
+        ['Importance Level', documentIndex.importance_level, 'number', false, 'indexImportanceLevel'],
+        ['Complexity Score', documentIndex.complexity_score, 'number', false, 'indexComplexityScore'],
+        ['Sentiment', documentIndex.sentiment, 'text', false, 'indexSentiment'],
         ['Source', documentIndex.source, 'text', false, 'indexSource'],
         ['Version', documentIndex.version, 'text', false, 'indexVersion'],
         ['Access Level', documentIndex.access_level, 'text', false, 'indexAccessLevel'],
         ['License', documentIndex.license, 'text', false, 'indexLicense'],
-        ['Category', documentIndex.category, 'text', false, 'indexCategory'],
-        ['Index Version', documentIndex.metadata_version, 'text', false, 'indexMetadataVersion'],
-        ['Topics', documentIndex.topics, 'text', false, 'indexTopics'],
-        ['Keywords', documentIndex.keywords, 'text', false, 'indexKeywords'],
-        ['Key Phrases', documentIndex.key_phrases, 'text', false, 'indexKeyPhrases'],
-        ['Sentiment', documentIndex.sentiment, 'text', false, 'indexSentiment'],
-        ['Entities', documentIndex.entities, 'text', false, 'indexEntities'],
-        ['Tags', documentIndex.tags, 'text', false, 'indexTags'],
-        ['Geolocation', documentIndex.geolocation, 'text', false, 'indexGeolocation'],
-        ['Complexity Score', documentIndex.complexity_score, 'number', false, 'indexComplexityScore'],
-        ['Readability Score', documentIndex.readability_score, 'text', false, 'indexReadabilityScore'],
         ['Word Count', documentIndex.word_count, 'number', true],
         ['Reading Time', documentIndex.reading_time, 'number', true],
         ['Paragraphs', documentIndex.paragraphs, 'number', true],
@@ -1032,8 +1033,6 @@
         ['Character Count', documentIndex.character_count, 'number', true],
         ['Unique Words', documentIndex.unique_word_count, 'number', true],
         ['Avg Sentence Length', documentIndex.average_sentence_length, 'number', true],
-        ['Links Count', documentIndex.links_count, 'number', true],
-        ['Image Count', documentIndex.image_count, 'number', true],
         ['Created Date', documentIndex.created_date, 'text', true],
         ['Modified Date', documentIndex.last_modified_date, 'text', true],
         ['Generated Date', documentIndex.generated_date, 'text', true]
@@ -1042,7 +1041,7 @@
       let html = '<h3>Doc Index Card: ' + (documentIndex.filename || 'Unknown') + '</h3>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem;">';
       html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info">Save and Export</button>';
-      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save All</button>';
+      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save &amp; Exit</button>';
       html += '<button type="button" onclick="closeDocumentIndexEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
       html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem; margin: 1rem 0; font-size: 0.9rem;">';
@@ -1073,7 +1072,7 @@
       html += '<div><label><strong>Comments:</strong></label><br><textarea id="indexComments" style="' + textareaStyle + '" onchange="markFormChanged()">' + (documentIndex.our_comments || '') + '</textarea></div>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">';
       html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info">Save and Export</button>';
-      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save All</button>';
+      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save &amp; Exit</button>';
       html += '<button type="button" onclick="closeDocumentIndexEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
       
@@ -1099,26 +1098,27 @@
     async function saveAllDocumentIndex(documentIndexId) {
       const updatedDocumentIndex = {
         id: documentIndexId,
-        file_path: document.getElementById('indexFilePath') ? document.getElementById('indexFilePath').value : '',
+        collection: currentCollection,
         title: document.getElementById('indexTitle') ? document.getElementById('indexTitle').value : '',
         author: document.getElementById('indexAuthor') ? document.getElementById('indexAuthor').value : '',
+        document_type: document.getElementById('indexDocumentType') ? document.getElementById('indexDocumentType').value : '',
         language: document.getElementById('indexLanguage') ? document.getElementById('indexLanguage').value : '',
         source: document.getElementById('indexSource') ? document.getElementById('indexSource').value : '',
         version: document.getElementById('indexVersion') ? document.getElementById('indexVersion').value : '',
         access_level: document.getElementById('indexAccessLevel') ? document.getElementById('indexAccessLevel').value : '',
         license: document.getElementById('indexLicense') ? document.getElementById('indexLicense').value : '',
         category: document.getElementById('indexCategory') ? document.getElementById('indexCategory').value : '',
-        metadata_version: document.getElementById('indexMetadataVersion') ? document.getElementById('indexMetadataVersion').value : '',
         summary: document.getElementById('indexSummary') ? document.getElementById('indexSummary').value : '',
         topics: document.getElementById('indexTopics') ? document.getElementById('indexTopics').value : '',
         keywords: document.getElementById('indexKeywords') ? document.getElementById('indexKeywords').value : '',
         key_phrases: document.getElementById('indexKeyPhrases') ? document.getElementById('indexKeyPhrases').value : '',
         sentiment: document.getElementById('indexSentiment') ? document.getElementById('indexSentiment').value : '',
         entities: document.getElementById('indexEntities') ? document.getElementById('indexEntities').value : '',
-        tags: document.getElementById('indexTags') ? document.getElementById('indexTags').value : '',
-        geolocation: document.getElementById('indexGeolocation') ? document.getElementById('indexGeolocation').value : '',
+        dates_mentioned: document.getElementById('indexDatesMentioned') ? document.getElementById('indexDatesMentioned').value : '',
+        amounts_mentioned: document.getElementById('indexAmountsMentioned') ? document.getElementById('indexAmountsMentioned').value : '',
+        action_items: document.getElementById('indexActionItems') ? document.getElementById('indexActionItems').value : '',
+        importance_level: document.getElementById('indexImportanceLevel') ? document.getElementById('indexImportanceLevel').value : '',
         complexity_score: document.getElementById('indexComplexityScore') ? document.getElementById('indexComplexityScore').value : '',
-        readability_score: document.getElementById('indexReadabilityScore') ? document.getElementById('indexReadabilityScore').value : '',
         our_comments: document.getElementById('indexComments') ? document.getElementById('indexComments').value : ''
       };
       
@@ -1151,10 +1151,10 @@
         filename: window.currentDocumentIndex.filename,
         file_type: window.currentDocumentIndex.file_type,
         file_size: window.currentDocumentIndex.file_size,
-        file_path: document.getElementById('indexFilePath') ? document.getElementById('indexFilePath').value : window.currentDocumentIndex.file_path,
         created_date: window.currentDocumentIndex.created_date,
         last_modified_date: window.currentDocumentIndex.last_modified_date,
         author: document.getElementById('indexAuthor') ? document.getElementById('indexAuthor').value : window.currentDocumentIndex.author,
+        document_type: document.getElementById('indexDocumentType') ? document.getElementById('indexDocumentType').value : window.currentDocumentIndex.document_type,
         language: document.getElementById('indexLanguage') ? document.getElementById('indexLanguage').value : window.currentDocumentIndex.language,
         source: document.getElementById('indexSource') ? document.getElementById('indexSource').value : window.currentDocumentIndex.source,
         version: document.getElementById('indexVersion') ? document.getElementById('indexVersion').value : window.currentDocumentIndex.version,
@@ -1169,20 +1169,18 @@
         category: document.getElementById('indexCategory') ? document.getElementById('indexCategory').value : window.currentDocumentIndex.category,
         sentiment: document.getElementById('indexSentiment') ? document.getElementById('indexSentiment').value : window.currentDocumentIndex.sentiment,
         entities: document.getElementById('indexEntities') ? document.getElementById('indexEntities').value : window.currentDocumentIndex.entities,
+        dates_mentioned: document.getElementById('indexDatesMentioned') ? document.getElementById('indexDatesMentioned').value : window.currentDocumentIndex.dates_mentioned,
+        amounts_mentioned: document.getElementById('indexAmountsMentioned') ? document.getElementById('indexAmountsMentioned').value : window.currentDocumentIndex.amounts_mentioned,
+        action_items: document.getElementById('indexActionItems') ? document.getElementById('indexActionItems').value : window.currentDocumentIndex.action_items,
+        importance_level: document.getElementById('indexImportanceLevel') ? document.getElementById('indexImportanceLevel').value : window.currentDocumentIndex.importance_level,
         complexity_score: document.getElementById('indexComplexityScore') ? document.getElementById('indexComplexityScore').value : window.currentDocumentIndex.complexity_score,
-        readability_score: document.getElementById('indexReadabilityScore') ? document.getElementById('indexReadabilityScore').value : window.currentDocumentIndex.readability_score,
         reading_time: window.currentDocumentIndex.reading_time,
         paragraphs: window.currentDocumentIndex.paragraphs,
         sentences: window.currentDocumentIndex.sentences,
         character_count: window.currentDocumentIndex.character_count,
         unique_word_count: window.currentDocumentIndex.unique_word_count,
         average_sentence_length: window.currentDocumentIndex.average_sentence_length,
-        links_count: window.currentDocumentIndex.links_count,
-        image_count: window.currentDocumentIndex.image_count,
         generated_date: window.currentDocumentIndex.generated_date,
-        metadata_version: document.getElementById('indexMetadataVersion') ? document.getElementById('indexMetadataVersion').value : window.currentDocumentIndex.metadata_version,
-        tags: document.getElementById('indexTags') ? document.getElementById('indexTags').value : window.currentDocumentIndex.tags,
-        geolocation: document.getElementById('indexGeolocation') ? document.getElementById('indexGeolocation').value : window.currentDocumentIndex.geolocation,
         our_comments: document.getElementById('indexComments') ? document.getElementById('indexComments').value : window.currentDocumentIndex.our_comments
       };
       
