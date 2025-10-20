@@ -240,9 +240,9 @@ if [ ! -d "AIPrivateSearch" ]; then
     mkdir -p AIPrivateSearch
 fi
 
-if [ ! -d "AIPrivateSearch/repos" ]; then
-    echo "📁 Creating AIPrivateSearch/repos directory..."
-    mkdir -p AIPrivateSearch/repos
+if [ ! -d "AIPrivateSearch/repo" ]; then
+    echo "📁 Creating AIPrivateSearch/repo directory..."
+    mkdir -p AIPrivateSearch/repo
 fi
 
 if [ ! -d "AIPrivateSearch/sources" ]; then
@@ -250,8 +250,8 @@ if [ ! -d "AIPrivateSearch/sources" ]; then
     mkdir -p AIPrivateSearch/sources
 fi
 
-# Change to AIPrivateSearch/repos directory
-cd AIPrivateSearch/repos
+# Change to AIPrivateSearch/repo directory
+cd AIPrivateSearch/repo
 echo "📂 Changed to: $(pwd)"
 
 # Remove existing installation

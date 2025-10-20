@@ -276,7 +276,7 @@ searchtype. Store prompts in .json configs
 
 131. create app for load-aiss-1017.command  --started
 
-132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repos/aiprivatesearch/sources before release   --done
+132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repo/aiprivatesearch/sources before release   --done
 
 133. Replace toggle advanced with 3 roles: standard, premium, developer  --started
 
@@ -292,7 +292,7 @@ searchtype. Store prompts in .json configs
 
 139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done
 
-140. Change repos to repo load 
+140. Change repos to repo load --done 
 
 
 Add license number: "CC-BY-4.0"

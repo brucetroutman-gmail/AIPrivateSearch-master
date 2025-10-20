@@ -4,8 +4,8 @@ import path from 'path';
 
 function getAppConfig() {
     const possiblePaths = [
-        '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch/client/c01_client-first-app/config/app.json',
-        '/Users/Shared/AIPrivateSearch/repos/AIPrivateSearch/client/c01_client-first-app/config/app.json',
+        '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/client/c01_client-first-app/config/app.json',
+        '/Users/Shared/AIPrivateSearch/repo/AIPrivateSearch/client/c01_client-first-app/config/app.json',
         path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json')
     ];
     
@@ -42,7 +42,7 @@ function validatePath(filePath) {
     // Allow paths under the aiprivatesearch project directory and sources directory
     const config = getAppConfig();
     const allowedRoots = [
-        '/Users/Shared/AIPrivateSearch/repos/aiprivatesearch',
+        '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch',
         config['sources-location']
     ];
     
