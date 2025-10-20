@@ -292,6 +292,8 @@ searchtype. Store prompts in .json configs
 
 139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done
 
+140. 
+
 
 
 

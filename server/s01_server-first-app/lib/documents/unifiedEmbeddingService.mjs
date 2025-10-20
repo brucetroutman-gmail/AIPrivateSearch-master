@@ -22,12 +22,19 @@ export class UnifiedEmbeddingService {
   }
 
   async setupDatabase(collection) {
+    console.log(`[UnifiedEmbeddingService] Setting up database for collection: ${collection}`);
+    
     if (!this.initialized.has(collection)) {
       const db = await this.getCollectionDb(collection);
       await db.init();
       this.initialized.add(collection);
+      console.log(`[UnifiedEmbeddingService] Database initialized for collection: ${collection}`);
     }
+    
     const db = await this.getCollectionDb(collection);
+    const dbPath = this.getCollectionDbPath(collection);
+    console.log(`[UnifiedEmbeddingService] Database path: ${dbPath}`);
+    
     db.exec(`
       CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY,
@@ -60,6 +67,8 @@ export class UnifiedEmbeddingService {
       CREATE INDEX IF NOT EXISTS idx_document_chunks ON chunks(document_id);
       CREATE INDEX IF NOT EXISTS idx_content_hash ON documents(content_hash);
     `);
+    
+    console.log(`[UnifiedEmbeddingService] Database tables created/verified for collection: ${collection}`);
   }
 
   generateContentHash(content) {
@@ -67,15 +76,22 @@ export class UnifiedEmbeddingService {
   }
 
   async processDocument(filename, content, collection) {
+    console.log(`[UnifiedEmbeddingService] Processing document: ${filename} in collection: ${collection}`);
+    
     await this.setupDatabase(collection);
     const db = await this.getCollectionDb(collection);
     const contentHash = this.generateContentHash(content);
     const documentId = `doc_${contentHash}`;
     
+    console.log(`[UnifiedEmbeddingService] Document ID: ${documentId}, Content hash: ${contentHash}`);
+    
     // Check if document already exists
     const existingDoc = db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
+    console.log(`[UnifiedEmbeddingService] Existing document found:`, !!existingDoc);
     
     if (!existingDoc) {
+      console.log(`[UnifiedEmbeddingService] Creating new document with embeddings...`);
+      
       // Document doesn't exist, create it with embeddings
       const docStmt = db.prepare(`
         INSERT INTO documents (id, filename, content_hash, full_content, document_embedding)
@@ -83,10 +99,15 @@ export class UnifiedEmbeddingService {
       `);
       
       const docEmbedding = await this.createEmbedding(content.substring(0, 8000));
-      await docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
+      console.log(`[UnifiedEmbeddingService] Document embedding created, length: ${docEmbedding.length}`);
+      
+      const docResult = docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
+      console.log(`[UnifiedEmbeddingService] Document inserted, changes: ${docResult.changes}`);
       
       // Create chunks
       const chunks = this.semanticChunking(content);
+      console.log(`[UnifiedEmbeddingService] Created ${chunks.length} chunks`);
+      
       const chunkStmt = db.prepare(`
         INSERT INTO chunks (id, document_id, chunk_index, content, embedding, start_char, end_char, chunk_type)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -94,9 +115,11 @@ export class UnifiedEmbeddingService {
       
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
+        console.log(`[UnifiedEmbeddingService] Processing chunk ${i + 1}/${chunks.length}`);
+        
         const embedding = await this.createEmbedding(chunk.content);
         
-        await chunkStmt.run(
+        const chunkResult = chunkStmt.run(
           `${documentId}_chunk_${i}`,
           documentId,
           i,
@@ -106,6 +129,7 @@ export class UnifiedEmbeddingService {
           chunk.endChar,
           chunk.type
         );
+        console.log(`[UnifiedEmbeddingService] Chunk ${i} inserted, changes: ${chunkResult.changes}`);
       }
     }
     
@@ -114,10 +138,18 @@ export class UnifiedEmbeddingService {
       INSERT OR IGNORE INTO collection_documents (document_id, filename)
       VALUES (?, ?)
     `);
-    await linkStmt.run(documentId, filename);
+    const linkResult = linkStmt.run(documentId, filename);
+    console.log(`[UnifiedEmbeddingService] Collection link created, changes: ${linkResult.changes}`);
     
     // Get chunk count
     const chunkCount = db.prepare('SELECT COUNT(*) as count FROM chunks WHERE document_id = ?').get(documentId);
+    console.log(`[UnifiedEmbeddingService] Final chunk count: ${chunkCount.count}`);
+    
+    // Verify data was saved
+    const docCount = db.prepare('SELECT COUNT(*) as count FROM documents').get();
+    const totalChunks = db.prepare('SELECT COUNT(*) as count FROM chunks').get();
+    const collectionDocs = db.prepare('SELECT COUNT(*) as count FROM collection_documents').get();
+    console.log(`[UnifiedEmbeddingService] Database totals - Documents: ${docCount.count}, Chunks: ${totalChunks.count}, Collection docs: ${collectionDocs.count}`);
     
     return { success: true, chunks: chunkCount.count, reused: !!existingDoc };
   }
@@ -162,40 +194,66 @@ export class UnifiedEmbeddingService {
   async findSimilarChunks(query, collection, topK = 5) {
     console.log(`[UnifiedEmbeddingService] Finding similar chunks for "${query}" in collection: ${collection}`);
     
-    await this.setupDatabase(collection);
-    const db = await this.getCollectionDb(collection);
+    try {
+      // Force fresh database connection
+      if (this.dbs.has(collection)) {
+        this.dbs.delete(collection);
+      }
+      this.initialized.delete(collection);
+      
+      await this.setupDatabase(collection);
+      const db = await this.getCollectionDb(collection);
+      
+      // Check if database file exists and has tables
+      const dbPath = this.getCollectionDbPath(collection);
+      console.log(`[UnifiedEmbeddingService] Database path: ${dbPath}`);
+      
+      // Check table existence
+      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+      console.log(`[UnifiedEmbeddingService] Available tables:`, tables.map(t => t.name));
+      
+      // Check data counts
+      const docCount = db.prepare('SELECT COUNT(*) as count FROM documents').get();
+      const chunkCount = db.prepare('SELECT COUNT(*) as count FROM chunks').get();
+      const collectionDocCount = db.prepare('SELECT COUNT(*) as count FROM collection_documents').get();
+      console.log(`[UnifiedEmbeddingService] Data counts - Documents: ${docCount.count}, Chunks: ${chunkCount.count}, Collection docs: ${collectionDocCount.count}`);
+      
+      if (chunkCount.count === 0) {
+        console.log(`[UnifiedEmbeddingService] No chunks found - embeddings may not be created yet`);
+        return [];
+      }
+      
+      console.log(`[UnifiedEmbeddingService] Creating query embedding...`);
+      const queryEmbedding = await this.createEmbedding(query);
+      console.log(`[UnifiedEmbeddingService] Query embedding created, length: ${queryEmbedding.length}`);
+      
+      const stmt = db.prepare(`
+        SELECT c.*, cd.filename
+        FROM chunks c
+        JOIN collection_documents cd ON c.document_id = cd.document_id
+      `);
+      const chunks = stmt.all();
+      console.log(`[UnifiedEmbeddingService] Found ${chunks.length} chunks in database`);
     
-    console.log(`[UnifiedEmbeddingService] Creating query embedding...`);
-    const queryEmbedding = await this.createEmbedding(query);
-    console.log(`[UnifiedEmbeddingService] Query embedding created, length: ${queryEmbedding.length}`);
-    
-    const stmt = db.prepare(`
-      SELECT c.*, cd.filename
-      FROM chunks c
-      JOIN collection_documents cd ON c.document_id = cd.document_id
-    `);
-    const chunks = stmt.all();
-    console.log(`[UnifiedEmbeddingService] Found ${chunks.length} chunks in database`);
-    
-    if (chunks.length === 0) {
-      console.log(`[UnifiedEmbeddingService] No chunks found - embeddings may not be created yet`);
+      
+      const similarities = chunks.map(chunk => {
+        const chunkEmbedding = JSON.parse(chunk.embedding);
+        const similarity = this.cosineSimilarity(queryEmbedding, chunkEmbedding);
+        
+        return { ...chunk, similarity };
+      });
+      
+      const results = similarities
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, topK)
+        .map(chunk => ({ ...chunk, collection }));
+        
+      console.log(`[UnifiedEmbeddingService] Returning ${results.length} results, top similarity: ${results[0]?.similarity || 'N/A'}`);
+      return results;
+    } catch (error) {
+      console.error(`[UnifiedEmbeddingService] Error in findSimilarChunks:`, error);
       return [];
     }
-    
-    const similarities = chunks.map(chunk => {
-      const chunkEmbedding = JSON.parse(chunk.embedding);
-      const similarity = this.cosineSimilarity(queryEmbedding, chunkEmbedding);
-      
-      return { ...chunk, similarity };
-    });
-    
-    const results = similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, topK)
-      .map(chunk => ({ ...chunk, collection }));
-      
-    console.log(`[UnifiedEmbeddingService] Returning ${results.length} results, top similarity: ${results[0]?.similarity || 'N/A'}`);
-    return results;
   }
 
   async createEmbedding(text) {
