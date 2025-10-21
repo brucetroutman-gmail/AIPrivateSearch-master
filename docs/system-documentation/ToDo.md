@@ -28,278 +28,144 @@ specs-3-scoring
 
 13. add user prompts dropdown --done
 
-14. Terminal interface for multiple tests? - no created test-executor  --done
+14. Terminal interface for multiple tests? - no ## COMPLETED TASKS
 
-15. add copyright and licence and add aisearch-n-score.com  --done
+~~created test-executor  --done~~
+~~15. add copyright and licence and add aisearch-n-score.com  --done~~
+~~16. create 41 tests - implement auto testing --done~~
+~~17. menu structure?  login, update config files. home, back ground from alan --done~~
+~~18. Create Family documents --done~~
+~~19. collect email address and store in searches table --done~~
+~~20. fix Collections !!!  --done~~
+~~19.  create way to create document collections stored in sources/local documents --done~~
+~~20. multiple models selection --done~~
+~~21. read prompts from tables ?? mutliple selections  --done~~
+~~23. Collect email and use with export & messaging --done~~
+~~24. Fix config manage Cancel with no changes -- done~~
+~~25. Add collections info to database -- done~~
+~~26. Privacy Policy Terms of Service , Contact --done~~
+~~27. add score model to db test --done~~
+~~28. Toggle Developer mode -- done~~
+~~29. Require email onevery page -- done~~
+~~30. Move Auto export next to Geneerate Scores -- done~~
+~~28. Only pull ollama if over 24 hrs old --Done~~
+~~28. Add context and tokens and temperature to scores  --done~~
+~~33. get the good enough score models --done~~
+~~34. get best embeding technique - embed with lanceDB ?? --done~~
+~~36. get the good enough search models.  --done~~
+~~37. Create Doctors and lawyers document set  --done~~
+~~38. processing consistent color scheme -- Done~~
+~~39. secureUser  set dark mode -- done ??~~
+~~40. EvalTokensperSecond-search not showing in DB  --done~~
+~~41. security (code issues) --done (using ESLint)~~
+~~42. Fix Show Chunks issue --done~~
+~~43. Persist User Prompt  --done~~
+~~44. Fix processing to disable other controls --done~~
+~~45. Fix dotenv 7.2.1  --done~~
+~~46. Fix close browser and terminal -- done~~
+~~47. fix .env file issue --done~~
+~~48. fix npm warning msgs  --done~~
+~~49. test scoring --done~~
+~~50. User-confirmed install Node.js in load-aiss.command --done~~
+~~51. User-confirmed install Ollama in load-aiss.command --done~~
+~~52. User-confirmed install Chrome browser --done~~
+~~53. User-confirmed start Ollama service in start.sh --done~~
+~~54. Enhanced error handling for missing dependencies --done~~
+~~55. Changed from auto-install to user confirmation for all dependencies --done~~
+~~56. Uncheck Search checkbox by default on model page --done~~
+~~57. Add Remove Unlisted Models button to clean up models not in models-list.json --done~~
+~~58. Remove :latest suffix from Ollama model names --done~~
+~~59. Left align scoring table content --done~~
+~~60. Fix criterion column width to fit "Weighted Score" --done~~
+~~61. Rename "Remove Unused Models" to "Remove Unlisted Models" --done~~
+~~62. Fix dark mode processing text to use light gray background --done~~
+~~63. Fix dark mode processing button and inline elements styling --done~~
+~~64. Where is the meta_collection .md file being saved?  --done~~
+~~67. Load-aiss.command is not pulling latest from github using curl --done~~
+~~68. analyze LanceDB vs ChromaDB stick with LanceDB --done~~
+~~69. ESLint for checking commits --done~~
+~~70. Add docid field to source and meta files for model correlation --done~~
+~~71. Update collections-editor UI: move Embed column, exclude META files from embedding --done~~
+~~72. Add "Add Meta Prompt" checkbox to search page --done~~
+~~73. Create meta-prompt.json file for collection meta-prompts --done~~
+~~74. Fix module import error for header/footer loading --done~~
+~~75. Fix collections-editor Create Metadata and Remove Embeds buttons --done~~
+~~76. Move meta-prompts.json to config directory --done~~
+~~77. Replace unchecked embed badge with dash for collection meta files --done~~
+~~78. colection meta file must grab certian stuff from other meta files. --done~~
+~~79. Meta-prompt should be concatination of all meta files --done~~
+~~80. In create metadata the docid for source does not equal docid for meta --done~~
+~~81. Review processing time for create Metadata  --done~~
+~~82. Test multi-mode-search --done~~
+~~83. Document each mode  --done~~
+~~83. evaluate the best techniques for a user  --done~~
+~~84. Enhance Traditonal Text (Exact Match Search) rename and improve  --done~~
+~~85. Move Document search to search page - common routine for responses. --done~~
+~~86. Create common Line Search formatting routine for both search and multi-mode pages --done~~
+~~87. Enhance Line Search View Document links to show line numbers and jump to match line --done~~
+~~88. Add dark mode support to document viewer --done~~
+~~89. Modify Document Search View Document links to work like Line Search with line numbers --done~~
+~~91. Document search disability and will finds Health Care --investigated: Health Insurance.md contains "Disabled dependents covered indefinitely" which matches "disability" search  --done~~
+~~92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done~~
+~~93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.  -done~~
+~~94. We have lost highlighting of matches in line search --done~~
+~~95. line serach, document search, RAG search, ai directis missing performancce metrics and system information --done~~
+~~96. after persisting temp etc. responses are not correct. are these parm being used is search?  --done~~
+~~97. Changed from sqllite3 to sql.js to remove Command line tools requirement on mac. --done~~
+~~98. Add version to header filee. --done~~
+~~99. Check on widlcards in both line and document search  --done~~
+~~100. Remove unneeded debug code.  --done~~
+~~101. added commit message and auto version bump  --done~~
+~~102. metadata search (document Index) - fixed to use sql.js and proper error messaging --done~~
+~~103. Clean up response vews  --done~~
+~~103. Change supporting files, functiond to be consistent with  titles . i.e. line search = exactMatch  --done~~
+~~104. change names meta -> Index, create metadata -> create Indexes  --done~~
+~~105. create user prompts based on source Type and collection and search type  --done~~
+~~106. Rename RAG/RagSearch references to "AI Document Chat" for consistency --done~~
+~~107. Reverted "Document Text Search" back to "Document Search" --done~~
+~~108. Rename FullTextSearch class to DocumentSearch --done~~
+~~109. Change all "fulltext" references to "document-search" --done~~
+~~110. Change "hybrid" to "hybrid-search" for consistency --done~~
+~~111. Fix multi-mode HTML container IDs for hybrid-search and document-search --done~~
+~~112. Replace innerHTML with secure DOM methods to prevent XSS --done~~
+~~113. Fix hybrid search endpoint URL from /hybrid to /hybrid-search --done~~
+~~114. Create comprehensive user manual (AIPrivateSearch-User-Manual.md) --done~~
+~~115. Change "Create Metadata" button to "Create Doc Indexes" and "Meta" badge to "Index" --done~~
+~~116. Fix SearchOrchestrator metadata method calls and implement getMetadataStatus --done~~
+~~117. Change user-facing "metadata" messages to "Doc Index" terminology --done~~
+~~118. metadata model is not working where is model coming from.  --done~~
+~~119. remove all timeouts  --done~~
+~~123. We need to place source documents outside of repo. --done~~
+~~130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources  --done~~
+~~132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repo/aiprivatesearch/sources before release   --done~~
+~~134. Fix inconsistent path construction causing "File not found" errors in document indexing --done~~
+~~135. Create centralized app.json config file to eliminate hardcoded paths --done~~
+~~136. Use app.json config for app-name in index.html title and heading --done~~
+~~137. Refocus app from AI testing to private document search for professionals and families --done~~
+~~138. Add user-friendly alerts when embeddings or doc indexes are missing with setup instructions for all search types --done~~
+~~139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done~~
+~~140. Change repos to repo load --done~~
+~~141. exchange order coll-edit  Embed badges and index card badges --done~~
+~~~~134. Fix convert on pdfs in Law-Office collection - PDF conversion is reading raw binary instead of using pdftotext extraction  --done~~~~
+
+## PENDING TASKS
 
 15. Can We make an electron app for this that runs locally on a mac? --started
-
-16. create 41 tests - implement auto testing --done
-
-17. menu structure?  login, update config files. home, back ground from alan --done
-
-18. Create Family documents --done
-
-19. collect email address and store in searches table --done
-
-20. fix Collections !!!  --done
-
-19.  create way to create document collections stored in sources/local documents 
---done 
-20. multiple models selection --done
-
-21. read prompts from tables ?? mutliple selections  --done
-
 22. Implement local documents only. -- started
-
-23. Collect email and use with export & messaging --done
-
-24. Fix config manage Cancel with no changes -- done
-
-25. Add collections info to database -- done
-
-26. Privacy Policy Terms of Service , Contact --done
-
-27. add score model to db test --done
-
-28. Toggle Developer mode -- done
-
-29. Require email onevery page -- done
-
-30. Move Auto export next to Geneerate Scores -- done
-
---------------------------------
-28. Only pull ollama if over 24 hrs old --Done
-
-28. in dev mode show all. hide if not in dev mode --started
-
-28. Add context and tokens and temperature to scores  --done
-
+28. in dev mode show all. hide if not in dev mode --done
 28. User and system propmt by source type
-
 32. Re-Visit the Test Codes - focus on speed  --started
-
-33. get the good enough score models
-
-34. get best embeding technique - embed with lanceDB ??
-
-36. get the good enough search models.
-
-37. Create Doctors and lawyers document set
-
-38. processing consistent color scheme -- Done 
-
-39. secureUser  set dark mode -- done ??
-
-40. EvalTokensperSecond-search not showing in DB  --done
-
-41. security (code issues) --done (using ESLint)
-
-69. ESLint for checking commits --done
-
-42. Fix Show Chunks issue --done
-
-43. Persist User Prompt  --done
-
-44. Fix processing to disable other controls --done
-
-45. Fix dotenv 7.2.1  --done
-
-46. Fix close browser and terminal -- done
-
-47. fix .env file issue --done
-
-48. fix npm warning msgs  --done
-
-49. test scoring --done
-
-50. User-confirmed install Node.js in load-aiss.command --done
-
-51. User-confirmed install Ollama in load-aiss.command --done
-
-52. User-confirmed install Chrome browser --done
-
-53. User-confirmed start Ollama service in start.sh --done
-
-54. Enhanced error handling for missing dependencies --done
-
-55. Changed from auto-install to user confirmation for all dependencies --done
-
-56. Uncheck Search checkbox by default on model page --done
-
-57. Add Remove Unlisted Models button to clean up models not in models-list.json --done
-
-58. Remove :latest suffix from Ollama model names --done
-
-59. Left align scoring table content --done
-
-60. Fix criterion column width to fit "Weighted Score" --done
-
-61. Rename "Remove Unused Models" to "Remove Unlisted Models" --done
-
-62. Fix dark mode processing text to use light gray background --done
-
-63. Fix dark mode processing button and inline elements styling --done
-
-64. Where is the meta_collection .md file being saved?
-
-67. Load-aiss.command is not pulling latest from github using curl --done
-
-68. analyze LanceDB vs ChromaDB stick with LanceDB --done
-
-70. Add docid field to source and meta files for model correlation --done
-
-71. Update collections-editor UI: move Embed column, exclude META files from embedding --done
-
-72. Add "Add Meta Prompt" checkbox to search page --done
-
-73. Create meta-prompt.json file for collection meta-prompts --done
-
-74. Fix module import error for header/footer loading --done
-
-75. Fix collections-editor Create Metadata and Remove Embeds buttons --done
-
-76. Move meta-prompts.json to config directory --done
-
-77. Replace unchecked embed badge with dash for collection meta files --done
-
-78. colection meta file must grab certian stuff from other meta files. --done
-
-79. Meta-prompt should be concatination of all meta files --done
-
-80. In create metadata the docid for source does not equal docid for meta --done 
-
-81. Review processing time for create Metadata  --done
-
-82. Test multi-mode-search --done
-
-83. Document each mode  --done
-
-83. eval uate the best techniques for a user  --started
-
-84. Enhance Traditonal Text (Exact Match Search) rename and improve  --done
-
-85. Move Document search to search page - common routine for responses. --done 
-
-86. Create common Line Search formatting routine for both search and multi-mode pages --done
-
-87. Enhance Line Search View Document links to show line numbers and jump to match line --done
-
-88. Add dark mode support to document viewer --done
-
-89. Modify Document Search View Document links to work like Line Search with line numbers --done
-
-91. Document search disability and will finds Health Care --investigated: Health Insurance.md contains "Disabled dependents covered indefinitely" which matches "disability" search  --done
-
-92. Add fuzzy match highlighting to Document Search (highlight 'disabled' when searching 'disability') --done
-
-93. Review show hide on search page. Is it in one function? There are problems local model only vs local documents.  -done
-
-94. We have lost highlighting of matches in line search --done
-
-95. line serach, document search, RAG search, ai directis missing performancce metrics and system information --done
-
-96. after persisting temp etc. responses are not correct. are these parm being used is search?
-
-97. Changed from sqllite3 to sql.js to remove Command line tools requirement on mac. --done
-
-98. Add version to header filee. --done
-
-99. Check on widlcards in both line and document search  --done
-
-100. Remove unneeded debug code.  --done
-
-101. added commit message and auto version bump  --done
-
-102. metadata search (document Index) - fixed to use sql.js and proper error messaging --done
-
-103. Clean up response vews  --done
-
-103. Change supporting files, functiond to be consistent with  titles . i.e. line search = exactMatch  --done
-
-104. change names meta -> Index, create metadata -> create Indexes  --done
-
-105. create user prompts based on source Type and collection and search type
-
-106. Rename RAG/RagSearch references to "AI Document Chat" for consistency --done
-
-107. Reverted "Document Text Search" back to "Document Search" --done
-
-108. Rename FullTextSearch class to DocumentSearch --done
-
-109. Change all "fulltext" references to "document-search" --done
-
-110. Change "hybrid" to "hybrid-search" for consistency --done
-
-111. Fix multi-mode HTML container IDs for hybrid-search and document-search --done
-
-112. Replace innerHTML with secure DOM methods to prevent XSS --done
-
-113. Fix hybrid search endpoint URL from /hybrid to /hybrid-search --done
-
-114. Create comprehensive user manual (AIPrivateSearch-User-Manual.md) --done
-
-115. Change "Create Metadata" button to "Create Doc Indexes" and "Meta" badge to "Index" --done
-
-116. Fix SearchOrchestrator metadata method calls and implement getMetadataStatus --done
-
-117. Change user-facing "metadata" messages to "Doc Index" terminology --done
-
-118. metadata model is not working where is model coming from.  --done
-
-119. remove all timeouts  --done
-
--------------- for version 19 -------------------
-
 120. create user prompts based on source Type and collection and search type
-
 121. focus on display and layout  --started
-
-122. review processing of each search type. creaate 3 prompts for sourcetype, collection,
-searchtype. Store prompts in .json configs
-
-123. We need to place source documents outside of repo. --done
-
+122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 124. Create a quick start guide.
-
-125. Connect with SecureAccess create roles Free 1 computer, Pro 5 computers $199/yr, Developer 25 computers $2999 (Register with Free) pay for admin, pay for developer.
-
+125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Developer computers $2999 (Register with Free) pay for Premiumm, pay for developer.
 126. enhance database saving add documents only
-
 127. highlight matched words in all.
-
-128. Make View Documnet consistent across all types, Add View Index Card to Doc Index Cards response
-
+128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
 129. review doc index card creation add  remove fields change models overall improve.
-
-130. sources for customers should not be aisns folder .. should be in uers/shared/aisns/sources  --done
-
-131. create app for load-aiss-1017.command  --started
-
-132. Add to release copy the AIPrivateSearch/sources content to AIPrivateSearch/repo/aiprivatesearch/sources before release   --done
-
-133. Replace toggle advanced with 3 roles: standard, premium, developer  --started
-
-134. Fix inconsistent path construction causing "File not found" errors in document indexing --done
-
-135. Create centralized app.json config file to eliminate hardcoded paths --done
-
-136. Use app.json config for app-name in index.html title and heading --done
-
-137. Refocus app from AI testing to private document search for professionals and families --done
-
-138. Add user-friendly alerts when embeddings or doc indexes are missing with setup instructions for all search types --done
-
-139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done
-
-140. Change repos to repo load --done 
-
-
-Add license number: "CC-BY-4.0"
-
-Change author to: "Thomas Jefferson & Continental Congress"
-
-Add comments: "Historical founding document"
-
-
-
+131. create app for load-AIPrivateSearch-xxxx.command  --started
+133. Replace toggle advanced with 3 roles: standard, premium, developer  --started  need to describe functionality:
+Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
+admin can add users, role admin and searcher. Premiun get all Standard plus manage models, options modify config files, Developer gets all menu items
+135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes

@@ -238,8 +238,8 @@
                 <th>Filename</th>
                 <th>Source</th>
                 <th>Converted</th>
-                <th>Embedded</th>
                 <th>Index</th>
+                <th>Embedded</th>
               </tr>
             </thead>
             <tbody id="documentTableBody">
@@ -467,10 +467,10 @@
             ${mdContent}
           </td>
           <td>
-            ${isCollectionMeta ? '-' : `<span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">${isEmbedded ? '✓' : '○'}</span>`}
+            ${indexContent}
           </td>
           <td>
-            ${indexContent}
+            ${isCollectionMeta ? '-' : `<span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">${isEmbedded ? '✓' : '○'}</span>`}
           </td>
         `;
         

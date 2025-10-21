@@ -112,17 +112,25 @@ export class DocumentProcessor {
 
   async convertToMarkdown(filePath) {
     const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath);
     
-    switch (ext) {
-      case '.txt':
-        return await this.processText(filePath);
-      case '.pdf':
-        return await this.processPDF(filePath);
-      case '.docx':
-      case '.doc':
-        return await this.processDocx(filePath);
-      default:
-        throw new Error(`Unsupported file format: ${ext}`);
+    console.log(`Converting ${filename} (${ext}) to markdown...`);
+    
+    try {
+      switch (ext) {
+        case '.txt':
+          return await this.processText(filePath);
+        case '.pdf':
+          return await this.processPDF(filePath);
+        case '.docx':
+        case '.doc':
+          return await this.processDocx(filePath);
+        default:
+          throw new Error(`Unsupported file format: ${ext}`);
+      }
+    } catch (error) {
+      console.error(`Conversion failed for ${filename}:`, error.message);
+      throw error;
     }
   }
 
@@ -140,10 +148,25 @@ export class DocumentProcessor {
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
       
-      const { stdout } = await execAsync(`pdftotext "${filePath}" -`);
-      return `# ${filename}\n\n${stdout.trim()}`;
+      // Use pdftotext to extract text from PDF
+      const { stdout, stderr } = await execAsync(`pdftotext "${filePath}" -`, { 
+        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+        timeout: 30000 // 30 second timeout
+      });
+      
+      if (stderr && stderr.trim()) {
+        console.warn(`PDF extraction warning for ${filename}:`, stderr);
+      }
+      
+      const extractedText = stdout.trim();
+      if (!extractedText || extractedText.length < 10) {
+        throw new Error('No text content extracted from PDF');
+      }
+      
+      return `# ${filename}\n\n${extractedText}`;
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting PDF content: ${error.message}]`;
+      console.error(`PDF processing error for ${filename}:`, error.message);
+      return `# ${filename}\n\n[Error extracting PDF content: ${error.message}]\n\n*This PDF could not be processed. Please ensure the PDF contains extractable text and is not image-based.*`;
     }
   }
 
