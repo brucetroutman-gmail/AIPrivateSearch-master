@@ -298,4 +298,27 @@ router.post('/document-index-status', async (req, res) => {
   }
 });
 
+// Remove document index from SQLite database
+router.post('/document-index-remove', async (req, res) => {
+  try {
+    const { collection, filename } = req.body;
+    
+    if (!collection || !filename) {
+      return res.status(400).json({ error: 'Collection and filename parameters are required' });
+    }
+    
+    const result = await searchOrchestrator.removeDocumentIndex(collection, filename);
+    res.json({
+      success: true,
+      removed: result.removed
+    });
+  } catch (error) {
+    console.error('Document index removal error:', error);
+    res.status(500).json({ 
+      error: 'Failed to remove Doc Index', 
+      message: error.message 
+    });
+  }
+});
+
 export default router;

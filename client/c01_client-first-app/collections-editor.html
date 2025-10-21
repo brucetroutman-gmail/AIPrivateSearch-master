@@ -254,6 +254,7 @@
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
           <button class="btn btn-warning" onclick="convertDocuments()">Convert Source Files</button>
           <button class="btn btn-info" onclick="generateDocumentIndex()">Create Doc Index Cards</button>
+          <button class="btn btn-danger" onclick="removeIndexCards()">Remove Index Cards</button>
           <button class="btn btn-primary" onclick="processDocuments()">Embed Converted Files</button>
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
@@ -1212,6 +1213,54 @@
     
     function markFormChanged() {
       window.formChanged = true;
+    }
+    
+    async function removeIndexCards() {
+      const selected = getSelectedDocuments();
+      const selectedFiles = selected.filter(file => (file.endsWith('.md') || file.endsWith('.json')) && !file.startsWith('META_'));
+      
+      if (selectedFiles.length === 0) {
+        showUserMessage('Please select at least one converted file (MD or JSON) to remove index cards from', 'error');
+        return;
+      }
+      
+      if (!await secureConfirm(`Remove Doc Index cards for ${selectedFiles.length} selected files from SQLite database?\n\nThis will permanently delete the index card entries but keep the source files.`)) {
+        return;
+      }
+      
+      setProcessingState(true);
+      clearLog();
+      showLog(`Removing Doc Index cards for ${selectedFiles.length} selected files...`);
+      
+      try {
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const filename = selectedFiles[i];
+          const progress = `${i + 1}/${selectedFiles.length}`;
+          
+          try {
+            const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-remove`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ collection: currentCollection, filename })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              showLog(`${progress} ✓ Removed index card: ${filename}`, 'success');
+            } else {
+              showLog(`${progress} ✗ Failed: ${filename} - ${result.error}`, 'error');
+            }
+          } catch (error) {
+            showLog(`${progress} ✗ Error: ${filename} - ${error.message}`, 'error');
+          }
+        }
+        
+        showLog(`✓ Index card removal complete: ${selectedFiles.length} files processed`, 'success');
+        loadDocuments();
+      } finally {
+        setProcessingState(false);
+      }
     }
     
     function closeDocumentIndexEditor() {

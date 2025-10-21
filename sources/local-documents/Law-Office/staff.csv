@@ -1,0 +1,5 @@
+StaffID,FirstName,LastName,Role,Email,Phone,OfficeAddress,City,State,Zip
+1,Laura,Bennett,Attorney,laura.bennett@lawfirm.com,555-0201,100 Law Office Way,Springfield,IL,62701
+2,Michael,Reynolds,Attorney,michael.reynolds@lawfirm.com,555-0202,100 Law Office Way,Springfield,IL,62701
+3,Sarah,Coleman,Paralegal,sarah.coleman@lawfirm.com,555-0203,100 Law Office Way,Springfield,IL,62701
+4,David,Patel,Paralegal,david.patel@lawfirm.com,555-0204,100 Law Office Way,Springfield,IL,62701

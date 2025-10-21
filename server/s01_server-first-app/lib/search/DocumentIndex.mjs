@@ -6,6 +6,17 @@ import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 
+let systemPrompts = null;
+
+async function loadSystemPrompts() {
+  if (!systemPrompts) {
+    const promptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/system-prompts.json');
+    const data = JSON.parse(fs.readFileSync(promptsPath, 'utf8'));
+    systemPrompts = data.system_prompts;
+  }
+  return systemPrompts;
+}
+
 export class DocumentIndex {
   constructor() {
     this.name = 'Document Index Search';
@@ -231,59 +242,29 @@ export class DocumentIndex {
           console.log(`Updated ${filename} with DocID: ${docId}`);
         }
         
-        // Enhanced AI analysis prompt
-        const analysisPrompt = `You are a document analysis expert. Analyze this document and extract key information. Return ONLY valid JSON with these exact fields:
+        // Load system prompts and get doc index prompt
+        const prompts = await loadSystemPrompts();
+        const docIndexPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
+        const analysisPrompt = `${docIndexPrompt}
 
-{
-  "title": "clear document title",
-  "author": "author or creator name",
-  "document_type": "legal/medical/financial/personal/business/government/other",
-  "category": "specific category like insurance, contract, policy, etc",
-  "summary": "concise 2-3 sentence summary of main content and purpose",
-  "topics": "main subjects covered, comma-separated",
-  "keywords": "important searchable terms, comma-separated",
-  "key_phrases": "significant phrases that identify this document, comma-separated",
-  "entities": "names of people, organizations, places mentioned, comma-separated",
-  "dates_mentioned": "important dates found in document, comma-separated",
-  "amounts_mentioned": "financial amounts, quantities, numbers mentioned, comma-separated",
-  "action_items": "tasks, requirements, or actions mentioned, comma-separated",
-  "importance_level": "1-5 where 5=critical, 4=important, 3=moderate, 2=minor, 1=reference",
-  "complexity_score": "1-10 where 10=very complex, 5=moderate, 1=simple",
-  "sentiment": "positive/negative/neutral",
-  "language": "en/es/fr/etc"
-}
-
-Be specific and accurate. Extract actual content, not generic descriptions.
-
-Document content:
-${content.substring(0, 6000)}`;
+Document: ${filename}
+Content: ${content.substring(0, 3000)}`;
         
         const aiResponse = await ollamaService.generateText(analysisPrompt, modelName);
-        let analysis = {};
         
-        // Simple text-based analysis to avoid JSON parsing issues
-        const simplePrompt = `Analyze this document briefly:
-
-Title: ${filename}
-Content: ${content.substring(0, 1000)}
-
-Provide a 2-sentence summary:`;
-        
-        const aiSummary = await ollamaService.generateText(simplePrompt, modelName);
-        
-        // Create analysis from simple response
-        analysis = {
+        // Parse AI response (numbered format)
+        let analysis = {
           title: filename.replace('.md', '').replace(/[-_]/g, ' '),
           author: '',
-          document_type: filename.includes('Declaration') ? 'government' : 'other',
+          document_type: 'other',
           language: 'en',
           source: '',
           version: '',
           access_level: 'public',
           license: '',
           category: 'document',
-          summary: aiSummary.substring(0, 200) || 'Document processed successfully',
-          topics: filename.includes('Declaration') ? 'independence, government, rights' : '',
+          summary: 'Document processed successfully',
+          topics: '',
           keywords: filename.replace('.md', '').toLowerCase().split(/[-_\s]+/).join(', '),
           key_phrases: '',
           sentiment: 'neutral',
@@ -294,6 +275,51 @@ Provide a 2-sentence summary:`;
           importance_level: '4',
           complexity_score: '6'
         };
+        
+        // Parse numbered AI response
+        const lines = aiResponse.split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+          if (line.startsWith('1.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.author = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
+          }
+          if (line.startsWith('2.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.document_type = content && !content.includes('Not specified') && !content.includes('None') ? content.toLowerCase() : 'other';
+          }
+          if (line.startsWith('3.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.entities = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
+          }
+          if (line.startsWith('4.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.dates_mentioned = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
+          }
+          if (line.startsWith('5.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.amounts_mentioned = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
+          }
+          if (line.startsWith('6.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.key_phrases = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
+          }
+          if (line.startsWith('7.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.action_items = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
+          }
+          if (line.startsWith('8.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.summary = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 300) : '';
+          }
+          if (line.startsWith('9.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.topics = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
+          }
+          if (line.startsWith('10.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            analysis.importance_level = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 1) : '4';
+          }
+        });
         
         // Calculate text metrics
         const words = content.split(/\s+/);
@@ -590,6 +616,40 @@ Provide a 2-sentence summary:`;
     }
   }
 
+  async removeDocumentIndex(collection, filename) {
+    try {
+      const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
+      
+      if (!fs.existsSync(dbPath)) {
+        return { removed: false, error: 'Database not found' };
+      }
+      
+      const dbBuffer = fs.readFileSync(dbPath);
+      const SQL = await initSqlJs();
+      const db = new SQL.Database(dbBuffer);
+      
+      try {
+        const stmt = db.prepare('DELETE FROM document_index WHERE filename = ?');
+        stmt.run([filename]);
+        const changes = db.getRowsModified();
+        stmt.free();
+        
+        const data = db.export();
+        fs.writeFileSync(dbPath, data);
+        db.close();
+        
+        console.log(`Removed ${changes} document index entries for ${filename}`);
+        return { removed: changes > 0 };
+      } catch (error) {
+        db.close();
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error removing document index:', error);
+      return { removed: false, error: error.message };
+    }
+  }
+
   async indexSingleDocument(collection, filename) {
     const collectionsPath = CollectionsUtil.getCollectionsPath();
     const collectionPath = path.join(collectionsPath, collection);
@@ -715,32 +775,13 @@ Provide a 2-sentence summary:`;
         console.log(`Updated ${filename} with DocID: ${docId}`);
       }
       
-      // Enhanced AI analysis
-      const analysisPrompt = `You are a document analysis expert. Analyze this document and extract key information. Return ONLY valid JSON with these exact fields:
+      // Enhanced AI analysis using system prompt
+      const prompts = await loadSystemPrompts();
+      const docIndexPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
+      const analysisPrompt = `${docIndexPrompt}
 
-{
-  "title": "clear document title",
-  "author": "author or creator name",
-  "document_type": "legal/medical/financial/personal/business/government/other",
-  "category": "specific category like insurance, contract, policy, etc",
-  "summary": "concise 2-3 sentence summary of main content and purpose",
-  "topics": "main subjects covered, comma-separated",
-  "keywords": "important searchable terms, comma-separated",
-  "key_phrases": "significant phrases that identify this document, comma-separated",
-  "entities": "names of people, organizations, places mentioned, comma-separated",
-  "dates_mentioned": "important dates found in document, comma-separated",
-  "amounts_mentioned": "financial amounts, quantities, numbers mentioned, comma-separated",
-  "action_items": "tasks, requirements, or actions mentioned, comma-separated",
-  "importance_level": "1-5 where 5=critical, 4=important, 3=moderate, 2=minor, 1=reference",
-  "complexity_score": "1-10 where 10=very complex, 5=moderate, 1=simple",
-  "sentiment": "positive/negative/neutral",
-  "language": "en/es/fr/etc"
-}
-
-Be specific and accurate. Extract actual content, not generic descriptions.
-
-Document content:
-${content.substring(0, 6000)}`;
+Document: ${filename}
+Content: ${content.substring(0, 3000)}`;
       
       // Enhanced AI analysis with error handling
       let analysis = {
@@ -768,18 +809,12 @@ ${content.substring(0, 6000)}`;
       
       // Try AI analysis with fallback to defaults
       try {
-        const aiPrompt = `Analyze this document and extract specific information. Respond with ONLY the requested information, no extra text:
+        const prompts = await loadSystemPrompts();
+        const docPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
+        const aiPrompt = `${docPrompt}
 
 Document: ${filename}
-Content: ${content.substring(0, 3000)}
-
-Extract:
-1. Author or creator:
-2. Key people/organizations mentioned:
-3. Important dates mentioned:
-4. Key phrases (2-3 most important):
-5. Main action items or requirements:
-6. Brief summary (1-2 sentences):`;
+Content: ${content.substring(0, 3000)}`;
         
         const aiResponse = await ollamaService.generateText(aiPrompt, modelName);
         
@@ -787,39 +822,63 @@ Extract:
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
           if (line.startsWith('1.')) {
-            const content = line.replace('1.', '').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && content.length > 5) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
               analysis.author = content.includes('Congress') ? 'Continental Congress' : content.substring(0, 100);
             }
           }
           if (line.startsWith('2.')) {
-            const content = line.replace('2.', '').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && content.length > 10) {
-              analysis.entities = content.substring(0, 200);
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 3) {
+              analysis.document_type = content.toLowerCase();
             }
           }
           if (line.startsWith('3.')) {
-            const content = line.replace('3.', '').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && content.length > 5) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
+              analysis.entities = content.substring(0, 200);
+            }
+          }
+          if (line.startsWith('4.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
               analysis.dates_mentioned = content.includes('July 4, 1776') ? 'July 4, 1776' : content.substring(0, 100);
             }
           }
           if (line.startsWith('5.')) {
-            const content = line.replace('5.', '').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && content.length > 10) {
-              analysis.action_items = content.substring(0, 200);
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
+              analysis.amounts_mentioned = content.substring(0, 100);
             }
           }
           if (line.startsWith('6.')) {
-            const content = line.replace('6.', '').trim();
-            if (content && content.length > 20) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
+              analysis.key_phrases = content.substring(0, 200);
+            }
+          }
+          if (line.startsWith('7.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
+              analysis.action_items = content.substring(0, 200);
+            }
+          }
+          if (line.startsWith('8.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 20) {
               analysis.summary = content.substring(0, 300);
             }
           }
-          if (line.includes('"') && line.includes('-')) {
-            const phrase = line.replace(/^\s*-\s*/, '').replace(/"/g, '').trim();
-            if (phrase) {
-              analysis.key_phrases = analysis.key_phrases ? analysis.key_phrases + ', ' + phrase : phrase;
+          if (line.startsWith('9.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
+              analysis.topics = content.substring(0, 200);
+            }
+          }
+          if (line.startsWith('10.')) {
+            const content = line.split(':').slice(1).join(':').trim();
+            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 0) {
+              analysis.importance_level = content.substring(0, 1);
             }
           }
         });

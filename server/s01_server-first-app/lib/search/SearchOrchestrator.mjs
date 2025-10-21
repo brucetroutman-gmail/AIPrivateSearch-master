@@ -84,4 +84,8 @@ export class SearchOrchestrator {
   async updateAllDocumentIndex(documentIndex) {
     return await this.searchMethods['document-index'].updateAllDocumentIndex(documentIndex);
   }
+
+  async removeDocumentIndex(collection, filename) {
+    return await this.searchMethods['document-index'].removeDocumentIndex(collection, filename);
+  }
 }
