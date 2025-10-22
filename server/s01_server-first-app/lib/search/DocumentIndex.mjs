@@ -11,7 +11,7 @@ let systemPrompts = null;
 
 async function loadSystemPrompts() {
   if (!systemPrompts) {
-    const promptsPath = path.join(process.cwd(), 'client/c01_client-first-app/config/system-prompts.json');
+    const promptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/system-prompts.json');
     const data = JSON.parse(fs.readFileSync(promptsPath, 'utf8'));
     systemPrompts = data.system_prompts;
   }
@@ -144,7 +144,14 @@ export class DocumentIndex {
       
       // Initialize AI service and NLP analytics
       const ollamaService = new OllamaService();
-      const nlpAnalytics = new NLPAnalytics();
+      let nlpAnalytics = null;
+      try {
+        nlpAnalytics = new NLPAnalytics();
+        console.log('[DocumentIndex] NLP Analytics initialized successfully');
+      } catch (nlpError) {
+        console.error('[DocumentIndex] Failed to initialize NLP Analytics:', nlpError.message);
+        console.log('[DocumentIndex] Continuing without NLP analytics');
+      }
       const modelName = 'llama3.2:3b'; // From models-list.json document-index category
       
       // Create new database with all 39 fields (clear existing if present)
@@ -278,8 +285,39 @@ Content: ${content.substring(0, 3000)}`;
           complexity_score: '6'
         };
         
-        // Get NLP analytics
-        const nlpResults = nlpAnalytics.analyzeText(content);
+        // Get NLP analytics with error handling
+        let nlpResults = {};
+        if (nlpAnalytics) {
+          try {
+            nlpResults = nlpAnalytics.analyzeText(content);
+          } catch (nlpError) {
+            console.log(`NLP analysis failed for ${filename}, using defaults:`, nlpError.message);
+            nlpResults = {
+              entities: { people: '', organizations: '', locations: '' },
+              dates: '',
+              keyPhrases: '',
+              wordCount: content.split(/\s+/).length,
+              sentenceCount: content.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+              paragraphCount: content.split(/\n\s*\n/).filter(p => p.trim().length > 0).length,
+              uniqueWordCount: new Set(content.split(/\s+/).map(w => w.toLowerCase())).size,
+              averageSentenceLength: 25,
+              readingTime: Math.ceil(content.split(/\s+/).length / 200)
+            };
+          }
+        } else {
+          // Fallback when NLP analytics is not available
+          nlpResults = {
+            entities: { people: '', organizations: '', locations: '' },
+            dates: '',
+            keyPhrases: '',
+            wordCount: content.split(/\s+/).length,
+            sentenceCount: content.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+            paragraphCount: content.split(/\n\s*\n/).filter(p => p.trim().length > 0).length,
+            uniqueWordCount: new Set(content.split(/\s+/).map(w => w.toLowerCase())).size,
+            averageSentenceLength: 25,
+            readingTime: Math.ceil(content.split(/\s+/).length / 200)
+          };
+        }
         
         // Parse numbered AI response
         const lines = aiResponse.split('\n').filter(line => line.trim());
@@ -327,7 +365,7 @@ Content: ${content.substring(0, 3000)}`;
         });
         
         // Merge AI analysis with NLP analytics (NLP takes precedence for factual data)
-        if (nlpResults.entities.people) analysis.entities = nlpResults.entities.people;
+        if (nlpResults.entities && nlpResults.entities.people) analysis.entities = nlpResults.entities.people;
         if (nlpResults.dates) analysis.dates_mentioned = nlpResults.dates;
         if (nlpResults.keyPhrases) analysis.key_phrases = nlpResults.keyPhrases;
         

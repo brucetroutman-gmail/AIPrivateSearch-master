@@ -1,0 +1,1395 @@
+[
+DocID: Med_1760491376659_g5sqe5vdb
+  {
+    "patient_id": "P001",
+    "name": "John A. Smith",
+    "dob": "1975-01-15",
+    "address": "123 Maple Street, Springfield, IL 62701",
+    "phone": "(217) 555-0123",
+    "email": "john.smith@email.com",
+    "insurance_provider": "BlueCross BlueShield",
+    "policy_number": "BC123456789",
+    "emergency_contact": "Jane Smith, Spouse, (217) 555-0124",
+    "medical_history": [
+      "Osteosarcoma diagnosed in 2023",
+      "Right femur fracture (2018), surgically repaired",
+      "Hypertension",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Follow-up for osteosarcoma treatment and hip pain evaluation",
+    "appointments": [
+      {
+        "date": "2025-10-20",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-10-22",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy administration"
+      },
+      {
+        "date": "2025-11-01",
+        "time": "9:30 AM",
+        "provider_purpose": "Michael Lee, NP: Post-chemotherapy follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Doxorubicin and Cisplatin, 6 cycles, every 3 weeks, starting 2025-10-22",
+      "Surgery: Limb-sparing surgery, 2026-01-15",
+      "Radiation: 5 sessions, starting 2026-02-01",
+      "Physical Therapy: Weekly, starting 2025-11-01"
+    ],
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P002",
+    "name": "Maria L. Gonzalez",
+    "dob": "1968-03-22",
+    "address": "456 Oak Avenue, Springfield, IL 62702",
+    "phone": "(217) 555-0234",
+    "email": "maria.gonzalez@email.com",
+    "insurance_provider": "Aetna",
+    "policy_number": "AE987654321",
+    "emergency_contact": "Luis Gonzalez, Son, (217) 555-0235",
+    "medical_history": [
+      "Osteoarthritis, left hip",
+      "Type 2 diabetes",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Pre-operative consultation for hip replacement",
+    "appointments": [
+      {
+        "date": "2025-10-21",
+        "time": "11:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Pre-op assessment"
+      },
+      {
+        "date": "2025-10-25",
+        "time": "8:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Hip replacement surgery"
+      },
+      {
+        "date": "2025-11-05",
+        "time": "1:00 PM",
+        "provider_purpose": "Michael Lee, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Total hip replacement, 2025-10-25",
+      "Physical Therapy: Bi-weekly, starting 2025-11-10",
+      "Pain Management: Post-op analgesics"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500 mg",
+        "frequency": "Twice daily",
+        "purpose": "Diabetes management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P003",
+    "name": "James R. Brown",
+    "dob": "1955-07-10",
+    "address": "789 Pine Road, Springfield, IL 62703",
+    "phone": "(217) 555-0345",
+    "email": "james.brown@email.com",
+    "insurance_provider": "Cigna",
+    "policy_number": "CG456789123",
+    "emergency_contact": "Mary Brown, Wife, (217) 555-0346",
+    "medical_history": [
+      "Lung cancer with bone metastasis (2024)",
+      "Hypertension",
+      "Allergic to penicillin"
+    ],
+    "reason_for_visit": "Management of bone metastasis pain",
+    "appointments": [
+      {
+        "date": "2025-10-23",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Pain management consultation"
+      },
+      {
+        "date": "2025-10-27",
+        "time": "3:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-11-03",
+        "time": "10:30 AM",
+        "provider_purpose": "Sarah Johnson, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Radiation: Palliative radiation, 10 sessions, starting 2025-10-27",
+      "Bisphosphonates: Zoledronic acid, monthly",
+      "Pain Management: Opioid therapy"
+    ],
+    "medications": [
+      {
+        "name": "Zoledronic Acid",
+        "dosage": "4 mg",
+        "frequency": "Monthly IV",
+        "purpose": "Bone metastasis treatment"
+      },
+      {
+        "name": "Morphine",
+        "dosage": "15 mg",
+        "frequency": "Every 4 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Amlodipine",
+        "dosage": "5 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      }
+    ]
+  },
+  {
+    "patient_id": "P004",
+    "name": "Emily T. Wilson",
+    "dob": "1982-11-05",
+    "address": "101 Elm Street, Springfield, IL 62704",
+    "phone": "(217) 555-0456",
+    "email": "emily.wilson@email.com",
+    "insurance_provider": "UnitedHealthcare",
+    "policy_number": "UH789123456",
+    "emergency_contact": "Thomas Wilson, Husband, (217) 555-0457",
+    "medical_history": [
+      "Tibial fracture (2025)",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Post-fracture follow-up",
+    "appointments": [
+      {
+        "date": "2025-10-24",
+        "time": "10:30 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Fracture assessment"
+      },
+      {
+        "date": "2025-10-28",
+        "time": "1:30 PM",
+        "provider_purpose": "Sarah Johnson, NP: Cast check"
+      },
+      {
+        "date": "2025-11-07",
+        "time": "11:00 AM",
+        "provider_purpose": "Michael Lee, NP: Physical therapy planning"
+      }
+    ],
+    "treatment_plan": [
+      "Immobilization: Cast for 6 weeks, applied 2025-10-10",
+      "Physical Therapy: Weekly, starting 2025-11-15",
+      "Follow-up Imaging: X-ray on 2025-11-20"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P005",
+    "name": "David K. Patel",
+    "dob": "1970-09-18",
+    "address": "202 Birch Lane, Springfield, IL 62705",
+    "phone": "(217) 555-0567",
+    "email": "david.patel@email.com",
+    "insurance_provider": "Humana",
+    "policy_number": "HM123789456",
+    "emergency_contact": "Priya Patel, Wife, (217) 555-0568",
+    "medical_history": [
+      "Chondrosarcoma, left femur (2024)",
+      "No other conditions",
+      "Allergic to sulfa drugs"
+    ],
+    "reason_for_visit": "Chemotherapy follow-up",
+    "appointments": [
+      {
+        "date": "2025-10-25",
+        "time": "9:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy session"
+      },
+      {
+        "date": "2025-10-30",
+        "time": "2:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-11-10",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Blood work review"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Methotrexate, 4 cycles, every 2 weeks, starting 2025-10-25",
+      "Surgery: Wide resection, 2026-01-20",
+      "Physical Therapy: Post-op, starting 2026-02-05"
+    ],
+    "medications": [
+      {
+        "name": "Methotrexate",
+        "dosage": "12 g/m²",
+        "frequency": "Every 2 weeks",
+        "purpose": "Chemotherapy for chondrosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P006",
+    "name": "Sarah M. Lee",
+    "dob": "1965-02-28",
+    "address": "303 Cedar Court, Springfield, IL 62706",
+    "phone": "(217) 555-0678",
+    "email": "sarah.lee@email.com",
+    "insurance_provider": "Anthem",
+    "policy_number": "AN456123789",
+    "emergency_contact": "John Lee, Husband, (217) 555-0679",
+    "medical_history": [
+      "Knee osteoarthritis",
+      "Hyperlipidemia",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Knee pain management",
+    "appointments": [
+      {
+        "date": "2025-10-26",
+        "time": "11:30 AM",
+        "provider_purpose": "Michael Lee, NP: Knee evaluation"
+      },
+      {
+        "date": "2025-10-31",
+        "time": "9:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Treatment planning"
+      },
+      {
+        "date": "2025-11-12",
+        "time": "2:30 PM",
+        "provider_purpose": "Sarah Johnson, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Injections: Hyaluronic acid, 3 sessions, starting 2025-11-01",
+      "Physical Therapy: Weekly, starting 2025-11-05",
+      "Lifestyle Modifications: Weight management program"
+    ],
+    "medications": [
+      {
+        "name": "Atorvastatin",
+        "dosage": "20 mg",
+        "frequency": "Daily",
+        "purpose": "Hyperlipidemia management"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Pain relief"
+      }
+    ]
+  }
+  {
+    "patient_id": "P007",
+    "name": "Michael J. Chen",
+    "dob": "1990-04-12",
+    "address": "404 Walnut Drive, Springfield, IL 62707",
+    "phone": "(217) 555-0789",
+    "email": "michael.chen@email.com",
+    "insurance_provider": "BlueCross BlueShield",
+    "policy_number": "BC789456123",
+    "emergency_contact": "Lisa Chen, Sister, (217) 555-0790",
+    "medical_history": [
+      "Ewing sarcoma, diagnosed 2024",
+      "No other conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Chemotherapy and imaging follow-up",
+    "appointments": [
+      {
+        "date": "2025-10-27",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-10-29",
+        "time": "1:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy"
+      },
+      {
+        "date": "2025-11-15",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Post-chemotherapy review"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Vincristine, Doxorubicin, Cyclophosphamide, 6 cycles, starting 2025-10-29",
+      "Radiation: 10 sessions, starting 2025-12-15",
+      "Surgery: Evaluation for resection, 2026-02-01"
+    ],
+    "medications": [
+      {
+        "name": "Vincristine",
+        "dosage": "1.5 mg/m²",
+        "frequency": "Weekly",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Cyclophosphamide",
+        "dosage": "1200 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P008",
+    "name": "Linda R. Davis",
+    "dob": "1978-06-30",
+    "address": "505 Spruce Way, Springfield, IL 62708",
+    "phone": "(217) 555-0890",
+    "email": "linda.davis@email.com",
+    "insurance_provider": "Aetna",
+    "policy_number": "AE123789456",
+    "emergency_contact": "Robert Davis, Husband, (217) 555-0891",
+    "medical_history": [
+      "Spinal tumor, diagnosed 2024",
+      "Hypothyroidism",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Spinal tumor management",
+    "appointments": [
+      {
+        "date": "2025-10-28",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Pre-radiation planning"
+      },
+      {
+        "date": "2025-11-01",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-11-20",
+        "time": "11:00 AM",
+        "provider_purpose": "Michael Lee, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Radiation: Stereotactic radiosurgery, 5 sessions, starting 2025-11-05",
+      "Surgery: Decompression surgery, 2026-01-10",
+      "Physical Therapy: Post-op, starting 2026-01-20"
+    ],
+    "medications": [
+      {
+        "name": "Levothyroxine",
+        "dosage": "100 mcg",
+        "frequency": "Daily",
+        "purpose": "Hypothyroidism management"
+      },
+      {
+        "name": "Gabapentin",
+        "dosage": "300 mg",
+        "frequency": "Three times daily",
+        "purpose": "Neuropathic pain"
+      }
+    ]
+  },
+  {
+    "patient_id": "P009",
+    "name": "Robert E. Kim",
+    "dob": "1985-12-01",
+    "address": "606 Chestnut Lane, Springfield, IL 62709",
+    "phone": "(217) 555-0901",
+    "email": "robert.kim@email.com",
+    "insurance_provider": "Cigna",
+    "policy_number": "CG789123456",
+    "emergency_contact": "Emily Kim, Wife, (217) 555-0902",
+    "medical_history": [
+      "Recurrent shoulder dislocation",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Surgical consultation for shoulder stabilization",
+    "appointments": [
+      {
+        "date": "2025-10-29",
+        "time": "9:30 AM",
+        "provider_purpose": "Michael Lee, NP: Pre-op evaluation"
+      },
+      {
+        "date": "2025-11-03",
+        "time": "8:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Arthroscopic surgery"
+      },
+      {
+        "date": "2025-11-15",
+        "time": "1:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Arthroscopic Bankart repair, 2025-11-03",
+      "Physical Therapy: Weekly, starting 2025-11-20",
+      "Sling Immobilization: 4 weeks post-op"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P010",
+    "name": "Anna B. Taylor",
+    "dob": "1995-08-15",
+    "address": "707 Poplar Street, Springfield, IL 62710",
+    "phone": "(217) 555-1012",
+    "email": "anna.taylor@email.com",
+    "insurance_provider": "UnitedHealthcare",
+    "policy_number": "UH456789123",
+    "emergency_contact": "Laura Taylor, Mother, (217) 555-1013",
+    "medical_history": [
+      "Osteosarcoma, pelvis, diagnosed 2024",
+      "No other conditions",
+      "Allergic to latex"
+    ],
+    "reason_for_visit": "Chemotherapy planning",
+    "appointments": [
+      {
+        "date": "2025-10-30",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-11-01",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy"
+      },
+      {
+        "date": "2025-11-18",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-01",
+      "Surgery: Pelvic resection, 2026-02-15",
+      "Radiation: Post-op, starting 2026-03-01"
+    ],
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P011",
+    "name": "Thomas G. White",
+    "dob": "1972-10-20",
+    "address": "808 Sycamore Lane, Springfield, IL 62711",
+    "phone": "(217) 555-1123",
+    "email": "thomas.white@email.com",
+    "insurance_provider": "Humana",
+    "policy_number": "HM789123456",
+    "emergency_contact": "Susan White, Wife, (217) 555-1124",
+    "medical_history": [
+      "Ankle fracture, 2025",
+      "Hypertension",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Fracture management",
+    "appointments": [
+      {
+        "date": "2025-10-31",
+        "time": "11:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Fracture evaluation"
+      },
+      {
+        "date": "2025-11-05",
+        "time": "9:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Surgical consultation"
+      },
+      {
+        "date": "2025-11-25",
+        "time": "1:30 PM",
+        "provider_purpose": "Michael Lee, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Open reduction internal fixation, 2025-11-05",
+      "Immobilization: Cast for 6 weeks",
+      "Physical Therapy: Starting 2025-12-15"
+    ],
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P012",
+    "name": "Jessica N. Harris",
+    "dob": "1988-01-25",
+    "address": "909 Willow Road, Springfield, IL 62712",
+    "phone": "(217) 555-1234",
+    "email": "jessica.harris@email.com",
+    "insurance_provider": "Anthem",
+    "policy_number": "AN123789456",
+    "emergency_contact": "Mark Harris, Husband, (217) 555-1235",
+    "medical_history": [
+      "Bone cyst, right humerus",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Cyst evaluation",
+    "appointments": [
+      {
+        "date": "2025-11-01",
+        "time": "10:30 AM",
+        "provider_purpose": "Michael Lee, NP: Imaging review"
+      },
+      {
+        "date": "2025-11-06",
+        "time": "2:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Surgical planning"
+      },
+      {
+        "date": "2025-11-20",
+        "time": "9:30 AM",
+        "provider_purpose": "Sarah Johnson, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Curettage and bone grafting, 2025-11-10",
+      "Physical Therapy: Post-op, starting 2025-11-25"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P013",
+    "name": "William C. Adams",
+    "dob": "1960-05-17",
+    "address": "1010 Ash Street, Springfield, IL 62713",
+    "phone": "(217) 555-1345",
+    "email": "william.adams@email.com",
+    "insurance_provider": "BlueCross BlueShield",
+    "policy_number": "BC456789123",
+    "emergency_contact": "Diane Adams, Wife, (217) 555-1346",
+    "medical_history": [
+      "Hip fracture, 2025",
+      "Type 2 diabetes",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Post-fracture surgical follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-02",
+        "time": "9:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Post-op review"
+      },
+      {
+        "date": "2025-11-07",
+        "time": "1:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Physical therapy planning"
+      },
+      {
+        "date": "2025-11-22",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Hip pinning, performed 2025-10-15",
+      "Physical Therapy: Bi-weekly, starting 2025-11-07",
+      "Follow-up Imaging: X-ray, 2025-12-01"
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500 mg",
+        "frequency": "Twice daily",
+        "purpose": "Diabetes management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P014",
+    "name": "Karen P. Young",
+    "dob": "1974-03-09",
+    "address": "1111 Magnolia Drive, Springfield, IL 62714",
+    "phone": "(217) 555-1456",
+    "email": "karen.young@email.com",
+    "insurance_provider": "Cigna",
+    "policy_number": "CG789456123",
+    "emergency_contact": "Paul Young, Husband, (217) 555-1457",
+    "medical_history": [
+      "Multiple myeloma, diagnosed 2023",
+      "Osteoporosis",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Myeloma treatment follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-03",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy"
+      },
+      {
+        "date": "2025-11-08",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-11-25",
+        "time": "11:00 AM",
+        "provider_purpose": "Michael Lee, NP: Blood work review"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Lenalidomide, Bortezomib, 6 cycles, starting 2025-11-03",
+      "Bisphosphonates: Pamidronate, monthly",
+      "Bone Health: Calcium and vitamin D supplementation"
+    ],
+    "medications": [
+      {
+        "name": "Lenalidomide",
+        "dosage": "25 mg",
+        "frequency": "Daily, days 1-21 every 28 days",
+        "purpose": "Myeloma treatment"
+      },
+      {
+        "name": "Bortezomib",
+        "dosage": "1.3 mg/m²",
+        "frequency": "Weekly",
+        "purpose": "Myeloma treatment"
+      },
+      {
+        "name": "Pamidronate",
+        "dosage": "90 mg",
+        "frequency": "Monthly IV",
+        "purpose": "Bone health"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      },
+      {
+        "name": "Vitamin D",
+        "dosage": "800 IU",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P015",
+    "name": "Steven L. Moore",
+    "dob": "1980-07-22",
+    "address": "1212 Laurel Street, Springfield, IL 62715",
+    "phone": "(217) 555-1567",
+    "email": "steven.moore@email.com",
+    "insurance_provider": "UnitedHealthcare",
+    "policy_number": "UH123456789",
+    "emergency_contact": "Emily Moore, Wife, (217) 555-1568",
+    "medical_history": [
+      "Rotator cuff tear",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Surgical consultation for rotator cuff repair",
+    "appointments": [
+      {
+        "date": "2025-11-04",
+        "time": "9:30 AM",
+        "provider_purpose": "Michael Lee, NP: Pre-op evaluation"
+      },
+      {
+        "date": "2025-11-10",
+        "time": "8:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Arthroscopic surgery"
+      },
+      {
+        "date": "2025-11-25",
+        "time": "1:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Arthroscopic repair, 2025-11-10",
+      "Physical Therapy: Weekly, starting 2025-11-25",
+      "Sling Immobilization: 6 weeks post-op"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P016",
+    "name": "Rachel F. Clark",
+    "dob": "1992-11-11",
+    "address": "1313 Cedar Lane, Springfield, IL 62716",
+    "phone": "(217) 555-1678",
+    "email": "rachel.clark@email.com",
+    "insurance_provider": "Humana",
+    "policy_number": "HM456789123",
+    "emergency_contact": "David Clark, Husband, (217) 555-1679",
+    "medical_history": [
+      "Osteosarcoma, humerus, diagnosed 2024",
+      "No other conditions",
+      "Allergic to penicillin"
+    ],
+    "reason_for_visit": "Chemotherapy follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-05",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-11-07",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy"
+      },
+      {
+        "date": "2025-11-22",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-07",
+      "Surgery: Limb-sparing surgery, 2026-02-20",
+      "Radiation: Post-op, starting 2026-03-10"
+    ],
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P017",
+    "name": "Daniel S. Lewis",
+    "dob": "1967-04-03",
+    "address": "1414 Oak Street, Springfield, IL 62717",
+    "phone": "(217) 555-1789",
+    "email": "daniel.lewis@email.com",
+    "insurance_provider": "Anthem",
+    "policy_number": "AN789123456",
+    "emergency_contact": "Linda Lewis, Wife, (217) 555-1790",
+    "medical_history": [
+      "Knee osteoarthritis",
+      "Hypertension",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Knee replacement consultation",
+    "appointments": [
+      {
+        "date": "2025-11-06",
+        "time": "11:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Pre-op evaluation"
+      },
+      {
+        "date": "2025-11-12",
+        "time": "8:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Knee replacement surgery"
+      },
+      {
+        "date": "2025-11-27",
+        "time": "1:00 PM",
+        "provider_purpose": "Michael Lee, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Total knee replacement, 2025-11-12",
+      "Physical Therapy: Bi-weekly, starting 2025-11-27",
+      "Pain Management: Post-op analgesics"
+    ],
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P018",
+    "name": "Laura E. Walker",
+    "dob": "1976-09-27",
+    "address": "1515 Pine Lane, Springfield, IL 62718",
+    "phone": "(217) 555-1890",
+    "email": "laura.walker@email.com",
+    "insurance_provider": "BlueCross BlueShield",
+    "policy_number": "BC123789456",
+    "emergency_contact": "James Walker, Husband, (217) 555-1891",
+    "medical_history": [
+      "Breast cancer with bone metastasis, diagnosed 2024",
+      "Osteoporosis",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Bone metastasis management",
+    "appointments": [
+      {
+        "date": "2025-11-07",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Pain management consultation"
+      },
+      {
+        "date": "2025-11-10",
+        "time": "2:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-11-28",
+        "time": "9:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Radiation: Palliative radiation, 10 sessions, starting 2025-11-10",
+      "Bisphosphonates: Zoledronic acid, monthly",
+      "Pain Management: Opioid therapy"
+    ],
+    "medications": [
+      {
+        "name": "Zoledronic Acid",
+        "dosage": "4 mg",
+        "frequency": "Monthly IV",
+        "purpose": "Bone metastasis treatment"
+      },
+      {
+        "name": "Morphine",
+        "dosage": "15 mg",
+        "frequency": "Every 4 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P019",
+    "name": "Paul R. Hall",
+    "dob": "1983-02-14",
+    "address": "1616 Elm Drive, Springfield, IL 62719",
+    "phone": "(217) 555-1901",
+    "email": "paul.hall@email.com",
+    "insurance_provider": "UnitedHealthcare",
+    "policy_number": "UH789456123",
+    "emergency_contact": "Sarah Hall, Wife, (217) 555-1902",
+    "medical_history": [
+      "Femoral fracture, 2025",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Post-fracture surgical follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-08",
+        "time": "9:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Post-op review"
+      },
+      {
+        "date": "2025-11-12",
+        "time": "1:30 PM",
+        "provider_purpose": "Sarah Johnson, NP: Physical therapy planning"
+      },
+      {
+        "date": "2025-11-30",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Intramedullary nailing, performed 2025-10-20",
+      "Physical Therapy: Weekly, starting 2025-11-12",
+      "Follow-up Imaging: X-ray, 2025-12-05"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P020",
+    "name": "Nancy T. King",
+    "dob": "1971-06-19",
+    "address": "1717 Maple Lane, Springfield, IL 62720",
+    "phone": "(217) 555-2012",
+    "email": "nancy.king@email.com",
+    "insurance_provider": "Humana",
+    "policy_number": "HM123789456",
+    "emergency_contact": "Robert King, Husband, (217) 555-2013",
+    "medical_history": [
+      "Chondrosarcoma, pelvis, diagnosed 2024",
+      "No other conditions",
+      "Allergic to sulfa drugs"
+    ],
+    "reason_for_visit": "Chemotherapy follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-09",
+        "time": "10:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy session"
+      },
+      {
+        "date": "2025-11-14",
+        "time": "2:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-12-01",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Blood work review"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Methotrexate, 4 cycles, every 2 weeks, starting 2025-11-09",
+      "Surgery: Wide resection, 2026-02-01",
+      "Physical Therapy: Post-op, starting 2026-02-15"
+    ],
+    "medications": [
+      {
+        "name": "Methotrexate",
+        "dosage": "12 g/m²",
+        "frequency": "Every 2 weeks",
+        "purpose": "Chemotherapy for chondrosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P021",
+    "name": "George M. Wright",
+    "dob": "1987-08-08",
+    "address": "1818 Oak Drive, Springfield, IL 62721",
+    "phone": "(217) 555-2123",
+    "email": "george.wright@email.com",
+    "insurance_provider": "Anthem",
+    "policy_number": "AN456789123",
+    "emergency_contact": "Linda Wright, Wife, (217) 555-2124",
+    "medical_history": [
+      "Elbow dislocation",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Post-dislocation follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-10",
+        "time": "9:30 AM",
+        "provider_purpose": "Michael Lee, NP: Elbow evaluation"
+      },
+      {
+        "date": "2025-11-15",
+        "time": "11:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Follow-up imaging"
+      },
+      {
+        "date": "2025-12-01",
+        "time": "1:30 PM",
+        "provider_purpose": "Sarah Johnson, NP: Physical therapy planning"
+      }
+    ],
+    "treatment_plan": [
+      "Immobilization: Sling for 3 weeks, started 2025-10-25",
+      "Physical Therapy: Weekly, starting 2025-12-01",
+      "Follow-up Imaging: X-ray, 2025-11-15"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P022",
+    "name": "Susan B. Scott",
+    "dob": "1993-12-12",
+    "address": "1919 Cedar Street, Springfield, IL 62722",
+    "phone": "(217) 555-2234",
+    "email": "susan.scott@email.com",
+    "insurance_provider": "BlueCross BlueShield",
+    "policy_number": "BC789123456",
+    "emergency_contact": "John Scott, Husband, (217) 555-2235",
+    "medical_history": [
+      "Osteosarcoma, tibia, diagnosed 2024",
+      "No other conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Chemotherapy and surgical planning",
+    "appointments": [
+      {
+        "date": "2025-11-11",
+        "time": "10:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology consultation"
+      },
+      {
+        "date": "2025-11-13",
+        "time": "2:00 PM",
+        "provider_purpose": "Sarah Johnson, NP: Chemotherapy"
+      },
+      {
+        "date": "2025-12-01",
+        "time": "9:00 AM",
+        "provider_purpose": "Michael Lee, NP: Pre-surgical evaluation"
+      }
+    ],
+    "treatment_plan": [
+      "Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-13",
+      "Surgery: Limb-sparing surgery, 2026-02-25",
+      "Radiation: Post-op, starting 2026-03-15"
+    ],
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m²",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P023",
+    "name": "Charles D. Green",
+    "dob": "1969-10-04",
+    "address": "2020 Pine Drive, Springfield, IL 62723",
+    "phone": "(217) 555-2345",
+    "email": "charles.green@email.com",
+    "insurance_provider": "UnitedHealthcare",
+    "policy_number": "UH123789456",
+    "emergency_contact": "Mary Green, Wife, (217) 555-2346",
+    "medical_history": [
+      "Hip osteoarthritis",
+      "Hypertension",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Hip replacement consultation",
+    "appointments": [
+      {
+        "date": "2025-11-12",
+        "time": "11:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Pre-op evaluation"
+      },
+      {
+        "date": "2025-11-18",
+        "time": "8:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Hip replacement surgery"
+      },
+      {
+        "date": "2025-12-03",
+        "time": "1:00 PM",
+        "provider_purpose": "Michael Lee, NP: Post-op follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Surgery: Total hip replacement, 2025-11-18",
+      "Physical Therapy: Bi-weekly, starting 2025-12-03",
+      "Pain Management: Post-op analgesics"
+    ],
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P024",
+    "name": "Patricia A. Hill",
+    "dob": "1977-01-30",
+    "address": "2121 Elm Lane, Springfield, IL 62724",
+    "phone": "(217) 555-2456",
+    "email": "patricia.hill@email.com",
+    "insurance_provider": "Humana",
+    "policy_number": "HM789456123",
+    "emergency_contact": "David Hill, Husband, (217) 555-2457",
+    "medical_history": [
+      "Bone tumor, spine, diagnosed 2024",
+      "Hypothyroidism",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Tumor management",
+    "appointments": [
+      {
+        "date": "2025-11-13",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Pain management consultation"
+      },
+      {
+        "date": "2025-11-15",
+        "time": "2:00 PM",
+        "provider_purpose": "Dr. Emily Carter, MD: Oncology review"
+      },
+      {
+        "date": "2025-12-05",
+        "time": "9:00 AM",
+        "provider_purpose": "Sarah Johnson, NP: Follow-up"
+      }
+    ],
+    "treatment_plan": [
+      "Radiation: Stereotactic radiosurgery, 5 sessions, starting 2025-11-20",
+      "Surgery: Decompression surgery, 2026-02-10",
+      "Physical Therapy: Post-op, starting 2026-02-25"
+    ],
+    "medications": [
+      {
+        "name": "Levothyroxine",
+        "dosage": "100 mcg",
+        "frequency": "Daily",
+        "purpose": "Hypothyroidism management"
+      },
+      {
+        "name": "Gabapentin",
+        "dosage": "300 mg",
+        "frequency": "Three times daily",
+        "purpose": "Neuropathic pain"
+      }
+    ]
+  },
+  {
+    "patient_id": "P025",
+    "name": "Edward J. Allen",
+    "dob": "1984-05-16",
+    "address": "2222 Oak Street, Springfield, IL 62725",
+    "phone": "(217) 555-2567",
+    "email": "edward.allen@email.com",
+    "insurance_provider": "Anthem",
+    "policy_number": "AN123456789",
+    "emergency_contact": "Linda Allen, Wife, (217) 555-2568",
+    "medical_history": [
+      "Clavicle fracture, 2025",
+      "No chronic conditions",
+      "No known allergies"
+    ],
+    "reason_for_visit": "Post-fracture follow-up",
+    "appointments": [
+      {
+        "date": "2025-11-14",
+        "time": "9:00 AM",
+        "provider_purpose": "Dr. Emily Carter, MD: Fracture assessment"
+      },
+      {
+        "date": "2025-11-18",
+        "time": "1:30 PM",
+        "provider_purpose": "Sarah Johnson, NP: Cast check"
+      },
+      {
+        "date": "2025-12-10",
+        "time": "10:00 AM",
+        "provider_purpose": "Michael Lee, NP: Physical therapy planning"
+      }
+    ],
+    "treatment_plan": [
+      "Immobilization: Sling for 6 weeks, applied 2025-10-25",
+      "Physical Therapy: Weekly, starting 2025-12-10",
+      "Follow-up Imaging: X-ray, 2025-12-15"
+    ],
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  }
+]

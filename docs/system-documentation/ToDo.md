@@ -146,13 +146,14 @@ specs-3-scoring
 ~~139. Create centralized SetupGuidance utility for consistent setup messaging across all search types --done~~
 ~~140. Change repos to repo load --done~~
 ~~141. exchange order coll-edit  Embed badges and index card badges --done~~
-~~~~134. Fix convert on pdfs in Law-Office collection - PDF conversion is reading raw binary instead of using pdftotext extraction  --done~~~~
+~~134. Fix convert on pdfs in Law-Office collection - PDF conversion is reading raw binary instead of using pdftotext extraction  --done~~
+~~136. Fix spacebar problem --done~~
+~~142. Fix document index creation failing with system-prompts.json path error --done~~
 
 ## PENDING TASKS
 
 15. Can We make an electron app for this that runs locally on a mac? --started
 22. Implement local documents only. -- started
-28. in dev mode show all. hide if not in dev mode --done
 28. User and system propmt by source type
 32. Re-Visit the Test Codes - focus on speed  --started
 120. create user prompts based on source Type and collection and search type
@@ -166,7 +167,8 @@ specs-3-scoring
 129. review doc index card creation add  remove fields change models overall improve.
 131. create app for load-AIPrivateSearch-xxxx.command  --started
 133. Replace toggle advanced with 3 roles: standard, premium, developer  --started  need to describe functionality:
-Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
-admin can add users, role admin and searcher. Premiun get all Standard plus manage models, options modify config files, Developer gets all menu items
+- Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
+admin can add users, role admin and searcher cannot modify doc index cards
+- Premiun get all Standard plus manage models, options modify config files, Can modify Doc Index cards.
+- Developer gets all menu items
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-~~136. Fix spacebar problem --done~~

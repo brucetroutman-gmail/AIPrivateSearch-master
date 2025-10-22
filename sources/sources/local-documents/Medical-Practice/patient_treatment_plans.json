@@ -1,0 +1,303 @@
+[
+DocID: Med_1760555326610_7ho6128lb
+  {
+    "patient_id": "P001",
+    "treatment_plan_item": "Chemotherapy: Doxorubicin and Cisplatin"
+  },
+  {
+    "patient_id": "P001",
+    "treatment_plan_item": "Surgery: Limb-sparing surgery"
+  },
+  {
+    "patient_id": "P001",
+    "treatment_plan_item": "Radiation: 5 sessions"
+  },
+  {
+    "patient_id": "P001",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P002",
+    "treatment_plan_item": "Surgery: Total hip replacement"
+  },
+  {
+    "patient_id": "P002",
+    "treatment_plan_item": "Physical Therapy: Bi-weekly"
+  },
+  {
+    "patient_id": "P002",
+    "treatment_plan_item": "Pain Management: Post-op analgesics"
+  },
+  {
+    "patient_id": "P003",
+    "treatment_plan_item": "Radiation: Palliative radiation"
+  },
+  {
+    "patient_id": "P003",
+    "treatment_plan_item": "Bisphosphonates: Zoledronic acid"
+  },
+  {
+    "patient_id": "P003",
+    "treatment_plan_item": "Pain Management: Opioid therapy"
+  },
+  {
+    "patient_id": "P004",
+    "treatment_plan_item": "Immobilization: Cast for 6 weeks"
+  },
+  {
+    "patient_id": "P004",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P004",
+    "treatment_plan_item": "Follow-up Imaging: X-ray on 2025-11-20"
+  },
+  {
+    "patient_id": "P005",
+    "treatment_plan_item": "Chemotherapy: Methotrexate"
+  },
+  {
+    "patient_id": "P005",
+    "treatment_plan_item": "Surgery: Wide resection"
+  },
+  {
+    "patient_id": "P005",
+    "treatment_plan_item": "Physical Therapy: Post-op"
+  },
+  {
+    "patient_id": "P006",
+    "treatment_plan_item": "Injections: Hyaluronic acid"
+  },
+  {
+    "patient_id": "P006",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P006",
+    "treatment_plan_item": "Lifestyle Modifications: Weight management program"
+  },
+  {
+    "patient_id": "P007",
+    "treatment_plan_item": "Chemotherapy: Vincristine"
+  },
+  {
+    "patient_id": "P007",
+    "treatment_plan_item": "Radiation: 10 sessions"
+  },
+  {
+    "patient_id": "P007",
+    "treatment_plan_item": "Surgery: Evaluation for resection"
+  },
+  {
+    "patient_id": "P008",
+    "treatment_plan_item": "Radiation: Stereotactic radiosurgery"
+  },
+  {
+    "patient_id": "P008",
+    "treatment_plan_item": "Surgery: Decompression surgery"
+  },
+  {
+    "patient_id": "P008",
+    "treatment_plan_item": "Physical Therapy: Post-op"
+  },
+  {
+    "patient_id": "P009",
+    "treatment_plan_item": "Surgery: Arthroscopic Bankart repair"
+  },
+  {
+    "patient_id": "P009",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P009",
+    "treatment_plan_item": "Sling Immobilization: 4 weeks post-op"
+  },
+  {
+    "patient_id": "P010",
+    "treatment_plan_item": "Chemotherapy: Doxorubicin"
+  },
+  {
+    "patient_id": "P010",
+    "treatment_plan_item": "Surgery: Pelvic resection"
+  },
+  {
+    "patient_id": "P010",
+    "treatment_plan_item": "Radiation: Post-op"
+  },
+  {
+    "patient_id": "P011",
+    "treatment_plan_item": "Surgery: Open reduction internal fixation"
+  },
+  {
+    "patient_id": "P011",
+    "treatment_plan_item": "Immobilization: Cast for 6 weeks"
+  },
+  {
+    "patient_id": "P011",
+    "treatment_plan_item": "Physical Therapy: Starting 2025-12-15"
+  },
+  {
+    "patient_id": "P012",
+    "treatment_plan_item": "Surgery: Curettage and bone grafting"
+  },
+  {
+    "patient_id": "P012",
+    "treatment_plan_item": "Physical Therapy: Post-op"
+  },
+  {
+    "patient_id": "P013",
+    "treatment_plan_item": "Surgery: Hip pinning"
+  },
+  {
+    "patient_id": "P013",
+    "treatment_plan_item": "Physical Therapy: Bi-weekly"
+  },
+  {
+    "patient_id": "P013",
+    "treatment_plan_item": "Follow-up Imaging: X-ray"
+  },
+  {
+    "patient_id": "P014",
+    "treatment_plan_item": "Chemotherapy: Lenalidomide"
+  },
+  {
+    "patient_id": "P014",
+    "treatment_plan_item": "Bisphosphonates: Pamidronate"
+  },
+  {
+    "patient_id": "P014",
+    "treatment_plan_item": "Bone Health: Calcium and vitamin D supplementation"
+  },
+  {
+    "patient_id": "P015",
+    "treatment_plan_item": "Surgery: Arthroscopic repair"
+  },
+  {
+    "patient_id": "P015",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P015",
+    "treatment_plan_item": "Sling Immobilization: 6 weeks post-op"
+  },
+  {
+    "patient_id": "P016",
+    "treatment_plan_item": "Chemotherapy: Doxorubicin"
+  },
+  {
+    "patient_id": "P016",
+    "treatment_plan_item": "Surgery: Limb-sparing surgery"
+  },
+  {
+    "patient_id": "P016",
+    "treatment_plan_item": "Radiation: Post-op"
+  },
+  {
+    "patient_id": "P017",
+    "treatment_plan_item": "Surgery: Total knee replacement"
+  },
+  {
+    "patient_id": "P017",
+    "treatment_plan_item": "Physical Therapy: Bi-weekly"
+  },
+  {
+    "patient_id": "P017",
+    "treatment_plan_item": "Pain Management: Post-op analgesics"
+  },
+  {
+    "patient_id": "P018",
+    "treatment_plan_item": "Radiation: Palliative radiation"
+  },
+  {
+    "patient_id": "P018",
+    "treatment_plan_item": "Bisphosphonates: Zoledronic acid"
+  },
+  {
+    "patient_id": "P018",
+    "treatment_plan_item": "Pain Management: Opioid therapy"
+  },
+  {
+    "patient_id": "P019",
+    "treatment_plan_item": "Surgery: Intramedullary nailing"
+  },
+  {
+    "patient_id": "P019",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P019",
+    "treatment_plan_item": "Follow-up Imaging: X-ray"
+  },
+  {
+    "patient_id": "P020",
+    "treatment_plan_item": "Chemotherapy: Methotrexate"
+  },
+  {
+    "patient_id": "P020",
+    "treatment_plan_item": "Surgery: Wide resection"
+  },
+  {
+    "patient_id": "P020",
+    "treatment_plan_item": "Physical Therapy: Post-op"
+  },
+  {
+    "patient_id": "P021",
+    "treatment_plan_item": "Immobilization: Sling for 3 weeks"
+  },
+  {
+    "patient_id": "P021",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P021",
+    "treatment_plan_item": "Follow-up Imaging: X-ray"
+  },
+  {
+    "patient_id": "P022",
+    "treatment_plan_item": "Chemotherapy: Doxorubicin"
+  },
+  {
+    "patient_id": "P022",
+    "treatment_plan_item": "Surgery: Limb-sparing surgery"
+  },
+  {
+    "patient_id": "P022",
+    "treatment_plan_item": "Radiation: Post-op"
+  },
+  {
+    "patient_id": "P023",
+    "treatment_plan_item": "Surgery: Total hip replacement"
+  },
+  {
+    "patient_id": "P023",
+    "treatment_plan_item": "Physical Therapy: Bi-weekly"
+  },
+  {
+    "patient_id": "P023",
+    "treatment_plan_item": "Pain Management: Post-op analgesics"
+  },
+  {
+    "patient_id": "P024",
+    "treatment_plan_item": "Radiation: Stereotactic radiosurgery"
+  },
+  {
+    "patient_id": "P024",
+    "treatment_plan_item": "Surgery: Decompression surgery"
+  },
+  {
+    "patient_id": "P024",
+    "treatment_plan_item": "Physical Therapy: Post-op"
+  },
+  {
+    "patient_id": "P025",
+    "treatment_plan_item": "Immobilization: Sling for 6 weeks"
+  },
+  {
+    "patient_id": "P025",
+    "treatment_plan_item": "Physical Therapy: Weekly"
+  },
+  {
+    "patient_id": "P025",
+    "treatment_plan_item": "Follow-up Imaging: X-ray"
+  }
+]

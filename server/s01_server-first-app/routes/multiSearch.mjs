@@ -175,9 +175,11 @@ router.post('/document-index-create-single', async (req, res) => {
     });
   } catch (error) {
     console.error('Single document index creation error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Single Doc Index creation failed', 
-      message: error.message 
+      message: error.message,
+      stack: error.stack
     });
   }
 });

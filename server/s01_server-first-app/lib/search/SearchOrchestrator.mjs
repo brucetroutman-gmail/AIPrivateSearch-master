@@ -58,7 +58,15 @@ export class SearchOrchestrator {
   }
 
   async indexCollectionDocumentIndex(collection) {
-    return await this.searchMethods['document-index'].indexCollection(collection);
+    try {
+      console.log(`[SearchOrchestrator] Starting document index creation for collection: ${collection}`);
+      const result = await this.searchMethods['document-index'].indexCollection(collection);
+      console.log(`[SearchOrchestrator] Document index creation completed for collection: ${collection}`);
+      return result;
+    } catch (error) {
+      console.error(`[SearchOrchestrator] Document index creation failed for collection: ${collection}`, error);
+      throw error;
+    }
   }
 
   async indexSingleDocument(collection, filename) {
