@@ -4,9 +4,12 @@ import { DocumentIndex } from './server/s01_server-first-app/lib/search/Document
 async function readDocIndex() {
   try {
     const docIndex = new DocumentIndex();
-    console.log('Reading Doc Index Card for Declaration of Independence...\n');
+    const collection = process.argv[2] ? process.argv[2].split('/').slice(-2)[0] : 'Federalist-Papers';
+    const document = process.argv[3] || 'The Federalist Papers.md';
     
-    const result = await docIndex.getDocumentIndex('USA-History', 'Declaration of Independence.md');
+    console.log(`Reading Doc Index Card for ${document} from ${collection}...\n`);
+    
+    const result = await docIndex.getDocumentIndex(collection, document);
     
     if (result) {
       console.log('=== DOC INDEX CARD ===');

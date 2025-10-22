@@ -744,10 +744,12 @@ tokensEl.addEventListener('change', () => {
 });
 
 // Save prompt text
-queryEl.addEventListener('input', () => {
+queryEl.addEventListener('input', (e) => {
+  // Don't interfere with normal typing
   const sanitizedValue = DOMSanitizer.sanitizeText(queryEl.value);
   localStorage.setItem('lastPrompt', sanitizedValue);
-  if (queryEl.value !== sanitizedValue) {
+  // Only update if sanitization actually changed something
+  if (queryEl.value !== sanitizedValue && sanitizedValue !== queryEl.value) {
     queryEl.value = sanitizedValue;
   }
 });

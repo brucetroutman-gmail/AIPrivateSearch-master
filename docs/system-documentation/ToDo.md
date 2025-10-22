@@ -159,7 +159,7 @@ specs-3-scoring
 121. focus on display and layout  --started
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 124. Create a quick start guide.
-125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Developer computers $2999 (Register with Free) pay for Premiumm, pay for developer.
+125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Developer license $2999 (Register with Free) pay for Premiumm, pay for developer.
 126. enhance database saving add documents only
 127. highlight matched words in all.
 128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
@@ -169,3 +169,4 @@ specs-3-scoring
 Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
 admin can add users, role admin and searcher. Premiun get all Standard plus manage models, options modify config files, Developer gets all menu items
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
+~~136. Fix spacebar problem --done~~

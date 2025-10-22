@@ -7,8 +7,8 @@ class DOMSanitizer {
       .replace(/[<>"'&]/g, (match) => {
         const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
         return entities[match];
-      })
-      .trim();
+      });
+      // Removed .trim() to preserve spaces
   }
 
   // Sanitize URL input

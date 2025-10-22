@@ -5,12 +5,13 @@ import { OllamaService } from '../services/OllamaService.mjs';
 import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
+import { NLPAnalytics } from '../nlp/NLPAnalytics.mjs';
 
 let systemPrompts = null;
 
 async function loadSystemPrompts() {
   if (!systemPrompts) {
-    const promptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/system-prompts.json');
+    const promptsPath = path.join(process.cwd(), 'client/c01_client-first-app/config/system-prompts.json');
     const data = JSON.parse(fs.readFileSync(promptsPath, 'utf8'));
     systemPrompts = data.system_prompts;
   }
@@ -141,8 +142,9 @@ export class DocumentIndex {
       
       console.log(`Processing ${documentFiles.length} documents with AI analysis`);
       
-      // Initialize AI service
+      // Initialize AI service and NLP analytics
       const ollamaService = new OllamaService();
+      const nlpAnalytics = new NLPAnalytics();
       const modelName = 'llama3.2:3b'; // From models-list.json document-index category
       
       // Create new database with all 39 fields (clear existing if present)
@@ -276,6 +278,9 @@ Content: ${content.substring(0, 3000)}`;
           complexity_score: '6'
         };
         
+        // Get NLP analytics
+        const nlpResults = nlpAnalytics.analyzeText(content);
+        
         // Parse numbered AI response
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
@@ -321,13 +326,13 @@ Content: ${content.substring(0, 3000)}`;
           }
         });
         
-        // Calculate text metrics
-        const words = content.split(/\s+/);
-        const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-        const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(w => w.length > 0));
-        const links = (content.match(/https?:\/\/[^\s]+/g) || []).length;
-        const images = (content.match(/!\[[^\]]*\]\([^)]+\)/g) || []).length;
+        // Merge AI analysis with NLP analytics (NLP takes precedence for factual data)
+        if (nlpResults.entities.people) analysis.entities = nlpResults.entities.people;
+        if (nlpResults.dates) analysis.dates_mentioned = nlpResults.dates;
+        if (nlpResults.keyPhrases) analysis.key_phrases = nlpResults.keyPhrases;
+        
+        // Use NLP text statistics
+        const { wordCount, sentenceCount, paragraphCount, uniqueWordCount, averageSentenceLength, readingTime } = nlpResults;
         
         // Insert with enhanced fields
         const stmt = db.prepare(`INSERT INTO document_index (
@@ -366,13 +371,13 @@ Content: ${content.substring(0, 3000)}`;
           analysis.action_items || '',
           analysis.importance_level || '3',
           analysis.complexity_score || '5',
-          words.length,
+          wordCount,
           content.length,
-          Math.ceil(words.length / 200),
-          paragraphs.length,
-          sentences.length,
-          uniqueWords.size,
-          sentences.length > 0 ? parseFloat((words.length / sentences.length).toFixed(1)) : 0,
+          readingTime,
+          paragraphCount,
+          sentenceCount,
+          uniqueWordCount,
+          averageSentenceLength,
           ''
         ]);
         stmt.free();

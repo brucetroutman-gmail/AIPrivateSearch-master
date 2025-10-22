@@ -251,7 +251,8 @@ searchQueryEl.addEventListener('keypress', (e) => {
 searchQueryEl.addEventListener('input', (e) => {
     const sanitizedValue = DOMSanitizer.sanitizeText(e.target.value);
     localStorage.setItem('multiModeSearchQuery', sanitizedValue);
-    if (e.target.value !== sanitizedValue) {
+    // Only update if sanitization actually changed something significant
+    if (e.target.value !== sanitizedValue && sanitizedValue !== e.target.value) {
         e.target.value = sanitizedValue;
     }
 });
