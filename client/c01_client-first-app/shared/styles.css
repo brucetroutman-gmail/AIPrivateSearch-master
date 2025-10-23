@@ -1039,3 +1039,70 @@ mark.search-highlight,
 .chunk-similarity {
   color: #666;
 }
+
+/* Markdown rendering styles for AI responses */
+.result-excerpt h3 {
+  color: #2c3e50;
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+}
+
+.result-excerpt h4 {
+  color: #34495e;
+  margin: 0.75rem 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.result-excerpt ol,
+.result-excerpt ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.result-excerpt li {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.result-excerpt code {
+  background: #f4f4f4;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.result-excerpt strong {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.result-excerpt em {
+  font-style: italic;
+  color: #555;
+}
+
+/* Dark mode markdown styles */
+[data-theme="dark"] .result-excerpt h3 {
+  color: #87ceeb;
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .result-excerpt h4 {
+  color: #bdc3c7;
+}
+
+[data-theme="dark"] .result-excerpt code {
+  background: #444;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .result-excerpt strong {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .result-excerpt em {
+  color: #bdc3c7;
+}

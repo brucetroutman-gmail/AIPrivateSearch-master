@@ -101,7 +101,7 @@ export class UnifiedEmbeddingService {
       const docEmbedding = await this.createEmbedding(content.substring(0, 8000));
       console.log(`[UnifiedEmbeddingService] Document embedding created, length: ${docEmbedding.length}`);
       
-      const docResult = docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
+      const docResult = await docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
       console.log(`[UnifiedEmbeddingService] Document inserted, changes: ${docResult.changes}`);
       
       // Create chunks
@@ -119,7 +119,7 @@ export class UnifiedEmbeddingService {
         
         const embedding = await this.createEmbedding(chunk.content);
         
-        const chunkResult = chunkStmt.run(
+        const chunkResult = await chunkStmt.run(
           `${documentId}_chunk_${i}`,
           documentId,
           i,
@@ -138,7 +138,7 @@ export class UnifiedEmbeddingService {
       INSERT OR IGNORE INTO collection_documents (document_id, filename)
       VALUES (?, ?)
     `);
-    const linkResult = linkStmt.run(documentId, filename);
+    const linkResult = await linkStmt.run(documentId, filename);
     console.log(`[UnifiedEmbeddingService] Collection link created, changes: ${linkResult.changes}`);
     
     // Get chunk count
@@ -192,15 +192,11 @@ export class UnifiedEmbeddingService {
   }
 
   async findSimilarChunks(query, collection, topK = 5) {
-    console.log(`[UnifiedEmbeddingService] Finding similar chunks for "${query}" in collection: ${collection}`);
+    console.log(`[UnifiedEmbeddingService] Finding similar chunks for "${query}" in collection: "${collection}"`);
+    console.log(`[UnifiedEmbeddingService] Collection parameter type: ${typeof collection}`);
+    console.log(`[UnifiedEmbeddingService] Collection parameter length: ${collection?.length}`);
     
     try {
-      // Force fresh database connection
-      if (this.dbs.has(collection)) {
-        this.dbs.delete(collection);
-      }
-      this.initialized.delete(collection);
-      
       await this.setupDatabase(collection);
       const db = await this.getCollectionDb(collection);
       

@@ -54,8 +54,8 @@ window.responseDisplayCommon = {
             const excerpt = document.createElement('div');
             excerpt.className = 'result-excerpt';
             
-            // Handle markdown conversion for vector and hybrid searches
-            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
+            // Handle markdown conversion for AI-based searches
+            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search' || searchResult.method === 'ai-document-chat' || searchResult.method === 'ai-direct') {
                 const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(sanitizedHTML, 'text/html');
@@ -73,17 +73,19 @@ window.responseDisplayCommon = {
             const meta = document.createElement('div');
             meta.className = 'result-meta';
             
-            // Add View Document link
-            if (result.source && collection) {
-                const linkElement = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
-                meta.appendChild(linkElement);
-            } else if (result.documentPath) {
-                const link = document.createElement('a');
-                link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
-                link.textContent = 'View Document';
-                link.target = '_blank';
-                link.className = 'view-document-link';
-                meta.appendChild(link);
+            // Add View Document link (except for AI Document Chat which has source links at bottom)
+            if (searchResult.method !== 'ai-document-chat') {
+                if (result.source && collection) {
+                    const linkElement = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
+                    meta.appendChild(linkElement);
+                } else if (result.documentPath) {
+                    const link = document.createElement('a');
+                    link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
+                    link.textContent = 'View Document';
+                    link.target = '_blank';
+                    link.className = 'view-document-link';
+                    meta.appendChild(link);
+                }
             }
             
             div.appendChild(meta);

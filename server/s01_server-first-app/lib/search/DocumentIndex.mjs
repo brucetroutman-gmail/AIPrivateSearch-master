@@ -5,6 +5,7 @@ import { OllamaService } from '../services/OllamaService.mjs';
 import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
+import { QueryProcessor } from '../utils/queryProcessor.mjs';
 import { NLPAnalytics } from '../nlp/NLPAnalytics.mjs';
 
 let systemPrompts = null;
@@ -27,8 +28,15 @@ export class DocumentIndex {
   async search(query, options = {}) {
     const { collection = null } = options;
     
+    // Process natural language queries into keywords
+    let processedQuery = query;
+    if (QueryProcessor.shouldProcessQuery(query)) {
+      processedQuery = QueryProcessor.extractKeywords(query);
+      console.log(`[DocumentIndexSearch] Converted "${query}" to "${processedQuery}"`);
+    }
+    
     try {
-      console.log(`[DocumentIndexSearch] Document Index search for: "${query}" in collection: "${collection}"`);
+      console.log(`[DocumentIndexSearch] Document Index search for: "${processedQuery}" in collection: "${collection}"`);
       
       const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
       console.log(`[DocumentIndexSearch] Database path: ${dbPath}`);
@@ -83,7 +91,7 @@ export class DocumentIndex {
         LIMIT 50
       `;
       
-      const searchTerm = `%${query}%`;
+      const searchTerm = `%${processedQuery}%`;
       console.log(`[DocumentIndexSearch] Executing search with term: "${searchTerm}"`);
       
       const results = db.exec(searchQuery, [searchTerm, searchTerm]);
@@ -97,7 +105,7 @@ export class DocumentIndex {
           results: [],
           method: 'document-index',
           total: 0,
-          message: `No documents found matching "${query}" in ${collection}`
+          message: `No documents found matching "${processedQuery}" in ${collection}`
         };
       }
       
@@ -114,7 +122,7 @@ export class DocumentIndex {
         results: formattedResults.map(doc => ({
           id: doc.docid,
           title: doc.filename.replace('.md', '').replace('.json', ''),
-          excerpt: ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, query),
+          excerpt: ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, processedQuery),
           score: doc.score,
           source: doc.filename
         })),

@@ -253,7 +253,7 @@ function toggleMenu() {
 
 // Role-based system
 function setUserRole(role) {
-  const validRoles = ['standard', 'premium', 'developer'];
+  const validRoles = ['standard', 'premium', 'professional'];
   if (!validRoles.includes(role)) return;
   
   localStorage.setItem('userRole', role);
@@ -262,20 +262,20 @@ function setUserRole(role) {
   const roleNames = {
     'standard': 'Standard',
     'premium': 'Premium', 
-    'developer': 'Developer'
+    'professional': 'Professional'
   };
   
   showUserMessage(`Role set to ${roleNames[role]}`, 'info');
 }
 
 function getUserRole() {
-  return localStorage.getItem('userRole') || 'developer'; // Default to developer for existing users
+  return localStorage.getItem('userRole') || 'professional'; // Default to professional for existing users
 }
 
 // Legacy function for backward compatibility
 function toggleDeveloperMode() {
   const currentRole = getUserRole();
-  const newRole = currentRole === 'standard' ? 'developer' : 'standard';
+  const newRole = currentRole === 'standard' ? 'professional' : 'standard';
   setUserRole(newRole);
 }
 
@@ -292,7 +292,7 @@ function applyUserRole(role = null) {
   }
   
   // Standard role: hide advanced features
-  // Premium and Developer roles: show advanced features
+  // Premium and Professional roles: show advanced features
   const showAdvanced = role !== 'standard';
   
   toggleElementsByClass('.dev-only', showAdvanced);
@@ -305,7 +305,7 @@ function applyDeveloperMode(isDeveloperMode = null) {
     // Migrate from old developerMode to role system
     const oldMode = localStorage.getItem('developerMode');
     if (oldMode !== null) {
-      const role = oldMode === 'true' ? 'developer' : 'standard';
+      const role = oldMode === 'true' ? 'professional' : 'standard';
       localStorage.setItem('userRole', role);
       localStorage.removeItem('developerMode');
     }
@@ -317,14 +317,14 @@ function loadDeveloperMode() {
   // Migrate existing users from developerMode to role system
   const oldMode = localStorage.getItem('developerMode');
   if (oldMode !== null && !localStorage.getItem('userRole')) {
-    const role = oldMode === 'true' ? 'developer' : 'standard';
+    const role = oldMode === 'true' ? 'professional' : 'standard';
     localStorage.setItem('userRole', role);
     localStorage.removeItem('developerMode');
   }
   
-  // Default to developer role if not set (for existing users)
+  // Default to professional role if not set (for existing users)
   if (!localStorage.getItem('userRole')) {
-    localStorage.setItem('userRole', 'developer');
+    localStorage.setItem('userRole', 'professional');
   }
   
   applyUserRole();

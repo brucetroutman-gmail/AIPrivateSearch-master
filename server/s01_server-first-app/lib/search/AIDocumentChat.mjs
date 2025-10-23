@@ -12,12 +12,14 @@ export class AIDocumentChat {
     const { collection = null, model, topK = 10, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
-      console.log(`AI Document Chat search for query: "${query}" in collection: ${collection}`);
+      console.log(`[AIDocumentChat] Search called with query: "${query}"`);
+      console.log(`[AIDocumentChat] Collection parameter: "${collection}"`);
+      console.log(`[AIDocumentChat] Collection type: ${typeof collection}`);
       
       // Check if embeddings exist - no auto-embedding
       
       const relevantChunks = await this.findSimilarChunks(query, collection, topK);
-      console.log(`Found ${relevantChunks.length} relevant chunks`);
+      console.log(`[AIDocumentChat] Found ${relevantChunks.length} relevant chunks`);
       
       if (relevantChunks.length === 0) {
         return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
@@ -26,6 +28,8 @@ export class AIDocumentChat {
       let aiResponse;
       try {
         aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit);
+        // Add source document links to AI response
+        aiResponse += this.addSourceLinks(relevantChunks);
       } catch (error) {
         console.log('AI generation failed, using chunks directly:', error.message);
         aiResponse = this.formatChunksDirectly(query, relevantChunks);
@@ -65,13 +69,34 @@ export class AIDocumentChat {
     
     chunks.slice(0, 3).forEach((chunk, index) => {
       const similarity = chunk.similarity ? ` (${(chunk.similarity * 100).toFixed(1)}% match)` : '';
+      const docLink = `[View Document](http://localhost:3001/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
       response += `### ${index + 1}. ${chunk.filename}${similarity}\n\n`;
       response += `${chunk.content.substring(0, 500)}...\n\n`;
+      response += `${docLink}\n\n`;
       response += `---\n\n`;
     });
     
     response += `*Analysis based on ${chunks.length} relevant document chunks using semantic search.*`;
     return response;
+  }
+
+  addSourceLinks(chunks) {
+    if (!chunks || chunks.length === 0) return '';
+    
+    const uniqueFiles = new Map();
+    chunks.forEach(chunk => {
+      if (!uniqueFiles.has(chunk.filename)) {
+        uniqueFiles.set(chunk.filename, chunk);
+      }
+    });
+    
+    let sourceSection = '\n\n---\n\n**Source Documents:**\n\n';
+    Array.from(uniqueFiles.values()).forEach((chunk, index) => {
+      const docLink = `[${chunk.filename}](http://localhost:3001/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
+      sourceSection += `${index + 1}. ${docLink}\n`;
+    });
+    
+    return sourceSection;
   }
 
 

@@ -1,5 +1,6 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { QueryProcessor } from '../utils/queryProcessor.mjs';
 import path from 'path';
 import { createInterface } from 'readline';
 import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
@@ -14,6 +15,13 @@ export class LineSearch {
     const { caseSensitive = false, wholeWords = false, collection = null, useWildcards = false } = options;
     const results = [];
     
+    // Process natural language queries into keywords
+    let processedQuery = query;
+    if (QueryProcessor.shouldProcessQuery(query)) {
+      processedQuery = QueryProcessor.extractKeywords(query);
+      console.log(`[LineSearch] Converted "${query}" to "${processedQuery}"`);
+    }
+    
     try {
       let collections = await this.getCollections(CollectionsUtil.getCollectionsPath());
       
@@ -22,7 +30,7 @@ export class LineSearch {
       }
       
       for (const coll of collections) {
-        const collectionResults = await this.searchInCollection(coll, query, { caseSensitive, wholeWords, useWildcards });
+        const collectionResults = await this.searchInCollection(coll, processedQuery, { caseSensitive, wholeWords, useWildcards });
         results.push(...collectionResults);
       }
       

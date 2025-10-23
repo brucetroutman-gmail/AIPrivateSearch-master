@@ -151,6 +151,9 @@ specs-3-scoring
 ~~142. Fix document index creation failing with system-prompts.json path error --done~~
 ~~140. AI Document Chat responses are not formatted --done~~
 ~~141. Add consistency to View Document links in all searchtypes --done~~
+~~143. Fix AI Document Chat single word queries failing with "embeddings required" error due to collection name case sensitivity --done~~
+~~144. Render AI Document Chat responses in proper markdown format instead of raw text --done~~
+~~145. Remove View Document links from AI Document Chat responses since they have source document links at bottom --done~~
 
 ## PENDING TASKS
 
@@ -162,18 +165,24 @@ specs-3-scoring
 121. focus on display and layout  --started
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 124. Create a quick start guide.
-125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Developer license $2999 (Register with Free) pay for Premiumm, pay for developer.
+125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Professional license $2999 (Register with Free) pay for Premiumm, pay for professional.
 126. enhance database saving add documents only
 127. highlight matched words in all.
 128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
 129. review doc index card creation add  remove fields change models overall improve.
 131. create app for load-AIPrivateSearch-xxxx.command  --started
-133. Replace toggle advanced with 3 roles: standard, premium, developer  --started  need to describe functionality:
+133. Replace toggle advanced with 3 roles: standard, premium, professional  --started  need to describe functionality:
 - Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
 admin can add users, role admin and searcher cannot modify doc index cards
 - Premiun get all Standard plus manage models, options modify config files, Can modify Doc Index cards.
-- Developer gets all menu items
+- Professional gets all menu items
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-137. send code to email: once evry 2 weeks for standard, once every month for premium, never for developer.
+137. send code to email: once evry 2 weeks for standard, once every month for premium, never for professional.
 138. work on manage models add category document-index.
 139. Standard can change search models but not set parameters and not change score model or parameters
+142. for ai document Chat the  view document link doesn't apply. Can we view source chunks?
+~~143. Change the term "Developer" to "Professional" throughout the app in code and text --done~~ 
+~~144. Explain why "which patients have hypertension" finds no results in line search and doc index search - Line/Document Index searches look for exact text matches, not natural language queries. Use single words like "hypertension" or AI-based searches for natural language questions --done~~
+~~145. Add phrase-to-keywords converter for Line Search and Document Index Search to extract relevant keywords from natural language queries --done~~
+~~146. Add View Document links for source chunks in AI Document Chat responses --done~~
+147. why does Smart Search return both matches and non matches?

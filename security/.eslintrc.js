@@ -42,7 +42,7 @@ module.exports = {
         logError: 'readonly',
         toggleDarkMode: 'readonly',
         toggleMenu: 'readonly',
-        toggleDeveloperMode: 'readonly',
+        toggleDeveloperMode: 'readonly', // Legacy function name for compatibility
         logger: 'readonly'
     },
     rules: {
