@@ -86,6 +86,36 @@
             border-color: #555;
             color: #e0e0e0;
         }
+        
+        /* Sortable table styles */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .sortable:hover {
+            background-color: #f0f0f0;
+        }
+        
+        [data-theme="dark"] .sortable:hover {
+            background-color: #444;
+        }
+        
+        .sort-arrow {
+            margin-left: 5px;
+            opacity: 0.3;
+        }
+        
+        .sortable.asc .sort-arrow::after {
+            content: '▲';
+            opacity: 1;
+        }
+        
+        .sortable.desc .sort-arrow::after {
+            content: '▼';
+            opacity: 1;
+        }
     </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
@@ -221,10 +251,10 @@
             <table class="performance-table">
                 <thead>
                     <tr>
-                        <th>Method</th>
-                        <th>Results</th>
-                        <th>Time (s)</th>
-                        <th>Relevance Score</th>
+                        <th class="sortable" data-sort="method">Method <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="results">Results <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="time">Time (s) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="score">Relevance Score <span class="sort-arrow"></span></th>
                     </tr>
                 </thead>
                 <tbody id="performanceTableBody">

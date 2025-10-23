@@ -35,44 +35,99 @@ function renderResults(containerId, searchResult) {
 
 
 
+// Store performance data for sorting
+let performanceData = [];
+let currentSort = { column: null, direction: 'asc' };
+
 // Update performance table
 function updatePerformanceTable(results) {
-    while (performanceTableBody.firstChild) {
-        performanceTableBody.removeChild(performanceTableBody.firstChild);
-    }
-    
-    // Maintain the correct order based on searchMethods object
+    // Store data for sorting
+    performanceData = [];
     const orderedMethods = Object.keys(searchMethods);
     orderedMethods.forEach(method => {
         if (results[method]) {
             const data = results[method];
-            const row = document.createElement('tr');
             const avgScore = data.results.length > 0 
-                ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length).toFixed(2)
-                : '0.00';
+                ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length)
+                : 0;
             
-            const nameCell = document.createElement('td');
-            nameCell.textContent = searchMethods[method].name;
-            
-            const countCell = document.createElement('td');
-            countCell.textContent = data.results.length;
-            
-            const timeCell = document.createElement('td');
-            timeCell.textContent = `${(data.time / 1000).toFixed(2)}s`;
-            
-            const scoreCell = document.createElement('td');
-            scoreCell.textContent = avgScore;
-            
-            row.appendChild(nameCell);
-            row.appendChild(countCell);
-            row.appendChild(timeCell);
-            row.appendChild(scoreCell);
-            
-            performanceTableBody.appendChild(row);
+            performanceData.push({
+                method: searchMethods[method].name,
+                results: data.results.length,
+                time: data.time / 1000,
+                score: avgScore
+            });
         }
     });
+    
+    renderPerformanceTable();
     performanceSection.classList.remove('hidden');
     performanceSection.style.display = 'block';
+}
+
+// Render performance table
+function renderPerformanceTable() {
+    while (performanceTableBody.firstChild) {
+        performanceTableBody.removeChild(performanceTableBody.firstChild);
+    }
+    
+    performanceData.forEach(data => {
+        const row = document.createElement('tr');
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = data.method;
+        
+        const countCell = document.createElement('td');
+        countCell.textContent = data.results;
+        
+        const timeCell = document.createElement('td');
+        timeCell.textContent = `${data.time.toFixed(2)}s`;
+        
+        const scoreCell = document.createElement('td');
+        scoreCell.textContent = data.score.toFixed(2);
+        
+        row.appendChild(nameCell);
+        row.appendChild(countCell);
+        row.appendChild(timeCell);
+        row.appendChild(scoreCell);
+        
+        performanceTableBody.appendChild(row);
+    });
+}
+
+// Sort performance table
+function sortPerformanceTable(column) {
+    if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+    }
+    
+    // Update header styles
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.classList.remove('asc', 'desc');
+    });
+    document.querySelector(`[data-sort="${column}"]`).classList.add(currentSort.direction);
+    
+    // Sort data
+    performanceData.sort((a, b) => {
+        let aVal = a[column];
+        let bVal = b[column];
+        
+        if (typeof aVal === 'string') {
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
+        }
+        
+        if (currentSort.direction === 'asc') {
+            return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+        } else {
+            return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        }
+    });
+    
+    renderPerformanceTable();
 }
 
 // Main search function
@@ -343,4 +398,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup parameter persistence
     setupParameterPersistence();
+    
+    // Add sort event listeners to table headers
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+            const column = th.dataset.sort;
+            sortPerformanceTable(column);
+        });
+    });
 });

@@ -154,35 +154,54 @@ specs-3-scoring
 ~~143. Fix AI Document Chat single word queries failing with "embeddings required" error due to collection name case sensitivity --done~~
 ~~144. Render AI Document Chat responses in proper markdown format instead of raw text --done~~
 ~~145. Remove View Document links from AI Document Chat responses since they have source document links at bottom --done~~
+~~143. Change the term "Developer" to "Professional" throughout the app in code and text --done~~ 
+~~144. Explain why "which patients have hypertension" finds no results in line search and doc index search - Line/Document Index searches look for exact text matches, not natural language queries. Use single words like "hypertension" or AI-based searches for natural language questions --done~~
+~~145. Add phrase-to-keywords converter for Line Search and Document Index Search to extract relevant keywords from natural language queries --done~~
+~~146. Add View Document links for source chunks in AI Document Chat responses --done~~
 
 ## PENDING TASKS
 
 15. Can We make an electron app for this that runs locally on a mac? --started
 22. Implement local documents only. -- started
 28. User and system propmt by source type
-32. Re-Visit the Test Codes - focus on speed  --started
+32. Re-Visit the Test Codes - focus on speed and document search testing --started
 120. create user prompts based on source Type and collection and search type
 121. focus on display and layout  --started
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 124. Create a quick start guide.
-125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Professional license $2999 (Register with Free) pay for Premiumm, pay for professional.
+~~125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Professional license $2999 (Register with Free) pay for Premiumm, pay for professional. --consolidated~~
 126. enhance database saving add documents only
 127. highlight matched words in all.
 128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
-129. review doc index card creation add  remove fields change models overall improve.
+129. review doc index card creation add  remove fields change models overall improve.  --done
 131. create app for load-AIPrivateSearch-xxxx.command  --started
-133. Replace toggle advanced with 3 roles: standard, premium, professional  --started  need to describe functionality:
-- Standard has admin and searcher roles only, menu search, multi-mode, manage collections and options toggle dark mode
-admin can add users, role admin and searcher cannot modify doc index cards
-- Premiun get all Standard plus manage models, options modify config files, Can modify Doc Index cards.
-- Professional gets all menu items
+133. Implement complete user management and 3-tier role system with external SecureAccess integration:
+
+Phase 1 - User Management Infrastructure:
+- Create internal user management system with database tables (users, roles, permissions, sessions)
+- Implement user authentication/authorization middleware
+- Build user management UI (add/edit/delete users, assign roles)
+- Create login/logout functionality with session management
+
+Phase 2 - SecureAccess Integration:
+- Implement external API connection to SecureAccess user management software
+- Create authentication bridge between internal system and SecureAccess
+- Sync user data, roles, and licensing status from SecureAccess
+- Handle license validation and computer limits
+
+Phase 3 - Role-Based Feature Control:
+- Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters, send code email every 2 weeks
+- Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
+- Professional: $2999 license, all menu items, no code emails, full access
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-137. send code to email: once evry 2 weeks for standard, once every month for premium, never for professional.
+~~137. send code to email: once evry 2 weeks for standard, once every month for premium, never for professional. --consolidated~~
 138. work on manage models add category document-index.
-139. Standard can change search models but not set parameters and not change score model or parameters
-142. for ai document Chat the  view document link doesn't apply. Can we view source chunks?
-~~143. Change the term "Developer" to "Professional" throughout the app in code and text --done~~ 
-~~144. Explain why "which patients have hypertension" finds no results in line search and doc index search - Line/Document Index searches look for exact text matches, not natural language queries. Use single words like "hypertension" or AI-based searches for natural language questions --done~~
-~~145. Add phrase-to-keywords converter for Line Search and Document Index Search to extract relevant keywords from natural language queries --done~~
-~~146. Add View Document links for source chunks in AI Document Chat responses --done~~
+~~139. Standard can change search models but not set parameters and not change score model or parameters --consolidated~~
+142. for ai document Chat the  view document link doesn't apply. Can we view source chunks?  --done
 147. why does Smart Search return both matches and non matches?
+~~148. In performance measurement make column titles sortable links. --done~~
+~~149. Consolidated role-related tasks into comprehensive user management system --done~~
+150. Create user database schema and authentication system (prerequisite for task 133)
+151. Build SecureAccess API integration layer (prerequisite for task 133)
+152. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
+153. Fix highlighting of matches across searchtypes.
