@@ -74,6 +74,7 @@ export class AIDirectSearch {
         content, 
         query, 
         filename, 
+        collection.name,
         options?.model || 'qwen2:0.5b',
         options?.temperature || 0.3,
         options?.contextSize || 1024,
@@ -92,7 +93,7 @@ export class AIDirectSearch {
     return results.filter(result => result !== null);
   }
 
-  async performAISearch(documentContent, query, filename, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null) {
+  async performAISearch(documentContent, query, filename, collectionName, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null) {
     const options = {
       temperature: temperature,
       num_ctx: contextSize
@@ -146,23 +147,29 @@ Answer:`;
       
       const relevanceScore = this.calculateRelevanceScore(query, documentContent, aiResponse, isNoMatch);
       
+      const documentPath = `http://localhost:3001/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
+      
       return {
         id: `ai_${filename}_${Date.now()}`,
         title: isNoMatch ? `${filename} (No Match)` : `${filename}`,
         excerpt: aiResponse,
         score: relevanceScore,
-        source: `Ollama ${model} analysis of ${filename}`,
-        hasMatch: !isNoMatch
+        source: filename,
+        hasMatch: !isNoMatch,
+        documentPath: documentPath
       };
     } catch (error) {
+      
+      const documentPath = `http://localhost:3001/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
       
       return {
         id: `ai_${filename}_${Date.now()}`,
         title: `${filename} (Error)`,
         excerpt: `Error: ${error.message}`,
         score: 0.1,
-        source: `Error - ${model}`,
-        hasMatch: false
+        source: filename,
+        hasMatch: false,
+        documentPath: documentPath
       };
     }
 

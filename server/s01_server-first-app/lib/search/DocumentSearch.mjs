@@ -14,6 +14,7 @@ export class DocumentSearch {
   async search(query, options = {}) {
     const { collection = null, useWildcards = false } = options;
     
+
     try {
       await this.buildIndex(collection);
       
@@ -51,8 +52,9 @@ export class DocumentSearch {
           title: doc.filename,
           excerpt: this.formatMatchedLine(matchData, useWildcards),
           score: result.score,
-          source: `Document Search - ${doc.filename}`,
-          documentPath: `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view?line=${matchData.lineNumber}`
+          source: doc.filename,
+          collection: doc.collection,
+          documentPath: `http://localhost:3001/api/documents/${doc.collection}/${encodeURIComponent(doc.filename)}/view?line=${matchData.lineNumber}`
         };
       });
       
@@ -88,6 +90,7 @@ export class DocumentSearch {
           content,
           collection: coll.name
         };
+
         
         this.documents.set(docId, doc);
         docs.push({

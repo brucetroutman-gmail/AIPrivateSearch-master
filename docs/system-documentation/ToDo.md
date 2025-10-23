@@ -149,6 +149,8 @@ specs-3-scoring
 ~~134. Fix convert on pdfs in Law-Office collection - PDF conversion is reading raw binary instead of using pdftotext extraction  --done~~
 ~~136. Fix spacebar problem --done~~
 ~~142. Fix document index creation failing with system-prompts.json path error --done~~
+~~140. AI Document Chat responses are not formatted --done~~
+~~141. Add consistency to View Document links in all searchtypes --done~~
 
 ## PENDING TASKS
 
@@ -172,3 +174,6 @@ admin can add users, role admin and searcher cannot modify doc index cards
 - Premiun get all Standard plus manage models, options modify config files, Can modify Doc Index cards.
 - Developer gets all menu items
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
+137. send code to email: once evry 2 weeks for standard, once every month for premium, never for developer.
+138. work on manage models add category document-index.
+139. Standard can change search models but not set parameters and not change score model or parameters

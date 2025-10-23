@@ -65,15 +65,29 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       if (searchType === 'line-search' || searchType === 'document-search' || searchType === 'document-index') {
         // Use common formatting logic
         searchResponse = methodResult.results.map((result, index) => {
-          const docLink = result.documentPath ? `[View Document](${result.documentPath})` : 
-                         `[View Document](http://localhost:3001/api/documents/${collection}/${result.source})`;
+          let docLink = '';
+          if (result.documentPath) {
+            docLink = `[View Document](${result.documentPath})`;
+          } else {
+            // Extract filename from source or use title
+            const filename = result.source && result.source.includes('.') ? result.source : 
+                           result.title.includes('.') ? result.title : `${result.title}.md`;
+            // Use the document's collection if available, otherwise fall back to request collection
+            const docCollection = result.collection || collection || 'default';
+            docLink = `[View Document](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          }
           return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
         }).join('\n---\n\n');
       } else if (searchType === 'ai-direct') {
-        // For AI Direct, format all results
+        // For AI Direct, format all results with View Document links
         searchResponse = methodResult.results.map((result, index) => {
-          return `**${result.title}**\n${result.excerpt}\n---\n`;
+          const docLink = result.documentPath ? `\n[View Document](${result.documentPath})` : '';
+          return `**${result.title}**\n${result.excerpt}${docLink}\n---\n`;
         }).join('\n');
+      } else if (searchType === 'ai-document-chat') {
+        // For AI Document Chat, use the formatted response directly
+        const firstResult = methodResult.results[0];
+        searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
       } else {
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';

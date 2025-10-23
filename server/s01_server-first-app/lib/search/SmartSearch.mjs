@@ -26,7 +26,7 @@ export class SmartSearch {
         const cleanTitle = this.generateUserFriendlyTitle(chunk.filename, chunk.content, query);
         const smartExcerpt = this.createSmartExcerpt(chunk.content, query);
         
-        const documentPath = `http://localhost:3001/api/documents/${chunk.collection}/${chunk.filename}/view`;
+        const documentPath = `http://localhost:3001/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view`;
         const formattedExcerpt = `${relevanceReason}<br><br>${smartExcerpt}<br><br>[View Document](${documentPath})`;
         
         return {
@@ -34,7 +34,7 @@ export class SmartSearch {
           title: cleanTitle,
           excerpt: formattedExcerpt,
           score: chunk.similarity,
-          source: '',
+          source: chunk.filename,
           collection: chunk.collection
         };
       });

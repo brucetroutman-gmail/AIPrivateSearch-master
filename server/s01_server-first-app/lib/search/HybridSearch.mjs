@@ -45,7 +45,7 @@ export class HybridSearch {
       
       return {
         results: combinedResults.slice(0, topK).map(doc => {
-          const documentPath = `http://localhost:3001/api/documents/${doc.collection}/${doc.filename}/view`;
+          const documentPath = `http://localhost:3001/api/documents/${doc.collection}/${encodeURIComponent(doc.filename)}/view`;
           const scoreBreakdown = `**Hybrid Score: ${Math.round(doc.hybridScore * 100)}%**\n` +
             `Keyword: ${Math.round(doc.keywordScore * 100)}% × ${keywordWeight} + ` +
             `Semantic: ${Math.round(doc.semanticScore * 100)}% × ${semanticWeight}`;
@@ -57,7 +57,7 @@ export class HybridSearch {
             title: doc.filename.replace('.md', '').replace(/[_-]/g, ' '),
             excerpt: formattedExcerpt,
             score: doc.hybridScore,
-            source: '',
+            source: doc.filename,
             breakdown: {
               keyword: doc.keywordScore,
               semantic: doc.semanticScore,
