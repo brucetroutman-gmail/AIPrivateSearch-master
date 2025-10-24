@@ -33,6 +33,17 @@ window.responseDisplayCommon = {
             return;
         }
         
+        // Use common formatter for AI Direct to ensure consistent filename links
+        if (searchResult.method === 'ai-direct') {
+            const formattedElement = window.CommonResultFormatter.formatSearchResults(searchResult.results, {
+                resultType: 'ai-direct',
+                showScore: true,
+                defaultCollection: collection || 'default'
+            });
+            container.appendChild(formattedElement);
+            return;
+        }
+        
         // Format other search types with consistent styling
         searchResult.results.forEach((result) => {
             const div = document.createElement('div');
@@ -55,7 +66,7 @@ window.responseDisplayCommon = {
             excerpt.className = 'result-excerpt';
             
             // Handle markdown conversion for AI-based searches
-            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search' || searchResult.method === 'ai-document-chat' || searchResult.method === 'ai-direct') {
+            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search' || searchResult.method === 'ai-document-chat') {
                 const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(sanitizedHTML, 'text/html');
@@ -69,24 +80,9 @@ window.responseDisplayCommon = {
             div.appendChild(header);
             div.appendChild(excerpt);
             
-            // Add metadata section with View Document link
+            // Add metadata section (no View Document links since filenames are clickable)
             const meta = document.createElement('div');
             meta.className = 'result-meta';
-            
-            // Add View Document link (except for AI Document Chat which has source links at bottom)
-            if (searchResult.method !== 'ai-document-chat') {
-                if (result.source && collection) {
-                    const linkElement = window.documentViewerCommon.createViewDocumentLink(collection, result.source);
-                    meta.appendChild(linkElement);
-                } else if (result.documentPath) {
-                    const link = document.createElement('a');
-                    link.href = result.documentPath.startsWith('http') ? result.documentPath : `http://localhost:3001${result.documentPath}`;
-                    link.textContent = 'View Document';
-                    link.target = '_blank';
-                    link.className = 'view-document-link';
-                    meta.appendChild(link);
-                }
-            }
             
             div.appendChild(meta);
             container.appendChild(div);
@@ -103,14 +99,32 @@ window.responseDisplayCommon = {
             const results = sections.map((section, index) => {
                 const lines = section.trim().split('\n');
                 const titleLine = lines.find(line => line.startsWith('**Result '));
-                const title = titleLine ? titleLine.replace(/\*\*Result \d+: /, '').replace(/\*\*/, '') : `Result ${index + 1}`;
+                
+                let title = `Result ${index + 1}`;
+                let source = 'AI Response';
+                
+                if (titleLine) {
+                    const cleanTitle = titleLine.replace(/\*\*Result \d+: /, '').replace(/\*\*$/, '');
+                    // Extract filename from markdown link if present
+                    const linkMatch = cleanTitle.match(/\[([^\]]+)\]\(([^\)]+)\)/);
+                    if (linkMatch) {
+                        title = linkMatch[1]; // Link text becomes title
+                        // Extract filename from URL path
+                        const urlPath = linkMatch[2];
+                        const pathParts = urlPath.split('/');
+                        source = decodeURIComponent(pathParts[pathParts.length - 2]); // Filename before /view
+                    } else {
+                        title = cleanTitle;
+                    }
+                }
+                
                 const excerpt = lines.slice(1).join('\n').trim();
                 
                 return {
                     title,
                     excerpt,
                     score: 1.0,
-                    source: title + '.md'
+                    source
                 };
             });
             

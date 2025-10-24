@@ -63,26 +63,37 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       
       // Get the search response - for line-search, document-search, and document-index, return all results with context
       if (searchType === 'line-search' || searchType === 'document-search' || searchType === 'document-index') {
-        // Use common formatting logic
+        // Use common formatting logic with clickable filename links
         searchResponse = methodResult.results.map((result, index) => {
-          let docLink = '';
-          if (result.documentPath) {
-            docLink = `[View Document](${result.documentPath})`;
-          } else {
-            // Extract filename from source or use title
-            const filename = result.source && result.source.includes('.') ? result.source : 
-                           result.title.includes('.') ? result.title : `${result.title}.md`;
-            // Use the document's collection if available, otherwise fall back to request collection
-            const docCollection = result.collection || collection || 'default';
-            docLink = `[View Document](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          // Create clickable filename link in title
+          let filename = result.source && result.source.includes('.') ? result.source : 
+                        result.title.includes('.') ? result.title : `${result.title}.md`;
+          
+          // For Line Search results, extract filename from source (removes :lineNumber)
+          if (filename && filename.includes(':')) {
+            filename = filename.split(':')[0];
           }
-          return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
+          
+          const docCollection = result.collection || collection || 'default';
+          const filenameLink = `[${result.title}](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          
+          return `**Result ${index + 1}: ${filenameLink}**\n${result.excerpt}\n`;
         }).join('\n---\n\n');
       } else if (searchType === 'ai-direct') {
-        // For AI Direct, format all results with View Document links
+        // For AI Direct, format all results with clickable filename links
         searchResponse = methodResult.results.map((result, index) => {
-          const docLink = result.documentPath ? `\n[View Document](${result.documentPath})` : '';
-          return `**${result.title}**\n${result.excerpt}${docLink}\n---\n`;
+          // Create clickable filename link in title
+          let filename = result.source || result.title.replace(' (No Match)', '').replace(' (Error)', '');
+          
+          // Clean up filename if it has line numbers
+          if (filename && filename.includes(':')) {
+            filename = filename.split(':')[0];
+          }
+          
+          const docCollection = result.collection || collection || 'default';
+          const filenameLink = `[${result.title}](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          
+          return `**Result ${index + 1}: ${filenameLink}**\n${result.excerpt}\n---\n`;
         }).join('\n');
       } else if (searchType === 'ai-document-chat') {
         // For AI Document Chat, use the formatted response directly

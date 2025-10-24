@@ -13,12 +13,21 @@ class HighlightRenderer {
   static renderHighlightedContent(element, content) {
     if (!element || !content) return;
     
-    if (this.hasHighlighting(content)) {
-      // Use sanitized HTML for highlighted content
-      element.innerHTML = DOMSanitizer.sanitizeHTML(content);
+    // Format line numbers with content on separate lines
+    let formattedContent = content;
+    if (typeof content === 'string') {
+      // Replace spaces between line numbers with line breaks, but keep line number with its content
+      formattedContent = content.replace(/(\d+:\s[^}]+[},])\s+(\d+:)/g, '$1\n$2');
+    }
+    
+    if (this.hasHighlighting(formattedContent)) {
+      // Use sanitized HTML for highlighted content, convert newlines to <br>
+      const htmlContent = DOMSanitizer.sanitizeHTML(formattedContent).replace(/\n/g, '<br>');
+      element.innerHTML = htmlContent;
     } else {
-      // Use safe text content for non-highlighted content
-      element.textContent = content;
+      // Use safe text content for non-highlighted content, convert newlines to <br>
+      const htmlContent = formattedContent.replace(/\n/g, '<br>');
+      element.innerHTML = htmlContent;
     }
   }
 

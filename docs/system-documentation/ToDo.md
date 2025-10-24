@@ -165,6 +165,7 @@ to do AIPrivateSearch
 ~~165. Fix JSON DocID formatting issues - JSON files now properly store DocID as JSON property instead of malformed text lines --done~~
 ~~166. Remove duplicate nested sources folder and verify all JSON files have correct formatting --done~~
 
+
 ## PENDING TASKS
 
 ### High Priority
@@ -207,7 +208,16 @@ Phase 3 - Role-Based Feature Control:
 121. focus on display and layout  --started
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
-127. highlight matched words in all.
-135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes  
+127. highlight matched words in all  --done
+135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
+
+## RECENTLY COMPLETED (v19.32)
+~~170. In AI direct responses make the file names into links as in Doc index, line and document search --done~~
+~~171. Remove View Document links from AI Direct responses since filenames are now clickable --done~~
+~~172. Format line numbers on separate lines in Doc Index, Line Search, and Document Search responses for better readability --done~~
+~~173. Add context lines (before and after) to Document Search results for better readability --done~~
+~~174. Make filename links jump to specific line numbers and highlight matched lines in document viewer --done~~
+
+
 
 

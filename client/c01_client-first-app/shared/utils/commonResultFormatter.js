@@ -33,15 +33,29 @@ class CommonResultFormatter {
         const collection = result.collection || defaultCollection;
         let filename = result.source || result.filename || result.title;
         
+        // Extract line number from excerpt or source
+        let lineNumber = null;
+        
         // For Line Search results, extract filename from source (removes :lineNumber)
         if (filename && filename.includes(':')) {
-          filename = filename.split(':')[0];
+          const parts = filename.split(':');
+          filename = parts[0];
+          lineNumber = parts[1];
+        }
+        
+        // Try to extract line number from excerpt (format: "123: content")
+        if (!lineNumber && result.excerpt) {
+          const lineMatch = result.excerpt.match(/^(\d+):\s/);
+          if (lineMatch) {
+            lineNumber = lineMatch[1];
+          }
         }
         
         const resultText = document.createTextNode(`Result ${index + 1}: `);
         title.appendChild(resultText);
         
-        const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename);
+        const linkOptions = lineNumber ? { lineNumber: parseInt(lineNumber) } : {};
+        const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename, linkOptions);
         filenameLink.textContent = result.title;
         filenameLink.className = 'filename-link';
         title.appendChild(filenameLink);
@@ -65,29 +79,8 @@ class CommonResultFormatter {
       // Use common highlight renderer
       HighlightRenderer.renderHighlightedContent(excerpt, result.excerpt || '');
       
-      const meta = document.createElement('div');
-      meta.className = 'result-meta';
-      
-      // Add View Document link if available
-      if (window.documentViewerCommon) {
-        const collection = result.collection || defaultCollection;
-        let filename = result.source || result.filename || result.title;
-        
-        // For Line Search results, extract filename from source (removes :lineNumber)
-        if (filename && filename.includes(':')) {
-          filename = filename.split(':')[0];
-        }
-        
-        // Create link if we have a filename
-        if (filename) {
-          const link = window.documentViewerCommon.createViewDocumentLink(collection, filename);
-          if (link) meta.appendChild(link);
-        }
-      }
-      
       item.appendChild(header);
       item.appendChild(excerpt);
-      item.appendChild(meta);
       container.appendChild(item);
     });
     

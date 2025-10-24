@@ -144,7 +144,7 @@ export class DocumentSearch {
     // For wildcard searches, prioritize original query terms over Lunr's matched terms
     const allTerms = useWildcards ? this.lastQueryTerms : [...new Set([...matchedTerms, ...this.lastQueryTerms])];
     
-    // Find all matches and return the best one
+    // Find all matches and return the best one with context
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
@@ -152,11 +152,21 @@ export class DocumentSearch {
         const actualMatch = this.findActualMatchInLine(line, term, useWildcards);
         
         if (actualMatch) {
+          // Include context lines (before and after)
+          const contextLines = [];
+          const prevLine = i > 0 ? lines[i - 1] : null;
+          const nextLine = i < lines.length - 1 ? lines[i + 1] : null;
+          
+          if (prevLine) contextLines.push({ lineNumber: i, line: prevLine });
+          contextLines.push({ lineNumber: i + 1, line: line, isMatch: true });
+          if (nextLine) contextLines.push({ lineNumber: i + 2, line: nextLine });
+          
           return {
             lineNumber: i + 1,
             line: line,
             matchedTerm: term,
-            actualMatch: actualMatch
+            actualMatch: actualMatch,
+            contextLines: contextLines
           };
         }
       }
@@ -192,11 +202,28 @@ export class DocumentSearch {
   }
   
   formatMatchedLine(matchData, useWildcards = false) {
-    const highlightedLine = matchData.actualMatch ? 
-      HighlightFormatter.highlightMatches(matchData.line, matchData.actualMatch, useWildcards) :
-      matchData.line;
-    
-    return `${matchData.lineNumber}: ${highlightedLine}`;
+    if (matchData.contextLines) {
+      // Format with context lines
+      return matchData.contextLines.map(contextLine => {
+        if (contextLine.isMatch) {
+          // Highlight the matched line
+          const highlightedLine = matchData.actualMatch ? 
+            HighlightFormatter.highlightMatches(contextLine.line, matchData.actualMatch, useWildcards) :
+            contextLine.line;
+          return `${contextLine.lineNumber}: ${highlightedLine}`;
+        } else {
+          // Regular context line
+          return `${contextLine.lineNumber}: ${contextLine.line}`;
+        }
+      }).join('\n');
+    } else {
+      // Fallback to single line format
+      const highlightedLine = matchData.actualMatch ? 
+        HighlightFormatter.highlightMatches(matchData.line, matchData.actualMatch, useWildcards) :
+        matchData.line;
+      
+      return `${matchData.lineNumber}: ${highlightedLine}`;
+    }
   }
   
   extractMatchedTerms(lunrResult) {

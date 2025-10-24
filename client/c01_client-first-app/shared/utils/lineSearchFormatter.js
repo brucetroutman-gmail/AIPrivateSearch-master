@@ -79,7 +79,7 @@ function convertMarkdownToHTML(markdown) {
 // Process inline markdown elements
 function processInlineMarkdown(text) {
     // Handle markdown links
-    text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" class="view-document-link">$1</a>');
+    text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" class="filename-link">$1</a>');
     
     // Handle bold text (but not if it's a full line header)
     if (!text.trim().startsWith('**') || !text.trim().endsWith('**') || text.includes(' ')) {
