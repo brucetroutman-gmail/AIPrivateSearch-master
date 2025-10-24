@@ -227,8 +227,32 @@ export class DocumentIndex {
         console.log(`Analyzing ${filename} with AI...`);
         
         // Extract or generate unique DocID
-        let docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
-        let docId = docIdMatch ? docIdMatch[1] : `${collection.substring(0, 3)}_${Date.now()}_${processedCount}`;
+        let docId;
+        let docIdMatch = null;
+        
+        if (filename.endsWith('.json')) {
+          // Handle JSON files
+          try {
+            const jsonData = JSON.parse(content);
+            if (jsonData.DocID) {
+              docId = jsonData.DocID;
+              docIdMatch = true; // Indicate DocID was found
+            }
+          } catch (jsonError) {
+            console.log(`Failed to parse JSON for ${filename}:`, jsonError.message);
+          }
+        } else {
+          // Handle markdown files
+          docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
+          if (docIdMatch) {
+            docId = docIdMatch[1];
+          }
+        }
+        
+        // Generate DocID if not found
+        if (!docId) {
+          docId = `${collection.substring(0, 3)}_${Date.now()}_${processedCount}`;
+        }
         
         // Check for duplicate DocID and generate unique one if needed
         let docIdUpdated = false;
@@ -246,14 +270,26 @@ export class DocumentIndex {
         // Update source document with correct DocID if needed
         if (docIdUpdated) {
           let updatedContent = content;
-          if (docIdMatch) {
-            // Replace existing DocID
-            updatedContent = content.replace(/DocID:\s*[^\s\n]+/, `DocID: ${docId}`);
+          if (filename.endsWith('.json')) {
+            // Handle JSON files differently
+            try {
+              const jsonData = JSON.parse(content);
+              jsonData.DocID = docId;
+              updatedContent = JSON.stringify(jsonData, null, 2);
+            } catch (jsonError) {
+              console.log(`Failed to parse JSON for ${filename}, skipping DocID update:`, jsonError.message);
+            }
           } else {
-            // Add DocID to document without one (after first line)
-            const lines = content.split('\n');
-            lines.splice(1, 0, `DocID: ${docId}`);
-            updatedContent = lines.join('\n');
+            // Handle markdown files
+            if (docIdMatch) {
+              // Replace existing DocID
+              updatedContent = content.replace(/DocID:\s*[^\s\n]+/, `DocID: ${docId}`);
+            } else {
+              // Add DocID to document without one (after first line)
+              const lines = content.split('\n');
+              lines.splice(1, 0, `DocID: ${docId}`);
+              updatedContent = lines.join('\n');
+            }
           }
           fs.writeFileSync(filePath, updatedContent, 'utf-8');
           console.log(`Updated ${filename} with DocID: ${docId}`);
@@ -792,9 +828,28 @@ Content: ${content.substring(0, 3000)}`;
         docId = existingResult[0].values[0][0];
       } else {
         // Extract DocID from source document or generate new one
-        const docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
-        if (docIdMatch) {
-          docId = docIdMatch[1];
+        let docIdMatch = null;
+        
+        if (filename.endsWith('.json')) {
+          // Handle JSON files
+          try {
+            const jsonData = JSON.parse(content);
+            if (jsonData.DocID) {
+              docId = jsonData.DocID;
+              docIdMatch = true;
+            }
+          } catch (jsonError) {
+            console.log(`Failed to parse JSON for ${filename}:`, jsonError.message);
+          }
+        } else {
+          // Handle markdown files
+          docIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
+          if (docIdMatch) {
+            docId = docIdMatch[1];
+          }
+        }
+        
+        if (docId && docIdMatch) {
           // Check if this DocID already exists in database
           const docIdCheck = db.exec("SELECT docid FROM document_index WHERE docid = ?", [docId]);
           if (docIdCheck && docIdCheck.length > 0 && docIdCheck[0].values.length > 0) {
@@ -812,14 +867,28 @@ Content: ${content.substring(0, 3000)}`;
       // Update source document with DocID if needed
       if (docIdUpdated || !content.includes(`DocID: ${docId}`)) {
         let updatedContent = content;
-        const existingDocIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
         
-        if (existingDocIdMatch) {
-          updatedContent = content.replace(/DocID:\s*[^\s\n]+/, `DocID: ${docId}`);
+        if (filename.endsWith('.json')) {
+          // Handle JSON files differently
+          try {
+            const jsonData = JSON.parse(content);
+            jsonData.DocID = docId;
+            updatedContent = JSON.stringify(jsonData, null, 2);
+          } catch (jsonError) {
+            console.log(`Failed to parse JSON for ${filename}, skipping DocID update:`, jsonError.message);
+            updatedContent = content; // Keep original content if JSON parsing fails
+          }
         } else {
-          const lines = content.split('\n');
-          lines.splice(1, 0, `DocID: ${docId}`);
-          updatedContent = lines.join('\n');
+          // Handle markdown files
+          const existingDocIdMatch = content.match(/DocID:\s*([^\s\n]+)/);
+          
+          if (existingDocIdMatch) {
+            updatedContent = content.replace(/DocID:\s*[^\s\n]+/, `DocID: ${docId}`);
+          } else {
+            const lines = content.split('\n');
+            lines.splice(1, 0, `DocID: ${docId}`);
+            updatedContent = lines.join('\n');
+          }
         }
         
         fs.writeFileSync(filePath, updatedContent, 'utf-8');

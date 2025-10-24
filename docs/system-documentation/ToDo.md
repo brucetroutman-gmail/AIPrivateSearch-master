@@ -162,23 +162,21 @@ to do AIPrivateSearch
 ~~162. Add persistence for selected search types in multi-mode search using localStorage --done~~
 ~~163. Integrate sentence transformers as primary embedding method with Ollama fallback for AI Document Chat and Doc Index creation --done~~
 ~~164. Remove hardcoded embedding models and use dynamic lookup from models-list.json configuration --done~~
+~~165. Fix JSON DocID formatting issues - JSON files now properly store DocID as JSON property instead of malformed text lines --done~~
+~~166. Remove duplicate nested sources folder and verify all JSON files have correct formatting --done~~
 
 ## PENDING TASKS
 
+### High Priority
 15. Can We make an electron app for this that runs locally on a mac? --started
-22. Implement local documents only. -- started
-28. User and system propmt by source type
-32. Re-Visit the Test Codes - focus on speed and document search testing --started
-120. create user prompts based on source Type and collection and search type
-121. focus on display and layout  --started
-122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
+22. Implement local documents only. --done
 124. Create a quick start guide.
-
-126. enhance database saving add documents only
-127. highlight matched words in all.
 128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
-
 131. create app for load-AIPrivateSearch-xxxx.command  --started
+147. why does Smart Search return both matches and non matches?
+
+
+### User Management System
 133. Implement complete user management and 3-tier role system with external SecureAccess integration:
 
 Phase 1 - User Management Infrastructure:
@@ -197,13 +195,19 @@ Phase 3 - Role-Based Feature Control:
 - Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters, send code email every 2 weeks
 - Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
 - Professional: $2999 license, all menu items, no code emails, full access
-135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
 
-~~138. on manage models, add new model . ADD category  checkbox "document-index". --done~~
-147. why does Smart Search return both matches and non matches?
 148. Create user database schema and authentication system (prerequisite for task 133)
 149. Build SecureAccess API integration layer (prerequisite for task 133)
 150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
-151. when adding doc_id to json files. the files not not formatted correctly.  
+
+### Enhancement Tasks
+28. User and system propmt by source type
+32. Re-Visit the Test Codes - focus on speed and document search testing --started
+120. create user prompts based on source Type and collection and search type
+121. focus on display and layout  --started
+122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
+126. enhance database saving add documents only
+127. highlight matched words in all.
+135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes  
 
 
