@@ -108,7 +108,7 @@ This command:
 2. **Major bump** (`release N`): Sets version to N.00 (e.g., `release 19` → 19.00)
 3. Updates version in README.md and both package.json files
 4. **Copies sources**: Syncs `/Users/Shared/AIPrivateSearch/sources/` to `sources/` in repo
-5. **Organizes ToDo.md**: Updates completed items with strikethrough and moves pending tasks to bottom
+5. **Organizes ToDo.md**: Updates completed items with strikethrough and moves completed tasks out of pending section
 6. Generates commit message in format: `vX.XX: [description of changes]`
 7. **Note**: Does not automatically commit - you must manually commit the changes
 
@@ -119,4 +119,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 19.27 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
+**Version**: 19.28 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch

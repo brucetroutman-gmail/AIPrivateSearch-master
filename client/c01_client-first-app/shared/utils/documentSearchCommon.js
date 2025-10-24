@@ -1,4 +1,5 @@
 // Common document search functionality for both search and multi-mode pages
+// Note: Requires highlightRenderer.js to be loaded
 
 class DocumentSearchCommon {
   constructor() {
@@ -34,53 +35,13 @@ class DocumentSearchCommon {
     }
   }
 
-  // Format document search results for display (safe DOM creation)
+  // Format document search results using common formatter
   formatDocumentSearchResults(results) {
-    const container = document.createElement('div');
-    
-    if (!results || results.length === 0) {
-      container.className = 'no-results';
-      container.textContent = 'No documents found';
-      return container;
-    }
-
-    container.className = 'document-search-results';
-    
-    results.forEach((result, index) => {
-      const item = document.createElement('div');
-      item.className = 'result-item';
-      
-      const header = document.createElement('div');
-      header.className = 'result-header';
-      
-      const title = document.createElement('h4');
-      title.textContent = result.title || '';
-      
-      const score = document.createElement('span');
-      score.className = 'score';
-      score.textContent = `${Math.round((result.score || 0) * 100)}%`;
-      
-      header.appendChild(title);
-      header.appendChild(score);
-      
-      const excerpt = document.createElement('div');
-      excerpt.className = 'result-excerpt';
-      excerpt.textContent = result.excerpt || '';
-      
-      const meta = document.createElement('div');
-      meta.className = 'result-meta';
-      if (result.documentPath && window.documentViewerCommon) {
-        const link = window.documentViewerCommon.createViewDocumentLink(result.collection || 'default', result.filename || result.title);
-        if (link) meta.appendChild(link);
-      }
-      
-      item.appendChild(header);
-      item.appendChild(excerpt);
-      item.appendChild(meta);
-      container.appendChild(item);
+    return CommonResultFormatter.formatSearchResults(results, {
+      resultType: 'document-search',
+      showScore: true,
+      defaultCollection: 'default'
     });
-    
-    return container;
   }
 
   // Add document search option to search type dropdown

@@ -90,6 +90,17 @@ class DOMSanitizer {
     const sanitized = this.sanitizeText(email);
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized) ? sanitized : '';
   }
+
+  // Sanitize HTML content allowing only safe highlighting markup
+  static sanitizeHTML(html) {
+    if (typeof html !== 'string') return '';
+    // Only allow search highlighting markup and basic formatting
+    return html
+      .replace(/<(?!\/?(mark|strong|em|code)\b)[^>]*>/gi, '') // Remove all tags except mark, strong, em, code
+      .replace(/(<mark[^>]*>)/gi, '$1') // Keep all mark tags
+      .replace(/javascript:/gi, '') // Remove javascript: URLs
+      .replace(/on\w+=/gi, ''); // Remove event handlers
+  }
 }
 
 // Make globally available

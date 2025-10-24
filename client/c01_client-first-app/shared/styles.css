@@ -769,7 +769,8 @@ th {
 mark,
 mark.search-highlight,
 .search-highlight,
-[class*="search-highlight"] {
+[class*="search-highlight"],
+.result-excerpt mark {
   background-color: #ffff00 !important;
   color: #000000 !important;
   font-weight: bold !important;
@@ -782,7 +783,8 @@ mark.search-highlight,
 [data-theme="dark"] mark,
 [data-theme="dark"] mark.search-highlight,
 [data-theme="dark"] .search-highlight,
-[data-theme="dark"] [class*="search-highlight"] {
+[data-theme="dark"] [class*="search-highlight"],
+[data-theme="dark"] .result-excerpt mark {
   background-color: #ffd700 !important;
   color: #000000 !important;
 }

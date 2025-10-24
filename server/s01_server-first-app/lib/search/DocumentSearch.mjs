@@ -1,5 +1,6 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { HighlightFormatter } from '../utils/highlightFormatter.mjs';
 import path from 'path';
 import lunr from 'lunr';
 
@@ -183,30 +184,17 @@ export class DocumentSearch {
   }
   
   formatAsLineSearchResult(matchData, filename, collection, resultIndex) {
-    // Highlight the actual matched word
-    let highlightedLine = matchData.line;
-    if (matchData.actualMatch) {
-      const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
-      highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
-    }
+    const highlightedLine = matchData.actualMatch ? 
+      HighlightFormatter.highlightMatches(matchData.line, matchData.actualMatch) :
+      matchData.line;
     
     return `**Result ${resultIndex}: ${filename}**\n${matchData.lineNumber}: ${highlightedLine}\n`;
   }
   
   formatMatchedLine(matchData, useWildcards = false) {
-    // Highlight the actual matched word
-    let highlightedLine = matchData.line;
-    if (matchData.actualMatch) {
-      if (useWildcards) {
-        // For wildcards, highlight the entire matched word
-        const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
-        highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
-      } else {
-        // For exact matching, use word boundaries
-        const regex = new RegExp(`\\b(${this.escapeRegex(matchData.actualMatch)})\\b`, 'gi');
-        highlightedLine = highlightedLine.replace(regex, '<mark class="search-highlight">$1</mark>');
-      }
-    }
+    const highlightedLine = matchData.actualMatch ? 
+      HighlightFormatter.highlightMatches(matchData.line, matchData.actualMatch, useWildcards) :
+      matchData.line;
     
     return `${matchData.lineNumber}: ${highlightedLine}`;
   }

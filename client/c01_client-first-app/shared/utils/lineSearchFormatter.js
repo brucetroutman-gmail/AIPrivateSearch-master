@@ -1,4 +1,5 @@
 // Common Line Search result formatting utility
+// Note: Requires highlightRenderer.js to be loaded
 
 // Convert markdown to HTML with safe link handling
 function convertMarkdownToHTML(markdown) {
@@ -48,7 +49,7 @@ function convertMarkdownToHTML(markdown) {
         
         // Handle separators
         if (trimmedLine === '---') {
-            html += '<hr class="result-separator">';
+            html += '<hr class="result-separator" style="margin: 1rem 0;">';
             return;
         }
         
@@ -59,11 +60,12 @@ function convertMarkdownToHTML(markdown) {
         }
         
         // Handle regular paragraphs
-        if (index > 0 && !html.endsWith('>')) {
+        html += processInlineMarkdown(line);
+        
+        // Add line break after each line (except the last one)
+        if (index < lines.length - 1) {
             html += '<br>';
         }
-        
-        html += processInlineMarkdown(line);
     });
     
     // Close any open lists
@@ -97,29 +99,13 @@ function processInlineMarkdown(text) {
     return text;
 }
 
-// Format Line Search results in consolidated format
+// Format Line Search results using common formatter
 function formatLineSearchResults(results) {
-    if (!results || results.length === 0) {
-        const div = document.createElement('div');
-        div.className = 'no-results';
-        div.textContent = 'No results found';
-        return div;
-    }
-    
-    const formattedResults = results.map((result, index) => {
-        const docLink = result.documentPath ? `[View Document](${result.documentPath})` : '';
-        return `**Result ${index + 1}: ${result.title}**\n${result.excerpt}\n${docLink}\n`;
-    }).join('\n---\n\n');
-    
-    const div = document.createElement('div');
-    div.className = 'result-item line-search-results';
-    const htmlContent = convertMarkdownToHTML(formattedResults);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    while (doc.body.firstChild) {
-        div.appendChild(doc.body.firstChild);
-    }
-    return div;
+    return CommonResultFormatter.formatSearchResults(results, {
+        resultType: 'line-search',
+        showScore: true,
+        defaultCollection: 'default'
+    });
 }
 
 // Export functions for use in other modules

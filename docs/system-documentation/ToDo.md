@@ -1,35 +1,21 @@
 to do AIPrivateSearch
 
-1. Add dropdown for Model selection - done
+## COMPLETED TASKS (Moved from Pending)
 
-2. sort model names and ignore nomic model in list - done
-
-3. total to weighted score - done
-
-4. if scoring is checked and there are no scores, redo scoring 1 time. if no scores after repo. message no scores are available - done
-
-specs-3-scoring
-
-5. show ollama times etc at end of response  --done
-
-6. create PcCode --done
-
-7. gather pc mmetics, ram cpu etc --done
-
-8. Use CreatedAt format not TimeStamp --done
-
-9. add model options Temperature and Context Size --done
-
-10. move Temp Cont to under Model drop down --done
-
-11. Store the results in the MySQL db aiprivatesearch searches --done
-
-12. add system propmts dropdown --done
-
-13. add user prompts dropdown --done
-
-14. Terminal interface for multiple tests? - no ## COMPLETED TASKS
-
+~~1. Add dropdown for Model selection - done~~
+~~2. sort model names and ignore nomic model in list - done~~
+~~3. total to weighted score - done~~
+~~4. if scoring is checked and there are no scores, redo scoring 1 time. if no scores after repo. message no scores are available - done~~
+~~5. show ollama times etc at end of response  --done~~
+~~6. create PcCode --done~~
+~~7. gather pc mmetics, ram cpu etc --done~~
+~~8. Use CreatedAt format not TimeStamp --done~~
+~~9. add model options Temperature and Context Size --done~~
+~~10. move Temp Cont to under Model drop down --done~~
+~~11. Store the results in the MySQL db aiprivatesearch searches --done~~
+~~12. add system propmts dropdown --done~~
+~~13. add user prompts dropdown --done~~
+~~14. Terminal interface for multiple tests? - no --done~~
 ~~created test-executor  --done~~
 ~~15. add copyright and licence and add aisearch-n-score.com  --done~~
 ~~16. create 41 tests - implement auto testing --done~~
@@ -158,6 +144,19 @@ specs-3-scoring
 ~~144. Explain why "which patients have hypertension" finds no results in line search and doc index search - Line/Document Index searches look for exact text matches, not natural language queries. Use single words like "hypertension" or AI-based searches for natural language questions --done~~
 ~~145. Add phrase-to-keywords converter for Line Search and Document Index Search to extract relevant keywords from natural language queries --done~~
 ~~146. Add View Document links for source chunks in AI Document Chat responses --done~~
+~~147. Consolidated role-related tasks into comprehensive user management system --done~~
+~~148. In performance measurement make column titles sortable links. --done~~
+~~149. Review doc index card creation add remove fields change models overall improve --done~~
+~~150. For AI document Chat the view document link doesn't apply. Can we view source chunks? --done~~
+~~151. Doc Index, Line and Document searches find matches. Only Line search does highlighting correctly. Fix highlighting of matches in response formatting. --done~~
+~~152. Fix Document Index Card search highlighting by updating ExcerptFormatter to use proper search-highlight class --done~~
+~~153. Create common highlighting utilities for consistent markup and rendering across all search types --done~~
+~~154. Update Line Search to use common HighlightFormatter utility for consistency --done~~
+~~155. Fix ES6 export syntax error in highlightRenderer.js --done~~
+~~156. Fix Line Search results running together by improving line break and separator handling --done~~
+~~157. Simplify Line Search formatting to match working Document Search and Document Index formatting --done~~
+~~158. Create common result formatter to eliminate duplicate code across Line Search, Document Search, and Document Index Search --done~~
+~~159. Fix Document Index Cards missing View Document links by updating common formatter to handle all result types --done~~
 
 ## PENDING TASKS
 
@@ -169,11 +168,11 @@ specs-3-scoring
 121. focus on display and layout  --started
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 124. Create a quick start guide.
-~~125. Connect with SecureAccess create roles Standard 1 computer free for 4 months then $49/yr, Premium 5 computers $199/yr, Professional license $2999 (Register with Free) pay for Premiumm, pay for professional. --consolidated~~
+
 126. enhance database saving add documents only
 127. highlight matched words in all.
 128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
-129. review doc index card creation add  remove fields change models overall improve.  --done
+
 131. create app for load-AIPrivateSearch-xxxx.command  --started
 133. Implement complete user management and 3-tier role system with external SecureAccess integration:
 
@@ -194,14 +193,14 @@ Phase 3 - Role-Based Feature Control:
 - Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
 - Professional: $2999 license, all menu items, no code emails, full access
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-~~137. send code to email: once evry 2 weeks for standard, once every month for premium, never for professional. --consolidated~~
+
 138. work on manage models add category document-index.
-~~139. Standard can change search models but not set parameters and not change score model or parameters --consolidated~~
-142. for ai document Chat the  view document link doesn't apply. Can we view source chunks?  --done
+
+
 147. why does Smart Search return both matches and non matches?
-~~148. In performance measurement make column titles sortable links. --done~~
-~~149. Consolidated role-related tasks into comprehensive user management system --done~~
-150. Create user database schema and authentication system (prerequisite for task 133)
-151. Build SecureAccess API integration layer (prerequisite for task 133)
-152. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
-153. Fix highlighting of matches across searchtypes.
+
+147. why does Smart Search return both matches and non matches?
+148. Create user database schema and authentication system (prerequisite for task 133)
+149. Build SecureAccess API integration layer (prerequisite for task 133)
+150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
+~~160. Fix Line Search View Document links failing due to source field containing line numbers (filename:123 format) --done~~

@@ -1,9 +1,9 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { QueryProcessor } from '../utils/queryProcessor.mjs';
+import { HighlightFormatter } from '../utils/highlightFormatter.mjs';
 import path from 'path';
 import { createInterface } from 'readline';
-import { ExcerptFormatter } from '../utils/excerptFormatter.mjs';
 
 export class LineSearch {
   constructor() {
@@ -128,7 +128,7 @@ export class LineSearch {
         results.push({
           id: `${path.basename(filePath)}_${line.number}`,
           title: path.basename(filePath),
-          excerpt: ExcerptFormatter.highlightMatches(contextLines.join('\n'), query),
+          excerpt: HighlightFormatter.highlightMatches(contextLines.join('\n'), query, options.useWildcards),
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,
@@ -283,41 +283,8 @@ export class LineSearch {
   }
   
   highlightQueryTerms(text, query, options = {}) {
-    if (options.useWildcards) {
-      return this.highlightWildcardMatches(text, query);
-    }
-    
     const queryTerms = this.parseQueryTerms(query);
-    let highlightedText = text;
-    
-    // Highlight all query terms using word boundaries for exact matching
-    queryTerms.forEach(term => {
-      const regex = new RegExp(`\\b(${this.escapeRegex(term)})\\b`, 'gi');
-      highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-    });
-    
-    return highlightedText;
-  }
-  
-  highlightWildcardMatches(text, query) {
-    const queryTerms = this.parseQueryTerms(query);
-    let highlightedText = text;
-    
-    queryTerms.forEach(term => {
-      // Find all words that contain the search term
-      const words = text.match(/\b\w+\b/g) || [];
-      const matchingWords = words.filter(word => 
-        word.toLowerCase().includes(term.toLowerCase())
-      );
-      
-      // Highlight each matching word
-      matchingWords.forEach(word => {
-        const regex = new RegExp(`\\b(${this.escapeRegex(word)})\\b`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-      });
-    });
-    
-    return highlightedText;
+    return HighlightFormatter.highlightMultipleTerms(text, queryTerms, options.useWildcards);
   }
   
   applyWildcards(query) {
