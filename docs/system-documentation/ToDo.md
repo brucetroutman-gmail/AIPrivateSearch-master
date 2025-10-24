@@ -204,3 +204,8 @@ Phase 3 - Role-Based Feature Control:
 149. Build SecureAccess API integration layer (prerequisite for task 133)
 150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
 ~~160. Fix Line Search View Document links failing due to source field containing line numbers (filename:123 format) --done~~
+~~161. Make filenames clickable links in search result headers for direct document access --done~~
+~~162. Add persistence for selected search types in multi-mode search using localStorage --done~~
+
+
+

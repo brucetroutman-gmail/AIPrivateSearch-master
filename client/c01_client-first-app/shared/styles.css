@@ -1108,3 +1108,24 @@ mark.search-highlight,
 [data-theme="dark"] .result-excerpt em {
   color: #bdc3c7;
 }
+
+/* Filename link styling in result headers */
+.filename-link {
+  color: #007bff !important;
+  text-decoration: none !important;
+  font-weight: bold !important;
+  transition: color 0.2s ease !important;
+}
+
+.filename-link:hover {
+  color: #0056b3 !important;
+  text-decoration: underline !important;
+}
+
+[data-theme="dark"] .filename-link {
+  color: #87ceeb !important;
+}
+
+[data-theme="dark"] .filename-link:hover {
+  color: #b0e0e6 !important;
+}

@@ -27,9 +27,29 @@ class CommonResultFormatter {
       header.className = 'result-header';
       
       const title = document.createElement('h4');
-      title.textContent = result.title ? 
-        `Result ${index + 1}: ${result.title}` : 
-        `Result ${index + 1}`;
+      
+      // Create filename link if available
+      if (result.title && window.documentViewerCommon) {
+        const collection = result.collection || defaultCollection;
+        let filename = result.source || result.filename || result.title;
+        
+        // For Line Search results, extract filename from source (removes :lineNumber)
+        if (filename && filename.includes(':')) {
+          filename = filename.split(':')[0];
+        }
+        
+        const resultText = document.createTextNode(`Result ${index + 1}: `);
+        title.appendChild(resultText);
+        
+        const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename);
+        filenameLink.textContent = result.title;
+        filenameLink.className = 'filename-link';
+        title.appendChild(filenameLink);
+      } else {
+        title.textContent = result.title ? 
+          `Result ${index + 1}: ${result.title}` : 
+          `Result ${index + 1}`;
+      }
       
       header.appendChild(title);
       

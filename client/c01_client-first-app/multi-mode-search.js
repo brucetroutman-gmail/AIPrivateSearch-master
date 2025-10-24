@@ -247,7 +247,40 @@ selectAllCheckbox.addEventListener('change', function() {
     });
     updateResultColumnVisibility();
     updateWildcardVisibility();
+    saveSelectedMethods();
 });
+
+// Save selected methods to localStorage
+function saveSelectedMethods() {
+    const selectedMethods = getSelectedMethods();
+    localStorage.setItem('selectedSearchMethods', JSON.stringify(selectedMethods));
+}
+
+// Restore selected methods from localStorage
+function restoreSelectedMethods() {
+    const saved = localStorage.getItem('selectedSearchMethods');
+    if (saved) {
+        try {
+            const selectedMethods = JSON.parse(saved);
+            const checkboxes = document.querySelectorAll('.method-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectedMethods.includes(checkbox.dataset.method);
+            });
+            
+            // Update Select All checkbox state
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            const noneChecked = Array.from(checkboxes).every(cb => !cb.checked);
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+            
+            updateResultColumnVisibility();
+            updateWildcardVisibility();
+        } catch (error) {
+            console.error('Failed to restore selected methods:', error);
+        }
+    }
+}
 
 // Function to show/hide wildcard option based on selected methods
 function updateWildcardVisibility() {
@@ -370,6 +403,7 @@ async function loadSearchTypes() {
                 
                 updateResultColumnVisibility();
                 updateWildcardVisibility();
+                saveSelectedMethods();
             });
         });
         
@@ -382,6 +416,9 @@ async function loadSearchTypes() {
 document.addEventListener('DOMContentLoaded', async () => {
     // Load search types first
     await loadSearchTypes();
+    
+    // Restore selected methods
+    restoreSelectedMethods();
     
     // Hide all columns initially (show only when methods are selected)
     updateResultColumnVisibility();
