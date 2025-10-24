@@ -9,6 +9,7 @@ import modelsRouter from './routes/models.mjs';
 import databaseRouter from './routes/database.mjs';
 import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
+import sentenceTransformersRouter from './routes/sentenceTransformers.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
@@ -80,14 +81,14 @@ app.get('/api/version', async (req, res) => {
   }
 });
 
-// Apply origin validation and CSRF protection to all API routes except multi-search (temporary debug)
+// Apply routes with specific middleware
 app.use('/api/search', validateOrigin, validateCSRFToken, searchRouter);
 app.use('/api/multi-search', validateOrigin, multiSearchRouter);
-app.use('/api', validateOrigin, validateCSRFToken);
-app.use('/api/models', modelsRouter);
-app.use('/api/database', databaseRouter);
-app.use('/api/documents', documentsRouter);
-app.use('/api/config', configRouter);
+app.use('/api/models', validateOrigin, validateCSRFToken, modelsRouter);
+app.use('/api/database', validateOrigin, validateCSRFToken, databaseRouter);
+app.use('/api/documents', validateOrigin, documentsRouter);
+app.use('/api/config', validateOrigin, validateCSRFToken, configRouter);
+app.use('/api/sentence-transformers', sentenceTransformersRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

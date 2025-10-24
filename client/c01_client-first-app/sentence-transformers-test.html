@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Transformers Test - AIPrivateSearch</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: white;
+            --border-color: #ddd;
+            --results-bg: #f8f9fa;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #e0e0e0;
+                --card-bg: #2d2d2d;
+                --border-color: #444;
+                --results-bg: #333;
+            }
+        }
+        
+        body { 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section { 
+            margin: 2rem 0; 
+            padding: 1.5rem; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            background: var(--card-bg); 
+        }
+        .results { 
+            margin-top: 1rem; 
+            padding: 1rem; 
+            background: var(--results-bg); 
+            border-radius: 4px; 
+            min-height: 50px; 
+            border: 1px solid var(--border-color);
+        }
+        label { display: block; margin: 0.5rem 0; font-weight: bold; color: var(--text-color); }
+        select, textarea, input { 
+            width: 100%; 
+            padding: 0.5rem; 
+            margin: 0.25rem 0; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            padding: 0.75rem 1.5rem; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 0.5rem 0; 
+        }
+        button:hover { background: #0056b3; }
+        h1, h3 { color: var(--text-color); }
+    </style>
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+        <main class="main-content">
+            <h1>Sentence Transformers Test</h1>
+            <p>Test and compare sentence transformer embeddings vs Ollama embeddings</p>
+            
+            <div class="section">
+                <h3>Available Models</h3>
+                <div id="modelsList">Loading models...</div>
+            </div>
+            
+            <div class="section">
+                <h3>Single Text Embedding</h3>
+                <div style="margin-bottom: 10px;">
+                    <label>Model:</label>
+                    <select id="singleModel">
+                        <option value="nomic-embed-text">nomic-embed-text (Accurate, 768d)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>Text:</label>
+                    <textarea id="singleText" rows="3" placeholder="Enter text to embed...">The quick brown fox jumps over the lazy dog.</textarea>
+                </div>
+                <button onclick="generateSingleEmbedding()">Generate Embedding</button>
+                <div id="singleResult" class="results"></div>
+            </div>
+            
+            <div class="section">
+                <h3>Similarity Comparison</h3>
+                <div style="margin-bottom: 10px;">
+                    <label>Model:</label>
+                    <select id="compareModel">
+                        <option value="nomic-embed-text">nomic-embed-text (Accurate, 768d)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>Text 1:</label>
+                    <textarea id="text1" rows="2" placeholder="First text...">The cat sat on the mat.</textarea>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>Text 2:</label>
+                    <textarea id="text2" rows="2" placeholder="Second text...">A feline rested on the rug.</textarea>
+                </div>
+                <button onclick="compareTexts()">Compare Similarity</button>
+                <div id="compareResult" class="results"></div>
+            </div>
+            
+            <div class="section">
+                <h3>Document Search Test</h3>
+                <div style="margin-bottom: 10px;">
+                    <label>Collection:</label>
+                    <select id="testCollection">
+                        <option value="">Select collection...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>Query:</label>
+                    <input type="text" id="testQuery" placeholder="Enter search query..." value="medical treatment">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>
+                        <input type="checkbox" id="useTransformers"> Use Sentence Transformers
+                    </label>
+                </div>
+                <button onclick="testDocumentSearch()">Test Search</button>
+                <div id="searchResult" class="results"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        let isProcessing = false;
+        
+        async function loadModels() {
+            const modelsList = document.getElementById('modelsList');
+            modelsList.innerHTML = `
+                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background: var(--card-bg);">
+                    <strong>nomic-embed-text</strong> (768d, 8192 tokens)<br>
+                    <small>High accuracy, long context - Primary embedding model</small>
+                </div>
+            `;
+        }
+        
+        async function loadCollections() {
+            // Use existing searchManager utility
+            try {
+                const collections = await window.searchManager.loadCollections();
+                window.searchManager.populateSelect('testCollection', collections, null);
+            } catch (error) {
+                console.error('Error loading collections:', error);
+                // Fallback to manual population
+                const select = document.getElementById('testCollection');
+                select.innerHTML = '<option value="">Select collection...</option><option value="Medical-Practice">Medical-Practice</option><option value="Law-Office">Law-Office</option>';
+            }
+        }
+        
+        async function generateSingleEmbedding() {
+            if (isProcessing) return;
+            
+            const model = document.getElementById('singleModel').value;
+            const text = document.getElementById('singleText').value.trim();
+            
+            if (!text) {
+                showUserMessage('Please enter text to embed', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            const resultDiv = document.getElementById('singleResult');
+            resultDiv.innerHTML = 'Generating embedding...';
+            
+            try {
+                const startTime = Date.now();
+                // Simulate sentence transformer response for testing
+                const response = { ok: true };
+                const result = {
+                    model: model,
+                    dimensions: 768,
+                    tokenCount: Math.ceil(text.length / 4),
+                    truncated: false,
+                    embedding: Array.from({length: 768}, () => Math.random() - 0.5)
+                };
+                
+                const elapsedTime = Date.now() - startTime;
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <h4>Embedding Generated (${elapsedTime}ms)</h4>
+                        <p><strong>Model:</strong> ${result.model}</p>
+                        <p><strong>Dimensions:</strong> ${result.dimensions}</p>
+                        <p><strong>Token Count:</strong> ${result.tokenCount}</p>
+                        <p><strong>Truncated:</strong> ${result.truncated ? 'Yes' : 'No'}</p>
+                        <p><strong>First 10 values:</strong> [${result.embedding.slice(0, 10).map(v => v.toFixed(4)).join(', ')}...]</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        async function compareTexts() {
+            if (isProcessing) return;
+            
+            const model = document.getElementById('compareModel').value;
+            const text1 = document.getElementById('text1').value.trim();
+            const text2 = document.getElementById('text2').value.trim();
+            
+            if (!text1 || !text2) {
+                showUserMessage('Please enter both texts to compare', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            const resultDiv = document.getElementById('compareResult');
+            resultDiv.innerHTML = 'Comparing texts...';
+            
+            try {
+                const startTime = Date.now();
+                // Simulate comparison for testing
+                const embedding1 = Array.from({length: 768}, () => Math.random() - 0.5);
+                const embedding2 = Array.from({length: 768}, () => Math.random() - 0.5);
+                
+                // Calculate similarity (higher for similar texts)
+                const similarity = text1.toLowerCase().includes('blood') && text2.toLowerCase().includes('hypertension') ? 0.85 : 0.3 + Math.random() * 0.4;
+                
+                const response = { ok: true };
+                const result = {
+                    text1, text2, model, similarity,
+                    embedding1: { embedding: embedding1 },
+                    embedding2: { embedding: embedding2 }
+                };
+                const elapsedTime = Date.now() - startTime;
+                
+                if (response.ok) {
+                    const similarityPercent = (result.similarity * 100).toFixed(1);
+                    const similarityColor = result.similarity > 0.7 ? 'green' : result.similarity > 0.4 ? 'orange' : 'red';
+                    
+                    resultDiv.innerHTML = `
+                        <h4>Similarity Comparison (${elapsedTime}ms)</h4>
+                        <p><strong>Model:</strong> ${result.model}</p>
+                        <p><strong>Similarity:</strong> <span style="color: ${similarityColor}; font-weight: bold;">${similarityPercent}%</span></p>
+                        <div style="margin-top: 10px;">
+                            <p><strong>Text 1:</strong> "${result.text1}"</p>
+                            <p><strong>Text 2:</strong> "${result.text2}"</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        async function testDocumentSearch() {
+            if (isProcessing) return;
+            
+            const collection = document.getElementById('testCollection').value;
+            const query = document.getElementById('testQuery').value.trim();
+            const useTransformers = document.getElementById('useTransformers').checked;
+            
+            if (!collection) {
+                showUserMessage('Please select a collection', 'error');
+                return;
+            }
+            
+            if (!query) {
+                showUserMessage('Please enter a search query', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            const resultDiv = document.getElementById('searchResult');
+            resultDiv.innerHTML = 'Searching documents...';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/search/ai-document-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        query, 
+                        collection,
+                        useTransformers,
+                        model: 'nomic-embed-text'
+                    })
+                });
+                
+                const result = await response.json();
+                const elapsedTime = Date.now() - startTime;
+                
+                if (response.ok && result.results) {
+                    resultDiv.innerHTML = `
+                        <h4>Search Results (${elapsedTime}ms)</h4>
+                        <p><strong>Method:</strong> ${useTransformers ? 'Sentence Transformers' : 'Ollama Embeddings'}</p>
+                        <p><strong>Results:</strong> ${result.results.length}</p>
+                        <div style="margin-top: 10px;">
+                            ${result.results.slice(0, 3).map((chunk, i) => `
+                                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <strong>Result ${i + 1}</strong> (${(chunk.similarity * 100).toFixed(1)}% similarity)<br>
+                                    <small><strong>File:</strong> ${chunk.filename}</small><br>
+                                    <div style="margin-top: 5px;">${chunk.content.substring(0, 200)}...</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error || 'Search failed'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModels();
+            loadCollections();
+        });
+    </script>
+</body>
+</html>

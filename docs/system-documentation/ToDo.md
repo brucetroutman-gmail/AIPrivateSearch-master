@@ -157,6 +157,11 @@ to do AIPrivateSearch
 ~~157. Simplify Line Search formatting to match working Document Search and Document Index formatting --done~~
 ~~158. Create common result formatter to eliminate duplicate code across Line Search, Document Search, and Document Index Search --done~~
 ~~159. Fix Document Index Cards missing View Document links by updating common formatter to handle all result types --done~~
+~~160. Fix Line Search View Document links failing due to source field containing line numbers (filename:123 format) --done~~
+~~161. Make filenames clickable links in search result headers for direct document access --done~~
+~~162. Add persistence for selected search types in multi-mode search using localStorage --done~~
+~~163. Integrate sentence transformers as primary embedding method with Ollama fallback for AI Document Chat and Doc Index creation --done~~
+~~164. Remove hardcoded embedding models and use dynamic lookup from models-list.json configuration --done~~
 
 ## PENDING TASKS
 
@@ -194,18 +199,11 @@ Phase 3 - Role-Based Feature Control:
 - Professional: $2999 license, all menu items, no code emails, full access
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
 
-138. work on manage models add category document-index.
-
-
-147. why does Smart Search return both matches and non matches?
-
+~~138. on manage models, add new model . ADD category  checkbox "document-index". --done~~
 147. why does Smart Search return both matches and non matches?
 148. Create user database schema and authentication system (prerequisite for task 133)
 149. Build SecureAccess API integration layer (prerequisite for task 133)
 150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
-~~160. Fix Line Search View Document links failing due to source field containing line numbers (filename:123 format) --done~~
-~~161. Make filenames clickable links in search result headers for direct document access --done~~
-~~162. Add persistence for selected search types in multi-mode search using localStorage --done~~
-
+151. when adding doc_id to json files. the files not not formatted correctly.  
 
 

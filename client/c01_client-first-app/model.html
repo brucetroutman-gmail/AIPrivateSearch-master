@@ -126,7 +126,8 @@
                 <div style="display: inline-block;">
                     <label><input type="checkbox" id="categorySearch" value="search"> Search</label><br>
                     <label><input type="checkbox" id="categoryScore" value="score"> Score</label><br>
-                    <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label>
+                    <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label><br>
+                    <label><input type="checkbox" id="categoryDocumentIndex" value="document-index"> Document Index</label>
                 </div>
             </div>
             <button class="update-btn" onclick="addNewModel()">Add Model</button>
@@ -249,6 +250,7 @@
             if (document.getElementById('categorySearch').checked) selectedCategories.push('search');
             if (document.getElementById('categoryScore').checked) selectedCategories.push('score');
             if (document.getElementById('categoryEmbed').checked) selectedCategories.push('embed');
+            if (document.getElementById('categoryDocumentIndex').checked) selectedCategories.push('document-index');
             
             if (!modelName) {
                 showUserMessage('Please enter a model name.', 'error');

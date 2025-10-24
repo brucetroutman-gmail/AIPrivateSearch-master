@@ -1,5 +1,6 @@
 import { SqlJsWrapper } from '../utils/SqlJsWrapper.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { modelConfig } from '../utils/modelConfig.mjs';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -75,8 +76,11 @@ export class UnifiedEmbeddingService {
     return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
   }
 
-  async processDocument(filename, content, collection) {
+  async processDocument(filename, content, collection, options = {}) {
     console.log(`[UnifiedEmbeddingService] Processing document: ${filename} in collection: ${collection}`);
+    
+    const embedModel = await modelConfig.getEmbeddingModel();
+    const { useTransformers = false, model = embedModel } = options;
     
     await this.setupDatabase(collection);
     const db = await this.getCollectionDb(collection);
@@ -98,7 +102,7 @@ export class UnifiedEmbeddingService {
         VALUES (?, ?, ?, ?, ?)
       `);
       
-      const docEmbedding = await this.createEmbedding(content.substring(0, 8000));
+      const docEmbedding = await this.createEmbedding(content.substring(0, 8000), useTransformers, model);
       console.log(`[UnifiedEmbeddingService] Document embedding created, length: ${docEmbedding.length}`);
       
       const docResult = await docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
@@ -117,7 +121,7 @@ export class UnifiedEmbeddingService {
         const chunk = chunks[i];
         console.log(`[UnifiedEmbeddingService] Processing chunk ${i + 1}/${chunks.length}`);
         
-        const embedding = await this.createEmbedding(chunk.content);
+        const embedding = await this.createEmbedding(chunk.content, useTransformers, model);
         
         const chunkResult = await chunkStmt.run(
           `${documentId}_chunk_${i}`,
@@ -191,10 +195,13 @@ export class UnifiedEmbeddingService {
     return chunks;
   }
 
-  async findSimilarChunks(query, collection, topK = 5) {
+  async findSimilarChunks(query, collection, topK = 5, options = {}) {
     console.log(`[UnifiedEmbeddingService] Finding similar chunks for "${query}" in collection: "${collection}"`);
     console.log(`[UnifiedEmbeddingService] Collection parameter type: ${typeof collection}`);
     console.log(`[UnifiedEmbeddingService] Collection parameter length: ${collection?.length}`);
+    
+    const embedModel = await modelConfig.getEmbeddingModel();
+    const { useTransformers = false, model = embedModel } = options;
     
     try {
       await this.setupDatabase(collection);
@@ -220,7 +227,7 @@ export class UnifiedEmbeddingService {
       }
       
       console.log(`[UnifiedEmbeddingService] Creating query embedding...`);
-      const queryEmbedding = await this.createEmbedding(query);
+      const queryEmbedding = await this.createEmbedding(query, useTransformers, model);
       console.log(`[UnifiedEmbeddingService] Query embedding created, length: ${queryEmbedding.length}`);
       
       const stmt = db.prepare(`
@@ -252,14 +259,29 @@ export class UnifiedEmbeddingService {
     }
   }
 
-  async createEmbedding(text) {
+  async createEmbedding(text, useTransformers = false, model = null) {
+    if (!model) {
+      model = await modelConfig.getEmbeddingModel();
+    }
     console.log(`[UnifiedEmbeddingService] Creating embedding for text: "${text.substring(0, 100)}..."`);
+    
+    if (useTransformers) {
+      try {
+        const { sentenceTransformerService } = await import('../embeddings/SentenceTransformerService.mjs');
+        const result = await sentenceTransformerService.generateEmbedding(text, model);
+        console.log(`[UnifiedEmbeddingService] Sentence transformer embedding created, length: ${result.embedding.length}`);
+        return result.embedding;
+      } catch (error) {
+        console.error(`[UnifiedEmbeddingService] Sentence transformer failed, falling back to Ollama:`, error);
+        // Fall through to Ollama
+      }
+    }
     
     const response = await fetch('http://localhost:11434/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'nomic-embed-text',
+        model: model,
         prompt: text
       })
     });
