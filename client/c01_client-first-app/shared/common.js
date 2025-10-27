@@ -166,7 +166,16 @@ async function loadAppConfig() {
     if (logoEl && config['app-name']) {
       const versionSpan = logoEl.querySelector('.version');
       const versionText = versionSpan ? versionSpan.outerHTML : '';
-      logoEl.innerHTML = `${config['app-name']} ${versionText}`;
+      // Clear existing content safely
+      while (logoEl.firstChild) {
+        logoEl.removeChild(logoEl.firstChild);
+      }
+      // Add app name as text node
+      logoEl.appendChild(document.createTextNode(config['app-name'] + ' '));
+      // Re-add version span if it existed
+      if (versionSpan) {
+        logoEl.appendChild(versionSpan);
+      }
     }
   } catch (error) {
     // Silently fail - app config is not critical

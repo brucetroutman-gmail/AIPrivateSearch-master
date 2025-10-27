@@ -23,11 +23,23 @@ class HighlightRenderer {
     if (this.hasHighlighting(formattedContent)) {
       // Use sanitized HTML for highlighted content, convert newlines to <br>
       const htmlContent = DOMSanitizer.sanitizeHTML(formattedContent).replace(/\n/g, '<br>');
-      element.innerHTML = htmlContent;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      // Clear element and append parsed content
+      element.textContent = '';
+      while (doc.body.firstChild) {
+        element.appendChild(doc.body.firstChild);
+      }
     } else {
       // Use safe text content for non-highlighted content, convert newlines to <br>
-      const htmlContent = formattedContent.replace(/\n/g, '<br>');
-      element.innerHTML = htmlContent;
+      const lines = formattedContent.split('\n');
+      element.textContent = '';
+      lines.forEach((line, index) => {
+        element.appendChild(document.createTextNode(line));
+        if (index < lines.length - 1) {
+          element.appendChild(document.createElement('br'));
+        }
+      });
     }
   }
 
