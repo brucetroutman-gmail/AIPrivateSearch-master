@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - AIPrivateSearch</title>
+    <link rel="stylesheet" href="shared/styles.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    
+    <main class="container">
+        <h1>User Management</h1>
+        
+        <div class="auth-section">
+            <div id="login-form" class="auth-form">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            
+            <div id="register-form" class="auth-form" style="display: none;">
+                <h2>Register New User</h2>
+                <form id="registerForm">
+                    <input type="email" id="registerEmail" placeholder="Email" required>
+                    <input type="password" id="registerPassword" placeholder="Password" required>
+                    <select id="registerSubscriptionTier">
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium</option>
+                        <option value="professional">Professional</option>
+                    </select>
+                    <select id="registerUserRole">
+                        <option value="searcher">Searcher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="user-dashboard" style="display: none;">
+            <div class="user-info">
+                <h2>Welcome, <span id="currentUserEmail"></span></h2>
+                <p>Subscription: <span id="currentUserSubscription"></span></p>
+                <p>Role: <span id="currentUserRole"></span></p>
+                <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
+                    <button onclick="window.location.href='/index.html'" style="background: #28a745;">Go to Application</button>
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </div>
+            
+            <div id="admin-panel" class="adv-only" style="display: none;">
+                <h3>User Management</h3>
+                <button id="showRegisterBtn">Add New User</button>
+                <div id="users-list"></div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-placeholder"></div>
+    
+    <script src="shared/utils/logger.js"></script>
+    <script src="shared/utils/domSanitizer.js"></script>
+    <script src="shared/common.js"></script>
+    <script>
+        // Load theme on page load
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        
+        // Load shared components
+        async function loadSharedComponents() {
+            try {
+                const headerResponse = await fetch('./shared/header.html');
+                const headerHTML = await headerResponse.text();
+                const headerEl = document.getElementById('header-placeholder');
+                if (headerEl) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(headerHTML, 'text/html');
+                    const headerContent = doc.body.firstElementChild;
+                    if (headerContent) {
+                        headerEl.appendChild(headerContent);
+                    }
+                }
+                
+                const footerResponse = await fetch('./shared/footer.html');
+                const footerHTML = await footerResponse.text();
+                const footerEl = document.getElementById('footer-placeholder');
+                if (footerEl) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(footerHTML, 'text/html');
+                    const footerContent = doc.body.firstElementChild;
+                    if (footerContent) {
+                        footerEl.appendChild(footerContent);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading shared components:', error);
+            }
+        }
+        
+        function showMessage(message, type = 'error') {
+            const messageEl = document.createElement('div');
+            messageEl.className = `user-message ${type}`;
+            messageEl.textContent = message;
+            document.body.appendChild(messageEl);
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.parentNode.removeChild(messageEl);
+                }
+            }, 3000);
+        }
+        
+        class AuthManager {
+            constructor() {
+                this.currentUser = null;
+                this.init();
+            }
+            
+            async init() {
+                await this.checkAuthStatus();
+                this.setupEventListeners();
+            }
+            
+            async checkAuthStatus() {
+                try {
+                    const sessionId = localStorage.getItem('sessionId');
+                    if (!sessionId) {
+                        this.showLogin();
+                        return;
+                    }
+                    const response = await fetch('http://localhost:3001/api/auth/me', {
+                        headers: { 'Authorization': `Bearer ${sessionId}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.currentUser = data.user;
+                        this.showDashboard();
+                    } else {
+                        this.showLogin();
+                    }
+                } catch (error) {
+                    this.showLogin();
+                }
+            }
+            
+            setupEventListeners() {
+                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));
+                document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+                document.getElementById('showRegisterBtn').addEventListener('click', () => this.toggleRegisterForm());
+            }
+            
+            async handleLogin(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                try {
+                    const response = await fetch('http://localhost:3001/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        localStorage.setItem('sessionId', data.sessionId);
+                        this.currentUser = data.user;
+                        this.showDashboard();
+                    } else {
+                        showMessage(data.error || 'Login failed');
+                    }
+                } catch (error) {
+                    showMessage('Login failed');
+                }
+            }
+            
+            async handleRegister(e) {
+                e.preventDefault();
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const subscriptionTier = document.getElementById('registerSubscriptionTier').value;
+                const userRole = document.getElementById('registerUserRole').value;
+                
+                try {
+                    const response = await fetch('http://localhost:3001/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password, subscriptionTier, userRole })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('registerForm').reset();
+                        this.toggleRegisterForm();
+                        this.loadUsers();
+                    } else {
+                        showMessage(data.error || 'Registration failed');
+                    }
+                } catch (error) {
+                    showMessage('Registration failed');
+                }
+            }
+            
+            async handleLogout() {
+                try {
+                    const sessionId = localStorage.getItem('sessionId');
+                    if (sessionId) {
+                        await fetch('http://localhost:3001/api/auth/logout', { 
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${sessionId}` }
+                        });
+                    }
+                    localStorage.removeItem('sessionId');
+                    this.currentUser = null;
+                    this.showLogin();
+                } catch (error) {
+                    showMessage('Logout failed');
+                }
+            }
+            
+            showLogin() {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('user-dashboard').style.display = 'none';
+                document.getElementById('register-form').style.display = 'none';
+            }
+            
+            showDashboard() {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('user-dashboard').style.display = 'block';
+                document.getElementById('currentUserEmail').textContent = this.currentUser.email;
+                document.getElementById('currentUserSubscription').textContent = this.currentUser.subscriptionTier;
+                document.getElementById('currentUserRole').textContent = this.currentUser.userRole;
+                
+                if (this.currentUser.userRole === 'admin') {
+                    document.getElementById('admin-panel').style.display = 'block';
+                    this.loadUsers();
+                }
+            }
+            
+            toggleRegisterForm() {
+                const form = document.getElementById('register-form');
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+            
+            async loadUsers() {
+                try {
+                    const sessionId = localStorage.getItem('sessionId');
+                    const response = await fetch('http://localhost:3001/api/auth/users', {
+                        headers: { 'Authorization': `Bearer ${sessionId}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.displayUsers(data.users);
+                    }
+                } catch (error) {
+                    console.error('Failed to load users:', error);
+                }
+            }
+            
+            displayUsers(users) {
+                const container = document.getElementById('users-list');
+                container.innerHTML = '';
+                
+                users.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user-item';
+                    userDiv.innerHTML = `
+                        <span>${user.email} (${user.subscriptionTier}/${user.userRole})</span>
+                        <select onchange="authManager.updateUserSubscription('${user.id}', this.value)">
+                            <option value="standard" ${user.subscriptionTier === 'standard' ? 'selected' : ''}>Standard</option>
+                            <option value="premium" ${user.subscriptionTier === 'premium' ? 'selected' : ''}>Premium</option>
+                            <option value="professional" ${user.subscriptionTier === 'professional' ? 'selected' : ''}>Professional</option>
+                        </select>
+                        <select onchange="authManager.updateUserRole('${user.id}', this.value)">
+                            <option value="searcher" ${user.userRole === 'searcher' ? 'selected' : ''}>Searcher</option>
+                            <option value="admin" ${user.userRole === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    `;
+                    container.appendChild(userDiv);
+                });
+            }
+            
+            async updateUserSubscription(userId, subscriptionTier) {
+                try {
+                    const sessionId = localStorage.getItem('sessionId');
+                    const response = await fetch(`http://localhost:3001/api/auth/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${sessionId}`
+                        },
+                        body: JSON.stringify({ subscriptionTier })
+                    });
+                    
+                    if (response.ok) {
+                        this.loadUsers();
+                    } else {
+                        showMessage('Failed to update subscription');
+                    }
+                } catch (error) {
+                    showMessage('Update failed');
+                }
+            }
+            
+            async updateUserRole(userId, userRole) {
+                try {
+                    const sessionId = localStorage.getItem('sessionId');
+                    const response = await fetch(`http://localhost:3001/api/auth/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${sessionId}`
+                        },
+                        body: JSON.stringify({ userRole })
+                    });
+                    
+                    if (response.ok) {
+                        this.loadUsers();
+                    } else {
+                        showMessage('Failed to update role');
+                    }
+                } catch (error) {
+                    showMessage('Update failed');
+                }
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            loadSharedComponents();
+        });
+        
+        const authManager = new AuthManager();
+    </script>
+</body>
+</html>

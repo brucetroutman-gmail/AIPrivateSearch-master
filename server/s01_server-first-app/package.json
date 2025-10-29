@@ -1,6 +1,6 @@
 {
   "name": "ai-search-score-server",
-  "version": "19.33",
+  "version": "19.34",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
@@ -9,6 +9,7 @@
   "dependencies": {
     "@xenova/transformers": "^2.17.2",
     "busboy": "^1.6.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",

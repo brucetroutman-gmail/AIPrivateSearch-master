@@ -10,9 +10,12 @@ import databaseRouter from './routes/database.mjs';
 import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
 import sentenceTransformersRouter from './routes/sentenceTransformers.mjs';
+import authRouter from './routes/auth.mjs';
+import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
+import { UserManager } from './lib/auth/userManager.mjs';
 import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
@@ -43,10 +46,11 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 
 // Serve static files from client
 app.use(express.static(path.join(process.cwd(), '../../client/c01_client-first-app')));
@@ -89,12 +93,27 @@ app.use('/api/database', validateOrigin, validateCSRFToken, databaseRouter);
 app.use('/api/documents', validateOrigin, documentsRouter);
 app.use('/api/config', validateOrigin, validateCSRFToken, configRouter);
 app.use('/api/sentence-transformers', sentenceTransformersRouter);
+app.use('/api/auth', authRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+// Initialize default admin user
+async function initializeDefaultAdmin() {
+  const userManager = new UserManager();
+  try {
+    const users = await userManager.loadUsers();
+    if (users.length === 0) {
+      await userManager.createUser('aips@anywhere.co', 'aips!123', 'standard', 'admin');
+      logger.log('Default admin user created: aips@anywhere.co');
+    }
+  } catch (error) {
+    logger.log('Default admin user already exists or creation failed');
+  }
+}
+
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, (err) => {
+app.listen(PORT, async (err) => {
   if (err) {
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to start server:', err);
@@ -102,4 +121,7 @@ app.listen(PORT, (err) => {
   }
   // logger sanitizes all inputs to prevent log injection
   logger.log(`Server running on port ${PORT}`);
+  
+  // Initialize default admin user
+  await initializeDefaultAdmin();
 });

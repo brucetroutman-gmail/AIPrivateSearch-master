@@ -1,0 +1,12 @@
+[
+  {
+    "id": "ad966ae1-0d42-43b8-ab9e-11b87d366a14",
+    "email": "aips@anywhere.co",
+    "passwordHash": "b9923fa2e7ea946ebe6249e27ffd061e20478cddad2f38b52b9dd2e5c926a681",
+    "subscriptionTier": "standard",
+    "userRole": "admin",
+    "createdAt": "2025-10-28T23:36:53.052Z",
+    "lastLogin": "2025-10-29T00:26:01.551Z",
+    "active": true
+  }
+]

@@ -1,6 +1,73 @@
 to do AIPrivateSearch
 
-## COMPLETED TASKS (Moved from Pending)
+## PENDING TASKS
+
+### High Priority
+15. Can We make an electron app for this that runs locally on a mac? --started
+22. Implement local documents only. --done
+124. Create a quick start guide.
+128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
+131. create app for load-AIPrivateSearch-xxxx.command  --started
+147. why does Smart Search return both matches and non matches?
+
+
+### User Management System
+133. Implement complete user management and 3-tier role system with external SecureAccess integration:
+
+~~Phase 1 - User Management Infrastructure: --done~~
+~~- Create internal user management system with database tables (users, roles, permissions, sessions) --done~~
+~~- Implement user authentication/authorization middleware --done~~
+~~- Build user management UI (add/edit/delete users, assign roles) --done~~
+~~- Create register/login/logout functionality with session management --done~~
+
+~~133.1 create AIPrivateSearch-User-Management-System.md. Describe the system, its database schema, Security features and set by step instructions to get started. --done~~
+
+Phase 2 - SecureAccess Integration:
+- Implement external API connection to SecureAccess user management software
+- Create authentication bridge between internal system and SecureAccess
+- Sync user data, roles, and licensing status from SecureAccess
+- Handle license validation and computer limits
+
+Phase 3 - Role-Based Feature Control:
+- Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters, send code email every 2 weeks
+- Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
+- Professional: $2999 license, all menu items, no code emails, full access
+
+148. Create user database schema and authentication system (prerequisite for task 133)
+149. Build SecureAccess API integration layer (prerequisite for task 133)
+150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
+
+### Enhancement Tasks
+28. User and system propmt by source type
+32. Re-Visit the Test Codes - focus on speed and document search testing --started
+120. create user prompts based on source Type and collection and search type
+121. focus on display and layout  --started
+122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
+126. enhance database saving add documents only
+135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
+
+## RECENTLY COMPLETED (v19.34)
+~~178. Implement Bearer token authentication system replacing cookie-based auth to resolve CORS issues --done~~
+~~179. Create complete user management system with admin/searcher roles and subscription tiers (standard/premium/professional) --done~~
+~~180. Add automatic default admin user creation (aips@anywhere.co / aips!123) on server startup --done~~
+~~181. Integrate user management UI with dark mode support and navigation between app and user management --done~~
+~~182. Replace alert() security risks with secure DOM-based messaging system --done~~
+~~183. Update AIPrivateSearch-User-Management-System.md with comprehensive authorization strategy documentation --done~~
+
+## COMPLETED (v19.33)
+~~175. Fix security linting errors by replacing unsafe innerHTML assignments with secure DOM methods --done~~
+~~176. Create AIPrivateSearch-PaymentProcessing.md documentation for subscription tiers and SecureAccess integration --done~~
+~~127. highlight matched words in all  --done~~
+~~177. Integrate user management system with existing email-based user info icon and navigation --done~~
+
+## COMPLETED (v19.32)
+~~170. In AI direct responses make the file names into links as in Doc index, line and document search --done~~
+~~171. Remove View Document links from AI Direct responses since filenames are now clickable --done~~
+~~172. Format line numbers on separate lines in Doc Index, Line Search, and Document Search responses for better readability --done~~
+~~173. Add context lines (before and after) to Document Search results for better readability --done~~
+~~174. Make filename links jump to specific line numbers and highlight matched lines in document viewer --done~~
+
+## COMPLETED TASKS (v01 -> v19.31)
 
 ~~1. Add dropdown for Model selection - done~~
 ~~2. sort model names and ignore nomic model in list - done~~
@@ -164,64 +231,6 @@ to do AIPrivateSearch
 ~~164. Remove hardcoded embedding models and use dynamic lookup from models-list.json configuration --done~~
 ~~165. Fix JSON DocID formatting issues - JSON files now properly store DocID as JSON property instead of malformed text lines --done~~
 ~~166. Remove duplicate nested sources folder and verify all JSON files have correct formatting --done~~
-
-
-## PENDING TASKS
-
-### High Priority
-15. Can We make an electron app for this that runs locally on a mac? --started
-22. Implement local documents only. --done
-124. Create a quick start guide.
-128. ** Make Response matches and View Document consistent across all types, Add View Index Card to Doc Index Cards response
-131. create app for load-AIPrivateSearch-xxxx.command  --started
-147. why does Smart Search return both matches and non matches?
-
-
-### User Management System
-133. Implement complete user management and 3-tier role system with external SecureAccess integration:
-
-Phase 1 - User Management Infrastructure:
-- Create internal user management system with database tables (users, roles, permissions, sessions)
-- Implement user authentication/authorization middleware
-- Build user management UI (add/edit/delete users, assign roles)
-- Create login/logout functionality with session management
-
-Phase 2 - SecureAccess Integration:
-- Implement external API connection to SecureAccess user management software
-- Create authentication bridge between internal system and SecureAccess
-- Sync user data, roles, and licensing status from SecureAccess
-- Handle license validation and computer limits
-
-Phase 3 - Role-Based Feature Control:
-- Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters, send code email every 2 weeks
-- Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
-- Professional: $2999 license, all menu items, no code emails, full access
-
-148. Create user database schema and authentication system (prerequisite for task 133)
-149. Build SecureAccess API integration layer (prerequisite for task 133)
-150. Implement role-based UI restrictions and feature gating (prerequisite for task 133)
-
-### Enhancement Tasks
-28. User and system propmt by source type
-32. Re-Visit the Test Codes - focus on speed and document search testing --started
-120. create user prompts based on source Type and collection and search type
-121. focus on display and layout  --started
-122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
-126. enhance database saving add documents only
-135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-
-## RECENTLY COMPLETED (v19.33)
-~~175. Fix security linting errors by replacing unsafe innerHTML assignments with secure DOM methods --done~~
-~~176. Create AIPrivateSearch-PaymentProcessing.md documentation for subscription tiers and SecureAccess integration --done~~
-~~127. highlight matched words in all  --done~~
-
-## COMPLETED (v19.32)
-~~170. In AI direct responses make the file names into links as in Doc index, line and document search --done~~
-~~171. Remove View Document links from AI Direct responses since filenames are now clickable --done~~
-~~172. Format line numbers on separate lines in Doc Index, Line Search, and Document Search responses for better readability --done~~
-~~173. Add context lines (before and after) to Document Search results for better readability --done~~
-~~174. Make filename links jump to specific line numbers and highlight matched lines in document viewer --done~~
-
 
 
 

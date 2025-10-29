@@ -385,14 +385,36 @@ async function updateUserEmail() {
 }
 
 async function showUserInfo() {
-  const email = getUserEmail();
-  if (email) {
-    const action = await secureConfirm(`Logged in as: ${email}\n\nClick OK to change email, Cancel to close.`);
-    if (action) {
-      await updateUserEmail();
+  try {
+    const sessionId = localStorage.getItem('sessionId');
+    const response = await fetch('http://localhost:3001/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${sessionId}` }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const user = data.user;
+      const action = await secureConfirm(`Logged in as: ${user.email}\nSubscription: ${user.subscriptionTier}\nRole: ${user.userRole}\n\nClick OK to go to User Management, Cancel to logout.`);
+      if (action) {
+        window.location.href = '/user-management.html';
+      } else {
+        await handleLogout();
+      }
+    } else {
+      window.location.href = '/user-management.html';
     }
-  } else {
-    await updateUserEmail();
+  } catch (error) {
+    window.location.href = '/user-management.html';
+  }
+}
+
+async function handleLogout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    showUserMessage('Logged out successfully', 'success');
+    localStorage.removeItem('userEmail');
+    window.location.reload();
+  } catch (error) {
+    showUserMessage('Logout failed', 'error');
   }
 }
 
@@ -647,6 +669,7 @@ if (typeof window !== 'undefined') {
   window.getUserRole = getUserRole;
   window.toggleMenu = toggleMenu;
   window.collectionsUtils = collectionsUtils;
+  window.handleLogout = handleLogout;
 }
 
 // Export functions for module imports
@@ -656,14 +679,35 @@ export { loadScoreModels, exportToDatabase };
 document.addEventListener('DOMContentLoaded', async function() {
   loadTheme();
   
-  // Check email first - handle async properly
-  const hasEmail = checkUserEmail();
-  if (!hasEmail) {
-    await promptForEmail();
+  // Check authentication status - require login
+  try {
+    const sessionId = localStorage.getItem('sessionId');
+    if (!sessionId) {
+      window.location.href = '/user-management.html';
+      return;
+    }
+    const response = await fetch('http://localhost:3001/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${sessionId}` }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const user = data.user;
+      // Set role from authenticated user
+      setUserRole(user.subscriptionTier);
+      // Store email for compatibility
+      localStorage.setItem('userEmail', user.email);
+    } else {
+      // Redirect to login if not authenticated
+      window.location.href = '/user-management.html';
+      return;
+    }
+  } catch (error) {
+    // Redirect to login on error
+    window.location.href = '/user-management.html';
+    return;
   }
   
   loadSharedComponents().then(() => {
     setupLoginIcon();
-    loadDeveloperMode();
   });
 });
