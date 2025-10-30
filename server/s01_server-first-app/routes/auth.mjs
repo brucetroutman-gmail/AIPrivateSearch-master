@@ -117,6 +117,10 @@ router.put('/users/:userId', requireAuth, async (req, res) => {
       }
     }
 
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No valid updates provided' });
+    }
+    
     const user = await userManager.updateUser(userId, updates);
     res.json({ success: true, user });
   } catch (error) {

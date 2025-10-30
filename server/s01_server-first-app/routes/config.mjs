@@ -20,22 +20,7 @@ router.post('/subscription-tier', async (req, res) => {
     
     await secureFs.writeFile(configPath, JSON.stringify(config, null, 2));
     
-    // Check if admin exists for new tier, create if needed
-    const { UserManager } = await import('../lib/auth/userManager.mjs');
-    const userManager = new UserManager();
-    const users = await userManager.loadUsers();
-    const adminExists = users.some(user => user.userRole === 'admin' && user.active);
-    
-    if (!adminExists) {
-      const tierNames = { 1: 'standard', 2: 'premium', 3: 'professional' };
-      const adminAccounts = {
-        1: { email: 'adm-std@a.com', password: '123' },
-        2: { email: 'adm-prem@a.com', password: '123' },
-        3: { email: 'adm-prof@a.com', password: '123' }
-      };
-      const admin = adminAccounts[tier];
-      await userManager.createUser(admin.email, admin.password, tierNames[tier], 'admin');
-    }
+
     
     res.json({ success: true });
   } catch (error) {
@@ -57,21 +42,26 @@ router.get('/files', async (req, res) => {
 
 // Get specific config file
 router.get('/:filename', async (req, res) => {
-  console.log('Config file request:', req.params.filename);
   try {
     const { filename } = req.params;
-    if (!filename.endsWith('.json')) {
-      console.log('Invalid file type:', filename);
-      return res.status(400).json({ error: 'Invalid file type' });
+    
+    // Validate filename to prevent path traversal
+    if (!filename || !filename.endsWith('.json') || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return res.status(400).json({ error: 'Invalid filename' });
     }
     
-    const filePath = path.join(process.cwd(), '../../client/c01_client-first-app/config', filename);
-    console.log('Reading file:', filePath);
+    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const filePath = path.join(configDir, filename);
+    
+    // Ensure the resolved path is within the config directory
+    if (!filePath.startsWith(configDir)) {
+      return res.status(400).json({ error: 'Invalid file path' });
+    }
+    
     const content = await secureFs.readFile(filePath, 'utf8');
     res.json({ content });
   } catch (error) {
-    console.log('Config file error:', error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'File not found' });
   }
 });
 
@@ -81,15 +71,23 @@ router.put('/:filename', async (req, res) => {
     const { filename } = req.params;
     const { content } = req.body;
     
-    if (!filename.endsWith('.json')) {
-      return res.status(400).json({ error: 'Invalid file type' });
+    // Validate filename to prevent path traversal
+    if (!filename || !filename.endsWith('.json') || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return res.status(400).json({ error: 'Invalid filename' });
     }
     
-    const filePath = path.join(process.cwd(), '../../client/c01_client-first-app/config', filename);
+    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const filePath = path.join(configDir, filename);
+    
+    // Ensure the resolved path is within the config directory
+    if (!filePath.startsWith(configDir)) {
+      return res.status(400).json({ error: 'Invalid file path' });
+    }
+    
     await secureFs.writeFile(filePath, content);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Write failed' });
   }
 });
 

@@ -16,7 +16,7 @@ import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
-import { UserManager } from './lib/auth/userManager.mjs';
+
 import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
@@ -100,30 +100,17 @@ app.use('/api/subscription', subscriptionRouter);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// Initialize default admin user
-async function initializeDefaultAdmin() {
-  const userManager = new UserManager();
-  try {
-    const users = await userManager.loadUsers();
-    if (users.length === 0) {
-      await userManager.createUser('adm-std@a.com', '123', 'standard', 'admin');
-      logger.log('Default admin user created: adm-std@a.com');
-    }
-  } catch (error) {
-    logger.log('Default admin user already exists or creation failed');
-  }
-}
+
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, async (err) => {
-  if (err) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Failed to start server:', err);
-    process.exit(1);
-  }
-  // logger sanitizes all inputs to prevent log injection
+const server = app.listen(PORT, () => {
   logger.log(`Server running on port ${PORT}`);
-  
-  // Initialize default admin user
-  await initializeDefaultAdmin();
+});
+
+server.on('error', (err) => {
+  logger.error('Server error:', err.message);
+  if (err.code === 'EADDRINUSE') {
+    logger.error(`Port ${PORT} is already in use`);
+  }
+  process.exit(1);
 });

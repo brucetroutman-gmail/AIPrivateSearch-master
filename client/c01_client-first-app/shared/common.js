@@ -1,4 +1,3 @@
-import { logger } from './utils/logger.js';
 import { DOMSanitizer } from './utils/domSanitizer.js';
 
 // Simple rate limiting
@@ -237,10 +236,7 @@ async function loadSharedComponents() {
     }
     
   } catch (error) {
-    if (typeof logger !== 'undefined') {
-      logger.error('Error loading shared components:', error);
-    }
-    throw error;
+    console.error('Error loading shared components:', error);
   }
 }
 
@@ -282,7 +278,7 @@ async function setUserRole(role) {
   
   try {
     const sessionId = localStorage.getItem('sessionId');
-    const response = await fetch('http://localhost:3001/api/config/subscription-tier', {
+    const response = await window.csrfManager.fetch('http://localhost:3001/api/config/subscription-tier', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -299,7 +295,7 @@ async function setUserRole(role) {
       showUserMessage('Failed to update subscription tier', 'error');
     }
   } catch (error) {
-    showUserMessage('Error updating subscription tier', 'error');
+    showUserMessage('Update failed', 'error');
   }
 }
 
@@ -418,7 +414,7 @@ async function handleLogout() {
   try {
     const sessionId = localStorage.getItem('sessionId');
     if (sessionId) {
-      await fetch('http://localhost:3001/api/auth/logout', { 
+      await window.csrfManager.fetch('http://localhost:3001/api/auth/logout', { 
         method: 'POST',
         headers: { 'Authorization': `Bearer ${sessionId}` }
       });
@@ -447,9 +443,7 @@ async function loadScoreModels(selectElementId) {
     const scoreSelect = document.getElementById(selectElementId);
     
     if (!scoreSelect) {
-      if (typeof logger !== 'undefined') {
-        logger.error('Score select element not found:', selectElementId);
-      }
+      console.error('Score select element not found:', selectElementId);
       return;
     }
     
@@ -494,9 +488,7 @@ async function loadScoreModels(selectElementId) {
       scoreSelect.appendChild(option);
     }
   } catch (error) {
-    if (typeof logger !== 'undefined') {
-      logger.error('Error loading score models:', error);
-    }
+    console.error('Error loading score models:', error);
     const selectEl = document.getElementById(selectElementId);
     if (selectEl) {
       while (selectEl.firstChild) {
@@ -527,14 +519,10 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       try {
         const date = new Date(result.createdAt);
         const formatted = date.toISOString().slice(0, 19).replace('T', ' ');
-        if (typeof logger !== 'undefined') {
-          logger.debug('CreatedAt formatting:', 'original:', result.createdAt, 'formatted:', formatted, 'length:', formatted.length);
-        }
+        console.debug('CreatedAt formatting:', 'original:', result.createdAt, 'formatted:', formatted, 'length:', formatted.length);
         return formatted;
       } catch (e) {
-        if (typeof logger !== 'undefined') {
-          logger.error('Date formatting error:', e);
-        }
+        console.error('Date formatting error:', e);
         return null;
       }
     })(),
@@ -591,25 +579,16 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       throw new Error(`Database error: ${saveResult.error} (Code: ${saveResult.code || 'unknown'})`);
     }
   } catch (error) {
-    if (typeof logger !== 'undefined') {
-      logger.error('Full database export error:', error);
-      logger.error('Error message:', error.message);
-      logger.error('Error stack:', error.stack);
-    }
+    console.error('Database export error:', error);
     
     // Retry on connection issues (common on M4 Macs)
     if (error.message && (error.message.includes('ECONNRESET') || error.message.includes('ECONNREFUSED')) && retryCount < 3) {
-      if (typeof logger !== 'undefined') {
-        logger.warn(`Database connection issue (${error.message.includes('ECONNREFUSED') ? 'refused' : 'reset'}), retrying... (attempt ${retryCount + 1})`);
-      }
+      console.warn(`Database connection issue, retrying... (attempt ${retryCount + 1})`);
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return exportToDatabase(result, testCategory, testDescription, testParams, retryCount + 1);
     }
     
     const errorMsg = error.message || error.toString() || 'Unknown database error';
-    if (typeof logger !== 'undefined') {
-      logger.error('Database export error:', errorMsg);
-    }
     throw new Error(errorMsg);
   }
 }
@@ -625,7 +604,7 @@ const collectionsUtils = {
       const data = await response.json();
       return data.collections || [];
     } catch (error) {
-      logger.error('Failed to load collections:', error);
+      console.error('Failed to load collections:', error);
       return [];
     }
   },
@@ -667,7 +646,7 @@ const collectionsUtils = {
         localStorage.setItem('selectedCollection', this.value);
       });
     } catch (error) {
-      logger.error('Failed to populate collection select:', error);
+      console.error('Failed to populate collection select:', error);
     }
   }
 };
@@ -705,7 +684,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       window.location.href = '/user-management.html';
       return;
     }
-    const response = await fetch('http://localhost:3001/api/auth/me', {
+    const response = await window.csrfManager.fetch('http://localhost:3001/api/auth/me', {
       headers: { 'Authorization': `Bearer ${sessionId}` }
     });
     if (response.ok) {

@@ -18,5 +18,25 @@
     "createdAt": "2025-10-29T17:00:16.395Z",
     "lastLogin": "2025-10-30T13:59:34.769Z",
     "active": true
+  },
+  {
+    "id": "c6d084c2-1e56-4ca0-b14d-8b19fd477b38",
+    "email": "adm-prem@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "premium",
+    "userRole": "admin",
+    "createdAt": "2025-10-30T20:00:00.000Z",
+    "lastLogin": null,
+    "active": true
+  },
+  {
+    "id": "d7e195d3-2f67-5db1-c25e-9c20ge588c49",
+    "email": "adm-prof@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "professional",
+    "userRole": "admin",
+    "createdAt": "2025-10-30T20:00:00.000Z",
+    "lastLogin": null,
+    "active": true
   }
 ]

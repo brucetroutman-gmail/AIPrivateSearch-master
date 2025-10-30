@@ -45,7 +45,12 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-## RECENTLY COMPLETED (v19.35)
+## RECENTLY COMPLETED (v19.36)
+~~188. Fix security vulnerabilities in common.js by implementing consistent CSRF protection and error handling --done~~
+~~189. Resolve path traversal vulnerabilities in config routes with proper input validation --done~~
+~~190. Move hardcoded admin credentials from code to users.json file for better security management --done~~
+
+## COMPLETED (v19.35)
 ~~185. Implement tier-based user isolation where admins only see users from their own subscription tier --done~~
 ~~186. Review application for dead and duplicate code using Amazon Q Security Scan --done~~
 ~~187. Resolve hardcoded credentials security issues by implementing proper .gitignore for sensitive data files --done~~
