@@ -4,20 +4,26 @@ const userManager = new UserManager();
 
 export async function requireAuth(req, res, next) {
   try {
+    console.log('Auth headers:', req.headers.authorization);
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
+    console.log('Extracted sessionId:', sessionId);
     
     if (!sessionId) {
+      console.log('No sessionId found');
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     const user = await userManager.validateSession(sessionId);
+    console.log('Validated user:', user ? user.email : 'null');
     if (!user) {
+      console.log('User validation failed');
       return res.status(401).json({ error: 'Invalid or expired session' });
     }
 
     req.user = user;
     next();
   } catch (error) {
+    console.log('Auth error:', error);
     res.status(500).json({ error: 'Authentication error' });
   }
 }

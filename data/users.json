@@ -1,12 +1,22 @@
 [
   {
     "id": "ad966ae1-0d42-43b8-ab9e-11b87d366a14",
-    "email": "aips@anywhere.co",
-    "passwordHash": "b9923fa2e7ea946ebe6249e27ffd061e20478cddad2f38b52b9dd2e5c926a681",
+    "email": "adm-std@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
     "subscriptionTier": "standard",
     "userRole": "admin",
     "createdAt": "2025-10-28T23:36:53.052Z",
-    "lastLogin": "2025-10-29T00:26:01.551Z",
+    "lastLogin": "2025-10-30T15:18:05.660Z",
+    "active": true
+  },
+  {
+    "id": "b5c973b1-f1b5-4ba9-a03c-7a08ec50c027",
+    "email": "search-std@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "standard",
+    "userRole": "searcher",
+    "createdAt": "2025-10-29T17:00:16.395Z",
+    "lastLogin": "2025-10-30T13:59:34.769Z",
     "active": true
   }
 ]

@@ -95,14 +95,27 @@ export class UserManager {
     return userWithoutPassword;
   }
 
+  async getTokenTimeout() {
+    try {
+      const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+      const configData = await secureFs.readFile(configPath, 'utf8');
+      const config = JSON.parse(configData);
+      return (config['bearer-token-timeout'] || 300) * 1000; // Convert seconds to milliseconds
+    } catch (error) {
+      return 300 * 1000; // Default 300 seconds if config fails
+    }
+  }
+
   async createSession(userId) {
     const sessions = await this.loadSessions();
     const sessionId = this.generateId();
     
+    const expirationTime = await this.getTokenTimeout();
+    
     sessions[sessionId] = {
       userId,
       createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + expirationTime).toISOString()
     };
 
     await this.saveSessions(sessions);
@@ -113,14 +126,32 @@ export class UserManager {
     const sessions = await this.loadSessions();
     const session = sessions[sessionId];
     
+    console.log('Session lookup:', sessionId, session ? 'found' : 'not found');
+    if (session) {
+      console.log('Session expires at:', session.expiresAt);
+      console.log('Current time:', new Date().toISOString());
+      console.log('Session expired?', new Date(session.expiresAt) < new Date());
+    }
+    
     if (!session || new Date(session.expiresAt) < new Date()) {
       return null;
     }
 
     const users = await this.loadUsers();
+    console.log('Looking for userId:', session.userId);
+    console.log('Available users:', users.map(u => ({ id: u.id, email: u.email, active: u.active })));
+    
     const user = users.find(u => u.id === session.userId && u.active);
     
+    console.log('User found for session:', user ? user.email : 'not found');
+    
     if (!user) {
+      const userById = users.find(u => u.id === session.userId);
+      if (userById) {
+        console.log('User exists but inactive:', userById.email, 'active:', userById.active);
+      } else {
+        console.log('No user found with ID:', session.userId);
+      }
       return null;
     }
 
@@ -149,10 +180,35 @@ export class UserManager {
 
     if (updates.subscriptionTier) user.subscriptionTier = updates.subscriptionTier;
     if (updates.userRole) user.userRole = updates.userRole;
+    if (typeof updates.isActive === 'boolean') user.active = updates.isActive;
+    if (updates.password) user.passwordHash = this.hashPassword(updates.password);
+    if (updates.email) user.email = updates.email;
     
     await this.saveUsers(users);
     
     const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  async deleteUser(userId) {
+    const users = await this.loadUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+
+    users.splice(userIndex, 1);
+    await this.saveUsers(users);
+    
+    // Also delete all sessions for this user
+    const sessions = await this.loadSessions();
+    const updatedSessions = {};
+    for (const [sessionId, session] of Object.entries(sessions)) {
+      if (session.userId !== userId) {
+        updatedSessions[sessionId] = session;
+      }
+    }
+    await this.saveSessions(updatedSessions);
   }
 }

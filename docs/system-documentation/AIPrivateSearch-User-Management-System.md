@@ -110,49 +110,46 @@ The AIPrivateSearch User Management System provides secure authentication, autho
 
 ## Getting Started
 
-### Step 1: Initial Setup
-```bash
-# Navigate to project directory
-cd /Users/Shared/AIPrivateSearch/repo/aiprivatesearch
+### Step 1: Automatic Setup
+The system automatically configures itself when you start the application:
 
-# Ensure data directory exists
-mkdir -p /Users/Shared/AIPrivateSearch/data
+```bash
+# Use the standard AIPrivateSearch startup
+# Navigate to /Users/Shared and double-click:
+load-aiss.command
 ```
 
-### Step 2: Default Admin User
-The system automatically creates a default admin user on first startup:
+**What happens automatically**:
+- Data directory created at `/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/data/`
+- Default admin user created on first server startup
+- Authentication system initialized
+- All dependencies installed and services started
+
+### Step 2: Default Admin Access
+**Pre-configured admin credentials** (ready to use immediately):
 - **Email**: `aips@anywhere.co`
 - **Password**: `aips!123`
 - **Subscription**: `standard`
 - **Role**: `admin`
 
-**Optional**: Create additional admin users using the script:
+### Step 3: First Login
+1. Navigate to `http://localhost:3000` (any page)
+2. System automatically redirects to user management for authentication
+3. Login with default admin credentials
+4. Access granted to full application
+
+### Step 4: User Management (Admin Only)
+- **Add Users**: Click "Add New User" in admin panel
+- **Manage Roles**: Change user roles (admin/searcher) via dropdown
+- **Subscription Tiers**: Assign standard/premium/professional tiers
+- **Navigation**: Use "Go to Application" button to return to main app
+
+### Step 5: Optional - Additional Admin Users
+Create additional admin users using the script:
 ```bash
-node server/s01_server-first-app/scripts/createAdminUser.mjs
+cd /Users/Shared/AIPrivateSearch/repo/aiprivatesearch/server/s01_server-first-app
+node scripts/createAdminUser.mjs
 ```
-
-### Step 3: Start Services
-```bash
-# Start backend server
-cd server/s01_server-first-app
-npm start
-
-# Start frontend (new terminal)
-cd client/c01_client-first-app
-npm start
-```
-
-### Step 4: Access User Management
-1. Navigate to `http://localhost:3000/user-management.html`
-2. Login with default admin credentials (`aips@anywhere.co` / `aips!123`)
-3. Create additional users as needed
-
-### Step 5: Application Integration
-- **Authentication Required**: All application pages now require login
-- **Automatic Redirect**: Unauthenticated users redirected to user-management page
-- **Session Persistence**: Login sessions persist across page navigation
-- **Dark Mode Support**: User management page respects app theme settings
-- **Navigation**: "Go to Application" button returns users to main app
 
 ## User Management Operations
 
@@ -264,6 +261,92 @@ export async function requireAuth(req, res, next) {
 - Automated user synchronization
 - Enhanced subscription management
 
+## Authentication Workflow Example
+
+### Scenario: Admin Login → Search → Manage Collections
+
+#### 1. Initial Access
+```
+User navigates to: http://localhost:3000/search.html
+↓
+No sessionId in localStorage
+↓
+Automatic redirect to: http://localhost:3000/user-management.html
+```
+
+#### 2. Admin Login
+```
+User enters credentials:
+- Email: aips@anywhere.co
+- Password: aips!123
+↓
+POST /api/auth/login
+{
+  "email": "aips@anywhere.co",
+  "password": "aips!123"
+}
+↓
+Server response:
+{
+  "success": true,
+  "user": {
+    "id": "uuid-123",
+    "email": "aips@anywhere.co",
+    "subscriptionTier": "standard",
+    "userRole": "admin"
+  },
+  "sessionId": "session-token-456"
+}
+↓
+Client stores sessionId in localStorage
+```
+
+#### 3. Navigate to Search Page
+```
+User clicks "Go to Application" or navigates to search.html
+↓
+common.js checks authentication:
+GET /api/auth/me
+Headers: { "Authorization": "Bearer session-token-456" }
+↓
+Server validates session and returns user data
+↓
+Search page loads with admin privileges
+```
+
+#### 4. Access Collections Management
+```
+User navigates to collections.html
+↓
+Same authentication check with stored sessionId
+↓
+Admin role grants full access to:
+- Create/edit collections
+- Manage document indexes
+- Modify embeddings
+- All collection management features
+```
+
+#### 5. Session Persistence
+```
+All subsequent page navigation:
+- sessionId remains in localStorage
+- Authorization header sent with every API request
+- No re-login required until session expires (24 hours)
+- Logout clears sessionId and redirects to user-management
+```
+
+### Authentication Headers in Action
+```javascript
+// Every authenticated API request includes:
+fetch('http://localhost:3001/api/collections', {
+  headers: {
+    'Authorization': 'Bearer session-token-456',
+    'Content-Type': 'application/json'
+  }
+})
+```
+
 ---
 
-**Version**: 19.33 | **Last Updated**: 2024-10-28 | **Status**: Phase 1 Complete - Authorization System Implemented
+**Version**: 19.34 | **Last Updated**: 2024-10-28 | **Status**: Phase 1 Complete - Authorization System Implemented

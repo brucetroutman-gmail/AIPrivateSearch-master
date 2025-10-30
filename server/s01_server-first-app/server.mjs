@@ -11,6 +11,7 @@ import documentsRouter from './routes/documents.mjs';
 import configRouter from './routes/config.mjs';
 import sentenceTransformersRouter from './routes/sentenceTransformers.mjs';
 import authRouter from './routes/auth.mjs';
+import subscriptionRouter from './routes/subscription.mjs';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
@@ -91,9 +92,10 @@ app.use('/api/multi-search', validateOrigin, multiSearchRouter);
 app.use('/api/models', validateOrigin, validateCSRFToken, modelsRouter);
 app.use('/api/database', validateOrigin, validateCSRFToken, databaseRouter);
 app.use('/api/documents', validateOrigin, documentsRouter);
-app.use('/api/config', validateOrigin, validateCSRFToken, configRouter);
+app.use('/api/config', validateOrigin, configRouter);
 app.use('/api/sentence-transformers', sentenceTransformersRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/auth', validateOrigin, authRouter);
+app.use('/api/subscription', subscriptionRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
@@ -104,8 +106,8 @@ async function initializeDefaultAdmin() {
   try {
     const users = await userManager.loadUsers();
     if (users.length === 0) {
-      await userManager.createUser('aips@anywhere.co', 'aips!123', 'standard', 'admin');
-      logger.log('Default admin user created: aips@anywhere.co');
+      await userManager.createUser('adm-std@a.com', '123', 'standard', 'admin');
+      logger.log('Default admin user created: adm-std@a.com');
     }
   } catch (error) {
     logger.log('Default admin user already exists or creation failed');

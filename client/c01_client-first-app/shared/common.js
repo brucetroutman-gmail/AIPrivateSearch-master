@@ -184,15 +184,21 @@ async function loadAppConfig() {
 
 // Load version from API
 async function loadVersion() {
+  const versionEl = document.getElementById('version-display');
+  if (versionEl) {
+    versionEl.textContent = '(loading...)';
+  }
+  
   try {
     const response = await fetch('http://localhost:3001/api/version');
     const data = await response.json();
-    const versionEl = document.getElementById('version-display');
     if (versionEl && data.version) {
       versionEl.textContent = `(v${data.version})`;
     }
   } catch (error) {
-    // Silently fail - version display is not critical
+    if (versionEl) {
+      versionEl.textContent = '(version unavailable)';
+    }
   }
 }
 
@@ -261,20 +267,40 @@ function toggleMenu() {
 }
 
 // Role-based system
-function setUserRole(role) {
+async function setUserRole(role) {
   const validRoles = ['standard', 'premium', 'professional'];
   if (!validRoles.includes(role)) return;
   
-  localStorage.setItem('userRole', role);
-  applyUserRole(role);
+  const currentRole = getUserRole();
+  if (currentRole === role) {
+    showUserMessage(`Already on ${role} tier`, 'info');
+    return;
+  }
   
-  const roleNames = {
-    'standard': 'Standard',
-    'premium': 'Premium', 
-    'professional': 'Professional'
-  };
+  const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
+  const tier = tierMap[role];
   
-  showUserMessage(`Role set to ${roleNames[role]}`, 'info');
+  try {
+    const sessionId = localStorage.getItem('sessionId');
+    const response = await fetch('http://localhost:3001/api/config/subscription-tier', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionId}`
+      },
+      body: JSON.stringify({ tier })
+    });
+    
+    if (response.ok) {
+      localStorage.setItem('userRole', role);
+      showUserMessage(`Subscription tier changed to ${role}. Logging out...`, 'success');
+      setTimeout(() => handleLogout(), 1500);
+    } else {
+      showUserMessage('Failed to update subscription tier', 'error');
+    }
+  } catch (error) {
+    showUserMessage('Error updating subscription tier', 'error');
+  }
 }
 
 function getUserRole() {
@@ -385,34 +411,22 @@ async function updateUserEmail() {
 }
 
 async function showUserInfo() {
-  try {
-    const sessionId = localStorage.getItem('sessionId');
-    const response = await fetch('http://localhost:3001/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${sessionId}` }
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const user = data.user;
-      const action = await secureConfirm(`Logged in as: ${user.email}\nSubscription: ${user.subscriptionTier}\nRole: ${user.userRole}\n\nClick OK to go to User Management, Cancel to logout.`);
-      if (action) {
-        window.location.href = '/user-management.html';
-      } else {
-        await handleLogout();
-      }
-    } else {
-      window.location.href = '/user-management.html';
-    }
-  } catch (error) {
-    window.location.href = '/user-management.html';
-  }
+  window.location.href = '/user-management.html';
 }
 
 async function handleLogout() {
   try {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    showUserMessage('Logged out successfully', 'success');
+    const sessionId = localStorage.getItem('sessionId');
+    if (sessionId) {
+      await fetch('http://localhost:3001/api/auth/logout', { 
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${sessionId}` }
+      });
+    }
+    localStorage.removeItem('sessionId');
     localStorage.removeItem('userEmail');
-    window.location.reload();
+    showUserMessage('Logged out successfully', 'success');
+    window.location.href = '/user-management.html';
   } catch (error) {
     showUserMessage('Logout failed', 'error');
   }
@@ -670,6 +684,11 @@ if (typeof window !== 'undefined') {
   window.toggleMenu = toggleMenu;
   window.collectionsUtils = collectionsUtils;
   window.handleLogout = handleLogout;
+  window.testLogout = () => {
+    if (confirm('Logout for testing?')) {
+      handleLogout();
+    }
+  };
 }
 
 // Export functions for module imports

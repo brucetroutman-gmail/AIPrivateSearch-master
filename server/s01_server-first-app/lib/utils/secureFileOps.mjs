@@ -13,16 +13,16 @@ function getAppConfig() {
         try {
             if (fs.existsSync(configPath)) {
                 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-                console.log(`[SecureFileOps] Loaded config from: ${configPath}`);
+                // Config loaded successfully
                 return config;
             }
         } catch (error) {
-            console.warn(`[SecureFileOps] Failed to load config from ${configPath}:`, error.message);
+            // Failed to load config from this path
             continue;
         }
     }
     
-    console.log(`[SecureFileOps] Using default config - no config file found`);
+    // Using default config
     return {
         'app-name': 'AI Private Search',
         'sources-location': '/Users/Shared/AIPrivateSearch/sources'

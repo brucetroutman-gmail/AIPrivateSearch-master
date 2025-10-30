@@ -29,8 +29,8 @@ Phase 2 - SecureAccess Integration:
 - Handle license validation and computer limits
 
 Phase 3 - Role-Based Feature Control:
-- Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters, send code email every 2 weeks
-- Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, send code email monthly
+- Standard: Free 4 months then $49/yr, 1 computer, admin/searcher roles only, menu: search, multi-mode, manage collections, options/dark mode, admin can add users, cannot modify doc index cards, can change search models but not parameters, cannot change score model/parameters
+- Premium: $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards, 
 - Professional: $2999 license, all menu items, no code emails, full access
 
 148. Create user database schema and authentication system (prerequisite for task 133)
@@ -45,14 +45,19 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
+## RECENTLY COMPLETED (v19.35)
+~~185. Implement tier-based user isolation where admins only see users from their own subscription tier --done~~
+~~186. Review application for dead and duplicate code using Amazon Q Security Scan --done~~
+~~187. Resolve hardcoded credentials security issues by implementing proper .gitignore for sensitive data files --done~~
 
-## RECENTLY COMPLETED (v19.34)
+## COMPLETED (v19.34)
 ~~178. Implement Bearer token authentication system replacing cookie-based auth to resolve CORS issues --done~~
 ~~179. Create complete user management system with admin/searcher roles and subscription tiers (standard/premium/professional) --done~~
 ~~180. Add automatic default admin user creation (aips@anywhere.co / aips!123) on server startup --done~~
 ~~181. Integrate user management UI with dark mode support and navigation between app and user management --done~~
 ~~182. Replace alert() security risks with secure DOM-based messaging system --done~~
 ~~183. Update AIPrivateSearch-User-Management-System.md with comprehensive authorization strategy documentation --done~~
+~~184. Fix version display in header showing v18.01 instead of current v19.34 --done~~
 
 ## COMPLETED (v19.33)
 ~~175. Fix security linting errors by replacing unsafe innerHTML assignments with secure DOM methods --done~~

@@ -76,8 +76,6 @@ for model in $REQUIRED_MODELS; do
     fi
 done
 
-# Removed verbose model update message
-
 # Track if we updated any models
 MODELS_UPDATED=false
 
