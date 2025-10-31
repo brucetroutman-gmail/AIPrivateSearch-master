@@ -39,11 +39,12 @@ function validatePath(filePath) {
     const normalizedPath = path.normalize(filePath);
     const resolvedPath = path.resolve(normalizedPath);
     
-    // Allow paths under the aiprivatesearch project directory and sources directory
+    // Allow paths under the aiprivatesearch project directory, sources directory, and data directory
     const config = getAppConfig();
     const allowedRoots = [
         '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch',
-        config['sources-location']
+        config['sources-location'],
+        '/Users/Shared/AIPrivateSearch/data'
     ];
     
     for (const root of allowedRoots) {

@@ -65,6 +65,23 @@ else
     echo "   ⚠️  Sources directory not found at /Users/Shared/AIPrivateSearch/sources/"
 fi
 
+# Copy data to repo
+echo "📁 Copying data to repo..."
+if [ -d "/Users/Shared/AIPrivateSearch/data" ]; then
+    # Remove existing data in repo (except .gitignore)
+    if [ -d "data" ]; then
+        find data -type f ! -name '.gitignore' -delete 2>/dev/null || true
+    else
+        mkdir -p data
+    fi
+    
+    # Copy data files from shared location to repo
+    cp "/Users/Shared/AIPrivateSearch/data/"*.json data/ 2>/dev/null || true
+    echo "   ✅ Data files copied from /Users/Shared/AIPrivateSearch/data/"
+else
+    echo "   ⚠️  Data directory not found at /Users/Shared/AIPrivateSearch/data/"
+fi
+
 # Generate commit message
 echo ""
 echo "🎯 Release $NEW_VERSION prepared!"

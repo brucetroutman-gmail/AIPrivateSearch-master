@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIPrivateSearch Test Results Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        textarea { height: 100px; resize: vertical; }
+        button { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #005a87; }
+        .test-phase { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #007cba; }
+        .status-pass { color: #28a745; font-weight: bold; }
+        .status-fail { color: #dc3545; font-weight: bold; }
+        .status-pending { color: #ffc107; font-weight: bold; }
+        .results-display { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AIPrivateSearch Test Results Tracker</h1>
+        
+        <div class="form-group">
+            <label for="testerEmail">Tester Email:</label>
+            <input type="email" id="testerEmail" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="testTitle">Test Title:</label>
+            <input type="text" id="testTitle" value="user-auth-test" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Mac Serial Number: <span id="macSerial">Loading...</span></label>
+        </div>
+        
+        <div class="form-group">
+            <label>Test Date/Time: <span id="testDateTime"></span></label>
+        </div>
+
+        <div class="test-phase">
+            <h3>Phase 1: Admin Login Testing</h3>
+            <div class="form-group">
+                <label for="phase1Status">Status:</label>
+                <select id="phase1Status">
+                    <option value="pending">Pending</option>
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phase1Comments">Comments:</label>
+                <textarea id="phase1Comments" placeholder="Test results and observations..."></textarea>
+            </div>
+        </div>
+
+        <div class="test-phase">
+            <h3>Phase 2: User Creation Testing</h3>
+            <div class="form-group">
+                <label for="phase2Status">Status:</label>
+                <select id="phase2Status">
+                    <option value="pending">Pending</option>
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phase2Comments">Comments:</label>
+                <textarea id="phase2Comments" placeholder="Test results and observations..."></textarea>
+            </div>
+        </div>
+
+        <div class="test-phase">
+            <h3>Phase 3: Feature Access Testing</h3>
+            <div class="form-group">
+                <label for="phase3Status">Status:</label>
+                <select id="phase3Status">
+                    <option value="pending">Pending</option>
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phase3Comments">Comments:</label>
+                <textarea id="phase3Comments" placeholder="Test results and observations..."></textarea>
+            </div>
+        </div>
+
+        <div class="test-phase">
+            <h3>Phase 4: Cross-Tier Isolation Testing</h3>
+            <div class="form-group">
+                <label for="phase4Status">Status:</label>
+                <select id="phase4Status">
+                    <option value="pending">Pending</option>
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phase4Comments">Comments:</label>
+                <textarea id="phase4Comments" placeholder="Test results and observations..."></textarea>
+            </div>
+        </div>
+
+        <div class="test-phase">
+            <h3>Phase 5: Error Handling Testing</h3>
+            <div class="form-group">
+                <label for="phase5Status">Status:</label>
+                <select id="phase5Status">
+                    <option value="pending">Pending</option>
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phase5Comments">Comments:</label>
+                <textarea id="phase5Comments" placeholder="Test results and observations..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="overallComments">Overall Test Comments:</label>
+            <textarea id="overallComments" placeholder="General observations, issues, recommendations..."></textarea>
+        </div>
+
+        <button onclick="saveResults()">Save Test Results</button>
+        <button onclick="loadResults()">Load Previous Results</button>
+        <button onclick="exportResults()">Export Results</button>
+
+        <div id="resultsDisplay" class="results-display hidden">
+            <h3>Saved Results</h3>
+            <pre id="resultsContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            getMacSerial();
+            setInterval(updateDateTime, 1000);
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('testDateTime').textContent = now.toLocaleString();
+        }
+
+        async function getMacSerial() {
+            try {
+                const response = await fetch('/api/system-info');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('macSerial').textContent = data.serialNumber || 'Unable to retrieve';
+                } else {
+                    document.getElementById('macSerial').textContent = 'TEST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                }
+            } catch (error) {
+                document.getElementById('macSerial').textContent = 'TEST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            }
+        }
+
+        function collectTestData() {
+            const macSerial = document.getElementById('macSerial').textContent;
+            const testerEmail = document.getElementById('testerEmail').value;
+            const testTitle = document.getElementById('testTitle').value;
+            
+            if (!testerEmail || !testTitle) {
+                alert('Please enter tester email and test title');
+                return null;
+            }
+
+            return {
+                testSession: {
+                    testTitle: testTitle,
+                    testerEmail: testerEmail,
+                    macSerial: macSerial,
+                    testDateTime: new Date().toISOString(),
+                    testDateTimeLocal: new Date().toLocaleString()
+                },
+                testResults: {
+                    phase1: {
+                        name: "Admin Login Testing",
+                        status: document.getElementById('phase1Status').value,
+                        comments: document.getElementById('phase1Comments').value
+                    },
+                    phase2: {
+                        name: "User Creation Testing", 
+                        status: document.getElementById('phase2Status').value,
+                        comments: document.getElementById('phase2Comments').value
+                    },
+                    phase3: {
+                        name: "Feature Access Testing",
+                        status: document.getElementById('phase3Status').value,
+                        comments: document.getElementById('phase3Comments').value
+                    },
+                    phase4: {
+                        name: "Cross-Tier Isolation Testing",
+                        status: document.getElementById('phase4Status').value,
+                        comments: document.getElementById('phase4Comments').value
+                    },
+                    phase5: {
+                        name: "Error Handling Testing",
+                        status: document.getElementById('phase5Status').value,
+                        comments: document.getElementById('phase5Comments').value
+                    }
+                },
+                overallComments: document.getElementById('overallComments').value,
+                overallStatus: calculateOverallStatus()
+            };
+        }
+
+        function calculateOverallStatus() {
+            const phases = ['phase1Status', 'phase2Status', 'phase3Status', 'phase4Status', 'phase5Status'];
+            const statuses = phases.map(id => document.getElementById(id).value);
+            
+            if (statuses.includes('fail')) return 'fail';
+            if (statuses.includes('pending')) return 'pending';
+            return 'pass';
+        }
+
+        async function saveResults() {
+            const testData = collectTestData();
+            if (!testData) return;
+
+            const fileName = `${testData.testSession.testTitle}-results.json`;
+            
+            try {
+                const response = await fetch('/api/save-test-results', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileName, data: testData })
+                });
+
+                if (response.ok) {
+                    alert('Test results saved to: ' + fileName);
+                    displayResults(testData);
+                } else {
+                    throw new Error('Server save failed');
+                }
+            } catch (error) {
+                const key = `test-results-${testData.testSession.macSerial}-${Date.now()}`;
+                localStorage.setItem(key, JSON.stringify(testData));
+                alert('Results saved locally (server unavailable)');
+                displayResults(testData);
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('resultsContent').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('resultsDisplay').classList.remove('hidden');
+        }
+
+        function exportResults() {
+            const testData = collectTestData();
+            if (!testData) return;
+
+            const dataStr = JSON.stringify(testData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${testData.testSession.testTitle}-results.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        async function loadResults() {
+            try {
+                const response = await fetch('/api/test-results');
+                if (response.ok) {
+                    const results = await response.json();
+                    displayResults(results);
+                }
+            } catch (error) {
+                const localResults = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('test-results-')) {
+                        localResults.push(JSON.parse(localStorage.getItem(key)));
+                    }
+                }
+                displayResults(localResults);
+            }
+        }
+    </script>
+</body>
+</html>

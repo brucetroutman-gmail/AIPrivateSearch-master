@@ -12,6 +12,7 @@ import configRouter from './routes/config.mjs';
 import sentenceTransformersRouter from './routes/sentenceTransformers.mjs';
 import authRouter from './routes/auth.mjs';
 import subscriptionRouter from './routes/subscription.mjs';
+import testResultsRouter from './routes/testResults.mjs';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
@@ -96,6 +97,7 @@ app.use('/api/config', validateOrigin, configRouter);
 app.use('/api/sentence-transformers', sentenceTransformersRouter);
 app.use('/api/auth', validateOrigin, authRouter);
 app.use('/api/subscription', subscriptionRouter);
+app.use('/api', testResultsRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

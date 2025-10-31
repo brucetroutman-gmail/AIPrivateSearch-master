@@ -100,6 +100,22 @@ else
     echo "✅ .env file found in /Users/Shared/AIPrivateSearch"
 fi
 
+# Check for data files in /Users/Shared/AIPrivateSearch/data
+if [ ! -f /Users/Shared/AIPrivateSearch/data/users.json ]; then
+    echo "📁 Creating user data files in /Users/Shared/AIPrivateSearch/data..."
+    mkdir -p /Users/Shared/AIPrivateSearch/data
+    if [ -f "../../data/users.json" ]; then
+        cp "../../data/users.json" "/Users/Shared/AIPrivateSearch/data/"
+        echo "   ✅ users.json copied to shared location"
+    fi
+    if [ -f "../../data/sessions.json" ]; then
+        cp "../../data/sessions.json" "/Users/Shared/AIPrivateSearch/data/"
+        echo "   ✅ sessions.json copied to shared location"
+    fi
+else
+    echo "✅ User data files found in /Users/Shared/AIPrivateSearch/data"
+fi
+
 # Always ensure dependencies are installed
 if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
     echo "📦 Installing server dependencies..."

@@ -5,8 +5,8 @@ import { USER_DEFAULTS } from './userDefaults.mjs';
 
 export class UserManager {
   constructor() {
-    this.usersFile = '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/data/users.json';
-    this.sessionsFile = '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/data/sessions.json';
+    this.usersFile = '/Users/Shared/AIPrivateSearch/data/users.json';
+    this.sessionsFile = '/Users/Shared/AIPrivateSearch/data/sessions.json';
     this.ensureDataDirectory();
   }
 

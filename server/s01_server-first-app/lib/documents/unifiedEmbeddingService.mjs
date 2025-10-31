@@ -4,9 +4,10 @@ import { modelConfig } from '../utils/modelConfig.mjs';
 import crypto from 'crypto';
 import path from 'path';
 
+// Per-Collection Embedding Service - manages individual databases for each collection
 export class UnifiedEmbeddingService {
   constructor() {
-    this.dbs = new Map(); // Cache for collection databases
+    this.dbs = new Map(); // Cache for per-collection databases
     this.initialized = new Set(); // Track initialized collections
   }
   
@@ -23,13 +24,13 @@ export class UnifiedEmbeddingService {
   }
 
   async setupDatabase(collection) {
-    console.log(`[UnifiedEmbeddingService] Setting up database for collection: ${collection}`);
+    console.log(`[PerCollectionEmbeddingService] Setting up database for collection: ${collection}`);
     
     if (!this.initialized.has(collection)) {
       const db = await this.getCollectionDb(collection);
       await db.init();
       this.initialized.add(collection);
-      console.log(`[UnifiedEmbeddingService] Database initialized for collection: ${collection}`);
+      console.log(`[PerCollectionEmbeddingService] Database initialized for collection: ${collection}`);
     }
     
     const db = await this.getCollectionDb(collection);

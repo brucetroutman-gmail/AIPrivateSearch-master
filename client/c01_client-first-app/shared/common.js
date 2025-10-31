@@ -164,17 +164,33 @@ async function loadAppConfig() {
     const logoEl = document.getElementById('app-logo');
     if (logoEl && config['app-name']) {
       const versionSpan = logoEl.querySelector('.version');
-      const versionText = versionSpan ? versionSpan.outerHTML : '';
+      const tierSpan = logoEl.querySelector('.tier');
+      
       // Clear existing content safely
       while (logoEl.firstChild) {
         logoEl.removeChild(logoEl.firstChild);
       }
+      
       // Add app name as text node
       logoEl.appendChild(document.createTextNode(config['app-name'] + ' '));
+      
       // Re-add version span if it existed
       if (versionSpan) {
         logoEl.appendChild(versionSpan);
       }
+      
+      // Add tier display
+      if (!tierSpan) {
+        const newTierSpan = document.createElement('span');
+        newTierSpan.className = 'tier';
+        newTierSpan.id = 'tier-display';
+        logoEl.appendChild(newTierSpan);
+      } else {
+        logoEl.appendChild(tierSpan);
+      }
+      
+      // Update tier display
+      updateTierDisplay();
     }
   } catch (error) {
     // Silently fail - app config is not critical
@@ -201,6 +217,17 @@ async function loadVersion() {
   }
 }
 
+// Update tier display
+function updateTierDisplay() {
+  const tierEl = document.getElementById('tier-display');
+  if (tierEl) {
+    const role = getUserRole();
+    const tierMap = { 'standard': '1', 'premium': '2', 'professional': '3' };
+    const tierNumber = tierMap[role] || '?';
+    tierEl.textContent = ` - ${tierNumber}`;
+  }
+}
+
 // Load shared header and footer
 async function loadSharedComponents() {
   try {
@@ -218,6 +245,7 @@ async function loadSharedComponents() {
         // Load app config and version after header is loaded
         loadAppConfig();
         loadVersion();
+        updateTierDisplay();
       }
     }
     
@@ -289,6 +317,7 @@ async function setUserRole(role) {
     
     if (response.ok) {
       localStorage.setItem('userRole', role);
+      updateTierDisplay(); // Update tier display immediately
       showUserMessage(`Subscription tier changed to ${role}. Logging out...`, 'success');
       setTimeout(() => handleLogout(), 1500);
     } else {

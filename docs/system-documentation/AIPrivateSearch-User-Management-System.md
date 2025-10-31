@@ -148,7 +148,7 @@ load-aiss.command
 Create additional admin users using the script:
 ```bash
 cd /Users/Shared/AIPrivateSearch/repo/aiprivatesearch/server/s01_server-first-app
-node scripts/createAdminUser.mjs
+# Admin users are pre-configured in data/users.json
 ```
 
 ## User Management Operations
@@ -220,13 +220,58 @@ export async function requireAuth(req, res, next) {
 ### File Locations
 - User data: `/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/data/users.json`
 - Session data: `/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/data/sessions.json`
-- Admin script: `server/s01_server-first-app/scripts/createAdminUser.mjs`
+- Admin users: Pre-configured in `data/users.json`
 
 ### Security Best Practices
 - **Change Default Credentials**: Update default admin password immediately
 - **HTTPS in Production**: Use secure connections for token transmission
 - **Regular Audits**: Review user access levels and session activity
 - **Token Security**: Tokens stored in localStorage (not sessionStorage for persistence)
+
+## Test Results Tracking System
+
+### Overview
+Integrated test results tracking system for comprehensive user management testing across all subscription tiers and user roles.
+
+### Test Results Tracker
+**Location**: `http://localhost:3000/test-results/test-results-tracker.html`
+
+**Features**:
+- Automated Mac serial number detection
+- Tester identification via email
+- Real-time timestamp recording
+- Structured test phase tracking (5 phases)
+- JSON file storage with descriptive naming
+
+### Test Data Structure
+```json
+{
+  "testSession": {
+    "testTitle": "user-auth-test",
+    "testerEmail": "tester@example.com",
+    "macSerial": "C02XY1234567",
+    "testDateTime": "2024-10-28T15:30:00.000Z",
+    "testDateTimeLocal": "10/28/2024, 3:30:00 PM"
+  },
+  "testResults": {
+    "phase1": {
+      "name": "Admin Login Testing",
+      "status": "pass",
+      "comments": "All tier admin logins successful"
+    }
+  },
+  "overallStatus": "pass"
+}
+```
+
+### Storage and Retrieval
+- **Server Storage**: `/test-results/{testTitle}-results.json`
+- **API Endpoints**: 
+  - `GET /api/system-info` - Mac serial detection
+  - `POST /api/save-test-results` - Save test results
+  - `GET /api/test-results` - Retrieve all results
+- **Local Fallback**: localStorage if server unavailable
+- **Export**: Downloadable JSON files
 
 ## Future Enhancements
 
@@ -254,6 +299,9 @@ export async function requireAuth(req, res, next) {
 - Automatic default admin user creation
 - Session management with 24-hour expiration
 - Cross-page authentication integration
+- **Test results tracking system with Mac serial detection**
+- **Comprehensive test plan with 5-phase validation**
+- **Automated test data storage and retrieval**
 
 ### 🔄 Next Phase: SecureAccess Integration
 - External API connection to SecureAccess
@@ -349,4 +397,4 @@ fetch('http://localhost:3001/api/collections', {
 
 ---
 
-**Version**: 19.34 | **Last Updated**: 2024-10-28 | **Status**: Phase 1 Complete - Authorization System Implemented
+**Version**: 19.36 | **Last Updated**: 2024-10-28 | **Status**: Phase 1 Complete - Authorization System + Test Tracking Implemented

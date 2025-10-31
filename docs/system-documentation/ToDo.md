@@ -45,10 +45,25 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-## RECENTLY COMPLETED (v19.36)
+~~196. Analyze data folder and unified_embeddings.db usage - determined system uses per-collection databases, not unified --done~~ 
+
+## RECENTLY COMPLETED (v19.37)
 ~~188. Fix security vulnerabilities in common.js by implementing consistent CSRF protection and error handling --done~~
 ~~189. Resolve path traversal vulnerabilities in config routes with proper input validation --done~~
 ~~190. Move hardcoded admin credentials from code to users.json file for better security management --done~~
+~~191. Complete comprehensive security review and validation - all security-check.sh tests passing --done~~
+~~192. Create AIPrivateSearch-User-Test-Plan.md with comprehensive testing procedures for all tiers and roles --done~~
+~~193. Create test results tracking system with tester email, Mac serial number, and JSON storage --done~~
+~~194. Create step-by-step user-auth-testing-guide.md with detailed testing procedures --done~~
+~~195. Add subscription tier number display to app title for tester visibility --done~~
+~~196. Analyze data folder and unified_embeddings.db usage - determined system uses per-collection databases, not unified --done~~
+~~197. Implement data folder cleanup recommendations - removed unused unified databases and duplicates --done~~
+~~198. Create /Users/Shared/AIPrivateSearch/data directory and update application to use shared data files --done~~
+~~199. Fix login issue - secureFileOps was blocking access to shared data directory --done~~
+~~200. Add data folder copying to release script following same pattern as sources folder --done~~
+~~201. Update README.md to document data folder copying in release command --done~~
+
+## COMPLETED (v19.36)
 
 ## COMPLETED (v19.35)
 ~~185. Implement tier-based user isolation where admins only see users from their own subscription tier --done~~

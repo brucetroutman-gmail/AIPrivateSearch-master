@@ -6,17 +6,7 @@
     "subscriptionTier": "standard",
     "userRole": "admin",
     "createdAt": "2025-10-28T23:36:53.052Z",
-    "lastLogin": "2025-10-30T15:18:05.660Z",
-    "active": true
-  },
-  {
-    "id": "b5c973b1-f1b5-4ba9-a03c-7a08ec50c027",
-    "email": "search-std@a.com",
-    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-    "subscriptionTier": "standard",
-    "userRole": "searcher",
-    "createdAt": "2025-10-29T17:00:16.395Z",
-    "lastLogin": "2025-10-30T13:59:34.769Z",
+    "lastLogin": "2025-10-31T13:22:27.224Z",
     "active": true
   },
   {
@@ -26,7 +16,7 @@
     "subscriptionTier": "premium",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": null,
+    "lastLogin": "2025-10-30T20:20:42.292Z",
     "active": true
   },
   {

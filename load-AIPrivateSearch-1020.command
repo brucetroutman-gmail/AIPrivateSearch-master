@@ -250,6 +250,11 @@ if [ ! -d "AIPrivateSearch/sources" ]; then
     mkdir -p AIPrivateSearch/sources
 fi
 
+if [ ! -d "AIPrivateSearch/data" ]; then
+    echo "📁 Creating AIPrivateSearch/data directory..."
+    mkdir -p AIPrivateSearch/data
+fi
+
 # Change to AIPrivateSearch/repo directory
 cd AIPrivateSearch/repo
 echo "📂 Changed to: $(pwd)"
@@ -310,6 +315,21 @@ if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
                 echo "📁 Copying sample documents to sources folder..."
                 cp -r "aiprivatesearch/sources/local-documents" "/Users/Shared/AIPrivateSearch/sources/"
                 echo "   ✅ Sample documents copied"
+            fi
+        fi
+        
+        # Check and copy data files if needed
+        if [ ! -f "/Users/Shared/AIPrivateSearch/data/users.json" ]; then
+            if [ -f "aiprivatesearch/data/users.json" ]; then
+                echo "📁 Copying user data files to data folder..."
+                cp "aiprivatesearch/data/users.json" "/Users/Shared/AIPrivateSearch/data/"
+                echo "   ✅ User data files copied"
+            fi
+        fi
+        
+        if [ ! -f "/Users/Shared/AIPrivateSearch/data/sessions.json" ]; then
+            if [ -f "aiprivatesearch/data/sessions.json" ]; then
+                cp "aiprivatesearch/data/sessions.json" "/Users/Shared/AIPrivateSearch/data/"
             fi
         fi
         
