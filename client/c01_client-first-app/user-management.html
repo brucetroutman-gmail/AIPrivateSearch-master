@@ -59,7 +59,7 @@
                 <div class="profile-form">
                     <div class="form-group">
                         <label>Email:</label>
-                        <input type="email" id="profileEmail" readonly>
+                        <input type="email" id="profileEmail">
                     </div>
                     <div class="form-group">
                         <label>New Password:</label>
@@ -199,6 +199,7 @@
                     if (response.ok) {
                         const data = await response.json();
                         this.currentUser = data.user;
+                        // If user is authenticated, go directly to dashboard
                         this.showDashboard();
                     } else {
                         this.showLogin();
@@ -248,7 +249,8 @@
                 const userRole = document.getElementById('registerUserRole').value;
                 
                 try {
-                    const response = await fetch('http://localhost:3001/api/auth/register', {
+                    const { default: AuthUtils } = await import('./shared/utils/authUtils.js');
+                    const response = await AuthUtils.authenticatedFetch('http://localhost:3001/api/auth/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password, userRole })
@@ -263,6 +265,7 @@
                         showMessage(data.error || 'Registration failed');
                     }
                 } catch (error) {
+                    if (error.message === 'Session expired') return;
                     showMessage('Registration failed');
                 }
             }
@@ -465,31 +468,44 @@
             }
             
             async updateProfile() {
+                const email = document.getElementById('profileEmail').value;
                 const password = document.getElementById('profilePassword').value;
                 
-                if (!password) {
-                    showMessage('Please enter a new password to update', 'error');
+                if (!email && !password) {
+                    showMessage('Please enter email or password to update', 'error');
                     return;
                 }
                 
                 try {
-                    const sessionId = localStorage.getItem('sessionId');
-                    const response = await fetch(`http://localhost:3001/api/auth/users/${this.currentUser.id}`, {
+                    const updates = {};
+                    if (email && email !== this.currentUser.email) updates.email = email;
+                    if (password) updates.password = password;
+                    
+                    if (Object.keys(updates).length === 0) {
+                        showMessage('No changes to update', 'info');
+                        return;
+                    }
+                    
+                    const { default: AuthUtils } = await import('./shared/utils/authUtils.js');
+                    const response = await AuthUtils.authenticatedFetch(`http://localhost:3001/api/auth/users/${this.currentUser.id}`, {
                         method: 'PUT',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${sessionId}`
-                        },
-                        body: JSON.stringify({ password })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updates)
                     });
                     
                     if (response.ok) {
                         showMessage('Profile updated successfully', 'success');
                         document.getElementById('profilePassword').value = '';
+                        if (updates.email) {
+                            this.currentUser.email = updates.email;
+                            localStorage.setItem('userEmail', updates.email);
+                        }
                     } else {
-                        showMessage('Failed to update profile');
+                        const errorData = await response.json().catch(() => ({}));
+                        showMessage(`Failed to update profile: ${errorData.error || response.status}`);
                     }
                 } catch (error) {
+                    if (error.message === 'Session expired') return;
                     showMessage('Update failed');
                 }
             }
@@ -515,8 +531,23 @@
         window.testLogout = testLogout;
         
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
+            
+            // Check authentication first
+            try {
+                const { default: AuthUtils } = await import('./shared/utils/authUtils.js');
+                const user = await AuthUtils.checkAuth();
+                if (user) {
+                    // Store user data for compatibility
+                    localStorage.setItem('userRole', user.subscriptionTier);
+                    localStorage.setItem('userUserRole', user.userRole);
+                    localStorage.setItem('userEmail', user.email);
+                }
+            } catch (error) {
+                console.warn('Auth check failed:', error);
+            }
+            
             loadSharedComponents();
         });
         

@@ -7,31 +7,31 @@
       <span></span>
     </div>
     <nav class="nav-menu" id="navMenu">
-      <a href="./search.html">Search</a>
-      <a href="./multi-mode-search.html">Multi-Mode Search</a>
-      <a href="./test.html" class="adv-only">Test</a>
-      <a href="./analyze-tests.html" class="adv-only">Analyze</a>
-      <div class="dropdown">
+      <a href="./search.html" class="menu-search" style="display: none;">Search</a>
+      <a href="./multi-mode-search.html" class="menu-multi-mode" style="display: none;">Multi-Mode Search</a>
+      <a href="./test.html" class="adv-only menu-test" style="display: none;">Test</a>
+      <a href="./analyze-tests.html" class="adv-only menu-analyze" style="display: none;">Analyze</a>
+      <div class="dropdown menu-manage" style="display: none;">
         <a href="#manage">Manage</a>
         <div class="dropdown-content">
-          <a href="./collections.html">Collections</a>
-          <a href="./model.html">Models</a>
-          <a href="./user-management.html" class="adv-only">User Management</a>
+          <a href="./collections.html" class="menu-manage-collections">Collections</a>
+          <a href="./model.html" class="menu-manage-models adv-only">Models</a>
+          <a href="./user-management.html" class="admin-only menu-user-management">User Management</a>
         </div>
       </div>
       <div class="dropdown">
         <a href="#options">Options</a>
         <div class="dropdown-content">
-          <a href="#dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</a>
-          <a href="#role-standard" onclick="setUserRole('standard')">Role: Standard</a>
-          <a href="#role-premium" onclick="setUserRole('premium')">Role: Premium</a>
-          <a href="#role-professional" onclick="setUserRole('professional')">Role: Professional</a>
-          <a href="#logout" onclick="testLogout()">🚪 Logout (Test)</a>
-          <a href="./config.html" class="adv-only">Modify Config Files</a>
-          <a href="./testcode-checker.html" class="adv-only">TestCode Checker</a>
+          <a href="#dark-mode" onclick="event.preventDefault(); toggleDarkMode()">Toggle Dark Mode</a>
+          <a href="#role-standard" onclick="event.preventDefault(); setUserRole('standard')" style="display: none;">Role: Standard</a>
+          <a href="#role-premium" onclick="event.preventDefault(); setUserRole('premium')" style="display: none;">Role: Premium</a>
+          <a href="#role-professional" onclick="event.preventDefault(); setUserRole('professional')" style="display: none;">Role: Professional</a>
+          <a href="#logout" onclick="event.preventDefault(); testLogout()" style="display: none;">🚪 Logout (Test)</a>
+          <a href="./config.html" class="adv-only admin-only menu-modify-config" style="display: none;">Modify Config Files</a>
+          <a href="./testcode-checker.html" class="adv-only admin-only" style="display: none;">TestCode Checker</a>
         </div>
       </div>
-      <div class="login-icon" title="User Info"><img src="aiprivatesearch.jpg" alt="User" style="width: 24px; height: 24px; border-radius: 50%;"></div>
+      <div class="login-icon" title="User Info" style="display: none;"><img src="aiprivatesearch.jpg" alt="User" style="width: 24px; height: 24px; border-radius: 50%;"></div>
     </nav>
   </div>
 </header>

@@ -1,4 +1,5 @@
 import { DOMSanitizer } from './utils/domSanitizer.js';
+import AuthUtils from './utils/authUtils.js';
 
 // Simple rate limiting
 let messageCallCount = 0;
@@ -332,6 +333,10 @@ function getUserRole() {
   return localStorage.getItem('userRole') || 'professional'; // Default to professional for existing users
 }
 
+function getUserUserRole() {
+  return localStorage.getItem('userUserRole') || 'admin'; // Default to admin for existing users
+}
+
 // Legacy function for backward compatibility
 function toggleDeveloperMode() {
   const currentRole = getUserRole();
@@ -346,17 +351,34 @@ function toggleElementsByClass(className, isDeveloperMode) {
   });
 }
 
-function applyUserRole(role = null) {
+async function applyUserRole(role = null, userRole = null) {
   if (role === null) {
     role = getUserRole();
   }
+  if (userRole === null) {
+    userRole = getUserUserRole();
+  }
   
-  // Standard role: hide advanced features
-  // Premium and Professional roles: show advanced features
+  // Try to use tier access manager if available
+  if (window.tierAccessManager) {
+    try {
+      const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
+      const tier = tierMap[role] || 3;
+      await window.tierAccessManager.applyCSSClasses(tier, userRole);
+      return;
+    } catch (error) {
+      console.warn('Tier access manager failed, using fallback:', error);
+    }
+  }
+  
+  // Fallback to original logic
   const showAdvanced = role !== 'standard';
+  const isAdmin = userRole === 'admin';
   
   toggleElementsByClass('.dev-only', showAdvanced);
   toggleElementsByClass('.adv-only', showAdvanced);
+  toggleElementsByClass('.admin-only', isAdmin);
+  toggleElementsByClass('.searcher-only', !isAdmin);
 }
 
 // Legacy function for backward compatibility
@@ -436,31 +458,20 @@ async function updateUserEmail() {
 }
 
 async function showUserInfo() {
-  window.location.href = '/user-management.html';
+  window.location.href = './user-management.html';
 }
 
 async function handleLogout() {
-  try {
-    const sessionId = localStorage.getItem('sessionId');
-    if (sessionId) {
-      await window.csrfManager.fetch('http://localhost:3001/api/auth/logout', { 
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${sessionId}` }
-      });
-    }
-    localStorage.removeItem('sessionId');
-    localStorage.removeItem('userEmail');
-    showUserMessage('Logged out successfully', 'success');
-    window.location.href = '/user-management.html';
-  } catch (error) {
-    showUserMessage('Logout failed', 'error');
-  }
+  AuthUtils.logout();
 }
 
 function setupLoginIcon() {
   const loginIcon = document.querySelector('.login-icon');
   if (loginIcon) {
-    loginIcon.addEventListener('click', showUserInfo);
+    loginIcon.addEventListener('click', (e) => {
+      e.preventDefault();
+      showUserInfo();
+    });
   }
 }
 
@@ -689,6 +700,7 @@ if (typeof window !== 'undefined') {
   window.toggleDeveloperMode = toggleDeveloperMode;
   window.setUserRole = setUserRole;
   window.getUserRole = getUserRole;
+  window.getUserUserRole = getUserUserRole;
   window.toggleMenu = toggleMenu;
   window.collectionsUtils = collectionsUtils;
   window.handleLogout = handleLogout;
@@ -704,37 +716,36 @@ export { loadScoreModels, exportToDatabase };
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
+  // Load tier access manager
+  try {
+    const { default: tierAccessManager } = await import('./utils/tierAccessManager.js');
+    window.tierAccessManager = tierAccessManager;
+    await tierAccessManager.loadConfig();
+  } catch (error) {
+    console.warn('Failed to load tier access manager:', error);
+  }
   loadTheme();
   
   // Check authentication status - require login
-  try {
-    const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) {
-      window.location.href = '/user-management.html';
-      return;
-    }
-    const response = await window.csrfManager.fetch('http://localhost:3001/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${sessionId}` }
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const user = data.user;
-      // Set role from authenticated user
-      setUserRole(user.subscriptionTier);
-      // Store email for compatibility
-      localStorage.setItem('userEmail', user.email);
-    } else {
-      // Redirect to login if not authenticated
-      window.location.href = '/user-management.html';
-      return;
-    }
-  } catch (error) {
-    // Redirect to login on error
-    window.location.href = '/user-management.html';
-    return;
-  }
+  const user = await AuthUtils.requireAuth();
+  if (!user) return;
   
-  loadSharedComponents().then(() => {
+  // Set role from authenticated user
+  setUserRole(user.subscriptionTier);
+  // Store user role (admin/searcher)
+  localStorage.setItem('userUserRole', user.userRole);
+  // Store email for compatibility
+  localStorage.setItem('userEmail', user.email);
+  // Apply role-based restrictions (but wait for header to load)
+  setTimeout(async () => {
+    await applyUserRole(user.subscriptionTier, user.userRole);
+  }, 100);
+  
+  loadSharedComponents().then(async () => {
     setupLoginIcon();
+    // Apply tier access after header is loaded
+    if (window.tierAccessManager) {
+      await window.tierAccessManager.applyAccessControl();
+    }
   });
 });

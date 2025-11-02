@@ -45,7 +45,13 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-~~196. Analyze data folder and unified_embeddings.db usage - determined system uses per-collection databases, not unified --done~~ 
+
+## RECENTLY COMPLETED (v19.38)
+~~201. Review menu availability for all role/tier combinations - created comprehensive analysis matrix --done~~
+~~202. Implement role-based menu restrictions with admin-only and searcher-only CSS classes --done~~
+~~203. Create tier-access.json configuration file for centralized role/tier-based access control --done~~
+~~204. Change normal mode background from white to light grey (#e8e8e8) for better visual contrast --done~~
+~~205. Fix text color contrast issues in index.html for medium grey background --done~~
 
 ## RECENTLY COMPLETED (v19.37)
 ~~188. Fix security vulnerabilities in common.js by implementing consistent CSRF protection and error handling --done~~
@@ -62,6 +68,7 @@ Phase 3 - Role-Based Feature Control:
 ~~199. Fix login issue - secureFileOps was blocking access to shared data directory --done~~
 ~~200. Add data folder copying to release script following same pattern as sources folder --done~~
 ~~201. Update README.md to document data folder copying in release command --done~~
+~~196. Analyze data folder and unified_embeddings.db usage - determined system uses per-collection databases, not unified --done~~ 
 
 ## COMPLETED (v19.36)
 

@@ -6,7 +6,7 @@
     "subscriptionTier": "standard",
     "userRole": "admin",
     "createdAt": "2025-10-28T23:36:53.052Z",
-    "lastLogin": "2025-10-31T13:22:27.224Z",
+    "lastLogin": "2025-11-01T17:09:56.643Z",
     "active": true
   },
   {
@@ -16,7 +16,7 @@
     "subscriptionTier": "premium",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": "2025-10-30T20:20:42.292Z",
+    "lastLogin": "2025-11-02T17:01:39.537Z",
     "active": true
   },
   {
@@ -27,6 +27,26 @@
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
     "lastLogin": null,
+    "active": true
+  },
+  {
+    "id": "378019d0-465e-47f9-a558-c6c788a91fdc",
+    "email": "srch-std@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "standard",
+    "userRole": "searcher",
+    "createdAt": "2025-11-01T17:10:24.152Z",
+    "lastLogin": "2025-11-01T17:10:38.283Z",
+    "active": true
+  },
+  {
+    "id": "0f55b643-2c88-4c06-8d8f-3927422f9fa9",
+    "email": "srch-prem@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "premium",
+    "userRole": "searcher",
+    "createdAt": "2025-11-02T17:02:05.945Z",
+    "lastLogin": "2025-11-02T17:48:58.957Z",
     "active": true
   }
 ]

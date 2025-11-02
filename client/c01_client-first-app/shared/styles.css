@@ -1,5 +1,5 @@
 :root {
-  --bg-color: #f8f9fa;
+  --bg-color: #e8e8e8;
   --text-color: #333;
   --header-bg: #2c3e50;
   --card-bg: white;
@@ -827,6 +827,15 @@ mark.search-highlight,
 /* Common utility classes to replace inline styles */
 .hidden {
   display: none !important;
+}
+
+/* Role-based visibility classes */
+.admin-only {
+  display: none;
+}
+
+.searcher-only {
+  display: none;
 }
 
 .wildcard-option {

@@ -4,101 +4,105 @@ import path from 'path';
 export class SubscriptionManager {
   constructor() {
     this.configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+    this.tierAccessPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/tier-access.json');
+    this.tierAccessConfig = null;
+  }
+
+  async loadTierAccessConfig() {
+    if (this.tierAccessConfig) return this.tierAccessConfig;
+    
+    try {
+      const configData = await secureFs.readFile(this.tierAccessPath, 'utf8');
+      this.tierAccessConfig = JSON.parse(configData);
+      return this.tierAccessConfig;
+    } catch (error) {
+      console.error('Failed to load tier-access.json, using fallback config:', error);
+      // Fallback to hardcoded config if file doesn't exist
+      this.tierAccessConfig = this.getFallbackConfig();
+      return this.tierAccessConfig;
+    }
+  }
+
+  getFallbackConfig() {
+    return {
+      tiers: {
+        1: { name: 'standard', features: { canModifyDocIndex: false, canChangeModelParams: false } },
+        2: { name: 'premium', features: { canModifyDocIndex: true, canChangeModelParams: true } },
+        3: { name: 'professional', features: { canModifyDocIndex: true, canChangeModelParams: true } }
+      },
+      config: { enabled: true, defaultTier: 1 }
+    };
   }
 
   async getSubscriptionTier() {
     try {
       const configData = await secureFs.readFile(this.configPath, 'utf8');
       const config = JSON.parse(configData);
-      return config['subscription-tier'] || 1; // Default to tier 1 (standard)
+      return config['subscription-tier'] || 1;
     } catch (error) {
-      return 1; // Default to tier 1 if config fails
+      return 1;
     }
   }
 
-  getTierName(tier) {
-    const tierNames = {
-      1: 'standard',
-      2: 'premium', 
-      3: 'professional'
-    };
-    return tierNames[tier] || 'standard';
+  async getTierName(tier) {
+    const config = await this.loadTierAccessConfig();
+    return config.tiers[tier]?.name || 'standard';
   }
 
-  getTierFeatures(tier) {
-    const features = {
-      1: { // Standard - Free 4 months then $49/yr, 1 computer, admin/searcher roles only
-        name: 'Standard',
-        price: '$49/yr after 4 months free',
-        computers: 1,
-        menuItems: ['search', 'multi-mode', 'manage-collections', 'options'],
-        canModifyDocIndex: false,
-        canChangeModelParams: false,
-        canChangeScoreModel: false,
-        canChangeScoreParams: false,
-        canAddUsers: true, // admin role only
-        canManageModels: false,
-        canModifyConfigFiles: false,
-        fullMenuAccess: false,
-        codeEmailFrequency: '2 weeks'
-      },
-      2: { // Premium - $199/yr, 5 computers, all Standard features plus manage models, modify config files, modify doc index cards
-        name: 'Premium',
-        price: '$199/yr',
-        computers: 5,
-        menuItems: ['search', 'multi-mode', 'manage-collections', 'manage-models', 'modify-config', 'options'],
-        canModifyDocIndex: true,
-        canChangeModelParams: true,
-        canChangeScoreModel: true,
-        canChangeScoreParams: true,
-        canAddUsers: true,
-        canManageModels: true,
-        canModifyConfigFiles: true,
-        fullMenuAccess: false,
-        codeEmailFrequency: 'monthly'
-      },
-      3: { // Professional - $2999 license, all menu items, no code emails, full access
-        name: 'Professional',
-        price: '$2999 license',
-        computers: 'unlimited',
-        menuItems: 'all',
-        canModifyDocIndex: true,
-        canChangeModelParams: true,
-        canChangeScoreModel: true,
-        canChangeScoreParams: true,
-        canAddUsers: true,
-        canManageModels: true,
-        canModifyConfigFiles: true,
-        fullMenuAccess: true,
-        codeEmailFrequency: 'none'
-      }
+  async getTierFeatures(tier) {
+    const config = await this.loadTierAccessConfig();
+    const tierConfig = config.tiers[tier] || config.tiers[1];
+    
+    return {
+      name: tierConfig.displayName || tierConfig.name,
+      price: tierConfig.price,
+      computers: tierConfig.computers,
+      menuItems: tierConfig.menuItems,
+      ...tierConfig.features,
+      codeEmailFrequency: tierConfig.codeEmailFrequency
     };
-    return features[tier] || features[1];
   }
 
   async checkFeatureAccess(featureName, userRole = 'searcher') {
-    const tier = await this.getSubscriptionTier();
-    const features = this.getTierFeatures(tier);
+    const config = await this.loadTierAccessConfig();
     
-    switch (featureName) {
-      case 'modify-doc-index':
-        return features.canModifyDocIndex;
-      case 'change-model-params':
-        return features.canChangeModelParams;
-      case 'change-score-model':
-        return features.canChangeScoreModel;
-      case 'change-score-params':
-        return features.canChangeScoreParams;
-      case 'manage-models':
-        return features.canManageModels;
-      case 'modify-config-files':
-        return features.canModifyConfigFiles;
-      case 'full-menu-access':
-        return features.fullMenuAccess;
-      case 'add-users':
-        return features.canAddUsers && userRole === 'admin';
-      default:
-        return true; // Default allow for basic features
+    if (!config.config.enabled) {
+      return true; // If tier access is disabled, allow everything
     }
+    
+    const tier = await this.getSubscriptionTier();
+    const featureGate = config.featureGates[featureName];
+    
+    if (!featureGate) {
+      return true; // If feature not defined, allow by default
+    }
+    
+    // Check tier requirement
+    if (featureGate.requiredTier && tier < featureGate.requiredTier) {
+      return false;
+    }
+    
+    // Check role requirement
+    if (featureGate.requiredRole && userRole !== featureGate.requiredRole) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  async getAccessMatrix(tier, role) {
+    const config = await this.loadTierAccessConfig();
+    const tierName = await this.getTierName(tier);
+    return config.accessMatrix[tierName]?.[role] || { menuAccess: [], features: [], restrictions: [] };
+  }
+
+  async getCSSClassMapping(tier, role) {
+    const config = await this.loadTierAccessConfig();
+    const tierName = await this.getTierName(tier);
+    
+    return {
+      tierClasses: config.cssClassMapping['tier-based'][tierName] || { show: [], hide: [] },
+      roleClasses: config.cssClassMapping['role-based'][role] || { show: [], hide: [] }
+    };
   }
 }

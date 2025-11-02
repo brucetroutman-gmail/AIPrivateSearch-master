@@ -83,21 +83,23 @@ router.get('/users', requireAuth, async (req, res) => {
   }
 });
 
-// Update user (admin only)
+// Update user
 router.put('/users/:userId', requireAuth, async (req, res) => {
   try {
-    // Only admins can update others
-    if (req.user.userRole !== 'admin') {
-      return res.status(403).json({ error: 'Insufficient permissions' });
-    }
-
     const { userId } = req.params;
     const { subscriptionTier, userRole, isActive, password, email } = req.body;
     
     const updates = {};
+    const isAdmin = req.user.userRole === 'admin';
+    const isOwnProfile = req.user.id === userId;
     
-    // Only admins can update user role, active status, email, and any user's password
-    if (req.user.userRole === 'admin') {
+    // Check permissions
+    if (!isAdmin && !isOwnProfile) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    
+    // Admins can update everything for any user
+    if (isAdmin) {
       if (userRole && VALID_USER_ROLES.includes(userRole)) {
         updates.userRole = userRole;
       }
@@ -110,9 +112,13 @@ router.put('/users/:userId', requireAuth, async (req, res) => {
       if (password) {
         updates.password = password;
       }
-    } else {
-      // Non-admins can only update their own password
-      if (password && req.user.id === userId) {
+    } 
+    // Users can update their own email and password
+    else if (isOwnProfile) {
+      if (email) {
+        updates.email = email;
+      }
+      if (password) {
         updates.password = password;
       }
     }
