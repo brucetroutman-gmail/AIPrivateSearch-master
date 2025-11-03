@@ -34,24 +34,25 @@ This checklist ensures all role-tier combinations display correct menu items and
 **Price**: $49/yr after 4 months free | **Computers**: 1
 
 ### ✅ Menu Items That SHOULD Be Visible:
-- [ ] User icon (login-icon)
-- [ ] Search
-- [ ] Multi-Mode Search
-- [ ] Manage Collections
-- [ ] Options/Settings
+- [x] User icon (login-icon)
+- [x] Search
+- [x] Multi-Mode Search
+- [x] Manage Collections
+- [x] Options/Settings
 
 ### ❌ Menu Items That SHOULD Be Hidden:
-- [ ] User Management (menu-user-management)
-- [ ] Test (menu-test)
-- [ ] Analyze (menu-analyze)
-- [ ] Manage Models (menu-manage-models)
-- [ ] Modify Config (menu-modify-config)
+- [x] User Management (menu-user-management)
+- [x] Test (menu-test)
+- [x] Analyze (menu-analyze)
+- [x] Manage Models (menu-manage-models)
+- [x] Modify Config (menu-modify-config)
 
 ### 🔒 Feature Restrictions to Verify:
-- [ ] Cannot modify model parameters
-- [ ] Cannot edit doc index cards
-- [ ] Cannot modify config files
-- [ ] Cannot access user management
+- [x] Cannot modify model parameters
+- [x] Cannot edit doc index cards
+- [x] Cannot modify config files
+- [x] Cannot access user management
+- [x] Cannot remove collections
 
 ---
 
@@ -105,6 +106,8 @@ This checklist ensures all role-tier combinations display correct menu items and
 - [ ] Cannot manage models
 - [ ] CAN edit doc index cards
 - [ ] CAN modify config files
+- [ ] Cannot remove collections
+
 
 ---
 
@@ -160,6 +163,7 @@ This checklist ensures all role-tier combinations display correct menu items and
 - [ ] CAN edit doc index cards
 - [ ] CAN modify config files
 - [ ] CAN manage models
+- [ ] Cannot remove collections
 
 ---
 

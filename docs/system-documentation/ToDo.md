@@ -45,7 +45,14 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-211. 
+212. Hide Remove Collection button for searcher roles
+213. 
+
+## RECENTLY COMPLETED (v19.41)
+~~211. test srch-std is Ok --done~~
+
+## RECENTLY COMPLETED (v19.40)
+~~210. create me a checklist for each role-tier for testing with each Role-tier and all menu items that should appear. --done~~
 
 ## RECENTLY COMPLETED (v19.39)
 ~~207. Continue testing of auth-session for all roles and tiers. Srch-prem shows the wrong menus: missing User icon and manage collections. --done~~
@@ -105,9 +112,6 @@ Phase 3 - Role-Based Feature Control:
 ~~172. Format line numbers on separate lines in Doc Index, Line Search, and Document Search responses for better readability --done~~
 ~~173. Add context lines (before and after) to Document Search results for better readability --done~~
 ~~174. Make filename links jump to specific line numbers and highlight matched lines in document viewer --done~~
-
-## COMPLETED TASKS (v01 -> v19.40)
-~~210. create me a checklist for each role-tier for testing with each Role-tier and all menu items that should appear. --done~~
 
 ## COMPLETED TASKS (v01 -> v19.31)
 
