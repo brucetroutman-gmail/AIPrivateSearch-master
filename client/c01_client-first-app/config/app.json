@@ -1,6 +1,6 @@
 {
   "app-name": "AI Private Search",
   "sources-location": "/Users/Shared/AIPrivateSearch/sources",
-  "bearer-token-timeout": 30,
-  "subscription-tier": 3
+  "bearer-token-timeout": 60,
+  "subscription-tier": 1
 }

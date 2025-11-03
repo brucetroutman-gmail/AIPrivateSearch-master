@@ -309,7 +309,6 @@ async function setUserRole(role) {
   
   const currentRole = getUserRole();
   if (currentRole === role) {
-    showUserMessage(`Already on ${role} tier`, 'info');
     return;
   }
   
@@ -329,14 +328,12 @@ async function setUserRole(role) {
     
     if (response.ok) {
       localStorage.setItem('userRole', role);
-      updateTierDisplay(); // Update tier display immediately
-      showUserMessage(`Subscription tier changed to ${role}. Logging out...`, 'success');
-      setTimeout(() => handleLogout(), 1500);
-    } else {
-      showUserMessage('Failed to update subscription tier', 'error');
+      updateTierDisplay();
+      const userRole = getUserUserRole();
+      await applyUserRole(role, userRole);
     }
   } catch (error) {
-    showUserMessage('Update failed', 'error');
+    // Silent fail - tier change will be handled by authentication flow
   }
 }
 

@@ -201,6 +201,10 @@
       color: #e0e0e0;
       border-color: #2d5a2d;
     }
+    
+    .doc-index-edit-only {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -1041,8 +1045,8 @@
       
       let html = '<h3>Doc Index Card: ' + (documentIndex.filename || 'Unknown') + '</h3>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem;">';
-      html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info">Save and Export</button>';
-      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save &amp; Exit</button>';
+      html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info doc-index-edit-only">Save and Export</button>';
+      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary doc-index-edit-only">Save &amp; Exit</button>';
       html += '<button type="button" onclick="closeDocumentIndexEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
       html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem; margin: 1rem 0; font-size: 0.9rem;">';
@@ -1072,8 +1076,8 @@
       html += '<div><label><strong>Summary:</strong></label><br><textarea id="indexSummary" style="' + textareaStyle + '" onchange="markFormChanged()">' + (documentIndex.summary || '') + '</textarea></div>';
       html += '<div><label><strong>Comments:</strong></label><br><textarea id="indexComments" style="' + textareaStyle + '" onchange="markFormChanged()">' + (documentIndex.our_comments || '') + '</textarea></div>';
       html += '<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">';
-      html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info">Save and Export</button>';
-      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary">Save &amp; Exit</button>';
+      html += '<button type="button" onclick="exportDocumentIndex()" class="btn btn-info doc-index-edit-only">Save and Export</button>';
+      html += '<button type="button" onclick="saveAllDocumentIndex(\'' + documentIndex.id + '\')" class="btn btn-primary doc-index-edit-only">Save &amp; Exit</button>';
       html += '<button type="button" onclick="closeDocumentIndexEditor()" class="btn btn-secondary">Close</button>';
       html += '</div>';
       
@@ -1081,6 +1085,12 @@
       
       modal.appendChild(editor);
       document.body.appendChild(modal);
+      
+      // Apply tier access restrictions after modal is created
+      if (window.tierAccessManager) {
+        const userInfo = window.tierAccessManager.getCurrentUserInfo();
+        window.tierAccessManager.applyCSSClasses(userInfo.tier, userInfo.role);
+      }
       
       window.currentDocumentIndexModal = modal;
       window.currentDocumentIndex = documentIndex;
