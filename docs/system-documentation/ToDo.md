@@ -46,7 +46,14 @@ Phase 3 - Role-Based Feature Control:
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
 
+
+## RECENTLY COMPLETED (v19.39)
+~~207. Continue testing of auth-session for all roles and tiers. Srch-prem shows the wrong menus: missing User icon and manage collections. --done~~
+~~209. Document auth-session-security interaction when a new page is called. Is this a common routine? --done~~
+
 ## RECENTLY COMPLETED (v19.38)
+~~208. After successful login the user icon now shows on the header menu for all user types and tiers --done~~
+~~206. Modernize light theme with improved colors, spacing, and visual hierarchy; set dark mode as default for new users --done~~
 ~~201. Review menu availability for all role/tier combinations - created comprehensive analysis matrix --done~~
 ~~202. Implement role-based menu restrictions with admin-only and searcher-only CSS classes --done~~
 ~~203. Create tier-access.json configuration file for centralized role/tier-based access control --done~~

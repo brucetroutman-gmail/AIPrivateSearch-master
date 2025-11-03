@@ -279,8 +279,19 @@ function toggleDarkMode() {
 
 // Load saved theme
 function loadTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  const savedTheme = localStorage.getItem('theme');
+  let theme;
+  
+  if (savedTheme) {
+    // Use saved preference
+    theme = savedTheme;
+  } else {
+    // First-time user - default to dark mode
+    theme = 'dark';
+    localStorage.setItem('theme', theme);
+  }
+  
+  document.documentElement.setAttribute('data-theme', theme);
 }
 
 // Toggle mobile menu

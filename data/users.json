@@ -26,7 +26,7 @@
     "subscriptionTier": "professional",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": null,
+    "lastLogin": "2025-11-03T15:10:03.428Z",
     "active": true
   },
   {
@@ -46,7 +46,7 @@
     "subscriptionTier": "premium",
     "userRole": "searcher",
     "createdAt": "2025-11-02T17:02:05.945Z",
-    "lastLogin": "2025-11-02T17:48:58.957Z",
+    "lastLogin": "2025-11-03T14:47:33.098Z",
     "active": true
   }
 ]

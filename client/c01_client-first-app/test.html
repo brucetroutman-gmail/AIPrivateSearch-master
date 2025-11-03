@@ -567,6 +567,7 @@
             let dbSaveSuccess = false;
             let dbInsertId = null;
             try {
+                const { exportToDatabase } = await import('./shared/common.js');
                 const dbResult = await exportToDatabase(result, testCategory, testDescription, params);
                 dbSaveSuccess = true;
                 dbInsertId = dbResult.insertId;
@@ -647,7 +648,8 @@
                 });
                 
                 // Load score models using common function
-                loadScoreModels('scoreModelSelect');
+                const { loadScoreModels } = await import('./shared/common.js');
+                await loadScoreModels('scoreModelSelect');
                 
                 // Setup select all models functionality
                 document.getElementById('selectAllModels').addEventListener('change', function() {
@@ -692,8 +694,11 @@
         }
         
         // Initialize
-        loadModels();
-        loadModelTests();
+        async function initialize() {
+            await loadModels();
+            await loadModelTests();
+        }
+        initialize();
     </script>
     
     </div>
