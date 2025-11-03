@@ -202,9 +202,7 @@
       border-color: #2d5a2d;
     }
     
-    .doc-index-edit-only {
-      display: none !important;
-    }
+    /* doc-index-edit-only visibility controlled by tier access manager */
   </style>
 </head>
 <body>
@@ -312,6 +310,46 @@
     } else {
       showError('No collection specified');
     }
+    
+    // Apply tier access restrictions after page loads
+    setTimeout(async () => {
+      console.log('DEBUG: Checking doc index edit access...');
+      console.log('DEBUG: tierAccessManager exists:', !!window.tierAccessManager);
+      console.log('DEBUG: localStorage userRole:', localStorage.getItem('userRole'));
+      console.log('DEBUG: localStorage userUserRole:', localStorage.getItem('userUserRole'));
+      
+      if (window.tierAccessManager) {
+        const userInfo = window.tierAccessManager.getCurrentUserInfo();
+        console.log('DEBUG: Current user info:', userInfo);
+        
+        const userType = await window.tierAccessManager.getUserTypeInfo(userInfo.tier, userInfo.role);
+        console.log('DEBUG: User type config:', userType);
+        
+        // Check doc index edit buttons
+        const docEditButtons = document.querySelectorAll('.doc-index-edit-only');
+        console.log('DEBUG: Found doc-index-edit-only elements:', docEditButtons.length);
+        docEditButtons.forEach((btn, i) => {
+          console.log(`DEBUG: Doc edit button ${i}:`, btn.textContent, 'display:', window.getComputedStyle(btn).display);
+        });
+        
+        // Check if should show doc-index-edit-only
+        const shouldShow = userType.cssShow && userType.cssShow.includes('.doc-index-edit-only');
+        const shouldHide = userType.cssHide && userType.cssHide.includes('.doc-index-edit-only');
+        console.log('DEBUG: Should show doc-index-edit-only:', shouldShow);
+        console.log('DEBUG: Should hide doc-index-edit-only:', shouldHide);
+        
+        window.tierAccessManager.applyAccessControl();
+        
+        // Check buttons after access control
+        setTimeout(() => {
+          docEditButtons.forEach((btn, i) => {
+            console.log(`DEBUG: After access control - Doc edit button ${i}:`, btn.textContent, 'display:', window.getComputedStyle(btn).display);
+          });
+        }, 100);
+      }
+    }, 200);
+    
+
     
     async function loadDocuments() {
       try {
@@ -1090,6 +1128,16 @@
       if (window.tierAccessManager) {
         const userInfo = window.tierAccessManager.getCurrentUserInfo();
         window.tierAccessManager.applyCSSClasses(userInfo.tier, userInfo.role);
+        console.log('DEBUG: Applied tier access to doc index modal for user:', userInfo);
+        
+        // Check button visibility after applying access control
+        setTimeout(() => {
+          const editButtons = modal.querySelectorAll('.doc-index-edit-only');
+          console.log('DEBUG: Doc index edit buttons after tier access:', editButtons.length);
+          editButtons.forEach((btn, i) => {
+            console.log(`DEBUG: Edit button ${i}:`, btn.textContent, 'display:', window.getComputedStyle(btn).display);
+          });
+        }, 100);
       }
       
       window.currentDocumentIndexModal = modal;

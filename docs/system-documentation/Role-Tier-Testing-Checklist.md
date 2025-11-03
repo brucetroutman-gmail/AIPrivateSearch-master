@@ -24,9 +24,12 @@ This checklist ensures all role-tier combinations display correct menu items and
 
 ### 🔒 Feature Restrictions to Verify:
 - [x] Cannot modify model parameters
-- [ ] Cannot edit doc index cards
+- [x] Cannot edit doc index cards
 - [x] Cannot modify config files
 - [x] CAN add users (admin privilege)
+
+- [ ] CAN remove collections ?
+
 
 ---
 
@@ -60,26 +63,26 @@ This checklist ensures all role-tier combinations display correct menu items and
 **Price**: $199/yr | **Computers**: 5
 
 ### ✅ Menu Items That SHOULD Be Visible:
-- [ ] User icon (login-icon)
-- [ ] Search
-- [ ] Multi-Mode Search
-- [ ] Manage Collections
-- [ ] Manage Models
-- [ ] Modify Config
-- [ ] User Management
-- [ ] Test
-- [ ] Analyze
-- [ ] Options/Settings
+- [x] User icon (login-icon)
+- [x] Search
+- [x] Multi-Mode Search
+- [x] Manage Collections
+- [x] Manage Models
+- [x] Modify Config
+- [x] User Management
+- [x] Options/Settings
 
 ### ❌ Menu Items That SHOULD Be Hidden:
-- [ ] None (full access except searcher-only items)
+- [x] Test
+- [x] Analyze
 
 ### 🔒 Feature Access to Verify:
-- [ ] CAN modify model parameters
-- [ ] CAN edit doc index cards
-- [ ] CAN modify config files
-- [ ] CAN manage models
-- [ ] CAN add users (admin privilege)
+- [x] CAN modify model parameters
+- [x] CAN edit doc index cards
+- [x] CAN remove collections
+- [x] CAN modify config files
+- [x] CAN manage models
+- [x] CAN add users (admin privilege)
 
 ---
 

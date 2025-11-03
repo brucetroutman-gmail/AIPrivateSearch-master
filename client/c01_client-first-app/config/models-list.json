@@ -56,29 +56,9 @@
       "size": "5.4 GB"
     },
     {
-      "category": "embed",
-      "modelName": "BGE-M3",
-      "size": "1.2 GB"
-    },
-    {
       "category": "search",
       "modelName": "phi3:3.8b",
       "size": "2.2 GB"
-    },
-    {
-      "category": "search",
-      "modelName": "tinyllama",
-      "size": "unknown"
-    },
-    {
-      "category": "score",
-      "modelName": "tinyllama",
-      "size": "unknown"
-    },
-    {
-      "category": "document-index",
-      "modelName": "tinyllama",
-      "size": "unknown"
     }
   ]
 }

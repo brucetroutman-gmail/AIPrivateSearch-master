@@ -974,10 +974,7 @@ mark.search-highlight,
 }
 
 /* Role-based visibility classes */
-.admin-only {
-  display: none;
-}
-
+/* Visibility controlled by tier access manager */
 .searcher-only {
   display: none;
 }
