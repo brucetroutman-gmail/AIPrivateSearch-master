@@ -331,7 +331,7 @@
               </select>
             </div>
             
-            <div class="model-options adv-only">
+            <div class="model-options prem-only">
               <div class="option-group">
                 <label for="temperature">Temperature</label>
                 <select id="temperature">
@@ -366,13 +366,7 @@
             </div>
             
             <div class="field">
-              <div class="flex-between">
-                <label for="userPrompts">User Prompts</label>
-                <label class="checkbox-label small-label">
-                  <input type="checkbox" id="addMetaPrompt" class="checkbox-input" />
-                  Add Meta Prompt
-                </label>
-              </div>
+              <label for="userPrompts">User Prompts</label>
               <select id="userPrompts">
                 <option value="">Loading...</option>
               </select>
@@ -393,12 +387,12 @@
                 Generate scores
               </label>
               
-              <label class="checkbox-label adv-only">
+              <label class="checkbox-label prem-only">
                 <input type="checkbox" id="autoExportToggle" />
                 Auto Export to Database
               </label>
               
-              <label id="showChunksLabel" class="checkbox-label adv-only hidden">
+              <label id="showChunksLabel" class="checkbox-label prem-only hidden">
                 <input type="checkbox" id="showChunksToggle" />
                 Show source chunks
               </label>

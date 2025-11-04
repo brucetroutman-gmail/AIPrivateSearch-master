@@ -16,7 +16,7 @@
     "subscriptionTier": "premium",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": "2025-11-03T21:22:56.387Z",
+    "lastLogin": "2025-11-04T14:43:24.393Z",
     "active": true
   },
   {
@@ -26,7 +26,7 @@
     "subscriptionTier": "professional",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": "2025-11-03T15:10:03.428Z",
+    "lastLogin": "2025-11-04T14:43:05.639Z",
     "active": true
   },
   {
@@ -46,7 +46,17 @@
     "subscriptionTier": "premium",
     "userRole": "searcher",
     "createdAt": "2025-11-02T17:02:05.945Z",
-    "lastLogin": "2025-11-03T14:47:33.098Z",
+    "lastLogin": "2025-11-04T14:43:47.711Z",
+    "active": true
+  },
+  {
+    "id": "f3aee9d9-e299-48f1-a44d-9ccf87c608e2",
+    "email": "srch-prof@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "professional",
+    "userRole": "searcher",
+    "createdAt": "2025-11-04T14:30:50.291Z",
+    "lastLogin": "2025-11-04T14:31:05.480Z",
     "active": true
   }
 ]

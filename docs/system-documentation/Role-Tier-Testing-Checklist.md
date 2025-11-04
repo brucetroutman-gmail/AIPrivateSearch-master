@@ -90,26 +90,26 @@ This checklist ensures all role-tier combinations display correct menu items and
 **Price**: $199/yr | **Computers**: 5
 
 ### ✅ Menu Items That SHOULD Be Visible:
-- [ ] User icon (login-icon)
-- [ ] Search
-- [ ] Multi-Mode Search
-- [ ] Manage dropdown (menu-manage)
-- [ ] Manage Collections
-- [ ] Modify Config
-- [ ] Options/Settings
+- [x] User icon (login-icon)
+- [x] Search
+- [x] Multi-Mode Search
+- [x] Manage dropdown (menu-manage)
+- [x] Manage Collections
+- [x] Options/Settings
 
 ### ❌ Menu Items That SHOULD Be Hidden:
-- [ ] User Management (menu-user-management)
-- [ ] Manage Models (menu-manage-models)
-- [ ] Test (menu-test)
-- [ ] Analyze (menu-analyze)
+- [x] User Management (menu-user-management)
+- [x] Manage Models (menu-manage-models)
+- [x] Test (menu-test)
+- [x] Analyze (menu-analyze)
+- [x] Modify Config
 
 ### 🔒 Feature Restrictions to Verify:
-- [ ] Cannot access user management
-- [ ] Cannot manage models
-- [ ] CAN edit doc index cards
-- [ ] CAN modify config files
-- [ ] Cannot remove collections
+- [x] Cannot access user management
+- [x] Cannot manage models
+- [x] CAN edit doc index cards
+- [x] Cannot modify config files
+- [x] Cannot remove collections
 
 
 ---
@@ -118,28 +118,28 @@ This checklist ensures all role-tier combinations display correct menu items and
 **Price**: $2999 license | **Computers**: Unlimited
 
 ### ✅ Menu Items That SHOULD Be Visible:
-- [ ] User icon (login-icon)
-- [ ] Search
-- [ ] Multi-Mode Search
-- [ ] Manage dropdown (menu-manage)
-- [ ] Manage Collections
-- [ ] Manage Models
-- [ ] Modify Config
-- [ ] User Management
-- [ ] Test
-- [ ] Analyze
-- [ ] Options/Settings
+- [x] User icon (login-icon)
+- [x] Search
+- [x] Multi-Mode Search
+- [x] Manage dropdown (menu-manage)
+- [x] Manage Collections
+- [x] Manage Models
+- [x] Modify Config
+- [x] User Management
+- [x] Test
+- [x] Analyze
+- [x] Options/Settings
 
 ### ❌ Menu Items That SHOULD Be Hidden:
-- [ ] None (full access)
+- [x] None (full access)
 
 ### 🔒 Feature Access to Verify:
-- [ ] Full access to all features
-- [ ] CAN modify model parameters
-- [ ] CAN edit doc index cards
-- [ ] CAN modify config files
-- [ ] CAN manage models
-- [ ] CAN add users (admin privilege)
+- [x] Full access to all features
+- [x] CAN modify model parameters
+- [x] CAN edit doc index cards
+- [x] CAN modify config files
+- [x] CAN manage models
+- [x] CAN add users (admin privilege)
 
 ---
 
@@ -147,49 +147,47 @@ This checklist ensures all role-tier combinations display correct menu items and
 **Price**: $2999 license | **Computers**: Unlimited
 
 ### ✅ Menu Items That SHOULD Be Visible:
-- [ ] User icon (login-icon)
-- [ ] Search
-- [ ] Multi-Mode Search
-- [ ] Manage Collections
-- [ ] Manage Models
-- [ ] Modify Config
-- [ ] Test
-- [ ] Analyze
-- [ ] Options/Settings
+- [x] User icon (login-icon)
+- [x] Search
+- [x] Multi-Mode Search
+- [x] Manage Collections
+- [x] Manage Models
+- [x] Test
+- [x] Analyze
+- [x] Options/Settings
 
 ### ❌ Menu Items That SHOULD Be Hidden:
-- [ ] User Management (menu-user-management)
+- [x] User Management (menu-user-management)
+- [x] Modify Config
 
 ### 🔒 Feature Restrictions to Verify:
-- [ ] Cannot access user management
-- [ ] CAN modify model parameters
-- [ ] CAN edit doc index cards
-- [ ] CAN modify config files
-- [ ] CAN manage models
-- [ ] Cannot remove collections
+- [x] Cannot access user management
+- [x] CAN edit doc index cards
+- [x] CAN manage models
+- [x] Cannot remove collections
 
 ---
 
 ## Common Elements to Test for ALL Roles
 
 ### Universal Menu Items (Should Always Be Visible):
-- [ ] User icon appears after login
-- [ ] Search menu item
-- [ ] Multi-Mode Search menu item
-- [ ] Options/Settings menu item
+- [x] User icon appears after login
+- [x] Search menu item
+- [x] Multi-Mode Search menu item
+- [x] Options/Settings menu item
 
 ### Authentication Flow:
-- [ ] Login page loads correctly
-- [ ] Authentication redirects work properly
-- [ ] Session persistence across page refreshes
-- [ ] Logout functionality works
+- [x] Login page loads correctly
+- [x] Authentication redirects work properly
+- [x] Session persistence across page refreshes
+- [x] Logout functionality works
 
 ### Page Access:
-- [ ] Home/Index page loads
-- [ ] Search page accessible
-- [ ] Multi-mode search page accessible
-- [ ] Collections page accessible (if in menuAccess)
-- [ ] Restricted pages properly blocked
+- [x] Home/Index page loads
+- [x] Search page accessible
+- [x] Multi-mode search page accessible
+- [x] Collections page accessible (if in menuAccess)
+- [x] Restricted pages properly blocked
 
 ---
 
@@ -208,8 +206,8 @@ This checklist ensures all role-tier combinations display correct menu items and
 - `.menu-analyze` - Analyze menu item
 - `.admin-only` - Admin-only content
 - `.searcher-only` - Searcher-only content
-- `.dev-only` - Developer/Professional content
-- `.adv-only` - Advanced/Professional content
+- `.prem-only` - Premium tier (2) and above content
+- `.pro-only` - Professional tier (3) only content
 
 ### Test Environment Setup:
 1. Use user-management.html to create test users for each role-tier

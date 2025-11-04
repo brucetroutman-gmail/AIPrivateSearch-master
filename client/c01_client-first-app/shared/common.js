@@ -383,8 +383,10 @@ async function applyUserRole(role = null, userRole = null) {
   const showAdvanced = role !== 'standard';
   const isAdmin = userRole === 'admin';
   
-  toggleElementsByClass('.dev-only', showAdvanced);
-  toggleElementsByClass('.adv-only', showAdvanced);
+  const isPremium = role === 'premium';
+  const isProfessional = role === 'professional';
+  toggleElementsByClass('.prem-only', isPremium || isProfessional);
+  toggleElementsByClass('.pro-only', isProfessional);
   toggleElementsByClass('.admin-only', isAdmin);
   toggleElementsByClass('.searcher-only', !isAdmin);
 }

@@ -45,9 +45,16 @@ Phase 3 - Role-Based Feature Control:
 122. review processing of each search type. creaate 3 prompts for sourcetype, collection, searchtype. Store prompts in .json configs
 126. enhance database saving add documents only
 135. review chunking..chunk size small and large documents  many documents are only 2 chunks what are the pros and cons of changing chunks sizes
-218. test srch-prem
-219. test adm-prof
-220. test srch-prof
+
+## RECENTLY COMPLETED (v19.43)
+218. test srch-prem  --done
+219. test adm-prof  --done
+220. test srch-prof  --done
+221. Consolidate redundant CSS classes - Removed .dev-only class which was functionally identical to .adv-only --done
+222. Implement tier-specific CSS classes - Replaced .adv-only with .prem-only (Premium tier 2+) and .pro-only (Professional tier 3 only) --done
+223. Update tier-access.json configuration to use precise tier-specific class controls --done
+224. Update all HTML files to use new tier-specific classes for better access control granularity --done
+225. Remove "Add Meta Prompt" checkbox from search page to simplify user interface --done
 
 ## RECENTLY COMPLETED (v19.42)
 213. Fix premium administrator menu access - Test and Analyze menus now properly hidden for Premium tier, only visible for Professional tier --done
