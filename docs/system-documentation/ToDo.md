@@ -75,6 +75,8 @@ Phase 3 - Role-Based Feature Control:
 251. Create sample HR system for small to medium business.
 253. 
 
+## RECENTLY COMPLETED (v19.45)
+
 ## RECENTLY COMPLETED (v19.44)
 252. Remove "Model Settings" from Options menu as it's already available in Manage dropdown --done
 
