@@ -120,4 +120,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 19.45 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
+**Version**: 19.46 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch

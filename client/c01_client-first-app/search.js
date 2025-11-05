@@ -629,9 +629,11 @@ if (useWildcardsEl) {
 }
 
 // Save meta prompt checkbox state
-addMetaPromptEl.addEventListener('change', () => {
-  localStorage.setItem('addMetaPrompt', addMetaPromptEl.checked);
-});
+if (addMetaPromptEl) {
+  addMetaPromptEl.addEventListener('change', () => {
+    localStorage.setItem('addMetaPrompt', addMetaPromptEl.checked);
+  });
+}
 
 // Save vectorDB selection
 if (vectorDBEl) {
@@ -688,7 +690,7 @@ if (generateScoresSetting === 'true') {
 
 // Restore meta prompt setting
 const addMetaPromptSetting = localStorage.getItem('addMetaPrompt');
-if (addMetaPromptSetting === 'true') {
+if (addMetaPromptSetting === 'true' && addMetaPromptEl) {
   addMetaPromptEl.checked = true;
 }
 
@@ -1137,7 +1139,7 @@ form.addEventListener('submit', async (e) => {
     const searchType = (sourceTypeEl.value.includes('Docu')) ? searchTypeEl.value : null;
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
-    const addMetaPrompt = addMetaPromptEl.checked;
+    const addMetaPrompt = addMetaPromptEl ? addMetaPromptEl.checked : false;
     // VectorDB removed - using unified SQLite service only
     
     // Validate collection selection for local documents
