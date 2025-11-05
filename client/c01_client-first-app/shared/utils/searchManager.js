@@ -21,7 +21,7 @@ class SearchManager {
   // Load collections
   async loadCollections() {
     try {
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/collections');
+      const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
       const data = await response.json();
       this.collections = data.collections || [];
       return this.collections;
@@ -98,7 +98,7 @@ class SearchManager {
   }
 
   async performLineSearch(query, options) {
-    const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/line-search', {
+    const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/line-search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, options })
@@ -108,7 +108,7 @@ class SearchManager {
   }
 
   async performAIDocumentChat(query, options) {
-    const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/ai-document-chat', {
+    const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/ai-document-chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

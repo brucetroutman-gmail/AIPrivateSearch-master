@@ -4,7 +4,7 @@ window.documentViewerCommon = {
     // Generate document viewer URL with optional line number and search term
     generateDocumentUrl(collection, filename, options = {}) {
         const { lineNumber, searchTerm } = options;
-        let url = `http://localhost:3001/api/documents/${collection}/${filename}/view`;
+        let url = `${window.API_BASE_URL}/api/documents/${collection}/${filename}/view`;
         
         const params = new URLSearchParams();
         if (lineNumber) {

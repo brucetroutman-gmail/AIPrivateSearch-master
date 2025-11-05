@@ -11,7 +11,7 @@ class DocumentSearchCommon {
     const startTime = Date.now();
     
     try {
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/document-search', {
+      const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

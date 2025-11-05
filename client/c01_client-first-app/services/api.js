@@ -1,6 +1,6 @@
 import { logger } from '../shared/logger.js';
 
-const API_ROOT = 'http://localhost:3001';
+const API_ROOT = window.API_BASE_URL || 'http://localhost:3001';
 
 // Helper function for API response handling
 async function handleApiResponse(res) {

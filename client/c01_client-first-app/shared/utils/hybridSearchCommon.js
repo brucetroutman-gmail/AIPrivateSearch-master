@@ -6,7 +6,7 @@ window.hybridSearchCommon = {
         const startTime = Date.now();
         
         try {
-            const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/hybrid-search', {
+            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/hybrid-search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, options: { collection, topK } })

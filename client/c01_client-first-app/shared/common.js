@@ -1,5 +1,6 @@
 import { DOMSanitizer } from './utils/domSanitizer.js';
 import AuthUtils from './utils/authUtils.js';
+import './utils/apiConfig.js';
 
 // Simple rate limiting
 let messageCallCount = 0;
@@ -206,7 +207,7 @@ async function loadVersion() {
   }
   
   try {
-    const response = await fetch('http://localhost:3001/api/version');
+    const response = await fetch(`${window.API_BASE_URL}/api/version`);
     const data = await response.json();
     if (versionEl && data.version) {
       versionEl.textContent = `(v${data.version})`;
@@ -317,7 +318,7 @@ async function setUserRole(role) {
   
   try {
     const sessionId = localStorage.getItem('sessionId');
-    const response = await window.csrfManager.fetch('http://localhost:3001/api/config/subscription-tier', {
+    const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/subscription-tier`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -610,7 +611,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
   };
   
   try {
-    const response = await window.csrfManager.fetch('http://localhost:3001/api/database/save', {
+    const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/database/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dbData)
@@ -647,7 +648,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
 const collectionsUtils = {
   async loadCollections() {
     try {
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/collections');
+      const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }

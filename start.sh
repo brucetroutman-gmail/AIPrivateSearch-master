@@ -2,10 +2,18 @@
 
 echo "🚀 Starting AIPrivateSearch..."
 
+# Read ports from app.json config
+FRONTEND_PORT=3000
+BACKEND_PORT=3001
+if [ -f "client/c01_client-first-app/config/app.json" ]; then
+    FRONTEND_PORT=$(grep -o '"frontend":[[:space:]]*[0-9]*' client/c01_client-first-app/config/app.json | grep -o '[0-9]*' || echo 3000)
+    BACKEND_PORT=$(grep -o '"backend":[[:space:]]*[0-9]*' client/c01_client-first-app/config/app.json | grep -o '[0-9]*' || echo 3001)
+fi
+
 # Kill any existing server processes to free up ports
 # Kill processes by port to ensure clean shutdown
-lsof -ti :3001 | xargs kill -9 2>/dev/null || true
-lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
 # Also kill by process name as backup
 pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
@@ -166,7 +174,7 @@ sleep 1
 
 # Start frontend with the working command
 echo "🔧 Starting frontend server..."
-npx serve . -l 3000 >/dev/null 2>&1 &
+npx serve . -l $FRONTEND_PORT >/dev/null 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for frontend to start
@@ -179,11 +187,11 @@ fi
 
 echo ""
 echo "✅ Application started successfully!"
-echo "🔗 Frontend: http://localhost:3000"
-echo "🔗 Backend API: http://localhost:3001"
+echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
+echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
 echo "🌐 Opening Chrome browser..."
-open -a "Google Chrome" http://localhost:3000 2>/dev/null || open http://localhost:3000
+open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
 echo ""
 echo "Press Ctrl+C to stop both servers"
 echo ""
@@ -199,8 +207,8 @@ cleanup() {
     echo "Stopping servers..."
     kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
     sleep 1
-    lsof -ti :3001 | xargs kill -9 2>/dev/null || true
-    lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+    lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+    lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
     pkill -f 'npx serve' 2>/dev/null || true
     pkill -f 'node server.mjs' 2>/dev/null || true
     pkill -f 'npm start' 2>/dev/null || true

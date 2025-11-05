@@ -48,8 +48,27 @@ app.use((req, res, next) => {
   next();
 });
 
+// Load CORS origins from app.json config
+let corsOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'];
+try {
+  const fs = await import('fs/promises');
+  const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
+  if (appConfig.ports) {
+    const frontendPort = appConfig.ports.frontend || 3000;
+    const backendPort = appConfig.ports.backend || 3001;
+    corsOrigins = [
+      `http://localhost:${frontendPort}`,
+      `http://localhost:${backendPort}`,
+      `http://127.0.0.1:${frontendPort}`,
+      `http://127.0.0.1:${backendPort}`
+    ];
+  }
+} catch (error) {
+  // Use defaults if config can't be read
+}
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
+  origin: corsOrigins,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -106,7 +125,16 @@ app.use(errorHandler);
 
 
 
-const PORT = process.env.PORT || 3001;
+// Load port from app.json config
+let PORT = process.env.PORT || 3001;
+try {
+  const fs = await import('fs/promises');
+  const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
+  PORT = process.env.PORT || appConfig.ports?.backend || 3001;
+} catch (error) {
+  // Fallback to default if config can't be read
+  PORT = process.env.PORT || 3001;
+}
 const server = app.listen(PORT, () => {
   logger.log(`Server running on port ${PORT}`);
 });

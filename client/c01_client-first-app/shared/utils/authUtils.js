@@ -8,7 +8,7 @@ class AuthUtils {
     if (!sessionId) return null;
     
     try {
-      const response = await fetch('http://localhost:3001/api/auth/me', {
+      const response = await fetch(`${window.API_BASE_URL}/api/auth/me`, {
         headers: { 'Authorization': `Bearer ${sessionId}` }
       });
       
@@ -33,7 +33,9 @@ class AuthUtils {
       'Authorization': `Bearer ${sessionId}`
     };
     
-    const response = await fetch(url, { ...options, headers });
+    // Update URL to use dynamic API base if it's a relative API call
+    const finalUrl = url.startsWith('/api/') ? `${window.API_BASE_URL}${url}` : url;
+    const response = await fetch(finalUrl, { ...options, headers });
     
     if (response.status === 401) {
       localStorage.removeItem('sessionId');
@@ -47,7 +49,7 @@ class AuthUtils {
   static logout() {
     const sessionId = localStorage.getItem('sessionId');
     if (sessionId) {
-      fetch('http://localhost:3001/api/auth/logout', {
+      fetch(`${window.API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${sessionId}` }
       }).catch(() => {});

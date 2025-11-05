@@ -23,7 +23,7 @@ class CSRFManager {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/csrf-token');
+      const response = await fetch(`${window.API_BASE_URL}/api/csrf-token`);
       if (!response.ok) {
         throw new Error(`Failed to fetch CSRF token: ${response.status}`);
       }
