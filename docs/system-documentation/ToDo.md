@@ -75,6 +75,8 @@ Phase 3 - Role-Based Feature Control:
 251. Create sample HR system for small to medium business.
 253. 
 
+## RECENTLY COMPLETED (v19.47)
+
 ## RECENTLY COMPLETED (v19.46)
 
 ## RECENTLY COMPLETED (v19.45)
