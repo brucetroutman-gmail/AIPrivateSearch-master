@@ -1,0 +1,9 @@
+Product	Category	Price	Stock	Supplier
+Laptop	Electronics	999.99	25	TechCorp
+Mouse	Electronics	29.99	150	TechCorp
+Keyboard	Electronics	79.99	75	InputDevices
+Monitor	Electronics	299.99	40	DisplayTech
+Desk	Furniture	199.99	20	OfficePlus
+Chair	Furniture	149.99	35	OfficePlus
+Notebook	Stationery	4.99	200	PaperCo
+Pen	Stationery	1.99	500	PaperCo

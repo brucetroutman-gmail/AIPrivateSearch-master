@@ -403,7 +403,11 @@ router.get('/:collection/:filename', async (req, res) => {
     
     // Get file extension
     const ext = filename.split('.').pop().toLowerCase();
-    const allowedExtensions = ['md', 'txt', 'json', 'csv', 'xls', 'xlsx', 'pdf', 'doc', 'docx'];
+    const allowedExtensions = [
+      'md', 'txt', 'json', 'csv', 'tsv', 'yaml', 'yml', 'xml', 'html', 'htm',
+      'py', 'js', 'java', 'cpp', 'c', 'h', 'css', 'sql', 'log', 'eml', 'tex',
+      'rtf', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'epub'
+    ];
     
     if (!allowedExtensions.includes(ext)) {
       return res.status(400).json({ error: 'File type not supported' });
@@ -412,12 +416,34 @@ router.get('/:collection/:filename', async (req, res) => {
     const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     
     // Set appropriate content type and read method based on file type
-    if (ext === 'md' || ext === 'txt' || ext === 'json' || ext === 'csv') {
+    const textExtensions = ['md', 'txt', 'json', 'csv', 'tsv', 'yaml', 'yml', 'xml', 'html', 'htm', 'py', 'js', 'java', 'cpp', 'c', 'h', 'css', 'sql', 'log', 'eml', 'tex', 'rtf'];
+    
+    if (textExtensions.includes(ext)) {
       const content = await secureFs.readFile(filePath, 'utf8');
-      let contentType = 'text/plain; charset=utf-8';
-      if (ext === 'json') contentType = 'application/json; charset=utf-8';
-      if (ext === 'csv') contentType = 'text/csv; charset=utf-8';
-      res.setHeader('Content-Type', contentType);
+      
+      const contentTypes = {
+        json: 'application/json; charset=utf-8',
+        csv: 'text/csv; charset=utf-8',
+        tsv: 'text/tab-separated-values; charset=utf-8',
+        yaml: 'application/x-yaml; charset=utf-8',
+        yml: 'application/x-yaml; charset=utf-8',
+        xml: 'application/xml; charset=utf-8',
+        html: 'text/html; charset=utf-8',
+        htm: 'text/html; charset=utf-8',
+        js: 'application/javascript; charset=utf-8',
+        css: 'text/css; charset=utf-8',
+        py: 'text/x-python; charset=utf-8',
+        java: 'text/x-java-source; charset=utf-8',
+        cpp: 'text/x-c++src; charset=utf-8',
+        c: 'text/x-csrc; charset=utf-8',
+        h: 'text/x-chdr; charset=utf-8',
+        sql: 'application/sql; charset=utf-8',
+        tex: 'application/x-latex; charset=utf-8',
+        rtf: 'application/rtf; charset=utf-8',
+        eml: 'message/rfc822; charset=utf-8'
+      };
+      
+      res.setHeader('Content-Type', contentTypes[ext] || 'text/plain; charset=utf-8');
       res.send(content);
     } else {
       // Binary files (PDF, DOC, DOCX)
@@ -428,7 +454,13 @@ router.get('/:collection/:filename', async (req, res) => {
         doc: 'application/msword',
         docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         xls: 'application/vnd.ms-excel',
-        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ppt: 'application/vnd.ms-powerpoint',
+        pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        odt: 'application/vnd.oasis.opendocument.text',
+        ods: 'application/vnd.oasis.opendocument.spreadsheet',
+        odp: 'application/vnd.oasis.opendocument.presentation',
+        epub: 'application/epub+zip'
       };
       
       res.setHeader('Content-Type', contentTypes[ext]);

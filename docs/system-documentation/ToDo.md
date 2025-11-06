@@ -73,14 +73,18 @@ Phase 3 - Role-Based Feature Control:
 239. Create user onboarding tutorial/wizard
 
 251. Create sample HR system for small to medium business.
-265. 
+267. 
 
 
 
+
+## RECENTLY COMPLETED (v19.50)
+265. Fix collections-editor source file links for YAML, XML, TSV, HTML and other formats by expanding allowed file extensions and adding proper MIME types --done
+266. Create comprehensive Type-Test collection with 25+ sample files covering all supported document formats for testing --done
 
 ## RECENTLY COMPLETED (v19.49)
-240. Add support for additional document formats (PowerPoint, etc.) --done
-264. Reorganize collections-editor buttons - Put Process Source Files and Delete Documents on first line (always visible), other buttons on second line (Professional tier only) --done
+~~240. Add support for additional document formats (PowerPoint, etc.)~~ --done
+~~264. Reorganize collections-editor buttons - Put Process Source Files and Delete Documents on first line (always visible), other buttons on second line (Professional tier only)~~ --done
 
 ## RECENTLY COMPLETED (v19.48)
 ~~257. Fix config-editor URL parameter parsing with better debugging and fallback handling~~ --done

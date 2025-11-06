@@ -1,0 +1,11 @@
+Sample Text Document
+
+This is a plain text file containing sample content for testing document processing capabilities. 
+
+Key features:
+- Simple text format
+- No special formatting
+- Easy to read and process
+- Universal compatibility
+
+This document tests the basic text processing functionality of AIPrivateSearch.

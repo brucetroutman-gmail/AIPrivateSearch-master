@@ -1,0 +1,43 @@
+Return-Path: <sender@example.com>
+Delivered-To: recipient@company.com
+Received: from mail.example.com (mail.example.com [192.168.1.50])
+	by mx.company.com (Postfix) with ESMTP id 12345ABC
+	for <recipient@company.com>; Mon, 15 Jan 2024 10:30:00 -0500 (EST)
+From: John Sender <sender@example.com>
+To: Jane Recipient <recipient@company.com>
+Cc: Bob Manager <manager@company.com>
+Subject: Sample Email Document - Testing EML Processing
+Date: Mon, 15 Jan 2024 10:29:45 -0500
+Message-ID: <20240115152945.12345@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hello Jane,
+
+This is a sample email document for testing EML file processing capabilities in AIPrivateSearch.
+
+Key features of this email:
+- Standard RFC 2822 format
+- Multiple recipients (To and CC)
+- Plain text content
+- Proper headers and metadata
+
+The email processing should extract:
+1. Sender information
+2. Recipient information
+3. Subject line
+4. Date and time
+5. Message content
+
+This helps test the email parsing functionality of the document processor.
+
+Best regards,
+John Sender
+
+--
+John Sender
+Senior Developer
+Example Company
+Phone: (555) 123-4567
+Email: sender@example.com

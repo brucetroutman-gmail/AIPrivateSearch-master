@@ -1,0 +1,32 @@
+# 04-sample
+DocID: Typ_1762462640696_31jcqrc2g
+
+```yaml
+document_type: sample_yaml
+title: Sample YAML Document
+description: This YAML file tests structured configuration processing
+
+features:
+  - Human readable format
+  - Hierarchical structure
+  - Configuration files
+  - Data serialization
+
+metadata:
+  version: 1.0
+  created: 2024-01-01
+  purpose: testing
+
+test_data:
+  numbers: [1, 2, 3, 4, 5]
+  boolean: true
+  null_value: null
+  
+servers:
+  - name: web1
+    ip: 192.168.1.10
+    port: 80
+  - name: web2
+    ip: 192.168.1.11
+    port: 80
+```

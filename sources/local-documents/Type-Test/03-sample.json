@@ -1,0 +1,21 @@
+{
+  "document_type": "sample_json",
+  "title": "Sample JSON Document",
+  "description": "This JSON file tests structured data processing",
+  "features": [
+    "Structured data format",
+    "Key-value pairs",
+    "Arrays and objects",
+    "Machine readable"
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01",
+    "purpose": "testing"
+  },
+  "test_data": {
+    "numbers": [1, 2, 3, 4, 5],
+    "boolean": true,
+    "null_value": null
+  }
+}

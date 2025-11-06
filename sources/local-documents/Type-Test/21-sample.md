@@ -1,0 +1,4 @@
+# 21-sample
+DocID: Typ_1762462741935_zlblvqb3k
+
+Sample HTM Document Sample HTM Document This is an HTM file (alternative HTML extension) that tests web markup processing. Key Differences Uses .htm extension instead of .html Legacy 8.3 filename compatibility Same HTML content and structure Identical processing requirements Sample Content This document contains: Headers and paragraphs Lists (ordered and unordered) Basic HTML formatting Semantic structure This document tests HTM processing in AIPrivateSearch.

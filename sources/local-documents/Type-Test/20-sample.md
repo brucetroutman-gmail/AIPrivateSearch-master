@@ -1,0 +1,42 @@
+# 20-sample
+DocID: Typ_1762462732686_agmweic5c
+
+```yaml
+# Sample YML Document (alternative YAML extension)
+document_type: sample_yml
+title: Sample YML Document
+description: This YML file tests YAML processing with .yml extension
+
+# Application configuration
+app:
+  name: AIPrivateSearch
+  version: 19.49
+  environment: testing
+  
+# Database settings  
+database:
+  host: localhost
+  port: 3306
+  name: aiprivatesearch
+  ssl: true
+  
+# Feature flags
+features:
+  document_processing: true
+  ai_scoring: true
+  multi_search: true
+  user_management: true
+  
+# Supported formats
+supported_formats:
+  - txt
+  - pdf
+  - docx
+  - pptx
+  - xlsx
+  - html
+  - json
+  - yaml
+  - xml
+  - csv
+```
