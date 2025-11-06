@@ -73,9 +73,29 @@ Phase 3 - Role-Based Feature Control:
 239. Create user onboarding tutorial/wizard
 240. Add support for additional document formats (PowerPoint, etc.)
 251. Create sample HR system for small to medium business.
-253. 
+257. Fix config-editor URL parameter parsing with better debugging and fallback handling --done
+258. Add comprehensive debugging to config pages for URL parameter troubleshooting --done
+259. Fix config-editor URL parameter loss by adding sessionStorage fallback --in progress
+260. Add server-side routing for config-editor to preserve query parameters on custom ports --in progress
+261. Fix menu navigation to config.html and CSRF token timing with dynamic ports --in progress
+262. Fix hardcoded URLs and CSRF timing issues across all pages for dynamic port compatibility --done, test plan created
+264. 
+
+
+
+
+## RECENTLY COMPLETED (v19.48)
+263. Restrict standard tier users from changing search and score model parameters (Temperature, Context, Tokens) --done
 
 ## RECENTLY COMPLETED (v19.47)
+253. Fix Manage Collections connection refused error by updating hardcoded API URLs to use dynamic API_BASE_URL --done
+254. Fix Modify Config page 404 errors by removing non-existent default.css and updating hardcoded API URLs --done
+255. Fix Config file list page by removing non-existent default.css, adding API config, and fixing editor link --done
+256. Fix config-editor timing issue by ensuring API config loads before attempting to load file --done
+257. Fix config-editor URL parameter parsing with better debugging and fallback handling --done
+258. Add comprehensive debugging to config pages for URL parameter troubleshooting --done
+259. Fix config-editor URL parameter loss by adding sessionStorage fallback --done
+260. Add server-side routing for config-editor to preserve query parameters on custom ports --done
 
 ## RECENTLY COMPLETED (v19.46)
 

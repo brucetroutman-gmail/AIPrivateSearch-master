@@ -77,6 +77,14 @@ app.use(cookieParser());
 // Serve static files from client
 app.use(express.static(path.join(process.cwd(), '../../client/c01_client-first-app')));
 
+// Specific route for config-editor to preserve query parameters
+app.get('/config-editor.html', (req, res) => {
+  res.sendFile(path.join(process.cwd(), '../../client/c01_client-first-app/config-editor.html'));
+});
+app.get('/config-editor', (req, res) => {
+  res.sendFile(path.join(process.cwd(), '../../client/c01_client-first-app/config-editor.html'));
+});
+
 // CSRF token endpoint
 app.get('/api/csrf-token', generateCSRFToken, (req, res) => {
   res.json({ csrfToken: req.csrfToken });

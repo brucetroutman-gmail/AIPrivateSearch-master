@@ -53,7 +53,7 @@ async function loadCollections() {
       collections = await window.collectionsUtils.loadCollections();
     } else {
       // Fallback to direct API call
-      const response = await fetch('http://localhost:3001/api/multi-search/collections');
+      const response = await fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
       const data = await response.json();
       collections = data.collections || [];
     }
@@ -1182,7 +1182,7 @@ form.addEventListener('submit', async (e) => {
     } else if (searchType === 'line-search') {
       // Use same endpoint as multi-mode for line-search searches
       const searchStartTime = Date.now();
-      const response = await window.csrfManager.fetch('http://localhost:3001/api/multi-search/line-search', {
+      const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/line-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: trimmedQuery, options: { collection, useWildcards } })
@@ -1332,7 +1332,7 @@ form.addEventListener('submit', async (e) => {
     // Add system information to all results that don't have it
     if (!result.systemInfo || !result.pcCode) {
       try {
-        const systemInfoResponse = await fetch('http://localhost:3001/api/system-info');
+        const systemInfoResponse = await fetch(`${window.API_BASE_URL}/api/system-info`);
         if (systemInfoResponse.ok) {
           const systemInfo = await systemInfoResponse.json();
           result.systemInfo = systemInfo.systemInfo;

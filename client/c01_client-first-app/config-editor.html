@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Config Editor - AIPrivateSearch</title>
-  <link rel="stylesheet" href="default.css">
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
+  <script src="shared/utils/apiConfig.js"></script>
   <script type="module" src="shared/common.js"></script>
   <style>
     
@@ -132,26 +132,62 @@
     let originalContent = '';
     
     function getQueryParam(param) {
+      console.log('Full URL:', window.location.href);
+      console.log('Search params:', window.location.search);
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
+      const value = urlParams.get(param);
+      console.log(`Parameter '${param}':`, value);
+      
+      // Fallback: try to parse manually if URLSearchParams fails
+      if (!value && window.location.search) {
+        const match = window.location.search.match(new RegExp(`[?&]${param}=([^&]*)`));
+        if (match) {
+          const fallbackValue = decodeURIComponent(match[1]);
+          console.log(`Fallback parameter '${param}':`, fallbackValue);
+          return fallbackValue;
+        }
+      }
+      
+      return value;
     }
     
     async function loadFile() {
-      console.log('Loading file...');
+      console.log('=== loadFile() called ===');
+      console.log('Current URL:', window.location.href);
+      console.log('URL pathname:', window.location.pathname);
+      console.log('URL search:', window.location.search);
+      console.log('URL hash:', window.location.hash);
+      
       currentFileName = getQueryParam('file');
-      console.log('File name:', currentFileName);
+      console.log('Extracted file name:', currentFileName);
+      
+      // Fallback to sessionStorage if URL parameter is missing
+      if (!currentFileName) {
+        currentFileName = sessionStorage.getItem('configFile');
+        console.log('Fallback from sessionStorage:', currentFileName);
+      }
+      
+      console.log('Final file name:', currentFileName);
+      console.log('File name type:', typeof currentFileName);
+      console.log('File name length:', currentFileName ? currentFileName.length : 'null');
       
       if (!currentFileName) {
-        showError('No file specified');
+        showError('No file specified in URL. Please select a file from the config list.');
+        document.getElementById('fileName').textContent = 'No file selected';
+        document.getElementById('jsonEditor').value = 'No file specified. Please go back and select a config file to edit.';
         return;
       }
       
       document.getElementById('fileName').textContent = currentFileName;
       
       try {
+        const apiUrl = `${window.API_BASE_URL}/api/config/${currentFileName}`;
+        console.log('API_BASE_URL:', window.API_BASE_URL);
+        console.log('Full API URL:', apiUrl);
         console.log('Fetching from API...');
-        const response = await fetch(`http://localhost:3001/api/config/${currentFileName}`);
+        const response = await fetch(apiUrl);
         console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
@@ -187,7 +223,7 @@
       }
       
       try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/config/${currentFileName}`, {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/${currentFileName}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content })
@@ -272,8 +308,24 @@
     
 
     
-    // Load file on page load
-    loadFile();
+    // Load file on page load after API config is ready
+    console.log('=== Page load initialization ===');
+    console.log('Initial API_BASE_URL:', window.API_BASE_URL);
+    
+    setTimeout(() => {
+      console.log('First timeout - API_BASE_URL:', window.API_BASE_URL);
+      if (window.API_BASE_URL) {
+        console.log('API config ready, calling loadFile()');
+        loadFile();
+      } else {
+        console.log('API config not ready, retrying in 100ms');
+        // Retry after a short delay if API config not ready
+        setTimeout(() => {
+          console.log('Retry timeout - API_BASE_URL:', window.API_BASE_URL);
+          loadFile();
+        }, 100);
+      }
+    }, 50);
   </script>
 
   <div id="footer-placeholder"></div>

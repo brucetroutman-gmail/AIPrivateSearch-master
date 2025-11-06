@@ -22,6 +22,17 @@ class CSRFManager {
       return this.token;
     }
 
+    // Wait for API_BASE_URL to be available
+    let retries = 0;
+    while (!window.API_BASE_URL && retries < 10) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      retries++;
+    }
+    
+    if (!window.API_BASE_URL) {
+      throw new Error('API_BASE_URL not available');
+    }
+
     try {
       const response = await fetch(`${window.API_BASE_URL}/api/csrf-token`);
       if (!response.ok) {
@@ -90,6 +101,5 @@ class CSRFManager {
 // Global CSRF manager instance
 if (typeof window !== 'undefined') {
   window.csrfManager = new CSRFManager();
-  // Initialize immediately
-  window.csrfManager.init().catch(() => {});
+  // Don't initialize immediately - wait for API config to load
 }

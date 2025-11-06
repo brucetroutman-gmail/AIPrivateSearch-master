@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
+  <script src="shared/utils/apiConfig.js"></script>
   <script type="module" src="shared/common.js"></script>
   <style>
     .collections-container {
@@ -145,7 +146,7 @@
           collections = await window.collectionsUtils.loadCollections();
         } else {
           // Fallback to direct API call
-          const response = await fetch('http://localhost:3001/api/multi-search/collections');
+          const response = await fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
           const data = await response.json();
           collections = data.collections || [];
         }
@@ -218,7 +219,7 @@
       showMessage(`Creating collection '${collectionName}'...`, 'info');
       
       try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/documents/collections/create', {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: collectionName })

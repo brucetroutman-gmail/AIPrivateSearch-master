@@ -6,6 +6,7 @@
   <title>Edit Collection - AIPrivateSearch</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
+  <script src="shared/utils/apiConfig.js"></script>
   <script type="module" src="shared/common.js"></script>
   <style>
     .editor-container {
@@ -354,9 +355,9 @@
     async function loadDocuments() {
       try {
         const [filesResponse, indexedResponse, documentIndexResponse] = await Promise.all([
-          fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files?t=${Date.now()}`),
-          fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/indexed`),
-          fetch(`http://localhost:3001/api/multi-search/document-index-status`, {
+          fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/files?t=${Date.now()}`),
+          fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/indexed`),
+          fetch(`${window.API_BASE_URL}/api/multi-search/document-index-status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ collection: currentCollection })
@@ -584,7 +585,7 @@
           const formData = new FormData();
           formData.append('file', file);
           
-          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/upload`, {
+          const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/upload`, {
             method: 'POST',
             body: formData
           });
@@ -632,7 +633,7 @@
       showLog(`Converting ${selected.length} selected documents...`);
       
       try {
-        const response = await window.csrfManager.fetch('http://localhost:3001/api/documents/convert-selected', {
+        const response = await window.csrfManager.fetch('${window.API_BASE_URL}/api/documents/convert-selected', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection, files: selected })
@@ -678,7 +679,7 @@
         try {
           showLog(`${progress} Processing: ${filename}`, 'processing');
           
-          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+          const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
@@ -707,7 +708,7 @@
       
       // Force refresh of indexed documents status
       try {
-        const indexedResponse = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/indexed?t=${Date.now()}`);
+        const indexedResponse = await fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/indexed?t=${Date.now()}`);
         const indexedData = await indexedResponse.json();
         indexedDocuments = indexedData.documents || [];
         renderDocuments(); // Re-render to show updated status
@@ -726,7 +727,7 @@
       showLog(`Checking unified SQLite embeddings for collection: ${currentCollection}`);
       
       try {
-        const response = await fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/embeddings-info`);
+        const response = await fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/embeddings-info`);
         const data = await response.json();
         
         showLog(`=== UNIFIED SQLITE STORAGE ===`);
@@ -782,7 +783,7 @@
             
             // Process single document
             await window.csrfManager.init(); // Ensure CSRF is initialized
-            const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-create-single`, {
+            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-index-create-single`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ collection: currentCollection, filename: fileName })
@@ -824,7 +825,7 @@
       showLog(`Searching ${currentCollection} in unified SQLite embeddings for: "${query}"...`);
       
       try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/search`, {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, limit: 3 })
@@ -855,7 +856,7 @@
       showLog(`Removing collection '${currentCollection}'...`, 'info');
       
       try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}`, {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}`, {
           method: 'DELETE'
         });
         
@@ -911,7 +912,7 @@
     
     function openFile(filename) {
       // Open document content in new tab
-      const url = `http://localhost:3001/api/documents/${currentCollection}/${filename}`;
+      const url = `${window.API_BASE_URL}/api/documents/${currentCollection}/${filename}`;
       window.open(url, '_blank');
     }
     
@@ -940,7 +941,7 @@
         const progress = `${i + 1}/${selectedFiles.length}`;
         
         try {
-          const response = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+          const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/index/${filename}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ vectorDB })
@@ -984,7 +985,7 @@
         try {
           // Remove from unified SQLite embeddings if it's an MD file
           if (filename.endsWith('.md')) {
-            const removeResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/index/${filename}`, {
+            const removeResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/index/${filename}`, {
               method: 'DELETE'
             });
             if (removeResponse.ok) {
@@ -993,7 +994,7 @@
           }
           
           // Delete the file
-          const deleteResponse = await window.csrfManager.fetch(`http://localhost:3001/api/documents/collections/${currentCollection}/files/${filename}`, {
+          const deleteResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/files/${filename}`, {
             method: 'DELETE'
           });
           
@@ -1016,7 +1017,7 @@
     
     async function viewDocumentIndex(filename) {
       try {
-        const response = await fetch(`http://localhost:3001/api/multi-search/document-index-view`, {
+        const response = await fetch(`${window.API_BASE_URL}/api/multi-search/document-index-view`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection, filename })
@@ -1182,7 +1183,7 @@
       };
       
       try {
-        const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-update-all`, {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-index-update-all`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedDocumentIndex)
@@ -1296,7 +1297,7 @@
           const progress = `${i + 1}/${selectedFiles.length}`;
           
           try {
-            const response = await window.csrfManager.fetch(`http://localhost:3001/api/multi-search/document-index-remove`, {
+            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-index-remove`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ collection: currentCollection, filename })
