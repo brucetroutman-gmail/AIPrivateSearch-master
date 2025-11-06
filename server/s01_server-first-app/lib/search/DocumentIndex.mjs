@@ -895,27 +895,19 @@ Content: ${content.substring(0, 3000)}`;
         console.log(`Updated ${filename} with DocID: ${docId}`);
       }
       
-      // Enhanced AI analysis using system prompt
-      const prompts = await loadSystemPrompts();
-      const docIndexPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
-      const analysisPrompt = `${docIndexPrompt}
-
-Document: ${filename}
-Content: ${content.substring(0, 3000)}`;
-      
-      // Enhanced AI analysis with error handling
+      // Fast AI analysis with optimized prompt and timeout
       let analysis = {
         title: filename.replace('.md', '').replace(/[-_]/g, ' '),
         author: '',
-        document_type: filename.includes('Declaration') ? 'government' : 'other',
+        document_type: 'document',
         language: 'en',
         source: '',
         version: '',
         access_level: 'public',
         license: '',
         category: 'document',
-        summary: `Document: ${filename.replace('.md', '')}. Content processed successfully.`,
-        topics: filename.includes('Declaration') ? 'independence, government, rights' : '',
+        summary: `Document: ${filename.replace('.md', '')}`,
+        topics: '',
         keywords: filename.replace('.md', '').toLowerCase().split(/[-_\s]+/).join(', '),
         key_phrases: '',
         sentiment: 'neutral',
@@ -923,92 +915,71 @@ Content: ${content.substring(0, 3000)}`;
         dates_mentioned: '',
         amounts_mentioned: '',
         action_items: '',
-        importance_level: '4',
-        complexity_score: '6'
+        importance_level: '3',
+        complexity_score: '5'
       };
       
-      // Try AI analysis with fallback to defaults
+      // Fast AI analysis with timeout and reduced content
       try {
-        const prompts = await loadSystemPrompts();
-        const docPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
-        const aiPrompt = `${docPrompt}
-
-Document: ${filename}
-Content: ${content.substring(0, 3000)}`;
+        const shortPrompt = `Analyze this document briefly:\n\nTitle: ${filename}\nContent: ${content.substring(0, 1000)}\n\nProvide:\n1. Author:\n2. Type:\n3. Summary (1 sentence):\n4. Topics:\n5. Key phrases:`;
         
-        const aiResponse = await ollamaService.generateText(aiPrompt, modelName);
+        // Get document-index model from config
+        let docIndexModel = 'qwen2:1.5b'; // fallback
+        try {
+          const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');
+          const modelList = JSON.parse(fs.readFileSync(modelListPath, 'utf8'));
+          const docIndexModels = modelList.models.filter(m => m.category === 'document-index');
+          if (docIndexModels.length > 0) {
+            docIndexModel = docIndexModels[0].modelName;
+          }
+        } catch (configError) {
+          console.log('Using fallback model for document indexing:', docIndexModel);
+        }
         
-        // Parse AI response (numbered format)
+        // Use timeout to prevent hanging
+        const aiResponse = await Promise.race([
+          ollamaService.generateText(shortPrompt, docIndexModel),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('AI timeout')), 10000)) // 10s timeout
+        ]);
+        
+        // Parse simplified AI response
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
-          if (line.startsWith('1.')) {
+          if (line.startsWith('1.') && line.includes('Author:')) {
             const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
-              analysis.author = content.includes('Congress') ? 'Continental Congress' : content.substring(0, 100);
+            if (content && content.length > 2 && !content.toLowerCase().includes('unknown')) {
+              analysis.author = content.substring(0, 100);
             }
           }
-          if (line.startsWith('2.')) {
+          if (line.startsWith('2.') && line.includes('Type:')) {
             const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 3) {
-              analysis.document_type = content.toLowerCase();
+            if (content && content.length > 2) {
+              analysis.document_type = content.toLowerCase().substring(0, 50);
             }
           }
-          if (line.startsWith('3.')) {
+          if (line.startsWith('3.') && line.includes('Summary:')) {
             const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
-              analysis.entities = content.substring(0, 200);
+            if (content && content.length > 10) {
+              analysis.summary = content.substring(0, 200);
             }
           }
-          if (line.startsWith('4.')) {
+          if (line.startsWith('4.') && line.includes('Topics:')) {
             const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
-              analysis.dates_mentioned = content.includes('July 4, 1776') ? 'July 4, 1776' : content.substring(0, 100);
+            if (content && content.length > 3) {
+              analysis.topics = content.substring(0, 150);
             }
           }
-          if (line.startsWith('5.')) {
+          if (line.startsWith('5.') && line.includes('Key phrases:')) {
             const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
-              analysis.amounts_mentioned = content.substring(0, 100);
-            }
-          }
-          if (line.startsWith('6.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
-              analysis.key_phrases = content.substring(0, 200);
-            }
-          }
-          if (line.startsWith('7.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 10) {
-              analysis.action_items = content.substring(0, 200);
-            }
-          }
-          if (line.startsWith('8.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 20) {
-              analysis.summary = content.substring(0, 300);
-            }
-          }
-          if (line.startsWith('9.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 5) {
-              analysis.topics = content.substring(0, 200);
-            }
-          }
-          if (line.startsWith('10.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && !content.includes('None') && !content.includes('N/A') && !content.includes('Not specified') && content.length > 0) {
-              analysis.importance_level = content.substring(0, 1);
+            if (content && content.length > 5) {
+              analysis.key_phrases = content.substring(0, 150);
             }
           }
         });
-        if (analysis.key_phrases && analysis.key_phrases.length > 200) {
-          analysis.key_phrases = analysis.key_phrases.substring(0, 200);
-        }
         
-        console.log(`AI analysis completed for ${filename}`);
+        console.log(`Fast AI analysis completed for ${filename}`);
       } catch (aiError) {
-        console.log(`AI analysis failed for ${filename}, using defaults:`, aiError.message);
+        console.log(`AI analysis failed for ${filename} (${aiError.message}), using defaults`);
       }
       
       // Calculate text metrics

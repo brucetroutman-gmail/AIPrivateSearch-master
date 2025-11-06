@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Format Support - AIPrivateSearch</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="shared/utils/apiConfig.js"></script>
+  <script src="csrf.js"></script>
+
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="page-content">
+    <main class="container">
+      <h1>Document Format Support</h1>
+      <p>AIPrivateSearch supports comprehensive document conversion across 30+ file formats. All documents are converted to Markdown for optimal AI processing and search capabilities.</p>
+
+      <!-- Statistics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">32+</span>
+          <div class="stat-label">Supported Formats</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">6</span>
+          <div class="stat-label">Format Categories</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">100%</span>
+          <div class="stat-label">Markdown Output</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">AI</span>
+          <div class="stat-label">Enhanced Processing</div>
+        </div>
+      </div>
+
+      <!-- Conversion Process -->
+      <h2>Conversion Process</h2>
+      <div class="conversion-flow">
+        <div class="flow-step">Upload</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Convert</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Process</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Search</div>
+      </div>
+
+      <!-- Supported Formats -->
+      <h2>Supported File Formats</h2>
+      <div class="format-grid">
+        <!-- Office Documents -->
+        <div class="format-category">
+          <h3>📄 Office Documents</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.docx</span>
+              <div>
+                <div class="format-desc">Microsoft Word</div>
+                <div class="format-tech">mammoth library</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.doc</span>
+              <div>
+                <div class="format-desc">Legacy Word</div>
+                <div class="format-tech">mammoth library</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.pptx</span>
+              <div>
+                <div class="format-desc">PowerPoint</div>
+                <div class="format-tech">LibreOffice conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.ppt</span>
+              <div>
+                <div class="format-desc">Legacy PowerPoint</div>
+                <div class="format-tech">LibreOffice conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.xlsx</span>
+              <div>
+                <div class="format-desc">Excel Spreadsheet</div>
+                <div class="format-tech">LibreOffice → table</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.xls</span>
+              <div>
+                <div class="format-desc">Legacy Excel</div>
+                <div class="format-tech">LibreOffice → table</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.odt</span>
+              <div>
+                <div class="format-desc">OpenDocument Text</div>
+                <div class="format-tech">LibreOffice conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.ods</span>
+              <div>
+                <div class="format-desc">OpenDocument Spreadsheet</div>
+                <div class="format-tech">LibreOffice → table</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Text & Markup -->
+        <div class="format-category">
+          <h3>📝 Text & Markup</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.txt</span>
+              <div>
+                <div class="format-desc">Plain Text</div>
+                <div class="format-tech">native support</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.md</span>
+              <div>
+                <div class="format-desc">Markdown</div>
+                <div class="format-tech">native support</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.html</span>
+              <div>
+                <div class="format-desc">HTML Document</div>
+                <div class="format-tech">native parsing</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.rtf</span>
+              <div>
+                <div class="format-desc">Rich Text Format</div>
+                <div class="format-tech">LibreOffice conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.tex</span>
+              <div>
+                <div class="format-desc">LaTeX Document</div>
+                <div class="format-tech">pandoc conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.log</span>
+              <div>
+                <div class="format-desc">Log Files</div>
+                <div class="format-tech">formatted code blocks</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Data Files -->
+        <div class="format-category">
+          <h3>📊 Data Files</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.json</span>
+              <div>
+                <div class="format-desc">JSON Data</div>
+                <div class="format-tech">formatted code blocks</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.yaml</span>
+              <div>
+                <div class="format-desc">YAML Data</div>
+                <div class="format-tech">formatted code blocks</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.xml</span>
+              <div>
+                <div class="format-desc">XML Data</div>
+                <div class="format-tech">formatted code blocks</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.csv</span>
+              <div>
+                <div class="format-desc">Comma-Separated Values</div>
+                <div class="format-tech">markdown tables</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.tsv</span>
+              <div>
+                <div class="format-desc">Tab-Separated Values</div>
+                <div class="format-tech">markdown tables</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Code Files -->
+        <div class="format-category">
+          <h3>💻 Code Files</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.py</span>
+              <div>
+                <div class="format-desc">Python Code</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.js</span>
+              <div>
+                <div class="format-desc">JavaScript Code</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.java</span>
+              <div>
+                <div class="format-desc">Java Code</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.cpp</span>
+              <div>
+                <div class="format-desc">C++ Code</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.css</span>
+              <div>
+                <div class="format-desc">CSS Stylesheets</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.sql</span>
+              <div>
+                <div class="format-desc">SQL Scripts</div>
+                <div class="format-tech">syntax highlighting</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Email Files -->
+        <div class="format-category">
+          <h3>📧 Email Files</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.eml</span>
+              <div>
+                <div class="format-desc">Email Files (RFC 2822)</div>
+                <div class="format-tech">header & body parsing</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.msg</span>
+              <div>
+                <div class="format-desc">Outlook Email Files</div>
+                <div class="format-tech">limited binary support</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Specialized -->
+        <div class="format-category">
+          <h3>🔧 Specialized</h3>
+          <ul class="format-list">
+            <li class="format-item">
+              <span class="format-ext">.pdf</span>
+              <div>
+                <div class="format-desc">PDF Documents</div>
+                <div class="format-tech">pdftotext utility</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.epub</span>
+              <div>
+                <div class="format-desc">EPUB Ebooks</div>
+                <div class="format-tech">pandoc conversion</div>
+              </div>
+            </li>
+            <li class="format-item">
+              <span class="format-ext">.odp</span>
+              <div>
+                <div class="format-desc">OpenDocument Presentation</div>
+                <div class="format-tech">LibreOffice conversion</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Dependencies -->
+      <h2>System Dependencies</h2>
+      <div class="dependency-list">
+        <div class="dependency-item">
+          <div class="dependency-name">LibreOffice</div>
+          <div class="dependency-desc">Office formats, presentations, spreadsheets</div>
+          <div class="dependency-install">brew install --cask libreoffice</div>
+        </div>
+        <div class="dependency-item">
+          <div class="dependency-name">Pandoc</div>
+          <div class="dependency-desc">EPUB and LaTeX conversion</div>
+          <div class="dependency-install">brew install pandoc</div>
+        </div>
+        <div class="dependency-item">
+          <div class="dependency-name">Poppler</div>
+          <div class="dependency-desc">PDF text extraction</div>
+          <div class="dependency-install">brew install poppler</div>
+        </div>
+        <div class="dependency-item">
+          <div class="dependency-name">Mammoth</div>
+          <div class="dependency-desc">Word document processing</div>
+          <div class="dependency-install">automatically installed</div>
+        </div>
+      </div>
+
+      <!-- Unsupported -->
+      <div class="unsupported">
+        <h3>⚠️ Currently Unsupported</h3>
+        <p><strong>Apple Keynote:</strong> .key files - please export to PowerPoint format</p>
+        <p><strong>Image Files:</strong> OCR processing not yet implemented</p>
+        <p><strong>Unknown Formats:</strong> Clear error messages with conversion recommendations</p>
+      </div>
+
+      <!-- Performance Notes -->
+      <h2>Performance & Limitations</h2>
+      <div class="format-category">
+        <ul class="bulleted-list">
+          <li><strong>Excel Files:</strong> Limited to first 100 rows for performance</li>
+          <li><strong>LibreOffice Conversions:</strong> May take 30-60 seconds per file</li>
+          <li><strong>PDF Processing:</strong> Speed depends on document complexity</li>
+          <li><strong>Batch Processing:</strong> Files processed in parallel with rate limiting</li>
+          <li><strong>Error Handling:</strong> Failed conversions preserve original files</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script type="module" src="shared/common.js"></script>
+</body>
+</html>

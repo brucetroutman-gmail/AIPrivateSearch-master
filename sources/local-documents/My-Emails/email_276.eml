@@ -1,0 +1,21 @@
+From: supplier@b.com
+To: autoshop@a.com
+Subject: Order Confirmation - ORD-39334
+Date: Sat, 29 Mar 2025 11:56:58 
+Message-ID: <843210.5401@autoshop.a.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Dear Auto Shop,
+
+Your order has been confirmed:
+
+Order ID: ORD-39334
+Part: Muffler
+Quantity: 3
+Total: $264
+Estimated Delivery: 2025-11-17
+
+Thank you for your business!
+
+Supplier Team

@@ -324,7 +324,7 @@
                     
                     try {
                         // Load current models-list.json
-                        const configResponse = await fetch('${window.API_BASE_URL}/api/config/models-list.json');
+                        const configResponse = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
                         const configData = await configResponse.json();
                         const models = JSON.parse(configData.content);
                         
@@ -338,7 +338,7 @@
                         });
                         
                         // Save updated config
-                        const saveResponse = await window.csrfManager.fetch('${window.API_BASE_URL}/api/config/models-list.json', {
+                        const saveResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
@@ -555,7 +555,7 @@
                     
                     if (response.ok) {
                         // Remove from models-list.json
-                        const configResponse = await fetch('${window.API_BASE_URL}/api/config/models-list.json');
+                        const configResponse = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
                         const configData = await configResponse.json();
                         const models = JSON.parse(configData.content);
                         
@@ -563,7 +563,7 @@
                         models.models = models.models.filter(model => model.modelName !== modelName);
                         
                         // Save updated config
-                        await window.csrfManager.fetch('${window.API_BASE_URL}/api/config/models-list.json', {
+                        await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })

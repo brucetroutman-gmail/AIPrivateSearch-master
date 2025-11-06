@@ -71,21 +71,25 @@ Phase 3 - Role-Based Feature Control:
 237. Add automated testing suite for all search methods
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
-240. Add support for additional document formats (PowerPoint, etc.)
+
 251. Create sample HR system for small to medium business.
-257. Fix config-editor URL parameter parsing with better debugging and fallback handling --done
-258. Add comprehensive debugging to config pages for URL parameter troubleshooting --done
-259. Fix config-editor URL parameter loss by adding sessionStorage fallback --in progress
-260. Add server-side routing for config-editor to preserve query parameters on custom ports --in progress
-261. Fix menu navigation to config.html and CSRF token timing with dynamic ports --in progress
-262. Fix hardcoded URLs and CSRF timing issues across all pages for dynamic port compatibility --done, test plan created
-264. 
+265. 
 
 
 
+
+## RECENTLY COMPLETED (v19.49)
+240. Add support for additional document formats (PowerPoint, etc.) --done
+264. Reorganize collections-editor buttons - Put Process Source Files and Delete Documents on first line (always visible), other buttons on second line (Professional tier only) --done
 
 ## RECENTLY COMPLETED (v19.48)
-263. Restrict standard tier users from changing search and score model parameters (Temperature, Context, Tokens) --done
+~~257. Fix config-editor URL parameter parsing with better debugging and fallback handling~~ --done
+~~258. Add comprehensive debugging to config pages for URL parameter troubleshooting~~ --done
+~~259. Fix config-editor URL parameter loss by adding sessionStorage fallback~~ --done
+~~260. Add server-side routing for config-editor to preserve query parameters on custom ports~~ --done
+~~261. Fix menu navigation to config.html and CSRF token timing with dynamic ports~~ --done
+~~262. Fix hardcoded URLs and CSRF timing issues across all pages for dynamic port compatibility~~ --done, test plan created
+~~263. Restrict standard tier users from changing search and score model parameters (Temperature, Context, Tokens)~~ --done
 
 ## RECENTLY COMPLETED (v19.47)
 253. Fix Manage Collections connection refused error by updating hardcoded API URLs to use dynamic API_BASE_URL --done

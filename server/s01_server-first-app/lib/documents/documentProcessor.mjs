@@ -6,7 +6,7 @@ import { Ollama } from 'ollama';
 
 export class DocumentProcessor {
   constructor() {
-    this.supportedFormats = ['.txt', '.pdf', '.docx', '.doc'];
+    this.supportedFormats = ['.txt', '.pdf', '.docx', '.doc', '.pptx', '.ppt', '.xlsx', '.xls', '.rtf', '.html', '.htm', '.odt', '.epub', '.ods', '.key', '.odp', '.eml', '.msg', '.json', '.yaml', '.yml', '.xml', '.py', '.js', '.java', '.cpp', '.c', '.h', '.css', '.sql', '.tex', '.log', '.md', '.tsv', '.csv'];
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
     this.metadataModel = null;
     this.docIdCounter = 1;
@@ -125,8 +125,54 @@ export class DocumentProcessor {
         case '.docx':
         case '.doc':
           return await this.processDocx(filePath);
+        case '.pptx':
+        case '.ppt':
+          return await this.processPowerPoint(filePath);
+        case '.xlsx':
+        case '.xls':
+          return await this.processExcel(filePath);
+        case '.rtf':
+          return await this.processRTF(filePath);
+        case '.html':
+        case '.htm':
+          return await this.processHTML(filePath);
+        case '.odt':
+          return await this.processODT(filePath);
+        case '.epub':
+          return await this.processEPUB(filePath);
+        case '.ods':
+          return await this.processODS(filePath);
+        case '.key':
+        case '.odp':
+          return await this.processPresentation(filePath);
+        case '.eml':
+        case '.msg':
+          return await this.processEmail(filePath);
+        case '.json':
+        case '.yaml':
+        case '.yml':
+        case '.xml':
+          return await this.processStructuredData(filePath);
+        case '.py':
+        case '.js':
+        case '.java':
+        case '.cpp':
+        case '.c':
+        case '.h':
+        case '.css':
+        case '.sql':
+          return await this.processCode(filePath);
+        case '.tex':
+          return await this.processLaTeX(filePath);
+        case '.log':
+          return await this.processLog(filePath);
+        case '.md':
+          return await this.processMarkdown(filePath);
+        case '.tsv':
+        case '.csv':
+          return await this.processCSV(filePath);
         default:
-          throw new Error(`Unsupported file format: ${ext}`);
+          return await this.processUnsupported(filePath, ext);
       }
     } catch (error) {
       console.error(`Conversion failed for ${filename}:`, error.message);
@@ -182,6 +228,569 @@ export class DocumentProcessor {
     } catch (error) {
       return `# ${filename}\n\n[Error extracting DOCX content: ${error.message}]`;
     }
+  }
+
+  async processPowerPoint(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      // Use LibreOffice to convert PowerPoint to text
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to txt --outdir "${tempDir}" "${filePath}"`, {
+        timeout: 60000
+      });
+      
+      const txtFile = path.join(tempDir, filename + '.txt');
+      if (await secureFs.exists(txtFile)) {
+        const content = await secureFs.readFile(txtFile, 'utf8');
+        await secureFs.unlink(txtFile); // Clean up temp file
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting PowerPoint content: ${error.message}]\n\n*This PowerPoint file could not be processed. Please ensure LibreOffice is installed.*`;
+    }
+  }
+
+  async processExcel(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      // Use LibreOffice to convert Excel to CSV, then process
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to csv --outdir "${tempDir}" "${filePath}"`, {
+        timeout: 60000
+      });
+      
+      const csvFile = path.join(tempDir, filename + '.csv');
+      if (await secureFs.exists(csvFile)) {
+        const content = await secureFs.readFile(csvFile, 'utf8');
+        await secureFs.unlink(csvFile); // Clean up temp file
+        
+        // Convert CSV to markdown table
+        const lines = content.split('\n').filter(line => line.trim());
+        if (lines.length > 0) {
+          const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+          let markdown = `# ${filename}\n\n| ${headers.join(' | ')} |\n|${headers.map(() => '---').join('|')}|\n`;
+          
+          for (let i = 1; i < Math.min(lines.length, 101); i++) { // Limit to 100 rows
+            const cells = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+            markdown += `| ${cells.join(' | ')} |\n`;
+          }
+          
+          if (lines.length > 101) {
+            markdown += `\n*Note: Only first 100 rows shown. Total rows: ${lines.length - 1}*\n`;
+          }
+          
+          return markdown;
+        }
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting Excel content: ${error.message}]\n\n*This Excel file could not be processed. Please ensure LibreOffice is installed.*`;
+    }
+  }
+
+  async processRTF(filePath) {
+    const filename = path.basename(filePath, '.rtf');
+    
+    try {
+      // Use LibreOffice to convert RTF to text
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to txt --outdir "${tempDir}" "${filePath}"`, {
+        timeout: 60000
+      });
+      
+      const txtFile = path.join(tempDir, filename + '.txt');
+      if (await secureFs.exists(txtFile)) {
+        const content = await secureFs.readFile(txtFile, 'utf8');
+        await secureFs.unlink(txtFile); // Clean up temp file
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting RTF content: ${error.message}]\n\n*This RTF file could not be processed. Please ensure LibreOffice is installed.*`;
+    }
+  }
+
+  async processHTML(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      
+      // Simple HTML to text conversion - remove tags and decode entities
+      let textContent = content
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove scripts
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove styles
+        .replace(/<[^>]+>/g, ' ') // Remove HTML tags
+        .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+        .replace(/&amp;/g, '&') // Decode common entities
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      
+      return `# ${filename}\n\n${textContent}`;
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting HTML content: ${error.message}]`;
+    }
+  }
+
+  async processODT(filePath) {
+    const filename = path.basename(filePath, '.odt');
+    
+    try {
+      // Use LibreOffice to convert ODT to text
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to txt --outdir "${tempDir}" "${filePath}"`, {
+        timeout: 60000
+      });
+      
+      const txtFile = path.join(tempDir, filename + '.txt');
+      if (await secureFs.exists(txtFile)) {
+        const content = await secureFs.readFile(txtFile, 'utf8');
+        await secureFs.unlink(txtFile); // Clean up temp file
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting ODT content: ${error.message}]\n\n*This ODT file could not be processed. Please ensure LibreOffice is installed.*`;
+    }
+  }
+
+  async processEPUB(filePath) {
+    const filename = path.basename(filePath, '.epub');
+    
+    try {
+      // Use pandoc to convert EPUB to Markdown
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const outputFile = path.join(tempDir, filename + '_temp.md');
+      
+      const { stdout, stderr } = await execAsync(`pandoc "${filePath}" -t markdown -o "${outputFile}"`, {
+        timeout: 120000 // 2 minutes for large ebooks
+      });
+      
+      if (await secureFs.exists(outputFile)) {
+        const content = await secureFs.readFile(outputFile, 'utf8');
+        await secureFs.unlink(outputFile); // Clean up temp file
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Pandoc conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting EPUB content: ${error.message}]\n\n*This EPUB file could not be processed. Please ensure Pandoc is installed: brew install pandoc*`;
+    }
+  }
+
+  async processODS(filePath) {
+    const filename = path.basename(filePath, '.ods');
+    
+    try {
+      // Use LibreOffice to convert ODS to CSV
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to csv --outdir "${tempDir}" "${filePath}"`, {
+        timeout: 60000
+      });
+      
+      const csvFile = path.join(tempDir, filename + '.csv');
+      if (await secureFs.exists(csvFile)) {
+        const content = await secureFs.readFile(csvFile, 'utf8');
+        await secureFs.unlink(csvFile);
+        return this.csvToMarkdown(content, filename);
+      } else {
+        throw new Error('Conversion failed - no output file created');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting ODS content: ${error.message}]\n\n*This ODS file could not be processed. Please ensure LibreOffice is installed.*`;
+    }
+  }
+
+  async processPresentation(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      if (ext === '.key') {
+        // Keynote files need special handling - convert to PDF first
+        return `# ${filename}\n\n[Keynote files are not currently supported]\n\n*Please export your Keynote presentation to PowerPoint (.pptx) format first.*`;
+      } else {
+        // ODP files can be processed with LibreOffice
+        const { exec } = await import('child_process');
+        const { promisify } = await import('util');
+        const execAsync = promisify(exec);
+        
+        const tempDir = path.dirname(filePath);
+        const { stdout, stderr } = await execAsync(`libreoffice --headless --convert-to txt --outdir "${tempDir}" "${filePath}"`, {
+          timeout: 60000
+        });
+        
+        const txtFile = path.join(tempDir, filename + '.txt');
+        if (await secureFs.exists(txtFile)) {
+          const content = await secureFs.readFile(txtFile, 'utf8');
+          await secureFs.unlink(txtFile);
+          return `# ${filename}\n\n${content.trim()}`;
+        } else {
+          throw new Error('Conversion failed - no output file created');
+        }
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error extracting presentation content: ${error.message}]\n\n*This presentation file could not be processed.*`;
+    }
+  }
+
+  async processEmail(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      
+      if (ext === '.eml') {
+        return await this.processEMLFile(content, filename);
+      } else if (ext === '.msg') {
+        // MSG files are binary format, need different handling
+        return `# ${filename}\n\n[MSG files require specialized parsing]\n\n*MSG files are Microsoft Outlook binary format. Please export to EML format or forward as plain text.*`;
+      }
+      
+      return `# ${filename}\n\n[Unknown email format: ${ext}]`;
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing email file: ${error.message}]\n\n*Email file could not be read or parsed.*`;
+    }
+  }
+
+  async processEMLFile(content, filename) {
+    try {
+      const email = this.parseEMLContent(content);
+      
+      let markdown = `# ${filename}\n\n`;
+      
+      // Email headers
+      markdown += `## Email Details\n\n`;
+      if (email.from) markdown += `**From:** ${email.from}\n`;
+      if (email.to) markdown += `**To:** ${email.to}\n`;
+      if (email.cc) markdown += `**CC:** ${email.cc}\n`;
+      if (email.subject) markdown += `**Subject:** ${email.subject}\n`;
+      if (email.date) markdown += `**Date:** ${email.date}\n`;
+      
+      // Email body
+      if (email.body) {
+        markdown += `\n## Message Content\n\n${email.body}`;
+      }
+      
+      // Attachments info
+      if (email.attachments && email.attachments.length > 0) {
+        markdown += `\n\n## Attachments\n\n`;
+        email.attachments.forEach(att => {
+          markdown += `- ${att}\n`;
+        });
+      }
+      
+      return markdown;
+    } catch (error) {
+      return `# ${filename}\n\n[Error parsing EML content: ${error.message}]\n\n*EML file structure could not be parsed.*`;
+    }
+  }
+
+  parseEMLContent(content) {
+    const email = {
+      from: null,
+      to: null,
+      cc: null,
+      subject: null,
+      date: null,
+      body: null,
+      attachments: []
+    };
+    
+    const lines = content.split('\n');
+    let inHeaders = true;
+    let bodyLines = [];
+    let currentHeader = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (inHeaders) {
+        // Empty line marks end of headers
+        if (line.trim() === '') {
+          inHeaders = false;
+          continue;
+        }
+        
+        // Header continuation (starts with space or tab)
+        if (line.match(/^\s/) && currentHeader) {
+          email[currentHeader] += ' ' + line.trim();
+          continue;
+        }
+        
+        // New header
+        const headerMatch = line.match(/^([^:]+):\s*(.*)$/);
+        if (headerMatch) {
+          const headerName = headerMatch[1].toLowerCase();
+          const headerValue = headerMatch[2];
+          
+          switch (headerName) {
+            case 'from':
+              email.from = this.cleanEmailAddress(headerValue);
+              currentHeader = 'from';
+              break;
+            case 'to':
+              email.to = this.cleanEmailAddress(headerValue);
+              currentHeader = 'to';
+              break;
+            case 'cc':
+              email.cc = this.cleanEmailAddress(headerValue);
+              currentHeader = 'cc';
+              break;
+            case 'subject':
+              email.subject = headerValue;
+              currentHeader = 'subject';
+              break;
+            case 'date':
+              email.date = headerValue;
+              currentHeader = 'date';
+              break;
+            case 'content-disposition':
+              if (headerValue.includes('attachment')) {
+                const filenameMatch = headerValue.match(/filename="?([^"\n]+)"?/);
+                if (filenameMatch) {
+                  email.attachments.push(filenameMatch[1]);
+                }
+              }
+              currentHeader = null;
+              break;
+            default:
+              currentHeader = null;
+          }
+        }
+      } else {
+        // Body content
+        bodyLines.push(line);
+      }
+    }
+    
+    // Process body content
+    let bodyContent = bodyLines.join('\n');
+    
+    // Handle multipart content
+    if (bodyContent.includes('Content-Type: text/plain')) {
+      const plainTextMatch = bodyContent.match(/Content-Type: text\/plain[\s\S]*?\n\n([\s\S]*?)(?=\n--[\w-]+|\nContent-Type:|$)/);
+      if (plainTextMatch) {
+        bodyContent = plainTextMatch[1].trim();
+      }
+    } else if (bodyContent.includes('Content-Type: text/html')) {
+      const htmlMatch = bodyContent.match(/Content-Type: text\/html[\s\S]*?\n\n([\s\S]*?)(?=\n--[\w-]+|\nContent-Type:|$)/);
+      if (htmlMatch) {
+        // Simple HTML to text conversion
+        bodyContent = htmlMatch[1]
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+    }
+    
+    // Clean up body content
+    bodyContent = bodyContent
+      .replace(/^Content-Transfer-Encoding:.*$/gm, '')
+      .replace(/^Content-Type:.*$/gm, '')
+      .replace(/^--[\w-]+.*$/gm, '')
+      .replace(/\n\s*\n/g, '\n\n')
+      .trim();
+    
+    email.body = bodyContent || 'No readable content found';
+    
+    return email;
+  }
+  
+  cleanEmailAddress(address) {
+    if (!address) return null;
+    
+    // Remove angle brackets and extra whitespace
+    return address
+      .replace(/[<>]/g, '')
+      .replace(/^\s+|\s+$/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  async processStructuredData(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      
+      if (ext === '.json') {
+        const jsonData = JSON.parse(content);
+        const formatted = JSON.stringify(jsonData, null, 2);
+        return `# ${filename}\n\n\`\`\`json\n${formatted}\n\`\`\``;
+      } else if (ext === '.yaml' || ext === '.yml') {
+        return `# ${filename}\n\n\`\`\`yaml\n${content.trim()}\n\`\`\``;
+      } else if (ext === '.xml') {
+        return `# ${filename}\n\n\`\`\`xml\n${content.trim()}\n\`\`\``;
+      }
+      
+      return `# ${filename}\n\n\`\`\`\n${content.trim()}\n\`\`\``;
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing structured data: ${error.message}]`;
+    }
+  }
+
+  async processCode(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      const language = this.getLanguageFromExtension(ext);
+      
+      return `# ${filename}\n\n\`\`\`${language}\n${content.trim()}\n\`\`\``;
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing code file: ${error.message}]`;
+    }
+  }
+
+  async processLaTeX(filePath) {
+    const filename = path.basename(filePath, '.tex');
+    
+    try {
+      // Use pandoc to convert LaTeX to Markdown
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      
+      const tempDir = path.dirname(filePath);
+      const outputFile = path.join(tempDir, filename + '_temp.md');
+      
+      const { stdout, stderr } = await execAsync(`pandoc "${filePath}" -f latex -t markdown -o "${outputFile}"`, {
+        timeout: 60000
+      });
+      
+      if (await secureFs.exists(outputFile)) {
+        const content = await secureFs.readFile(outputFile, 'utf8');
+        await secureFs.unlink(outputFile);
+        return `# ${filename}\n\n${content.trim()}`;
+      } else {
+        throw new Error('Pandoc conversion failed');
+      }
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing LaTeX file: ${error.message}]\n\n*Please ensure Pandoc is installed: brew install pandoc*`;
+    }
+  }
+
+  async processLog(filePath) {
+    const filename = path.basename(filePath, '.log');
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      return `# ${filename}\n\n\`\`\`log\n${content.trim()}\n\`\`\``;
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing log file: ${error.message}]`;
+    }
+  }
+
+  async processMarkdown(filePath) {
+    const filename = path.basename(filePath, '.md');
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      return content; // Already markdown, return as-is
+    } catch (error) {
+      return `# ${filename}\n\n[Error reading markdown file: ${error.message}]`;
+    }
+  }
+
+  async processCSV(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const filename = path.basename(filePath, ext);
+    
+    try {
+      const content = await secureFs.readFile(filePath, 'utf8');
+      return this.csvToMarkdown(content, filename, ext === '.tsv' ? '\t' : ',');
+    } catch (error) {
+      return `# ${filename}\n\n[Error processing CSV/TSV file: ${error.message}]`;
+    }
+  }
+
+  async processUnsupported(filePath, ext) {
+    const filename = path.basename(filePath);
+    
+    return `# ${filename}\n\n**File Format Not Supported**\n\nThe file format \`${ext}\` cannot be processed by AIPrivateSearch.\n\n**Supported formats:**\n- Text: .txt, .md, .log\n- Office: .docx, .doc, .pptx, .ppt, .xlsx, .xls, .rtf, .odt, .ods\n- Web: .html, .htm\n- Data: .json, .yaml, .xml, .csv, .tsv\n- Code: .py, .js, .java, .cpp, .c, .h, .css, .sql\n- Other: .pdf, .epub, .tex\n\n**Recommendation:** Please convert this file to a supported format or contact support for additional format requests.`;
+  }
+
+  csvToMarkdown(content, filename, delimiter = ',') {
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length === 0) {
+      return `# ${filename}\n\nEmpty file.`;
+    }
+    
+    const headers = lines[0].split(delimiter).map(h => h.replace(/"/g, '').trim());
+    let markdown = `# ${filename}\n\n| ${headers.join(' | ')} |\n|${headers.map(() => '---').join('|')}|\n`;
+    
+    for (let i = 1; i < Math.min(lines.length, 101); i++) {
+      const cells = lines[i].split(delimiter).map(c => c.replace(/"/g, '').trim());
+      markdown += `| ${cells.join(' | ')} |\n`;
+    }
+    
+    if (lines.length > 101) {
+      markdown += `\n*Note: Only first 100 rows shown. Total rows: ${lines.length - 1}*\n`;
+    }
+    
+    return markdown;
+  }
+
+  getLanguageFromExtension(ext) {
+    const languageMap = {
+      '.py': 'python',
+      '.js': 'javascript',
+      '.java': 'java',
+      '.cpp': 'cpp',
+      '.c': 'c',
+      '.h': 'c',
+      '.css': 'css',
+      '.sql': 'sql'
+    };
+    
+    return languageMap[ext] || 'text';
   }
 
   async convertCollectionFiles(collection) {

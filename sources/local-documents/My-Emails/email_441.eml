@@ -1,0 +1,21 @@
+From: supplier@b.com
+To: autoshop@a.com
+Subject: Order Confirmation - ORD-87825
+Date: Wed, 25 Jun 2025 11:56:58 
+Message-ID: <493055.1864@autoshop.a.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Dear Auto Shop,
+
+Your order has been confirmed:
+
+Order ID: ORD-87825
+Part: Radiator
+Quantity: 4
+Total: $108
+Estimated Delivery: 2025-11-10
+
+Thank you for your business!
+
+Supplier Team

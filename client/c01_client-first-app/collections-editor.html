@@ -254,7 +254,11 @@
         </div>
         
         <div class="action-buttons">
+          <button class="btn btn-success" onclick="processSourceFiles()">Process Source Files</button>
           <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
+        </div>
+        
+        <div class="action-buttons pro-only">
           <button class="btn btn-warning" onclick="convertDocuments()">Convert Source Files</button>
           <button class="btn btn-info" onclick="generateDocumentIndex()">Create Doc Index Cards</button>
           <button class="btn btn-danger" onclick="removeIndexCards()">Remove Index Cards</button>
@@ -621,6 +625,132 @@
       }
     }
     
+    async function processSourceFiles() {
+      const selected = getSelectedDocuments();
+      if (selected.length === 0) {
+        showUserMessage('Please select source files to process', 'error');
+        return;
+      }
+      
+      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Create Doc Index Cards\n3. Embed Converted Files\n\nThis may take several minutes.`)) {
+        return;
+      }
+      
+      setProcessingState(true);
+      const totalStartTime = Date.now();
+      clearLog();
+      showLog(`=== PROCESSING ${selected.length} SOURCE FILES ===`, 'processing');
+      
+      try {
+        // Step 1: Convert Documents
+        showLog(`\n--- STEP 1: CONVERTING FILES ---`, 'processing');
+        const convertResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/convert-selected`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: currentCollection, files: selected })
+        });
+        
+        const convertResult = await convertResponse.json();
+        
+        if (convertResult.success) {
+          showLog(`✓ Conversion complete: ${convertResult.converted} files converted`, 'success');
+        } else {
+          showLog(`✗ Conversion failed: ${convertResult.error}`, 'error');
+          return;
+        }
+        
+        // Refresh document list to get converted files
+        await loadDocuments();
+        
+        // Get converted files for next steps
+        const convertedFiles = selected.map(file => {
+          const baseName = file.substring(0, file.lastIndexOf('.')) || file;
+          return baseName + '.md';
+        }).filter(file => documents.some(doc => (typeof doc === 'string' ? doc : doc.name) === file));
+        
+        if (convertedFiles.length === 0) {
+          showLog(`✗ No converted files found to process further`, 'error');
+          return;
+        }
+        
+        // Step 2: Create Doc Index Cards
+        showLog(`\n--- STEP 2: CREATING DOC INDEX CARDS ---`, 'processing');
+        for (let i = 0; i < convertedFiles.length; i++) {
+          const fileName = convertedFiles[i];
+          const progress = `${i + 1}/${convertedFiles.length}`;
+          const fileStartTime = Date.now();
+          
+          try {
+            showLog(`${progress} Creating index: ${fileName}`, 'processing');
+            
+            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-index-create-single`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ collection: currentCollection, filename: fileName })
+            });
+            
+            const result = await response.json();
+            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
+            
+            if (result.success) {
+              const docIdInfo = result.docId ? ` (DocID: ${result.docId})` : '';
+              showLog(`${progress} ✓ Index created: ${fileName}${docIdInfo} (${fileElapsed}s)`, 'success');
+            } else {
+              showLog(`${progress} ✗ Index failed: ${fileName} - ${result.error} (${fileElapsed}s)`, 'error');
+            }
+          } catch (error) {
+            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
+            showLog(`${progress} ✗ Index error: ${fileName} - ${error.message} (${fileElapsed}s)`, 'error');
+          }
+        }
+        
+        // Step 3: Embed Converted Files
+        showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
+        for (let i = 0; i < convertedFiles.length; i++) {
+          const fileName = convertedFiles[i];
+          const progress = `${i + 1}/${convertedFiles.length}`;
+          const fileStartTime = Date.now();
+          
+          try {
+            showLog(`${progress} Embedding: ${fileName}`, 'processing');
+            
+            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/index/${fileName}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({})
+            });
+            
+            const result = await response.json();
+            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
+            
+            if (result.success) {
+              const chunkInfo = result.chunks ? ` (${result.chunks} chunks)` : '';
+              const reuseInfo = result.reused ? ' [reused]' : ' [new]';
+              showLog(`${progress} ✓ Embedded: ${fileName}${chunkInfo}${reuseInfo} (${formatTime(fileElapsed)})`, 'success');
+            } else {
+              showLog(`${progress} ✗ Embed failed: ${fileName} - ${result.error} (${formatTime(fileElapsed)})`, 'error');
+            }
+          } catch (error) {
+            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
+            showLog(`${progress} ✗ Embed error: ${fileName} - ${error.message} (${formatTime(fileElapsed)})`, 'error');
+          }
+        }
+        
+        const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(1);
+        showLog(`\n=== PROCESSING COMPLETE ===`, 'success');
+        showLog(`✓ ${selected.length} source files processed in ${formatTime(totalElapsed)}`, 'success');
+        showLog(`Files are now ready for search and analysis`, 'info');
+        
+        // Refresh document list to show final status
+        await loadDocuments();
+        
+      } catch (error) {
+        showLog(`✗ Processing error: ${error.message}`, 'error');
+      } finally {
+        setProcessingState(false);
+      }
+    }
+    
     async function convertDocuments() {
       const selected = getSelectedDocuments();
       if (selected.length === 0) {
@@ -633,7 +763,7 @@
       showLog(`Converting ${selected.length} selected documents...`);
       
       try {
-        const response = await window.csrfManager.fetch('${window.API_BASE_URL}/api/documents/convert-selected', {
+        const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/convert-selected`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ collection: currentCollection, files: selected })

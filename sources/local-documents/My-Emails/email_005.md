@@ -1,0 +1,25 @@
+# email_005
+DocID: My-_1762459973550_uqw419ii4
+
+## Email Details
+
+**From:** autoshop@a.com
+**To:** supplier@b.com
+**Subject:** Parts Order Request - Brake Calipers
+**Date:** Sun, 13 Apr 2025 11:56:58 
+
+## Message Content
+
+Hi Supplier Team,
+
+We need to order the following parts for our shop:
+
+Order ID: ORD-99447
+Part: Brake Calipers
+Quantity: 4
+Expected Price: $269
+
+Please confirm availability and delivery timeline.
+
+Best regards,
+Auto Shop Team
