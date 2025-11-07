@@ -6,6 +6,20 @@ import path from 'path';
 
 const router = express.Router();
 
+// Get subscription tier
+router.get('/subscription-tier', async (req, res) => {
+  try {
+    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+    const configData = await secureFs.readFile(configPath, 'utf8');
+    const config = JSON.parse(configData);
+    
+    const tier = config['subscription-tier'] || 3; // Default to professional
+    res.json({ tier });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update subscription tier
 router.post('/subscription-tier', async (req, res) => {
   try {

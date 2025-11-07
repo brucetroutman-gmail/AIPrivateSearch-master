@@ -70,9 +70,13 @@ Phase 3 - Role-Based Feature Control:
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
 
-269. 
+269. Create a logging system that updates log.json in the config folder.
 
 
+
+## RECENTLY COMPLETED (v19.55)
+277. Fix collections dropdown loading by adding missing GET route for subscription-tier endpoint and adding sources directory to secureFs allowed paths --done
+278. Change multi-mode search page title from "Multi-Mode Search" to "Collections Multi-Mode Search" --done
 
 ## RECENTLY COMPLETED (v19.54)
 275. Fix secureFs wrapper by adding missing mkdir method that UserManager requires for directory creation --done

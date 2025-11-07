@@ -8,7 +8,9 @@ const ALLOWED_DIRS = [
     path.resolve('./sources/local-documents'),
     path.resolve('./data'),
     path.resolve('./lib'),
-    '/Users/Shared/AIPrivateSearch/data'
+    path.resolve('../../client/c01_client-first-app/config'),
+    '/Users/Shared/AIPrivateSearch/data',
+    '/Users/Shared/AIPrivateSearch/sources'
 ];
 
 function validatePath(filePath) {

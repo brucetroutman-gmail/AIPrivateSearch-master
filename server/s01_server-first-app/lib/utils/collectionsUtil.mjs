@@ -42,6 +42,7 @@ export class CollectionsUtil {
   static async getAvailableCollections() {
     try {
       const collectionsPath = this.getCollectionsPath();
+      console.log(`[CollectionsUtil] Attempting to read collections from: ${collectionsPath}`);
       const items = await secureFs.readdir(collectionsPath);
       
       const collections = [];

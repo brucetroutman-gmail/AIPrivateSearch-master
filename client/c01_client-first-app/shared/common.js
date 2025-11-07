@@ -648,7 +648,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
 const collectionsUtils = {
   async loadCollections() {
     try {
-      const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
+      const response = await fetch(`${window.API_BASE_URL}/api/multi-search/collections`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
