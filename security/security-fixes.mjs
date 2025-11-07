@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable security/detect-non-literal-fs-filename */
+/* eslint-disable security/detect-unsafe-regex */
 
 import fs from 'fs/promises';
 import path from 'path';

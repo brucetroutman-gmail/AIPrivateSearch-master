@@ -1,3 +1,5 @@
+ 
+ 
 export class EmbeddingService {
   constructor() {
     this.ollamaUrl = 'http://localhost:11434';

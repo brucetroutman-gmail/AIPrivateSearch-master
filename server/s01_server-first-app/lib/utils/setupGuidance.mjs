@@ -1,3 +1,5 @@
+ 
+ 
 // Common setup guidance messages for search types requiring embeddings or doc indexes
 
 export class SetupGuidance {

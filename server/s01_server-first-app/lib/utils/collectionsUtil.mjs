@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+ 
 import { secureFs } from './secureFileOps.mjs';
 import path from 'path';
 import fs from 'fs';

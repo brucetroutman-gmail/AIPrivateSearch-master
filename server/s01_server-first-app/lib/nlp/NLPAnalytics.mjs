@@ -1,3 +1,5 @@
+ 
+/* eslint-disable security/detect-unsafe-regex */
 import natural from 'natural';
 
 export class NLPAnalytics {

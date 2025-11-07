@@ -1,3 +1,5 @@
+ 
+ 
 export const USER_DEFAULTS = {
   SUBSCRIPTION_TIER: 'standard',
   USER_ROLE: 'searcher'

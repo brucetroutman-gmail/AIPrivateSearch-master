@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+ 
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';

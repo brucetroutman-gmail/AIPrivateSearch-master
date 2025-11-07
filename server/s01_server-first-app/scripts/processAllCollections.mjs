@@ -1,3 +1,5 @@
+ 
+ 
 import { CollectionManager } from '../lib/documents/collectionManager.mjs';
 import { DocumentSearch } from '../lib/documents/documentSearch.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';

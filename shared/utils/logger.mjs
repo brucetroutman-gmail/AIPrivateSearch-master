@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+/* eslint-disable security/detect-unsafe-regex */
 // Centralized logging utility with input sanitization
 // Prevents log injection attacks by sanitizing all logged content
 

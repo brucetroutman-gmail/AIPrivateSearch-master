@@ -1,3 +1,5 @@
+ 
+ 
 export class OllamaService {
   constructor() {
     this.baseURL = 'http://localhost:11434';

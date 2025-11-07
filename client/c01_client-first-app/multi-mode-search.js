@@ -1,3 +1,11 @@
+
+// Security: HTML sanitization function
+function sanitizeHtml(html) {
+    const div = document.createElement('div');
+    div.textContent = html;
+    return div.innerHTML;
+}
+
 import { DOMSanitizer } from './shared/utils/domSanitizer.js';
 
 // Multi-mode search functionality

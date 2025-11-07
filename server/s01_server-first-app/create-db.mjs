@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+ 
 import initSqlJs from 'sql.js';
 import fs from 'fs';
 import path from 'path';

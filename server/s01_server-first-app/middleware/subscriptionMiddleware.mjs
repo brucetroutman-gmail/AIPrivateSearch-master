@@ -1,3 +1,5 @@
+ 
+ 
 import { SubscriptionManager } from '../lib/auth/subscriptionManager.mjs';
 
 const subscriptionManager = new SubscriptionManager();

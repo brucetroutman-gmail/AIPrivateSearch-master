@@ -1,3 +1,5 @@
+ 
+ 
 // Common highlighting utility for search results across all search types
 
 export class HighlightFormatter {

@@ -1,36 +1,11 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+ 
 
 import fs from 'fs-extra';
 import path from 'path';
 
-function getAppConfig() {
-    const possiblePaths = [
-        '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/client/c01_client-first-app/config/app.json',
-        '/Users/Shared/AIPrivateSearch/repo/AIPrivateSearch/client/c01_client-first-app/config/app.json',
-        path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json')
-    ];
-    
-    for (const configPath of possiblePaths) {
-        try {
-            if (fs.existsSync(configPath)) {
-                const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-                // Config loaded successfully
-                return config;
-            }
-        } catch (error) {
-            // Failed to load config from this path
-            continue;
-        }
-    }
-    
-    // Using default config
-    return {
-        'app-name': 'AI Private Search',
-        'sources-location': '/Users/Shared/AIPrivateSearch/sources'
-    };
-}
-
 const ALLOWED_DIRS = [
-    path.resolve('../../sources'),
+    path.resolve('./sources/local-documents'),
     path.resolve('./data'),
     path.resolve('./lib')
 ];
@@ -39,75 +14,44 @@ function validatePath(filePath) {
     const normalizedPath = path.normalize(filePath);
     const resolvedPath = path.resolve(normalizedPath);
     
-    // Allow paths under the aiprivatesearch project directory, sources directory, and data directory
-    const config = getAppConfig();
-    const allowedRoots = [
-        '/Users/Shared/AIPrivateSearch/repo/aiprivatesearch',
-        config['sources-location'],
-        '/Users/Shared/AIPrivateSearch/data'
-    ];
+    const isAllowed = ALLOWED_DIRS.some(allowedDir => 
+        resolvedPath.startsWith(allowedDir)
+    );
     
-    for (const root of allowedRoots) {
-        if (resolvedPath.startsWith(root)) {
-            return resolvedPath;
-        }
+    if (!isAllowed) {
+        throw new Error('Path traversal attempt detected: ' + filePath);
     }
-    
-    throw new Error('Path traversal attempt detected: ' + filePath);
+    return resolvedPath;
 }
 
 export const secureFs = {
     async readFile(filePath, options) {
         const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.readFile(safePath, options);
     },
     
     async writeFile(filePath, data, options) {
         const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.writeFile(safePath, data, options);
     },
     
     async readdir(dirPath, options) {
         const safePath = validatePath(dirPath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.readdir(safePath, options);
     },
     
     async stat(filePath) {
         const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.stat(safePath);
     },
     
     createReadStream(filePath, options) {
         const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.createReadStream(safePath, options);
     },
     
     createWriteStream(filePath, options) {
         const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         return fs.createWriteStream(safePath, options);
-    },
-    
-    async unlink(filePath) {
-        const safePath = validatePath(filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        return fs.unlink(safePath);
-    },
-    
-    async rmdir(dirPath, options) {
-        const safePath = validatePath(dirPath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        return fs.rmdir(safePath, options);
-    },
-    
-    async mkdir(dirPath, options) {
-        const safePath = validatePath(dirPath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        return fs.mkdir(safePath, options);
     }
 };

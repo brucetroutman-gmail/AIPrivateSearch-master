@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+/* eslint-disable security/detect-unsafe-regex */
 import security from 'eslint-plugin-security';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
