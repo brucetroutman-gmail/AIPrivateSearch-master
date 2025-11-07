@@ -79,6 +79,9 @@ async function loadCollections() {
       collectionEl.value = lastUsed;
     }
     
+    // Load user prompts after collections are loaded
+    loadUserPrompts();
+    
     // Restore last used search type
     const lastSearchType = localStorage.getItem('lastSearchType');
     if (lastSearchType) {
@@ -234,15 +237,20 @@ Promise.all([
   // Handle collection loading if documents are involved
   if (sourceTypeEl.value.includes('Docu')) {
     loadCollections();
+  } else {
+    // Load user prompts for Local Model Only
+    loadUserPrompts();
   }
 }).catch(() => {
   // Fallback: use default visibility
   updateFieldVisibilityFallback();
+  // Still try to load user prompts
+  loadUserPrompts();
 });
 loadModels();
 loadSystemPrompts();
-loadUserPrompts();
 loadSearchTypes();
+// loadUserPrompts() is now called after collections are loaded
 
 loadTokensOptions();
 loadTemperatureOptions();
@@ -337,20 +345,7 @@ async function loadUserPrompts() {
     const response = await fetch('./config/user-prompts.json');
     const data = await response.json();
     
-    while (userPromptsEl.firstChild) {
-      userPromptsEl.removeChild(userPromptsEl.firstChild);
-    }
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'Select a prompt...';
-    userPromptsEl.appendChild(defaultOption);
-    
-    data.user_prompts.forEach(prompt => {
-      const option = document.createElement('option');
-      option.value = prompt.prompt;
-      option.textContent = prompt.name;
-      userPromptsEl.appendChild(option);
-    });
+    filterUserPrompts(data);
   } catch (error) {
     while (userPromptsEl.firstChild) {
       userPromptsEl.removeChild(userPromptsEl.firstChild);
@@ -362,6 +357,37 @@ async function loadUserPrompts() {
     // logger sanitizes all inputs to prevent log injection
     logger.error('Failed to load user prompts:', error);
   }
+}
+
+// Filter user prompts based on source type and collection
+function filterUserPrompts(data) {
+  if (!userPromptsEl) return;
+  
+  while (userPromptsEl.firstChild) {
+    userPromptsEl.removeChild(userPromptsEl.firstChild);
+  }
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select a prompt...';
+  userPromptsEl.appendChild(defaultOption);
+  
+  const sourceType = sourceTypeEl.value;
+  const collection = collectionEl.value;
+  
+  let prompts = [];
+  
+  if (sourceType === 'Local Model Only') {
+    prompts = data.local_model_only || [];
+  } else if ((sourceType === 'Local Documents Only' || sourceType === 'Local Model and Documents') && collection) {
+    prompts = data.local_documents?.[collection] || [];
+  }
+  
+  prompts.forEach(prompt => {
+    const option = document.createElement('option');
+    option.value = prompt.prompt;
+    option.textContent = prompt.name;
+    userPromptsEl.appendChild(option);
+  });
 }
 
 // Handle user prompt selection
@@ -407,13 +433,18 @@ sourceTypeEl.addEventListener('change', () => {
   // Filter assistant types based on source type
   filterAssistantTypes();
   
+  // Reload user prompts when source type changes
+  loadUserPrompts();
+  
   // Update all field visibility
   updateFieldVisibility();
 });
 
-// Save collection selection
+// Save collection selection and update user prompts
 collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
+  // Reload user prompts when collection changes
+  loadUserPrompts();
 });
 
 // Save search type selection and update visibility

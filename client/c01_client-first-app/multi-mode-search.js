@@ -1,13 +1,16 @@
+import { DOMSanitizer } from './shared/utils/domSanitizer.js';
 
 // Multi-mode search functionality
 
 // DOM elements
 const searchQueryEl = document.getElementById('searchQuery');
+const userPromptsEl = document.getElementById('userPrompts');
 const searchAllBtn = document.getElementById('searchAllBtn');
 
 const performanceSection = document.getElementById('performanceSection');
 const performanceTableBody = document.getElementById('performanceTableBody');
-const selectAllCheckbox = document.getElementById('selectAll');
+const selectAllNonAICheckbox = document.getElementById('selectAllNonAI');
+const selectAllAICheckbox = document.getElementById('selectAllAI');
 const methodCheckboxes = document.querySelectorAll('.method-checkbox');
 const wildcardOption = document.getElementById('wildcardOption');
 const useWildcardsMulti = document.getElementById('useWildcardsMulti');
@@ -239,9 +242,20 @@ function getSelectedMethods() {
     return selected;
 }
 
-// Select All functionality
-selectAllCheckbox.addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.method-checkbox');
+// Select All Non-AI functionality
+selectAllNonAICheckbox.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('#nonAICheckboxes .method-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateResultColumnVisibility();
+    updateWildcardVisibility();
+    saveSelectedMethods();
+});
+
+// Select All AI functionality
+selectAllAICheckbox.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('#aiCheckboxes .method-checkbox');
     checkboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });
@@ -268,11 +282,8 @@ function restoreSelectedMethods() {
                 checkbox.checked = selectedMethods.includes(checkbox.dataset.method);
             });
             
-            // Update Select All checkbox state
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-            const noneChecked = Array.from(checkboxes).every(cb => !cb.checked);
-            selectAllCheckbox.checked = allChecked;
-            selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+            // Update group Select All checkbox states
+            updateGroupSelectAllStates();
             
             updateResultColumnVisibility();
             updateWildcardVisibility();
@@ -349,11 +360,67 @@ searchQueryEl.addEventListener('input', (e) => {
 async function loadCollections() {
     const collections = await window.searchManager.loadCollections();
     window.searchManager.populateSelect('collectionSelect', collections, 'selectedCollection');
+    
+    // Add event listener to reload prompts when collection changes
+    const collectionSelect = document.getElementById('collectionSelect');
+    if (collectionSelect && !collectionSelect.hasAttribute('data-prompt-listener')) {
+        collectionSelect.addEventListener('change', () => {
+            loadUserPrompts();
+        });
+        collectionSelect.setAttribute('data-prompt-listener', 'true');
+    }
+    
+    // Load user prompts after collections are loaded
+    await loadUserPrompts();
 }
 
 async function loadModels() {
     const models = await window.searchManager.loadModels('search');
     window.searchManager.populateSelect('modelSelect', models, 'selectedSearchModel');
+}
+
+// Load user prompts
+async function loadUserPrompts() {
+    try {
+        const response = await fetch('config/user-prompts.json');
+        const data = await response.json();
+        
+        filterUserPrompts(data);
+        
+        // Add event listener for prompt selection (only once)
+        if (!userPromptsEl.hasAttribute('data-listener-added')) {
+            userPromptsEl.addEventListener('change', function() {
+                if (this.value) {
+                    searchQueryEl.value = this.value;
+                    // Save to localStorage
+                    localStorage.setItem('multiModeSearchQuery', this.value);
+                }
+            });
+            userPromptsEl.setAttribute('data-listener-added', 'true');
+        }
+        
+    } catch (error) {
+        console.error('Failed to load user prompts:', error);
+        userPromptsEl.innerHTML = '<option value="">Failed to load prompts</option>';
+    }
+}
+
+// Filter user prompts based on collection (multi-mode only uses local documents)
+function filterUserPrompts(data) {
+    // Clear existing options
+    userPromptsEl.innerHTML = '<option value="">Select a prompt...</option>';
+    
+    const collection = document.getElementById('collectionSelect').value;
+    
+    // Multi-mode search only uses local documents, so get collection-specific prompts
+    if (collection && data.local_documents && data.local_documents[collection]) {
+        data.local_documents[collection].forEach(prompt => {
+            const option = document.createElement('option');
+            option.value = prompt.prompt;
+            option.textContent = prompt.name;
+            userPromptsEl.appendChild(option);
+        });
+    }
 }
 
 // Setup parameter persistence using shared utility
@@ -370,15 +437,16 @@ async function loadSearchTypes() {
     try {
         const response = await fetch('config/search-types.json');
         const data = await response.json();
-        const container = document.getElementById('methodCheckboxes');
         
-        // Keep the Select All checkbox
-        const selectAllLabel = container.querySelector('label');
+        const nonAIContainer = document.getElementById('nonAICheckboxes');
+        const aiContainer = document.getElementById('aiCheckboxes');
         
-        // Clear existing checkboxes except Select All
-        while (container.children.length > 1) {
-            container.removeChild(container.lastChild);
-        }
+        // Define which methods are AI vs Non-AI
+        const aiMethods = ['ai-direct', 'ai-document-chat'];
+        
+        // Clear existing checkboxes
+        nonAIContainer.innerHTML = '';
+        aiContainer.innerHTML = '';
         
         // Generate checkboxes from search-types.json
         data.search_types.forEach(searchType => {
@@ -391,16 +459,17 @@ async function loadSearchTypes() {
             label.appendChild(checkbox);
             const textNode = document.createTextNode(' ' + DOMSanitizer.sanitizeText(searchType.name || ''));
             label.appendChild(textNode);
-            container.appendChild(label);
+            
+            // Add to appropriate container
+            if (aiMethods.includes(searchType.value)) {
+                aiContainer.appendChild(label);
+            } else {
+                nonAIContainer.appendChild(label);
+            }
             
             // Add event listener for the new checkbox
             checkbox.addEventListener('change', function() {
-                const allChecked = Array.from(document.querySelectorAll('.method-checkbox')).every(cb => cb.checked);
-                const noneChecked = Array.from(document.querySelectorAll('.method-checkbox')).every(cb => !cb.checked);
-                
-                selectAllCheckbox.checked = allChecked;
-                selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
-                
+                updateGroupSelectAllStates();
                 updateResultColumnVisibility();
                 updateWildcardVisibility();
                 saveSelectedMethods();
@@ -410,6 +479,24 @@ async function loadSearchTypes() {
     } catch (error) {
         console.error('Failed to load search types:', error);
     }
+}
+
+// Update group Select All checkbox states
+function updateGroupSelectAllStates() {
+    const nonAICheckboxes = document.querySelectorAll('#nonAICheckboxes .method-checkbox');
+    const aiCheckboxes = document.querySelectorAll('#aiCheckboxes .method-checkbox');
+    
+    // Update Non-AI Select All
+    const allNonAIChecked = Array.from(nonAICheckboxes).every(cb => cb.checked);
+    const noneNonAIChecked = Array.from(nonAICheckboxes).every(cb => !cb.checked);
+    selectAllNonAICheckbox.checked = allNonAIChecked;
+    selectAllNonAICheckbox.indeterminate = !allNonAIChecked && !noneNonAIChecked;
+    
+    // Update AI Select All
+    const allAIChecked = Array.from(aiCheckboxes).every(cb => cb.checked);
+    const noneAIChecked = Array.from(aiCheckboxes).every(cb => !cb.checked);
+    selectAllAICheckbox.checked = allAIChecked;
+    selectAllAICheckbox.indeterminate = !allAIChecked && !noneAIChecked;
 }
 
 // Initialize page
@@ -429,8 +516,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         searchQueryEl.value = DOMSanitizer.sanitizeText(savedQuery);
     }
     
-    // Load collections and models
-    loadCollections();
+    // Load collections (which will load user prompts) and models
+    await loadCollections();
     loadModels();
     
     // Setup parameter persistence

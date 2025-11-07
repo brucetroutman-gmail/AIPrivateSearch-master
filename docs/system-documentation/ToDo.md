@@ -69,13 +69,18 @@ Phase 3 - Role-Based Feature Control:
 236. Create API documentation for potential integrations
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
-267. 
+
+269. 
 
 
 
+## RECENTLY COMPLETED (v19.52)
+267. Hide model temperature, context, and tokens parameters on multi-mode search for Standard tier users by adding prem-only CSS class --done
+268. Reorganize user-prompts.json hierarchically with local_model_only and collection-specific prompts for local_documents, fix timing issues in search pages --done
+269. Fix multi-mode search layout by reorganizing controls: collection dropdown first, then user prompts, then model selection --done
+270. Fix user prompts loading timing issue in multi-mode search by ensuring prompts load after collections are available --done
 
 ## RECENTLY COMPLETED (v19.51)
-267. Fix document conversion bug where CSV files were being converted to JSON instead of Markdown by updating documents.mjs router to use DocumentProcessor.convertToMarkdown() consistently for all file types --done
 235. Implement document version control and change tracking --done
 237. Add automated testing suite for all search methods --done
 251. Create sample HR system for small to medium business --done

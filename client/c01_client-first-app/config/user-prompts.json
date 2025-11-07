@@ -1,5 +1,5 @@
 {
-  "user_prompts": [
+  "local_model_only": [
     {
       "name": "KNOWLEDGE-Quantum",
       "prompt": "What are the primary challenges in quantum computing, and how might they be overcome?"
@@ -20,5 +20,117 @@
       "name": "INSTRUCT-Fix wifi",
       "prompt": "Create a troubleshooting flowchart for common home WiFi problems."
     }
-  ]
+  ],
+  "local_documents": {
+    "USA-History": [
+      {
+        "name": "USA-Founding principles",
+        "prompt": "What are the key principles outlined in the Declaration of Independence?"
+      },
+      {
+        "name": "USA-Government structure",
+        "prompt": "How does the Constitution establish the structure of the federal government?"
+      },
+      {
+        "name": "USA-Rights and freedoms",
+        "prompt": "What unalienable rights are mentioned in these founding documents?"
+      },
+      {
+        "name": "USA-Colonial grievances",
+        "prompt": "What were the main complaints against King George III listed in the Declaration?"
+      },
+      {
+        "name": "USA-Constitutional powers",
+        "prompt": "How are powers divided between federal and state governments in the Constitution?"
+      }
+    ],
+    "Human-Resources": [
+      {
+        "name": "HR-Employee lookup",
+        "prompt": "Find all employees with CDL licenses expiring in the next 30 days"
+      },
+      {
+        "name": "HR-Safety incidents",
+        "prompt": "What safety incidents occurred this year and what were the root causes?"
+      },
+      {
+        "name": "HR-Drug testing",
+        "prompt": "Show the random drug testing schedule for Q1 2026"
+      },
+      {
+        "name": "HR-Benefits enrollment",
+        "prompt": "Which employees are enrolled in the high-deductible health plan?"
+      },
+      {
+        "name": "HR-Compliance audit",
+        "prompt": "What items need attention for the upcoming DOT audit?"
+      }
+    ],
+    "Law-Office": [
+      {
+        "name": "LAW-Estate planning",
+        "prompt": "Find all wills and trusts for clients with assets over $1 million"
+      },
+      {
+        "name": "LAW-Power of attorney",
+        "prompt": "Which clients have durable power of attorney documents on file?"
+      },
+      {
+        "name": "LAW-Client appointments",
+        "prompt": "Show upcoming appointments for estate planning consultations"
+      },
+      {
+        "name": "LAW-Living wills",
+        "prompt": "Find all living will documents and their key provisions"
+      },
+      {
+        "name": "LAW-Trust beneficiaries",
+        "prompt": "List all trust beneficiaries and their inheritance details"
+      }
+    ],
+    "Medical-Practice": [
+      {
+        "name": "MED-Patient history",
+        "prompt": "Find patients with diabetes and their current treatment plans"
+      },
+      {
+        "name": "MED-Medication lookup",
+        "prompt": "What medications are available for hypertension treatment?"
+      },
+      {
+        "name": "MED-Appointment schedule",
+        "prompt": "Show all appointments scheduled for next week"
+      },
+      {
+        "name": "MED-Treatment outcomes",
+        "prompt": "What are the treatment outcomes for patients with chronic conditions?"
+      },
+      {
+        "name": "MED-Practice overview",
+        "prompt": "Summarize the practice's services and specialties"
+      }
+    ],
+    "Family-Documents": [
+      {
+        "name": "FAM-Insurance policies",
+        "prompt": "What insurance policies do we have and when do they renew?"
+      },
+      {
+        "name": "FAM-Financial accounts",
+        "prompt": "Show all bank and investment account information"
+      },
+      {
+        "name": "FAM-Legal documents",
+        "prompt": "Find all wills, power of attorney, and legal documents"
+      },
+      {
+        "name": "FAM-Property records",
+        "prompt": "What property do we own and what are the deed details?"
+      },
+      {
+        "name": "FAM-Medical records",
+        "prompt": "Summarize family medical history and health insurance coverage"
+      }
+    ]
+  }
 }

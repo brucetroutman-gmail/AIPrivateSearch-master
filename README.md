@@ -109,9 +109,10 @@ This command:
 3. Updates version in README.md and both package.json files
 4. **Copies sources**: Syncs `/Users/Shared/AIPrivateSearch/sources/` to `sources/` in repo
 5. **Copies data**: Syncs `/Users/Shared/AIPrivateSearch/data/` to `data/` in repo
-6. **Organizes ToDo.md**: Updates completed items with strikethrough and moves completed tasks out of pending section
-7. Generates commit message in format: `vX.XX: [description of changes]`
-8. **Note**: Does not automatically commit - you must manually commit the changes
+6. **Checks Git security hooks**: Verifies pre-commit hooks are installed for ESLint/security validation
+7. **Organizes ToDo.md**: Updates completed items and moves completed tasks out of pending section
+8. Generates commit message in format: `vX.XX: [description of changes]`
+9. **Note**: Does not automatically commit - you must manually commit the changes
 
 **Setup in new chat sessions:**
 ```
@@ -120,4 +121,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 19.51 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
+**Version**: 19.52 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
