@@ -1,0 +1,21 @@
+Date,Driver_ID,Name,Violation_Type,Minutes_Over,Corrective_Action,Manager,Status
+2025-01-15,018,Charles Martinez,14-Hour Rule,25,Verbal Warning - HOS Training Required,Steven Taylor,Closed
+2025-02-03,033,Brian Lopez,11-Hour Driving,15,Written Warning - ELD Review,Mark Thompson,Closed
+2025-02-20,027,Steven Hall,30-Minute Break,45,Verbal Warning - Break Reminder,Brian Anderson,Closed
+2025-03-10,041,Jacob Carter,70-Hour Rule,120,Written Warning - Weekly Reset Training,Daniel White,Closed
+2025-03-25,019,Joseph Anderson,14-Hour Rule,35,Verbal Warning - Time Management,Steven Taylor,Closed
+2025-04-12,046,Stephen Phillips,11-Hour Driving,22,Written Warning - Route Planning,Brian Anderson,Closed
+2025-04-28,024,Anthony Lewis,30-Minute Break,30,Verbal Warning - Break Compliance,Mark Thompson,Closed
+2025-05-15,037,Timothy Adams,14-Hour Rule,18,Verbal Warning - HOS Review,Brian Anderson,Closed
+2025-06-02,050,Brandon Edwards,70-Hour Rule,95,Written Warning - Reset Procedures,Daniel White,Closed
+2025-06-18,029,Andrew Young,11-Hour Driving,28,Written Warning - Driving Limits,Steven Taylor,Closed
+2025-07-05,042,Gary Mitchell,30-Minute Break,40,Verbal Warning - Break Requirements,Mark Thompson,Closed
+2025-07-22,035,Edward Scott,14-Hour Rule,30,Verbal Warning - Duty Time,Mark Thompson,Closed
+2025-08-08,048,Justin Parker,11-Hour Driving,20,Written Warning - Drive Time,Steven Taylor,Closed
+2025-08-25,021,Christopher White,70-Hour Rule,85,Written Warning - Weekly Limits,Daniel White,Closed
+2025-09-12,044,Eric Roberts,14-Hour Rule,40,Written Warning - On-Duty Time,Mark Thompson,Closed
+2025-09-28,031,Kenneth King,30-Minute Break,35,Verbal Warning - Break Timing,Daniel White,Closed
+2025-10-15,039,Jeffrey Gonzalez,11-Hour Driving,25,Written Warning - Driving Hours,Steven Taylor,Closed
+2025-11-02,026,Donald Walker,14-Hour Rule,22,Verbal Warning - Duty Period,Brian Anderson,Closed
+2025-11-18,043,Nicholas Perez,70-Hour Rule,110,Written Warning - Reset Required,Mark Thompson,Open
+2025-12-05,047,Larry Campbell,11-Hour Driving,18,Verbal Warning - Drive Limits,Brian Anderson,Open

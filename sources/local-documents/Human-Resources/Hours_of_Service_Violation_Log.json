@@ -1,0 +1,202 @@
+[
+  {
+    "Date": "2025-01-15",
+    "Driver_ID": "018",
+    "Name": "Charles Martinez",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "25",
+    "Corrective_Action": "Verbal Warning - HOS Training Required",
+    "Manager": "Steven Taylor",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-02-03",
+    "Driver_ID": "033",
+    "Name": "Brian Lopez",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "15",
+    "Corrective_Action": "Written Warning - ELD Review",
+    "Manager": "Mark Thompson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-02-20",
+    "Driver_ID": "027",
+    "Name": "Steven Hall",
+    "Violation_Type": "30-Minute Break",
+    "Minutes_Over": "45",
+    "Corrective_Action": "Verbal Warning - Break Reminder",
+    "Manager": "Brian Anderson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-03-10",
+    "Driver_ID": "041",
+    "Name": "Jacob Carter",
+    "Violation_Type": "70-Hour Rule",
+    "Minutes_Over": "120",
+    "Corrective_Action": "Written Warning - Weekly Reset Training",
+    "Manager": "Daniel White",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-03-25",
+    "Driver_ID": "019",
+    "Name": "Joseph Anderson",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "35",
+    "Corrective_Action": "Verbal Warning - Time Management",
+    "Manager": "Steven Taylor",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-04-12",
+    "Driver_ID": "046",
+    "Name": "Stephen Phillips",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "22",
+    "Corrective_Action": "Written Warning - Route Planning",
+    "Manager": "Brian Anderson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-04-28",
+    "Driver_ID": "024",
+    "Name": "Anthony Lewis",
+    "Violation_Type": "30-Minute Break",
+    "Minutes_Over": "30",
+    "Corrective_Action": "Verbal Warning - Break Compliance",
+    "Manager": "Mark Thompson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-05-15",
+    "Driver_ID": "037",
+    "Name": "Timothy Adams",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "18",
+    "Corrective_Action": "Verbal Warning - HOS Review",
+    "Manager": "Brian Anderson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-06-02",
+    "Driver_ID": "050",
+    "Name": "Brandon Edwards",
+    "Violation_Type": "70-Hour Rule",
+    "Minutes_Over": "95",
+    "Corrective_Action": "Written Warning - Reset Procedures",
+    "Manager": "Daniel White",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-06-18",
+    "Driver_ID": "029",
+    "Name": "Andrew Young",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "28",
+    "Corrective_Action": "Written Warning - Driving Limits",
+    "Manager": "Steven Taylor",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-07-05",
+    "Driver_ID": "042",
+    "Name": "Gary Mitchell",
+    "Violation_Type": "30-Minute Break",
+    "Minutes_Over": "40",
+    "Corrective_Action": "Verbal Warning - Break Requirements",
+    "Manager": "Mark Thompson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-07-22",
+    "Driver_ID": "035",
+    "Name": "Edward Scott",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "30",
+    "Corrective_Action": "Verbal Warning - Duty Time",
+    "Manager": "Mark Thompson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-08-08",
+    "Driver_ID": "048",
+    "Name": "Justin Parker",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "20",
+    "Corrective_Action": "Written Warning - Drive Time",
+    "Manager": "Steven Taylor",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-08-25",
+    "Driver_ID": "021",
+    "Name": "Christopher White",
+    "Violation_Type": "70-Hour Rule",
+    "Minutes_Over": "85",
+    "Corrective_Action": "Written Warning - Weekly Limits",
+    "Manager": "Daniel White",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-09-12",
+    "Driver_ID": "044",
+    "Name": "Eric Roberts",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "40",
+    "Corrective_Action": "Written Warning - On-Duty Time",
+    "Manager": "Mark Thompson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-09-28",
+    "Driver_ID": "031",
+    "Name": "Kenneth King",
+    "Violation_Type": "30-Minute Break",
+    "Minutes_Over": "35",
+    "Corrective_Action": "Verbal Warning - Break Timing",
+    "Manager": "Daniel White",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-10-15",
+    "Driver_ID": "039",
+    "Name": "Jeffrey Gonzalez",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "25",
+    "Corrective_Action": "Written Warning - Driving Hours",
+    "Manager": "Steven Taylor",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-11-02",
+    "Driver_ID": "026",
+    "Name": "Donald Walker",
+    "Violation_Type": "14-Hour Rule",
+    "Minutes_Over": "22",
+    "Corrective_Action": "Verbal Warning - Duty Period",
+    "Manager": "Brian Anderson",
+    "Status": "Closed"
+  },
+  {
+    "Date": "2025-11-18",
+    "Driver_ID": "043",
+    "Name": "Nicholas Perez",
+    "Violation_Type": "70-Hour Rule",
+    "Minutes_Over": "110",
+    "Corrective_Action": "Written Warning - Reset Required",
+    "Manager": "Mark Thompson",
+    "Status": "Open"
+  },
+  {
+    "Date": "2025-12-05",
+    "Driver_ID": "047",
+    "Name": "Larry Campbell",
+    "Violation_Type": "11-Hour Driving",
+    "Minutes_Over": "18",
+    "Corrective_Action": "Verbal Warning - Drive Limits",
+    "Manager": "Brian Anderson",
+    "Status": "Open"
+  }
+]

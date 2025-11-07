@@ -115,51 +115,14 @@ router.post('/convert-selected', async (req, res) => {
         
         const sourcePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
         
-        // Convert CSV/Excel files to JSON, others to MD
-        if (ext === 'csv' || ext === 'xls' || ext === 'xlsx') {
-          const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.json'));
-          
-          let jsonContent;
-          
-          if (ext === 'csv') {
-            // Simple CSV to JSON conversion
-            const content = await secureFs.readFile(sourcePath, 'utf8');
-            const lines = content.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            const rows = lines.slice(1).map(line => {
-              const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-              const obj = {};
-              headers.forEach((header, index) => {
-                obj[header] = values[index] || '';
-              });
-              return obj;
-            });
-            jsonContent = JSON.stringify(rows, null, 2);
-          } else {
-            // For XLS/XLSX, use xlsx library to parse
-            const buffer = await secureFs.readFile(sourcePath);
-            const workbook = XLSX.read(buffer, { type: 'buffer' });
-            const result = {};
-            
-            workbook.SheetNames.forEach(sheetName => {
-              const worksheet = workbook.Sheets[sheetName];
-              const jsonData = XLSX.utils.sheet_to_json(worksheet);
-              result[sheetName] = jsonData;
-            });
-            
-            jsonContent = JSON.stringify(result, null, 2);
-          }
-          
-          await secureFs.writeFile(targetPath, jsonContent, 'utf8');
-        } else {
-          const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.md'));
-          
-          // Use DocumentProcessor for proper conversion
-          const markdownContent = await documentProcessor.convertToMarkdown(sourcePath);
-          
-          // Write markdown file
-          await secureFs.writeFile(targetPath, markdownContent, 'utf8');
-        }
+        // Convert all files to Markdown using DocumentProcessor
+        const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.md'));
+        
+        // Use DocumentProcessor for proper conversion
+        const markdownContent = await documentProcessor.convertToMarkdown(sourcePath);
+        
+        // Write markdown file
+        await secureFs.writeFile(targetPath, markdownContent, 'utf8');
         converted++;
       } catch (error) {
         errors.push(`${filename}: ${error.message}`);

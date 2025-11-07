@@ -66,34 +66,36 @@ Phase 3 - Role-Based Feature Control:
 232. Implement document preview without full download
 233. Create admin dashboard with usage analytics
 234. Add keyboard shortcuts for power users
-235. Implement document version control and change tracking
 236. Create API documentation for potential integrations
-237. Add automated testing suite for all search methods
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
-
-251. Create sample HR system for small to medium business.
 267. 
 
 
 
+
+## RECENTLY COMPLETED (v19.51)
+267. Fix document conversion bug where CSV files were being converted to JSON instead of Markdown by updating documents.mjs router to use DocumentProcessor.convertToMarkdown() consistently for all file types --done
+235. Implement document version control and change tracking --done
+237. Add automated testing suite for all search methods --done
+251. Create sample HR system for small to medium business --done
 
 ## RECENTLY COMPLETED (v19.50)
 265. Fix collections-editor source file links for YAML, XML, TSV, HTML and other formats by expanding allowed file extensions and adding proper MIME types --done
 266. Create comprehensive Type-Test collection with 25+ sample files covering all supported document formats for testing --done
 
 ## RECENTLY COMPLETED (v19.49)
-~~240. Add support for additional document formats (PowerPoint, etc.)~~ --done
-~~264. Reorganize collections-editor buttons - Put Process Source Files and Delete Documents on first line (always visible), other buttons on second line (Professional tier only)~~ --done
+240. Add support for additional document formats (PowerPoint, etc.) --done
+264. Reorganize collections-editor buttons - Put Process Source Files and Delete Documents on first line (always visible), other buttons on second line (Professional tier only) --done
 
 ## RECENTLY COMPLETED (v19.48)
-~~257. Fix config-editor URL parameter parsing with better debugging and fallback handling~~ --done
-~~258. Add comprehensive debugging to config pages for URL parameter troubleshooting~~ --done
-~~259. Fix config-editor URL parameter loss by adding sessionStorage fallback~~ --done
-~~260. Add server-side routing for config-editor to preserve query parameters on custom ports~~ --done
-~~261. Fix menu navigation to config.html and CSRF token timing with dynamic ports~~ --done
-~~262. Fix hardcoded URLs and CSRF timing issues across all pages for dynamic port compatibility~~ --done, test plan created
-~~263. Restrict standard tier users from changing search and score model parameters (Temperature, Context, Tokens)~~ --done
+257. Fix config-editor URL parameter parsing with better debugging and fallback handling --done
+258. Add comprehensive debugging to config pages for URL parameter troubleshooting --done
+259. Fix config-editor URL parameter loss by adding sessionStorage fallback --done
+260. Add server-side routing for config-editor to preserve query parameters on custom ports --done
+261. Fix menu navigation to config.html and CSRF token timing with dynamic ports --done
+262. Fix hardcoded URLs and CSRF timing issues across all pages for dynamic port compatibility --done, test plan created
+263. Restrict standard tier users from changing search and score model parameters (Temperature, Context, Tokens) --done
 
 ## RECENTLY COMPLETED (v19.47)
 253. Fix Manage Collections connection refused error by updating hardcoded API URLs to use dynamic API_BASE_URL --done
