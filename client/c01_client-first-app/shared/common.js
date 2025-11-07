@@ -737,9 +737,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   loadTheme();
   
-  // Check authentication status - require login
+  // Check authentication status - require login with fallback
   const user = await AuthUtils.requireAuth();
-  if (!user) return;
+  if (!user) {
+    // Clear invalid session data and redirect to login
+    localStorage.removeItem('sessionId');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userUserRole');
+    window.location.href = './user-management.html';
+    return;
+  }
   
   // Set role from authenticated user
   setUserRole(user.subscriptionTier);

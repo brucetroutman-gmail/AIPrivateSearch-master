@@ -7,7 +7,8 @@ import path from 'path';
 const ALLOWED_DIRS = [
     path.resolve('./sources/local-documents'),
     path.resolve('./data'),
-    path.resolve('./lib')
+    path.resolve('./lib'),
+    '/Users/Shared/AIPrivateSearch/data'
 ];
 
 function validatePath(filePath) {
@@ -43,6 +44,11 @@ export const secureFs = {
     async stat(filePath) {
         const safePath = validatePath(filePath);
         return fs.stat(safePath);
+    },
+    
+    async mkdir(dirPath, options) {
+        const safePath = validatePath(dirPath);
+        return fs.mkdir(safePath, options);
     },
     
     createReadStream(filePath, options) {

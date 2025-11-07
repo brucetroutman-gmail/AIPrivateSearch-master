@@ -62,6 +62,11 @@ class AuthUtils {
   static async requireAuth() {
     const user = await this.checkAuth();
     if (!user) {
+      // Clear all session data when authentication fails
+      localStorage.removeItem('sessionId');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userUserRole');
       window.location.href = './user-management.html';
       return null;
     }

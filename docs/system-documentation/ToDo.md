@@ -74,6 +74,16 @@ Phase 3 - Role-Based Feature Control:
 
 
 
+## RECENTLY COMPLETED (v19.54)
+275. Fix secureFs wrapper by adding missing mkdir method that UserManager requires for directory creation --done
+276. Fix authentication system by adding /Users/Shared/AIPrivateSearch/data to allowed directories in secureFs for user data access --done
+
+## RECENTLY COMPLETED (v19.53)
+271. Fix ESLint security issues by adding comprehensive disable comments for legitimate file operations --done
+272. Remove debug files (debug-collection-name.mjs, read-doc-index.mjs, test-embedding-search.mjs, check-db.mjs) for clean release --done
+273. Fix pre-commit hooks to reference security scripts in correct folder (security/lint.sh, security/security-check.sh) --done
+274. Fix cross-machine authentication by adding proper session cleanup when authentication fails on new machines --done
+
 ## RECENTLY COMPLETED (v19.52)
 267. Hide model temperature, context, and tokens parameters on multi-mode search for Standard tier users by adding prem-only CSS class --done
 268. Reorganize user-prompts.json hierarchically with local_model_only and collection-specific prompts for local_documents, fix timing issues in search pages --done
