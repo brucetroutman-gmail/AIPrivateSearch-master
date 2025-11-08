@@ -165,70 +165,22 @@ async function loadAppConfig() {
     const config = await response.json();
     const logoEl = document.getElementById('app-logo');
     if (logoEl && config['app-name']) {
-      const versionSpan = logoEl.querySelector('.version');
-      const tierSpan = logoEl.querySelector('.tier');
-      
       // Clear existing content safely
       while (logoEl.firstChild) {
         logoEl.removeChild(logoEl.firstChild);
       }
       
       // Add app name as text node
-      logoEl.appendChild(document.createTextNode(config['app-name'] + ' '));
-      
-      // Re-add version span if it existed
-      if (versionSpan) {
-        logoEl.appendChild(versionSpan);
-      }
-      
-      // Add tier display
-      if (!tierSpan) {
-        const newTierSpan = document.createElement('span');
-        newTierSpan.className = 'tier';
-        newTierSpan.id = 'tier-display';
-        logoEl.appendChild(newTierSpan);
-      } else {
-        logoEl.appendChild(tierSpan);
-      }
-      
-      // Update tier display
-      updateTierDisplay();
+      logoEl.appendChild(document.createTextNode(config['app-name']));
     }
   } catch (error) {
     // Silently fail - app config is not critical
   }
 }
 
-// Load version from API
-async function loadVersion() {
-  const versionEl = document.getElementById('version-display');
-  if (versionEl) {
-    versionEl.textContent = '(loading...)';
-  }
-  
-  try {
-    const response = await fetch(`${window.API_BASE_URL}/api/version`);
-    const data = await response.json();
-    if (versionEl && data.version) {
-      versionEl.textContent = `(v${data.version})`;
-    }
-  } catch (error) {
-    if (versionEl) {
-      versionEl.textContent = '(version unavailable)';
-    }
-  }
-}
 
-// Update tier display
-function updateTierDisplay() {
-  const tierEl = document.getElementById('tier-display');
-  if (tierEl) {
-    const role = getUserRole();
-    const tierMap = { 'standard': '1', 'premium': '2', 'professional': '3' };
-    const tierNumber = tierMap[role] || '?';
-    tierEl.textContent = ` - ${tierNumber}`;
-  }
-}
+
+
 
 // Load shared header and footer
 async function loadSharedComponents() {
@@ -244,10 +196,8 @@ async function loadSharedComponents() {
       const headerContent = doc.body.firstElementChild;
       if (headerContent) {
         headerEl.appendChild(headerContent);
-        // Load app config and version after header is loaded
+        // Load app config after header is loaded
         loadAppConfig();
-        loadVersion();
-        updateTierDisplay();
       }
     }
     
@@ -329,7 +279,6 @@ async function setUserRole(role) {
     
     if (response.ok) {
       localStorage.setItem('userRole', role);
-      updateTierDisplay();
       const userRole = getUserUserRole();
       await applyUserRole(role, userRole);
     }

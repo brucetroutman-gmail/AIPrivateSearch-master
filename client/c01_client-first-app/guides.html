@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guides - AIPrivateSearch</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1 id="guides-title">AI Private Search Guides</h1>
+        <p>Helpful resources and documentation for using AIPrivateSearch effectively.</p>
+
+        <div class="guides-grid">
+            <div class="guide-section">
+                <h2>Getting Started</h2>
+                <ul>
+                    <li><a href="./README.md">Quick Start Guide</a></li>
+                    <li><a href="./search.html">Basic Search</a></li>
+                    <li><a href="./multi-mode-search.html">Multi-Mode Search</a></li>
+                    <li><a href="./collections.html">Managing Collections</a></li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h2>Document Formats</h2>
+                <ul>
+                    <li><a href="./document-formats.html">Supported File Formats</a></li>
+                    <li><a href="#text-formats">Text Documents (TXT, MD, RTF)</a></li>
+                    <li><a href="#office-formats">Office Documents (DOCX, XLSX, PPTX)</a></li>
+                    <li><a href="#web-formats">Web Formats (HTML, XML, JSON)</a></li>
+                    <li><a href="#code-formats">Code Files (JS, PY, JAVA, C++)</a></li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h2>Search Methods</h2>
+                <ul>
+                    <li><a href="#line-search">Line Search - Boolean logic and context</a></li>
+                    <li><a href="#document-index">Document Index Cards - Structured metadata</a></li>
+                    <li><a href="#document-search">Document Search - Full-text with ranking</a></li>
+                    <li><a href="#smart-search">Smart Search - Semantic similarity</a></li>
+                    <li><a href="#hybrid-search">Hybrid Search - Combined methods</a></li>
+                    <li><a href="#ai-direct">AI Direct - Question answering</a></li>
+                    <li><a href="#ai-document-chat">AI Document Chat - Chunked retrieval</a></li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h2>Advanced Features</h2>
+                <ul>
+                    <li><a href="./model.html" class="prem-only">Model Management</a></li>
+                    <li><a href="./config.html" class="prem-only">Configuration Files</a></li>
+                    <li><a href="./test.html" class="pro-only">Testing & Benchmarks</a></li>
+                    <li><a href="./analyze-tests.html" class="pro-only">Test Analysis</a></li>
+                    <li><a href="./user-management.html" class="admin-only">User Management</a></li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h2>System Information</h2>
+                <ul>
+                    <li><a href="./privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="./terms-of-service.html">Terms of Service</a></li>
+                    <li><a href="./contact.html">Contact & Support</a></li>
+                    <li><a href="./group.html">About AIPrivateSearch Group</a></li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h2>External Resources</h2>
+                <ul>
+                    <li><a href="https://ollama.com/" target="_blank">Ollama - Local AI Models</a></li>
+                    <li><a href="https://nodejs.org/" target="_blank">Node.js - Runtime Environment</a></li>
+                    <li><a href="https://www.google.com/chrome/" target="_blank">Chrome Browser</a></li>
+                    <li><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND License</a></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <style>
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .guide-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .guide-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .guide-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .guide-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .guide-section a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.25rem 0;
+            display: block;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .guide-section a:hover {
+            background-color: var(--hover-bg);
+            padding-left: 0.5rem;
+        }
+
+        .guide-section a[target="_blank"]::after {
+            content: " ↗";
+            font-size: 0.8em;
+            opacity: 0.6;
+        }
+
+    </style>
+
+    <script>
+        // Load version information for title
+        async function loadVersionInfo() {
+            const titleEl = document.getElementById('guides-title');
+            if (titleEl) {
+                try {
+                    const response = await fetch(`${window.API_BASE_URL}/api/version`);
+                    const data = await response.json();
+                    if (data.version) {
+                        titleEl.textContent = `AI Private Search Guides (v${data.version})`;
+                    }
+                } catch (error) {
+                    // Keep original title if version fails to load
+                }
+            }
+        }
+
+        // Load version after page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(loadVersionInfo, 500); // Wait for API_BASE_URL to be set
+        });
+    </script>
+</body>
+</html>

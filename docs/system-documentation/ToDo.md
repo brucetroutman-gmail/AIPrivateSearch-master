@@ -72,9 +72,16 @@ Phase 3 - Role-Based Feature Control:
 
 280. Reveiw testcode strategy to include local docs. Add new testcodes to test page.
 281. Analyze and Create a search logging system that updates searchlog.json in the config folder.
-282. 
+282. Add Guides to main menu, create guides page that has helpful links. Move supported formats links from footer to the guides page. --done
+287. be sure that all AIPrivateSearch title are coming from App.json
 
 
+
+## RECENTLY COMPLETED (v19.57)
+283. Change menu title from Multi-mode Search to Multi --done
+284. Remove version display from header and add to Guides page --done
+285. Add version to guides page title and remove tier level display from header --done
+286. Change Guides title from AIPrivateSearch Guides to AI Private Search Guides with proper spacing --done
 
 ## RECENTLY COMPLETED (v19.56)
 278. Copy all config files to Users/Shared/AIPrivateSearch/config folder. Modify app to use config from this location --done

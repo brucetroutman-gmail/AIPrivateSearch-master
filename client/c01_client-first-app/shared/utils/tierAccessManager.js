@@ -12,11 +12,12 @@ class TierAccessManager {
     if (this.config) return this.config;
     
     try {
-      const response = await fetch(this.configPath);
+      const response = await fetch(`${window.API_BASE_URL}/api/config/tier-access.json`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      this.config = await response.json();
+      const data = await response.json();
+      this.config = JSON.parse(data.content);
       return this.config;
     } catch (error) {
       console.error('Failed to load tier-access.json:', error);
