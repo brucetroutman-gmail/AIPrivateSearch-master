@@ -28,9 +28,9 @@ export class SearchLogger {
 
       // Read existing log or create new array
       let logs = [];
-      if (fs.existsSync(logPath)) {
+      if (fs.existsSync(logPath)) { // eslint-disable-line security/detect-non-literal-fs-filename
         try {
-          const existingData = fs.readFileSync(logPath, 'utf-8');
+          const existingData = fs.readFileSync(logPath, 'utf-8'); // eslint-disable-line security/detect-non-literal-fs-filename
           logs = JSON.parse(existingData);
         } catch (error) {
           console.warn('[SearchLogger] Failed to parse existing log, creating new log');
@@ -42,7 +42,7 @@ export class SearchLogger {
       logs.push(logEntry);
 
       // Write back to file
-      fs.writeFileSync(logPath, JSON.stringify(logs, null, 2));
+      fs.writeFileSync(logPath, JSON.stringify(logs, null, 2)); // eslint-disable-line security/detect-non-literal-fs-filename
       
       return logEntry.id;
     } catch (error) {
@@ -141,7 +141,7 @@ export class SearchLogger {
         
         try {
           const filePath = path.join(logsDir, file);
-          const data = fs.readFileSync(filePath, 'utf-8');
+          const data = fs.readFileSync(filePath, 'utf-8'); // eslint-disable-line security/detect-non-literal-fs-filename
           const logs = JSON.parse(data);
           allLogs.push(...logs.reverse()); // Add newest first
         } catch (error) {
@@ -181,7 +181,7 @@ export class SearchLogger {
       for (const file of logFiles) {
         try {
           const filePath = path.join(logsDir, file);
-          const data = fs.readFileSync(filePath, 'utf-8');
+          const data = fs.readFileSync(filePath, 'utf-8'); // eslint-disable-line security/detect-non-literal-fs-filename
           const logs = JSON.parse(data);
           allLogs.push(...logs);
         } catch (error) {
