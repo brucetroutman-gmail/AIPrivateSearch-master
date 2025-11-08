@@ -24,8 +24,7 @@ const contextEl  = document.getElementById('context');
 const tokensEl   = document.getElementById('tokens');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
-const autoExportToggle = document.getElementById('autoExportToggle');
-const manualExportSection = document.getElementById('manualExportSection');
+
 const collectionEl = document.getElementById('collection');
 const collectionSection = document.getElementById('collectionSection');
 const searchTypeEl = document.getElementById('searchType');
@@ -699,18 +698,7 @@ scoreTglEl.addEventListener('change', () => {
   updateFieldVisibility();
 });
 
-// Handle auto export toggle
-autoExportToggle.addEventListener('change', () => {
-  manualExportSection.style.display = autoExportToggle.checked ? 'none' : 'block';
-  localStorage.setItem('autoExportToDatabase', autoExportToggle.checked);
-});
 
-// Restore auto export setting
-const autoExportSetting = localStorage.getItem('autoExportToDatabase');
-if (autoExportSetting === 'true') {
-  autoExportToggle.checked = true;
-  manualExportSection.style.display = 'none';
-}
 
 // Restore generate scores setting
 const generateScoresSetting = localStorage.getItem('generateScores');
@@ -1397,18 +1385,7 @@ form.addEventListener('submit', async (e) => {
     
     render(result);
     
-    // Auto export to database if enabled
-    if (autoExportToggle.checked) {
-      try {
-        const exportResult = await exportToDatabase(window.currentResult, null, null, null);
-        logger.log('Auto-exported to database with ID:', exportResult.insertId);
-        showUserMessage(`Auto-saved to database (ID: ${exportResult.insertId})`, 'success');
-      } catch (error) {
-        // logger sanitizes all inputs to prevent log injection
-      logger.error('Auto-export failed:', error);
-        showUserMessage(`Auto-save failed: ${error.message}`, 'error');
-      }
-    }
+
     
     // Export section is now part of the answer
   } catch (err) {

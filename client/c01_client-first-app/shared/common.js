@@ -173,6 +173,12 @@ async function loadAppConfig() {
       // Add app name as text node
       logoEl.appendChild(document.createTextNode(config['app-name']));
     }
+    
+    // Update footer group link if present
+    const footerGroupLink = document.getElementById('footer-group-link');
+    if (footerGroupLink && config['app-name']) {
+      footerGroupLink.textContent = `${config['app-name']} Group`;
+    }
   } catch (error) {
     // Silently fail - app config is not critical
   }
@@ -527,6 +533,8 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       }
     })(),
     SourceType: result.sourceType || null,
+    CollectionName: result.collection || null,
+    SearchMethodType: result.searchType || null,
     SystemPrompt: result.systemPromptName || null,
     Prompt: result.query || null,
     'ModelName-search': result.metrics?.search?.model || null,

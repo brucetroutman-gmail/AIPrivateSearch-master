@@ -21,6 +21,7 @@ CREATE TABLE `searches` (
   `CreatedAt` char(19) DEFAULT NULL,
   `SourceType` char(25) DEFAULT NULL,
   `CollectionName` char(50) DEFAULT NULL,
+  `SearchMethodType` char(50) DEFAULT NULL,
   `SystemPrompt` longblob,
   `Prompt` longblob,
   `ModelName-search` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,

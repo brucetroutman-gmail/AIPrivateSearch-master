@@ -71,11 +71,22 @@ Phase 3 - Role-Based Feature Control:
 239. Create user onboarding tutorial/wizard
 
 280. Reveiw testcode strategy to include local docs. Add new testcodes to test page.
-281. Analyze and Create a search logging system that updates searchlog.json in the config folder.
+281. Analyze and Create a search logging system that updates searchlog.json in the config folder. --done
 282. Add Guides to main menu, create guides page that has helpful links. Move supported formats links from footer to the guides page. --done
-287. be sure that all AIPrivateSearch title are coming from App.json
+287. be sure that all AIPrivateSearch title are coming from App.json --done
+288. Create search logs viewer page to display and analyze logged search activities --started
+289. analyze a local documents search to discover which colomns are not collected currenting by the mysql tables and log files. --done
+290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
+291. We need to create an Options Page that will be called by Option menu item in header. Provide a Checkbox for Darkmode, and a checkbox for Log Search Results. Move Modify Config to Manage menu item Configurations, Test Code Checker item TestCode Checker and adjust role-tier
+292. Create Search Logs feature, create export to mySQL feature -- select log files check if already loaded etc.
+293. Test log creation and mysql update.
+294. Complete Guides page and move to marketing Guides page.
+295. 
 
 
+
+## RECENTLY COMPLETED (v19.58)
+291. Create Options Page with Dark Mode and Log Search Results checkboxes, reorganize menu structure by moving Configurations and TestCode Checker to Manage menu --done
 
 ## RECENTLY COMPLETED (v19.57)
 283. Change menu title from Multi-mode Search to Multi --done

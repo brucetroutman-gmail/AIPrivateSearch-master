@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guides - AIPrivateSearch</title>
+    <title id="page-title">Guides - AI Private Search</title>
     <link rel="stylesheet" href="shared/styles.css">
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
@@ -13,7 +13,7 @@
 
     <main class="container">
         <h1 id="guides-title">AI Private Search Guides</h1>
-        <p>Helpful resources and documentation for using AIPrivateSearch effectively.</p>
+        <p id="guides-description">Helpful resources and documentation for using AI Private Search effectively.</p>
 
         <div class="guides-grid">
             <div class="guide-section">
@@ -138,25 +138,48 @@
     </style>
 
     <script>
-        // Load version information for title
-        async function loadVersionInfo() {
+        // Load app name and version information for title
+        async function loadTitleInfo() {
             const titleEl = document.getElementById('guides-title');
-            if (titleEl) {
-                try {
-                    const response = await fetch(`${window.API_BASE_URL}/api/version`);
-                    const data = await response.json();
-                    if (data.version) {
-                        titleEl.textContent = `AI Private Search Guides (v${data.version})`;
+            const pageTitleEl = document.getElementById('page-title');
+            const descriptionEl = document.getElementById('guides-description');
+            
+            try {
+                // Load app name from config
+                const configResponse = await fetch('./config/app.json');
+                const config = await configResponse.json();
+                const appName = config['app-name'] || 'AI Private Search';
+                
+                // Load version from API
+                const versionResponse = await fetch(`${window.API_BASE_URL}/api/version`);
+                const versionData = await versionResponse.json();
+                
+                // Update main title
+                if (titleEl) {
+                    if (versionData.version) {
+                        titleEl.textContent = `${appName} Guides (v${versionData.version})`;
+                    } else {
+                        titleEl.textContent = `${appName} Guides`;
                     }
-                } catch (error) {
-                    // Keep original title if version fails to load
                 }
+                
+                // Update page title
+                if (pageTitleEl) {
+                    pageTitleEl.textContent = `Guides - ${appName}`;
+                }
+                
+                // Update description
+                if (descriptionEl) {
+                    descriptionEl.textContent = `Helpful resources and documentation for using ${appName} effectively.`;
+                }
+            } catch (error) {
+                // Keep original titles if loading fails
             }
         }
 
-        // Load version after page loads
+        // Load title info after page loads
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(loadVersionInfo, 500); // Wait for API_BASE_URL to be set
+            setTimeout(loadTitleInfo, 500); // Wait for API_BASE_URL to be set
         });
     </script>
 </body>

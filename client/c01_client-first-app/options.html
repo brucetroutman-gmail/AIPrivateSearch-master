@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options - AI Private Search</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1>Options</h1>
+        <p>Configure your AI Private Search preferences and settings.</p>
+
+        <div class="options-grid">
+            <div class="option-section">
+                <h2>Display Settings</h2>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="darkModeToggle" />
+                        Enable Dark Mode
+                    </label>
+                    <p class="option-description">Switch between light and dark themes for better viewing comfort.</p>
+                </div>
+            </div>
+
+            <div class="option-section">
+                <h2>Privacy & Logging</h2>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="logSearchToggle" />
+                        Log Search Results
+                    </label>
+                    <p class="option-description">Enable logging of search activities for analytics and performance monitoring.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <style>
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .option-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .option-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        .option-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .option-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.75rem;
+            transform: scale(1.2);
+        }
+
+        .option-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+            padding-left: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .option-section {
+                padding: 1.5rem;
+            }
+
+            .option-description {
+                padding-left: 1.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        // Initialize options on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const logSearchToggle = document.getElementById('logSearchToggle');
+
+            // Set initial dark mode state
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            darkModeToggle.checked = currentTheme === 'dark';
+
+            // Set initial log search state
+            const logSearchEnabled = localStorage.getItem('logSearchResults');
+            logSearchToggle.checked = logSearchEnabled === 'true';
+
+            // Dark mode toggle handler
+            darkModeToggle.addEventListener('change', () => {
+                if (window.toggleDarkMode) {
+                    window.toggleDarkMode();
+                }
+            });
+
+            // Log search toggle handler
+            logSearchToggle.addEventListener('change', () => {
+                localStorage.setItem('logSearchResults', logSearchToggle.checked);
+                if (window.showUserMessage) {
+                    const message = logSearchToggle.checked ? 
+                        'Search logging enabled' : 'Search logging disabled';
+                    window.showUserMessage(message, 'success');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

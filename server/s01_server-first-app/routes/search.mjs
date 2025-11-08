@@ -7,6 +7,7 @@ import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 import { getSystemInfo } from '../lib/utils/systemInfo.mjs';
+import { SearchLogger } from '../lib/utils/searchLogger.mjs';
 
 const router = express.Router();
 
@@ -192,6 +193,24 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       ...(chunks && { chunks }),
       ...systemInfo
     };
+    
+    // Log the search activity
+    try {
+      const logData = {
+        ...result,
+        userEmail: req.user?.email,
+        sessionId: req.sessionId,
+        ipAddress: req.ip,
+        systemPromptName,
+        collectionName: collection,
+        searchMethod: searchType,
+        documentsFound: chunks ? chunks.length : (searchResponse ? 1 : 0),
+        documentsSearched: collection ? 'unknown' : 0
+      };
+      await SearchLogger.logSearch(logData);
+    } catch (logError) {
+      logger.error('Failed to log search:', logError.message);
+    }
     
     logger.log('Sending response with keys:', Object.keys(result));
     res.json(result);
