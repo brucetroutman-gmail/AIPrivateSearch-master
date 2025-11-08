@@ -2,6 +2,7 @@
  
 import express from 'express';
 import { secureFs } from '../lib/utils/secureFileOps.mjs';
+import { AppConfig } from '../lib/utils/appConfig.mjs';
 import path from 'path';
 
 const router = express.Router();
@@ -9,11 +10,7 @@ const router = express.Router();
 // Get subscription tier
 router.get('/subscription-tier', async (req, res) => {
   try {
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
-    const configData = await secureFs.readFile(configPath, 'utf8');
-    const config = JSON.parse(configData);
-    
-    const tier = config['subscription-tier'] || 3; // Default to professional
+    const tier = AppConfig.getSubscriptionTier();
     res.json({ tier });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -28,15 +25,14 @@ router.post('/subscription-tier', async (req, res) => {
       return res.status(400).json({ error: 'Invalid tier' });
     }
 
-    const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+    const configLocation = AppConfig.getConfigLocation();
+    const configPath = path.join(configLocation, 'app.json');
     const configData = await secureFs.readFile(configPath, 'utf8');
     const config = JSON.parse(configData);
     
     config['subscription-tier'] = tier;
     
     await secureFs.writeFile(configPath, JSON.stringify(config, null, 2));
-    
-
     
     res.json({ success: true });
   } catch (error) {
@@ -47,7 +43,7 @@ router.post('/subscription-tier', async (req, res) => {
 // Get config files list
 router.get('/files', async (req, res) => {
   try {
-    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const configDir = AppConfig.getConfigLocation();
     const files = await secureFs.readdir(configDir);
     const configFiles = files.filter(file => file.endsWith('.json'));
     res.json(configFiles);
@@ -66,7 +62,7 @@ router.get('/:filename', async (req, res) => {
       return res.status(400).json({ error: 'Invalid filename' });
     }
     
-    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const configDir = AppConfig.getConfigLocation();
     const filePath = path.join(configDir, filename);
     
     // Ensure the resolved path is within the config directory
@@ -77,7 +73,7 @@ router.get('/:filename', async (req, res) => {
     const content = await secureFs.readFile(filePath, 'utf8');
     res.json({ content });
   } catch (error) {
-    res.status(500).json({ error: 'File not found' });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -92,7 +88,7 @@ router.put('/:filename', async (req, res) => {
       return res.status(400).json({ error: 'Invalid filename' });
     }
     
-    const configDir = path.join(process.cwd(), '../../client/c01_client-first-app/config');
+    const configDir = AppConfig.getConfigLocation();
     const filePath = path.join(configDir, filename);
     
     // Ensure the resolved path is within the config directory
@@ -103,7 +99,7 @@ router.put('/:filename', async (req, res) => {
     await secureFs.writeFile(filePath, content);
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Write failed' });
+    res.status(500).json({ error: error.message });
   }
 });
 

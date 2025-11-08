@@ -70,9 +70,15 @@ Phase 3 - Role-Based Feature Control:
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
 
-269. Create a logging system that updates log.json in the config folder.
+280. Reveiw testcode strategy to include local docs. Add new testcodes to test page.
+281. Analyze and Create a search logging system that updates searchlog.json in the config folder.
+282. 
 
 
+
+## RECENTLY COMPLETED (v19.56)
+278. Copy all config files to Users/Shared/AIPrivateSearch/config folder. Modify app to use config from this location --done
+279. Add to release process, copy the config files from Users/Shared/AIPrivateSearch/config to repo/client/c01_client-first-app/config. Modify load script to copy config files from repo to shared config if empty --done
 
 ## RECENTLY COMPLETED (v19.55)
 277. Fix collections dropdown loading by adding missing GET route for subscription-tier endpoint and adding sources directory to secureFs allowed paths --done

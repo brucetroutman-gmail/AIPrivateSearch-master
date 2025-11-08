@@ -318,6 +318,20 @@ if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
             fi
         fi
         
+        # Check and copy config files if needed
+        if [ ! -d "/Users/Shared/AIPrivateSearch/config" ]; then
+            echo "📁 Creating config directory..."
+            mkdir -p "/Users/Shared/AIPrivateSearch/config"
+        fi
+        
+        if [ ! -f "/Users/Shared/AIPrivateSearch/config/app.json" ]; then
+            if [ -f "aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
+                echo "📁 Copying config files to shared config folder..."
+                cp -r "aiprivatesearch/client/c01_client-first-app/config/"* "/Users/Shared/AIPrivateSearch/config/"
+                echo "   ✅ Config files copied to /Users/Shared/AIPrivateSearch/config/"
+            fi
+        fi
+        
         # Check and copy data files if needed
         if [ ! -f "/Users/Shared/AIPrivateSearch/data/users.json" ]; then
             if [ -f "aiprivatesearch/data/users.json" ]; then
