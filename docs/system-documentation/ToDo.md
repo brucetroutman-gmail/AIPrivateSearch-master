@@ -71,11 +71,11 @@ Phase 3 - Role-Based Feature Control:
 239. Create user onboarding tutorial/wizard
 
 
-288. Create search logs viewer page to display and analyze logged search activities --started
+
 290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
 
 292. Create Search Logs feature, create export to mySQL feature -- select log files check if already loaded etc.
-293. Test log creation and mysql update.
+293. Test log creation and mysql update. not all elements are being saved.
 294. Complete Guides page and move to marketing Guides page.
 
 296. Create testCodes for DocumentSearch performance
@@ -83,8 +83,14 @@ Phase 3 - Role-Based Feature Control:
 
 
 
+## RECENTLY COMPLETED (v19.60)
+299. Create _template-page.html with all standard loading routines and patterns for new pages --done
+300. Fix search logs viewer initialization and file pattern matching to display actual log files --done
+301. Complete search logs viewer functionality with date filtering and Professional tier database export --done
+
 ## RECENTLY COMPLETED (v19.59)
 280. Review testcode strategy to include local docs. Add new testcodes to test page --done
+288. Create search logs viewer page to display and analyze logged search activities with date filtering and Professional tier database export --done
 295. Is show-hide.json require now, since we are using role-tier? --done (Yes, both needed: show-hide.json for functional visibility, tier-access.json for permission visibility)
 296. Update TestCode documentation Position 6 from collection-specific prompts to general User Prompts 1-5 --done
 297. Fix TestCode format validation in testcode-checker.html to use correct 10-character format --done

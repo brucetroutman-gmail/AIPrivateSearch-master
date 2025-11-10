@@ -22,10 +22,22 @@ import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
 
+// Debug wrapper for validateOrigin
+const debugValidateOrigin = (req, res, next) => {
+  console.log('validateOrigin check:', req.headers.origin, req.headers.referer);
+  validateOrigin(req, res, next);
+};
+
 import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
 const app = express();
+
+// Global request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // Security headers
 app.use((req, res, next) => {
@@ -118,6 +130,12 @@ app.get('/api/version', async (req, res) => {
   }
 });
 
+// Direct search logs test endpoint (no middleware)
+app.get('/api/search-logs-direct', (req, res) => {
+  console.log('Direct search logs endpoint hit!');
+  res.json({ message: 'Direct search logs working', timestamp: new Date().toISOString() });
+});
+
 // Apply routes with specific middleware
 app.use('/api/search', validateOrigin, validateCSRFToken, searchRouter);
 app.use('/api/multi-search', validateOrigin, multiSearchRouter);
@@ -129,8 +147,15 @@ app.use('/api/sentence-transformers', sentenceTransformersRouter);
 app.use('/api/auth', validateOrigin, authRouter);
 app.use('/api/subscription', subscriptionRouter);
 app.use('/api/tier-access', validateOrigin, tierAccessRouter);
-app.use('/api/search-logs', validateOrigin, validateCSRFToken, searchLogsRouter);
+// Simplified search-logs route (no middleware)
+app.use('/api/search-logs', searchLogsRouter);
 app.use('/api', testResultsRouter);
+
+// Catch-all for unmatched API routes
+app.use('/api/*', (req, res) => {
+  console.log('Unmatched API route:', req.method, req.originalUrl);
+  res.status(404).json({ error: 'API endpoint not found', path: req.originalUrl });
+});
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

@@ -11,7 +11,8 @@ const ALLOWED_DIRS = [
     path.resolve('../../client/c01_client-first-app/config'),
     '/Users/Shared/AIPrivateSearch/data',
     '/Users/Shared/AIPrivateSearch/sources',
-    '/Users/Shared/AIPrivateSearch/config'
+    '/Users/Shared/AIPrivateSearch/config',
+    '/Users/Shared/AIPrivateSearch/logs'
 ];
 
 function validatePath(filePath) {
