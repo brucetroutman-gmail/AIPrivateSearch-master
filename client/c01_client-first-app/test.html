@@ -327,27 +327,31 @@
         }
         
         function parseTestCode(testCode, sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions) {
-            // Parse testcode pattern: t[1-3][1-5][1-5][1-3][1-4][1-3][0-1]
+            // Parse testcode pattern: t[1-3][0-9][1-7][1-5][1-5][1-3][1-4][1-3][0-1]
             const sourceTypeMap = ['Local Model Only', 'Local Documents Only', 'Local Model and Documents'];
+            const collectionMap = ['None', 'A-Poem', 'DocType-Test', 'Family-Documents', 'Federalist-Papers', 'Human-Resources', 'Law-Office', 'Medical-Practice', 'My-Emails', 'My-Literature'];
+            const searchTypeMap = ['document-index', 'line-search', 'document-search', 'smart-search', 'hybrid-search', 'ai-direct', 'ai-document-chat'];
             const assistantTypeMap = ['Simple Assistant', 'Detailed Assistant', 'Reasoned Assistant', 'Creative Assistant', 'Coding Assistant'];
-            const userPromptMap = ['KNOWLEDGE-Quantum', 'REASON-AI-adopt', 'CREATE-AI-dialog', 'CODE-Pseudo', 'INSTRUCT-Fix wifi'];
+            const userPromptMap = ['Collection-specific prompt 1', 'Collection-specific prompt 2', 'Collection-specific prompt 3', 'Collection-specific prompt 4', 'Collection-specific prompt 5'];
             const temperatureMap = [0.3, 0.6, 0.9];
             const contextMap = [2048, 4096, 8192, 16384];
             const tokenMap = ['No Limit', '250', '500'];
             
             const sourceType = sourceTypeMap[parseInt(testCode[1]) - 1];
-            const assistantType = assistantTypeMap[parseInt(testCode[2]) - 1];
-            const userPromptType = userPromptMap[parseInt(testCode[3]) - 1];
-            const temperature = temperatureMap[parseInt(testCode[4]) - 1];
-            const context = contextMap[parseInt(testCode[5]) - 1];
-            const tokens = tokenMap[parseInt(testCode[6]) - 1];
-            const generateScores = testCode[7] === '1';
+            const collection = collectionMap[parseInt(testCode[2])];
+            const searchType = searchTypeMap[parseInt(testCode[3]) - 1];
+            const assistantType = assistantTypeMap[parseInt(testCode[4]) - 1];
+            const userPromptType = userPromptMap[parseInt(testCode[5]) - 1];
+            const temperature = temperatureMap[parseInt(testCode[6]) - 1];
+            const context = contextMap[parseInt(testCode[7]) - 1];
+            const tokens = tokenMap[parseInt(testCode[8]) - 1];
+            const generateScores = testCode[9] === '1';
             
             // Determine test category and description
             const { testCategory, testDescription } = getTestCategoryAndDescription(testCode);
             
-            // Get system prompt by id from testcode (position 2)
-            const assistantId = testCode[2];
+            // Get system prompt by id from testcode (position 5)
+            const assistantId = testCode[4];
             const systemPrompt = systemPrompts.system_prompts.find(p => p.id === assistantId);
             
             // Get user prompt
@@ -355,6 +359,8 @@
             
             return {
                 sourceType,
+                collection,
+                searchType,
                 assistantType,
                 systemPrompt: systemPrompt?.prompt || '',
                 systemPromptName: systemPrompt?.name || 'Unknown Assistant',

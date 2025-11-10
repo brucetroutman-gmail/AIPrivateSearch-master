@@ -70,22 +70,31 @@ Phase 3 - Role-Based Feature Control:
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
 
-280. Reveiw testcode strategy to include local docs. Add new testcodes to test page.
-281. Analyze and Create a search logging system that updates searchlog.json in the config folder. --done
-282. Add Guides to main menu, create guides page that has helpful links. Move supported formats links from footer to the guides page. --done
-287. be sure that all AIPrivateSearch title are coming from App.json --done
+
 288. Create search logs viewer page to display and analyze logged search activities --started
-289. analyze a local documents search to discover which colomns are not collected currenting by the mysql tables and log files. --done
 290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
-291. We need to create an Options Page that will be called by Option menu item in header. Provide a Checkbox for Darkmode, and a checkbox for Log Search Results. Move Modify Config to Manage menu item Configurations, Test Code Checker item TestCode Checker and adjust role-tier
+
 292. Create Search Logs feature, create export to mySQL feature -- select log files check if already loaded etc.
 293. Test log creation and mysql update.
 294. Complete Guides page and move to marketing Guides page.
-295. 
+
+296. Create testCodes for DocumentSearch performance
+297. 
 
 
+
+## RECENTLY COMPLETED (v19.59)
+280. Review testcode strategy to include local docs. Add new testcodes to test page --done
+295. Is show-hide.json require now, since we are using role-tier? --done (Yes, both needed: show-hide.json for functional visibility, tier-access.json for permission visibility)
+296. Update TestCode documentation Position 6 from collection-specific prompts to general User Prompts 1-5 --done
+297. Fix TestCode format validation in testcode-checker.html to use correct 10-character format --done
+298. Correct TestCode documentation examples and descriptions throughout system --done
 
 ## RECENTLY COMPLETED (v19.58)
+281. Create comprehensive search logging system with daily JSON files in /Users/Shared/AIPrivateSearch/logs/ --done
+282. Add Guides to main menu, create guides page with helpful links, move supported formats from footer --done
+287. Centralize all AIPrivateSearch titles to load from App.json configuration --done
+289. Analyze local documents search to identify 40+ missing data columns for enhanced analytics --done
 291. Create Options Page with Dark Mode and Log Search Results checkboxes, reorganize menu structure by moving Configurations and TestCode Checker to Manage menu --done
 
 ## RECENTLY COMPLETED (v19.57)

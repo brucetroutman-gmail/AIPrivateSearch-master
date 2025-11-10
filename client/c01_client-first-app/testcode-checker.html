@@ -79,7 +79,7 @@
             
             <div class="input-section">
                 <label for="testcodeInput">Enter TestCode:</label>
-                <input type="text" id="testcodeInput" class="testcode-input" placeholder="e.g., t1112310" maxlength="8">
+                <input type="text" id="testcodeInput" class="testcode-input" placeholder="e.g., t107111110" maxlength="10">
                 <button class="check-btn" onclick="checkTestCode()">Check</button>
             </div>
 
@@ -106,11 +106,11 @@
                 return;
             }
             
-            if (testCode.length !== 8 || !testCode.startsWith('t')) {
+            if (testCode.length !== 10 || !testCode.startsWith('t')) {
                 breakdownDiv.textContent = '';
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error';
-                errorDiv.textContent = 'TestCode must be 8 characters starting with "t" (e.g., t1112310)';
+                errorDiv.textContent = 'TestCode must be 10 characters starting with "t" (e.g., t107111110)';
                 breakdownDiv.appendChild(errorDiv);
                 resultsDiv.style.display = 'block';
                 return;
@@ -128,20 +128,43 @@
                 '3': 'Local Model and Documents'
             };
             
+            const collectionMap = {
+                '0': 'None (Local Model Only)',
+                '1': 'A-Poem',
+                '2': 'DocType-Test',
+                '3': 'Family-Documents',
+                '4': 'Federalist-Papers',
+                '5': 'Human-Resources',
+                '6': 'Law-Office',
+                '7': 'Medical-Practice',
+                '8': 'My-Emails',
+                '9': 'My-Literature'
+            };
+            
+            const searchTypeMap = {
+                '1': 'document-index',
+                '2': 'line-search',
+                '3': 'document-search',
+                '4': 'smart-search',
+                '5': 'hybrid-search',
+                '6': 'ai-direct',
+                '7': 'ai-document-chat'
+            };
+            
             const assistantTypeMap = {
-                '1': 'Detailed Assistant',
-                '2': 'Reasoned Assistant',
-                '3': 'Creative Assistant',
-                '4': 'Documents Only',
+                '1': 'Simple Assistant',
+                '2': 'Detailed Assistant',
+                '3': 'Reasoned Assistant',
+                '4': 'Creative Assistant',
                 '5': 'Coding Assistant'
             };
             
             const userPromptMap = {
-                '1': 'KNOWLEDGE-Quantum',
-                '2': 'REASON-AI-adopt',
-                '3': 'CREATE-AI-dialog',
-                '4': 'CODE-Pseudo',
-                '5': 'INSTRUCT-Fix wifi'
+                '1': 'User Prompt 1',
+                '2': 'User Prompt 2',
+                '3': 'User Prompt 3',
+                '4': 'User Prompt 4',
+                '5': 'User Prompt 5'
             };
             
             const temperatureMap = {
@@ -171,12 +194,14 @@
             return {
                 prefix: { digit: testCode[0], meaning: 'Test Prefix' },
                 sourceType: { digit: testCode[1], meaning: sourceTypeMap[testCode[1]] || 'Invalid' },
-                assistantType: { digit: testCode[2], meaning: assistantTypeMap[testCode[2]] || 'Invalid' },
-                userPrompt: { digit: testCode[3], meaning: userPromptMap[testCode[3]] || 'Invalid' },
-                temperature: { digit: testCode[4], meaning: temperatureMap[testCode[4]] || 'Invalid' },
-                context: { digit: testCode[5], meaning: contextMap[testCode[5]] || 'Invalid' },
-                tokens: { digit: testCode[6], meaning: tokenMap[testCode[6]] || 'Invalid' },
-                scoring: { digit: testCode[7], meaning: scoringMap[testCode[7]] || 'Invalid' }
+                collection: { digit: testCode[2], meaning: collectionMap[testCode[2]] || 'Invalid' },
+                searchType: { digit: testCode[3], meaning: searchTypeMap[testCode[3]] || 'Invalid' },
+                assistantType: { digit: testCode[4], meaning: assistantTypeMap[testCode[4]] || 'Invalid' },
+                userPrompt: { digit: testCode[5], meaning: userPromptMap[testCode[5]] || 'Invalid' },
+                temperature: { digit: testCode[6], meaning: temperatureMap[testCode[6]] || 'Invalid' },
+                context: { digit: testCode[7], meaning: contextMap[testCode[7]] || 'Invalid' },
+                tokens: { digit: testCode[8], meaning: tokenMap[testCode[8]] || 'Invalid' },
+                scoring: { digit: testCode[9], meaning: scoringMap[testCode[9]] || 'Invalid' }
             };
         }
         
@@ -189,12 +214,14 @@
             const positions = [
                 { key: 'prefix', label: 'Position 1 - Prefix' },
                 { key: 'sourceType', label: 'Position 2 - Source Type' },
-                { key: 'assistantType', label: 'Position 3 - Assistant Type' },
-                { key: 'userPrompt', label: 'Position 4 - User Prompt' },
-                { key: 'temperature', label: 'Position 5 - Temperature' },
-                { key: 'context', label: 'Position 6 - Context' },
-                { key: 'tokens', label: 'Position 7 - Tokens' },
-                { key: 'scoring', label: 'Position 8 - Scoring' }
+                { key: 'collection', label: 'Position 3 - Collection Name' },
+                { key: 'searchType', label: 'Position 4 - Search Type' },
+                { key: 'assistantType', label: 'Position 5 - Assistant Type' },
+                { key: 'userPrompt', label: 'Position 6 - User Prompts' },
+                { key: 'temperature', label: 'Position 7 - Temperature' },
+                { key: 'context', label: 'Position 8 - Context' },
+                { key: 'tokens', label: 'Position 9 - Tokens' },
+                { key: 'scoring', label: 'Position 10 - Generate Scores' }
             ];
             
             positions.forEach(pos => {

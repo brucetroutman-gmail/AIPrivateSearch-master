@@ -69,7 +69,7 @@ export class SearchLogger {
       // Search parameters
       sourceType: data.sourceType || null,
       collectionName: data.collectionName || null,
-      searchMethodType: data.searchType || null,
+      searchType: data.searchType || null,
       systemPrompt: data.systemPromptName || null,
       prompt: data.query || null,
       
@@ -101,7 +101,6 @@ export class SearchLogger {
       // Document search specific
       documentsFound: data.documentsFound || null,
       documentsSearched: data.documentsSearched || null,
-      searchMethod: data.searchMethod || null,
       
       // Additional metadata
       sessionId: data.sessionId || null,

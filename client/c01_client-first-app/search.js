@@ -797,7 +797,35 @@ function generateTestCode() {
   };
   testCode += sourceTypeMap[sourceTypeEl.value] || '1';
   
-  // Position 3: Assistant Type (1-5)
+  // Position 3: Collection Name (0-9)
+  const collectionMap = {
+    'A-Poem': '1',
+    'DocType-Test': '2',
+    'Family-Documents': '3',
+    'Federalist-Papers': '4',
+    'Human-Resources': '5',
+    'Law-Office': '6',
+    'Medical-Practice': '7',
+    'My-Emails': '8',
+    'My-Literature': '9'
+  };
+  const collectionCode = sourceTypeEl.value === 'Local Model Only' ? '0' : (collectionMap[collectionEl.value] || '0');
+  testCode += collectionCode;
+  
+  // Position 4: Search Type (1-7)
+  const searchTypeMap = {
+    'document-index': '1',
+    'line-search': '2',
+    'document-search': '3',
+    'smart-search': '4',
+    'hybrid-search': '5',
+    'ai-direct': '6',
+    'ai-document-chat': '7'
+  };
+  const searchTypeCode = sourceTypeEl.value === 'Local Model Only' ? '7' : (searchTypeMap[searchTypeEl.value] || '1');
+  testCode += searchTypeCode;
+  
+  // Position 5: Assistant Type (1-5)
   const assistantTypeMap = {
     'Simple Assistant': '1',
     'Detailed Assistant': '2',
@@ -807,38 +835,24 @@ function generateTestCode() {
   };
   testCode += assistantTypeMap[assistantTypeEl.value] || '1';
   
-  // Position 4: User Prompts (1-5) - default to 1
+  // Position 6: User Prompts by Collection (1-5) - default to 1
   let userPromptCode = '1';
-  if (systemPrompts && systemPrompts.length > 0) {
-    const userPromptMap = {
-      'KNOWLEDGE-Quantum': '1',
-      'REASON-AI-adopt': '2',
-      'CREATE-AI-dialog': '3',
-      'CODE-Pseudo': '4',
-      'INSTRUCT-Fix wifi': '5'
-    };
-    // Check if query matches any template
-    for (const [key, value] of Object.entries(userPromptMap)) {
-      const template = systemPrompts.find(p => p.name === key);
-      if (template && queryEl.value && queryEl.value.includes(template.prompt.substring(0, 20))) {
-        userPromptCode = value;
-        break;
-      }
-    }
+  if (userPromptsEl.selectedIndex > 0) {
+    userPromptCode = Math.min(userPromptsEl.selectedIndex, 5).toString();
   }
   testCode += userPromptCode;
   
-  // Position 5: Temperature (1-3)
+  // Position 7: Temperature (1-3)
   const tempValue = parseFloat(temperatureEl.value);
   const tempCode = tempValue === 0.3 ? '1' : tempValue === 0.6 ? '2' : '3';
   testCode += tempCode;
   
-  // Position 6: Context (1-4)
+  // Position 8: Context (1-4)
   const contextValue = parseInt(contextEl.value);
   const contextCode = contextValue === 2048 ? '1' : contextValue === 4096 ? '2' : contextValue === 8192 ? '3' : '4';
   testCode += contextCode;
   
-  // Position 7: Tokens (1-3)
+  // Position 9: Tokens (1-3)
   const tokenMap = {
     'No Limit': '1',
     '250': '2',
@@ -846,8 +860,8 @@ function generateTestCode() {
   };
   testCode += tokenMap[tokensEl.value] || '1';
   
-  // Position 8: Generate Scores (0-1)
-  testCode += scoreTglEl.checked ? '1' : '0';
+  // Position 10: Generate Scores (0-1)
+  testCode += (scoreTglEl && scoreTglEl.checked) ? '1' : '0';
   
   return testCode;
 }
@@ -1339,7 +1353,9 @@ form.addEventListener('submit', async (e) => {
         };
       }
     } else {
-      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
+      // Default to ai-document-chat for Local Model Only or fallback
+      const finalSearchType = sourceTypeEl.value === 'Local Model Only' ? 'ai-document-chat' : searchType;
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, finalSearchType, useWildcards);
     }
 
     

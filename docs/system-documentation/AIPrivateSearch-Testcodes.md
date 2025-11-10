@@ -4,9 +4,9 @@
 
 ## Overview
 
-The TestCode system provides a systematic way to configure and track all parameter combinations for comprehensive testing of the AI Search & Score application. Each TestCode is an 8-digit identifier that specifies exact settings for all user-configurable parameters.
+The TestCode system provides a systematic way to configure and track all parameter combinations for comprehensive testing of the AI Search & Score application. Each TestCode is a 10-character identifier that specifies exact settings for all user-configurable parameters.
 
-## TestCode Pattern: `t[1-3][1-5][1-5][1-3][1-4][1-3][0-1]`
+## TestCode Pattern: `t[1-3][0-9][1-7][1-5][1-5][1-3][1-4][1-3][0-1]`
 
 ### **Position 1: Test Identifier**
 - **t** = Test (fixed)
@@ -16,113 +16,134 @@ The TestCode system provides a systematic way to configure and track all paramet
 - **2** = Local Documents Only  
 - **3** = Local Model and Documents
 
-### **Position 3: Assistant Type** (1-5)
+### **Position 3: Collection Name** (0-9)
+- **0** = None (Local Model Only)
+- **1** = A-Poem
+- **2** = DocType-Test
+- **3** = Family-Documents
+- **4** = Federalist-Papers
+- **5** = Human-Resources
+- **6** = Law-Office
+- **7** = Medical-Practice
+- **8** = My-Emails
+- **9** = My-Literature
+
+### **Position 4: Search Type** (1-7)
+- **1** = document-index
+- **2** = line-search
+- **3** = document-search
+- **4** = smart-search
+- **5** = hybrid-search
+- **6** = ai-direct
+- **7** = ai-document-chat
+
+### **Position 5: Assistant Type** (1-5)
 - **1** = Simple Assistant
 - **2** = Detailed Assistant
 - **3** = Reasoned Assistant
 - **4** = Creative Assistant
 - **5** = Coding Assistant
 
-### **Position 4: User Prompts** (1-5)
-- **1** = KNOWLEDGE-Quantum
-- **2** = REASON-AI-adopt
-- **3** = CREATE-AI-dialog
-- **4** = CODE-Pseudo
-- **5** = INSTRUCT-Fix wifi
+### **Position 6: User Prompts** (1-5)
+- **1** = User Prompt 1
+- **2** = User Prompt 2
+- **3** = User Prompt 3
+- **4** = User Prompt 4
+- **5** = User Prompt 5
 
-### **Position 5: Temperature** (1-3)
+### **Position 7: Temperature** (1-3)
 - **1** = Predictable (0.3)
 - **2** = Moderate (0.6)
 - **3** = Creative (0.9)
 
-### **Position 6: Context** (1-4)
+### **Position 8: Context** (1-4)
 - **1** = 2048
 - **2** = 4096
 - **3** = 8192
 - **4** = 16384
 
-### **Position 7: Tokens** (1-3)
+### **Position 9: Tokens** (1-3)
 - **1** = No Limit
 - **2** = 250 tokens
 - **3** = 500 tokens
 
-### **Position 8: Generate Scores** (0-1)
+### **Position 10: Generate Scores** (0-1)
 - **0** = Disabled (false)
 - **1** = Enabled (true)
 
 ## Example TestCodes:
 
-- **t1111111** = Local Model Only + Simple Assistant + KNOWLEDGE-Quantum + Predictable + 2048 + No Limit + No Scoring
-- **t3542321** = Local Model and Documents + Creative Assistant + CODE-Pseudo + Moderate + 8192 + 250 tokens + Enabled Scoring
-- **t2314230** = Local Documents Only + Creative Assistant + KNOWLEDGE-Quantum + Predictable + 16384 + 500 tokens + No Scoring
+- **t1071111110** = Local Model Only + None + ai-document-chat + Simple Assistant + User Prompt 1 + Predictable + 2048 + No Limit + No Scoring
+- **t394543231** = Local Model and Documents + My-Literature + smart-search + Creative Assistant + User Prompt 4 + Moderate + 8192 + 250 tokens + Enabled Scoring
+- **t234111130** = Local Documents Only + Family-Documents + smart-search + Simple Assistant + User Prompt 1 + Predictable + 16384 + 500 tokens + No Scoring
 
 ## Total Possible Combinations:
-**3 × 5 × 5 × 3 × 4 × 3 × 2 = 5,400 unique test configurations**
+**3 × 10 × 7 × 5 × 5 × 3 × 4 × 3 × 2 = 315,000 unique test configurations
 
 ## Recommended Test Strategy:
 
 ### **Baseline Tests** (8 tests):
-- **t1111110** = All minimum values, no scoring
-- **t3554341** = All maximum values, with scoring
-- **t2323230** = Mixed values, no scoring
-- **t1452121** = Mixed values, with scoring
-- **t1234561** = Sequential progression, with scoring
-- **t3521430** = Reverse progression, no scoring
-- **t2143120** = Random mix A, no scoring
-- **t3415231** = Random mix B, with scoring
+- **t107111110** = All minimum values, no scoring
+- **t397554431** = All maximum values, with scoring
+- **t253232130** = Mixed values, no scoring
+- **t267451221** = Mixed values, with scoring
+- **t223451231** = Sequential progression, with scoring
+- **t389521430** = Reverse progression, no scoring
+- **t244312130** = Random mix A, no scoring
+- **t356152341** = Random mix B, with scoring
 
 ### **Parameter-Specific Tests** (focused testing):
 
 #### **Source Type Variations**:
-- **t1111110** = Local Model Only baseline
-- **t2111110** = Local Documents Only baseline
-- **t3111110** = Local Model and Documents baseline
+- **t107111110** = Local Model Only baseline
+- **t212111110** = Local Documents Only baseline
+- **t312111110** = Local Model and Documents baseline
 
 #### **Assistant Type Variations**:
-- **t1111110** = Simple Assistant baseline
-- **t1211110** = Detailed Assistant baseline
-- **t1311110** = Reasoned Assistant baseline
-- **t1411110** = Creative Assistant baseline
-- **t1511110** = Coding Assistant baseline
+- **t211111110** = Simple Assistant baseline
+- **t211211110** = Detailed Assistant baseline
+- **t211311110** = Reasoned Assistant baseline
+- **t211411110** = Creative Assistant baseline
+- **t211511110** = Coding Assistant baseline
 
 #### **User Prompt Variations**:
-- **t1111110** = KNOWLEDGE-Quantum baseline
-- **t1121110** = REASON-AI-adopt baseline
-- **t1131110** = CREATE-AI-dialog baseline
-- **t1141110** = CODE-Pseudo baseline
-- **t1151110** = INSTRUCT-Fix wifi baseline
+- **t211111110** = User Prompt 1 baseline
+- **t211121110** = User Prompt 2 baseline
+- **t211131110** = User Prompt 3 baseline
+- **t211141110** = User Prompt 4 baseline
+- **t211151110** = User Prompt 5 baseline
 
 #### **Temperature Variations**:
-- **t1111110** = Predictable (0.3) baseline
-- **t1111210** = Moderate (0.6) baseline
-- **t1111310** = Creative (0.9) baseline
+- **t211111110** = Predictable (0.3) baseline
+- **t211111210** = Moderate (0.6) baseline
+- **t211111310** = Creative (0.9) baseline
 
 #### **Context Variations**:
-- **t1111110** = 2048 context baseline
-- **t1111120** = 4096 context baseline
-- **t1111130** = 8192 context baseline
-- **t1111140** = 16384 context baseline
+- **t211111110** = 2048 context baseline
+- **t211111120** = 4096 context baseline
+- **t211111130** = 8192 context baseline
+- **t211111140** = 16384 context baseline
 
 #### **Token Limit Variations**:
-- **t1111110** = No Limit baseline
-- **t1111120** = 250 tokens baseline
-- **t1111130** = 500 tokens baseline
+- **t211111110** = No Limit baseline
+- **t211111121** = 250 tokens baseline
+- **t211111131** = 500 tokens baseline
 
 #### **Scoring Variations**:
-- **t1111110** = No scoring baseline
-- **t1111111** = With scoring baseline
+- **t211111110** = No scoring baseline
+- **t211111111** = With scoring baseline
 
 ### **Edge Case Tests**:
-- **t1111431** = Maximum Context + Maximum Tokens + Scoring
-- **t1413111** = Creative Assistant + Creative Temperature + Scoring
-- **t1544111** = Coding Assistant + CODE-Pseudo + Scoring
-- **t3254321** = All Documents + Detailed + AI-adopt + Moderate + 8192 + 250 + Scoring
-- **t2135140** = Documents + Simple + CREATE + Creative + 16384 + No Limit + No Scoring
+- **t299554431** = Maximum Context + Maximum Tokens + Scoring
+- **t219413131** = Creative Assistant + Creative Temperature + Scoring
+- **t219551431** = Coding Assistant + User Prompt 5 + Scoring
+- **t353254231** = All Documents + Human-Resources + Smart + Detailed + User Prompt 4 + Moderate + 8192 + 250 + Scoring
+- **t289913140** = Documents + My-Literature + Advanced + Simple + User Prompt 1 + Creative + 16384 + No Limit + No Scoring
 
 ### **Compatibility Tests**:
-- **t1444331** = Creative Assistant + Creative Temperature + Creative Tokens + Scoring
-- **t5511111** = Invalid (Assistant Type 5 max) - Error handling test
-- **t1611111** = Invalid (User Prompt 6 max) - Error handling test
+- **t299443331** = Creative Assistant + Creative Temperature + Creative Tokens + Scoring
+- **t215611111** = Invalid (Assistant Type 6 max) - Error handling test
+- **t211161111** = Invalid (User Prompt 6 max) - Error handling test
 
 ## Test Implementation Strategy:
 
