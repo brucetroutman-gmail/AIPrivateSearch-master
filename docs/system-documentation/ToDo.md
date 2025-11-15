@@ -79,9 +79,12 @@ Phase 3 - Role-Based Feature Control:
 294. Complete Guides page and move to marketing Guides page.
 
 296. Create testCodes for DocumentSearch performance
-297. 
+297. Create nitial app step If no ownr email, create email + pccode = key to tier. Registration app
 
 
+
+## RECENTLY COMPLETED (v19.61)
+302. Create updated executive summary for version 19.60 reflecting current enterprise-ready state with user management and security features --done
 
 ## RECENTLY COMPLETED (v19.60)
 299. Create _template-page.html with all standard loading routines and patterns for new pages --done
