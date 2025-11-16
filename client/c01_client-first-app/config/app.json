@@ -3,14 +3,9 @@
   "sources-location": "/Users/Shared/AIPrivateSearch/sources",
   "config-location": "/Users/Shared/AIPrivateSearch/config",
   "bearer-token-timeout": 300,
-  "subscription-tier": 1,
+  "subscription-tier": 3,
   "ports": {
     "frontend": 53000,
     "backend": 53001
-  },
-  "licensing": {
-    "custmgr-url": "http://localhost:56304",
-    "grace-period-days": 7,
-    "refresh-interval-hours": 24
   }
 }

@@ -4,6 +4,8 @@ class LicenseChecker {
         this.licenseStatus = null;
         this.apiBaseUrl = 'http://localhost:3001';
         this.initialized = false;
+        this.lastCheck = 0;
+        this.cacheTimeout = 5000; // 5 seconds cache
     }
 
     async initialize() {
@@ -27,8 +29,10 @@ class LicenseChecker {
     async checkLicenseStatus(forceRefresh = false) {
         await this.initialize();
         
-        // Return cached status unless forced refresh
-        if (this.licenseStatus && !forceRefresh) {
+        const now = Date.now();
+        // Return cached status unless forced refresh or cache expired
+        if (this.licenseStatus && !forceRefresh && (now - this.lastCheck) < this.cacheTimeout) {
+            console.log('🔐 LICENSE CHECKER: Using cached status');
             return this.licenseStatus;
         }
         
@@ -36,6 +40,7 @@ class LicenseChecker {
             const response = await fetch(`${this.apiBaseUrl}/api/licensing/status`);
             const data = await response.json();
             this.licenseStatus = data;
+            this.lastCheck = Date.now();
             console.log('License status updated:', data);
             return data;
         } catch (error) {
@@ -173,27 +178,50 @@ window.licenseChecker = new LicenseChecker();
 
 // Auto-check license on page load (independent of user auth)
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🔐 LICENSE CHECKER: DOMContentLoaded event fired');
     try {
+        console.log('🔐 LICENSE CHECKER: Step 2 - Starting license status check');
         // License check is independent of user authentication
         const status = await window.licenseChecker.checkLicenseStatus();
+        console.log('🔐 LICENSE CHECKER: Step 2a - License status received:', status);
         
         // Skip license enforcement if in fallback mode, valid license, or on user auth pages
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        console.log('🔐 LICENSE CHECKER: Step 2b - Current page:', currentPage);
+        
         const userAuthPages = ['user-management.html', 'login.html', 'register.html'];
         const skipEnforcement = userAuthPages.includes(currentPage) || 
                                status.fallback || 
                                (status.valid && !status.requiresActivation);
         
+        console.log('🔐 LICENSE CHECKER: Step 2c - Skip enforcement decision:', {
+            currentPage,
+            isUserAuthPage: userAuthPages.includes(currentPage),
+            isFallback: status.fallback,
+            isValidAndNotRequiringActivation: (status.valid && !status.requiresActivation),
+            skipEnforcement
+        });
+        
         if (!skipEnforcement) {
+            console.log('🔐 LICENSE CHECKER: Step 2d - Enforcing activation check');
             const redirected = await window.licenseChecker.enforceActivation();
-            if (redirected) return;
+            if (redirected) {
+                console.log('🔐 LICENSE CHECKER: Step 2e - Redirected to activation page');
+                return;
+            }
+        } else {
+            console.log('🔐 LICENSE CHECKER: Step 2d - Skipping enforcement');
         }
         
+        console.log('🔐 LICENSE CHECKER: Step 3 - Applying tier restrictions');
         await window.licenseChecker.applyTierRestrictions();
         
         // Display license status if container exists
         if (document.getElementById('licenseStatus')) {
+            console.log('🔐 LICENSE CHECKER: Step 4 - Displaying license status');
             window.licenseChecker.displayLicenseStatus('licenseStatus');
+        } else {
+            console.log('🔐 LICENSE CHECKER: Step 4 - No license status container found');
         }
     } catch (error) {
         console.error('License initialization failed:', error);

@@ -6,19 +6,19 @@
       "test_count": 4,
       "tests": [
         {
-          "testcode": "t1071112310",
+          "testcode": "t1112310",
           "description": "KNOWLEDGE-Quantum, No Scoring"
         },
         {
-          "testcode": "t1071112311",
+          "testcode": "t1112311",
           "description": "KNOWLEDGE-Quantum, Scoring"
         },
         {
-          "testcode": "t1071543311",
+          "testcode": "t1543311",
           "description": "Edge: CODE-Pseudo, Temp=0.9, Max Context=16384, 250 Tokens, Scoring"
         },
         {
-          "testcode": "t1071553411",
+          "testcode": "t1553411",
           "description": "Edge: INSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
         }
       ]
@@ -29,19 +29,19 @@
       "test_count": 4,
       "tests": [
         {
-          "testcode": "t2211112310",
+          "testcode": "t2112310",
           "description": "KNOWLEDGE-Quantum, No Scoring"
         },
         {
-          "testcode": "t2211112311",
+          "testcode": "t2112311",
           "description": "KNOWLEDGE-Quantum, Scoring"
         },
         {
-          "testcode": "t2211543311",
+          "testcode": "t2543311",
           "description": "Edge: CODE-Pseudo, Temp=0.9, Max Context=16384, 250 Tokens, Scoring"
         },
         {
-          "testcode": "t2211553411",
+          "testcode": "t2553411",
           "description": "Edge: INSTRUCT-Fix wifi, Creative Temp=0.9, Max Context=16384, Scoring"
         }
       ]

@@ -5,17 +5,23 @@ script.src = 'shared/utils/secure-html.js';
 document.head.appendChild(script);
 
 (async function() {
+    console.log('🚀 STARTUP LICENSE: Starting startup license check');
     try {
+        console.log('🚀 STARTUP LICENSE: Step 5 - Initializing license checker');
         // Initialize license checker
         await window.licenseChecker.initialize();
         
+        console.log('🚀 STARTUP LICENSE: Step 5a - Checking license status');
         // Check license status
         const status = await window.licenseChecker.checkLicenseStatus();
+        console.log('🚀 STARTUP LICENSE: Step 5b - Status received:', status);
         
         if (status.requiresActivation) {
+            console.log('🚀 STARTUP LICENSE: Step 6a - License requires activation');
             // Show activation message and redirect
             const licenseStatusEl = document.getElementById('licenseStatus');
             if (licenseStatusEl) {
+                console.log('🚀 STARTUP LICENSE: Step 6b - Showing activation message');
                  
                 licenseStatusEl.innerHTML = `
                     <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
@@ -38,10 +44,14 @@ document.head.appendChild(script);
             }, 3000);
             
         } else if (status.valid) {
+            console.log('🚀 STARTUP LICENSE: Step 6a - License is valid');
             // License is valid, show CTA buttons
             const ctaButtons = document.getElementById('ctaButtons');
             if (ctaButtons) {
+                console.log('🚀 STARTUP LICENSE: Step 6b - Showing CTA buttons');
                 ctaButtons.style.display = 'flex';
+            } else {
+                console.log('🚀 STARTUP LICENSE: Step 6b - CTA buttons element not found');
             }
             
             // Show license status
@@ -76,7 +86,7 @@ document.head.appendChild(script);
         }
         
     } catch (error) {
-        console.error('Startup license check failed:', error);
+        console.error('🚀 STARTUP LICENSE: Step ERROR - Startup license check failed:', error);
         
         // Show error message
         const licenseStatusEl = document.getElementById('licenseStatus');

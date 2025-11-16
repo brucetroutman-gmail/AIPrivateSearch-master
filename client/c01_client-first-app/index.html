@@ -10,15 +10,25 @@
   <script src="shared/license-checker.js"></script>
   <script src="shared/startup-license-check.js"></script>
   <script>
+    console.log('🏠 HOME PAGE: Starting page load sequence');
+    
     // Load app config and update title/heading
+    console.log('🏠 HOME PAGE: Step 1 - Loading app config');
     fetch('./config/app.json')
-      .then(response => response.json())
+      .then(response => {
+        console.log('🏠 HOME PAGE: Step 1a - App config response received');
+        return response.json();
+      })
       .then(config => {
+        console.log('🏠 HOME PAGE: Step 1b - App config loaded:', config);
         document.getElementById('page-title').textContent = config['app-name'] + ' - AI Private Searching Platform';
         document.title = config['app-name'] + ' - AI Private Searching Platform';
         document.querySelector('.hero h1').textContent = config['app-name'];
+        console.log('🏠 HOME PAGE: Step 1c - Page title updated');
       })
-      .catch(error => console.error('Error loading app config:', error));
+      .catch(error => {
+        console.error('🏠 HOME PAGE: Step 1 ERROR - Failed to load app config:', error);
+      });
   </script>
   <style>
     

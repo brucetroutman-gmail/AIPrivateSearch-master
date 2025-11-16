@@ -79,10 +79,12 @@ Phase 3 - Role-Based Feature Control:
 294. Complete Guides page and move to marketing Guides page.
 
 296. Create testCodes for DocumentSearch performance
-297. Create initial app step If no owner email, create email + pccode = key to tier. Registration app
-303. Fix licensing post-activation flow - after successful activation, home page shows "no activation" then redirects back to activation page. License checker state management needs debugging
+298. After activate check app should come to login.
 
 
+## RECENTLY COMPLETED (v19.63)
+297. Create initial app step If no owner email, create email + pccode = key to tier. Registration app --done
+303. Fix licensing post-activation flow - after successful activation, home page shows "no activation" then redirects back to activation page. License checker state management needs debugging --done
 
 ## RECENTLY COMPLETED (v19.62)
 304. Implement complete JWT-based licensing system with custmgr server integration --done
