@@ -2,24 +2,27 @@
 
 echo "🚀 Starting AIPrivateSearch..."
 
-# Read ports from app.json config
-FRONTEND_PORT=3000
-BACKEND_PORT=3001
-if [ -f "client/c01_client-first-app/config/app.json" ]; then
-    FRONTEND_PORT=$(grep -o '"frontend":[[:space:]]*[0-9]*' client/c01_client-first-app/config/app.json | grep -o '[0-9]*' || echo 3000)
-    BACKEND_PORT=$(grep -o '"backend":[[:space:]]*[0-9]*' client/c01_client-first-app/config/app.json | grep -o '[0-9]*' || echo 3001)
+# Read ports from app.json config - ONLY use config file values
+if [ ! -f "client/c01_client-first-app/config/app.json" ]; then
+    echo "❌ Config file not found: client/c01_client-first-app/config/app.json"
+    exit 1
 fi
 
-# Kill any existing server processes to free up ports
+FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend")
+BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.backend")
+
+if [ -z "$FRONTEND_PORT" ] || [ -z "$BACKEND_PORT" ]; then
+    echo "❌ Failed to read ports from config file"
+    exit 1
+fi
+
+# Kill any existing AIPrivateSearch server processes to free up ports
 # Kill processes by port to ensure clean shutdown
 lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
 lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
-# Also kill by process name as backup
-pkill -f "node server.mjs" 2>/dev/null || true
+# Kill only AIPrivateSearch specific processes (avoid killing custmgr)
 pkill -f "npx serve" 2>/dev/null || true
-pkill -f "npm start" 2>/dev/null || true
 sleep 2
-pkill -f "node server.mjs" 2>/dev/null || true
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
@@ -210,8 +213,7 @@ cleanup() {
     lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
     lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
     pkill -f 'npx serve' 2>/dev/null || true
-    pkill -f 'node server.mjs' 2>/dev/null || true
-    pkill -f 'npm start' 2>/dev/null || true
+    # Only kill AIPrivateSearch specific processes (avoid killing custmgr)
     
     # Disable history saving on Apple Silicon Macs to prevent terminal lockup
     if [[ $(uname -m) == "arm64" ]]; then

@@ -17,7 +17,9 @@ import subscriptionRouter from './routes/subscription.mjs';
 import testResultsRouter from './routes/testResults.mjs';
 import tierAccessRouter from './routes/tierAccess.mjs';
 import searchLogsRouter from './routes/searchLogs.mjs';
+import licensingRouter from './routes/licensing.mjs';
 import cookieParser from 'cookie-parser';
+import { LicenseManager } from './lib/licensing/license-manager.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
@@ -149,6 +151,7 @@ app.use('/api/subscription', subscriptionRouter);
 app.use('/api/tier-access', validateOrigin, tierAccessRouter);
 // Simplified search-logs route (no middleware)
 app.use('/api/search-logs', searchLogsRouter);
+app.use('/api/licensing', licensingRouter);
 app.use('/api', testResultsRouter);
 
 // Catch-all for unmatched API routes
@@ -172,8 +175,16 @@ try {
   // Fallback to default if config can't be read
   PORT = process.env.PORT || 3001;
 }
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   logger.log(`Server running on port ${PORT}`);
+  
+  // Initialize licensing system
+  try {
+    await LicenseManager.initialize();
+    logger.log('Licensing system initialized');
+  } catch (error) {
+    logger.error('Failed to initialize licensing system:', error);
+  }
 });
 
 server.on('error', (err) => {

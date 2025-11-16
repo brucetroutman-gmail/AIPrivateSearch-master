@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="shared/styles.css">
   <script src="csrf.js"></script>
   <script type="module" src="shared/common.js"></script>
+  <script src="shared/license-checker.js"></script>
+  <script src="shared/startup-license-check.js"></script>
   <script>
     // Load app config and update title/heading
     fetch('./config/app.json')
@@ -182,10 +184,11 @@
       <img src="./assets/AIPrivateSearch.jpg" alt="AI Private Search" style="max-width: 80px; height: auto; float: right; margin: 0 0 1rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow);">
       <h1>AI Private Search</h1>
       <p>Secure, private AI-powered search for your confidential documents. Perfect for medical practices, law firms, HR departments, and personal document collections. Your data never leaves your computer.</p>
-      <div class="cta-buttons" style="display: none;">
+      <div class="cta-buttons" id="ctaButtons" style="display: none;">
         <a href="./search.html" class="btn btn-primary">Search Your Documents</a>
         <a href="./collections.html" class="btn btn-secondary">Manage Collections</a>
       </div>
+      <div id="licenseStatus" style="margin-top: 2rem;"></div>
     </section>
 
     <section class="features">

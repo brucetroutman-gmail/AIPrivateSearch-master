@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Activation - AI Private Search</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <style>
+        .activation-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .activation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .form-group input {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+        .activate-btn {
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .activate-btn:hover {
+            background: var(--primary-hover);
+        }
+        .activate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status-message {
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .system-info {
+            background: var(--secondary-bg);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .skip-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .skip-link a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="activation-container">
+        <h1>License Activation Required</h1>
+        <p>Please enter your email address to activate your AI Private Search license.</p>
+        
+        <div class="system-info" id="systemInfo">
+            <strong>System Information:</strong><br>
+            <span id="systemDetails">Loading...</span>
+        </div>
+
+        <form class="activation-form" id="activationForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="Enter your email address">
+            </div>
+            
+            <button type="submit" class="activate-btn" id="activateBtn">
+                Activate License
+            </button>
+        </form>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="skip-link">
+            <a href="index.html">Continue without activation (limited features)</a>
+        </div>
+    </div>
+
+    <script>
+        let API_BASE_URL = 'http://localhost:3001';
+
+        // Load API configuration
+        async function loadAPIConfig() {
+            try {
+                const response = await fetch('./config/app.json');
+                const config = await response.json();
+                if (config.ports && config.ports.backend) {
+                    API_BASE_URL = `http://localhost:${config.ports.backend}`;
+                }
+            } catch (error) {
+                console.warn('Could not load API config, using default');
+            }
+        }
+
+        // Load system information
+        async function loadSystemInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/licensing/system-info`);
+                const data = await response.json();
+                
+                document.getElementById('systemDetails').innerHTML = `
+                    Hardware UUID: ${data.uuid || 'Unknown'}<br>
+                    Serial: ${data.serial || 'Unknown'}<br>
+                    Hardware ID Available: ${data.hasHardwareId ? 'Yes' : 'No'}
+                `;
+            } catch (error) {
+                document.getElementById('systemDetails').textContent = 'Unable to load system information';
+            }
+        }
+
+        // Show status message
+        function showStatus(message, isError = false) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
+            statusEl.style.display = 'block';
+        }
+
+        // Handle form submission
+        document.getElementById('activationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const activateBtn = document.getElementById('activateBtn');
+            
+            if (!email) {
+                showStatus('Please enter a valid email address', true);
+                return;
+            }
+
+            activateBtn.disabled = true;
+            activateBtn.textContent = 'Activating...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/licensing/activate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(`License activated successfully! Tier: ${data.tier === 1 ? 'Standard' : data.tier === 2 ? 'Premium' : 'Professional'}`);
+                    
+                    // Clear any existing license checker intervals to prevent conflicts
+                    if (window.licenseChecker) {
+                        window.licenseChecker.licenseStatus = null;
+                    }
+                    
+                    // Wait longer for license to propagate and redirect
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
+                } else {
+                    showStatus(data.error || 'Activation failed', true);
+                }
+            } catch (error) {
+                showStatus('Network error: Unable to connect to licensing server', true);
+            } finally {
+                activateBtn.disabled = false;
+                activateBtn.textContent = 'Activate License';
+            }
+        });
+
+        // Check if already activated and redirect
+        async function checkExistingLicense() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/licensing/status`);
+                const data = await response.json();
+                
+                if (data.valid && !data.requiresActivation) {
+                    // Already activated, redirect immediately
+                    window.location.href = 'index.html';
+                    return true;
+                }
+            } catch (error) {
+                // Continue with activation page
+            }
+            return false;
+        }
+
+        // Initialize page
+        async function init() {
+            await loadAPIConfig();
+            
+            // Check if already activated first
+            const alreadyActivated = await checkExistingLicense();
+            if (alreadyActivated) return;
+            
+            await loadSystemInfo();
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -7,5 +7,10 @@
   "ports": {
     "frontend": 53000,
     "backend": 53001
+  },
+  "licensing": {
+    "custmgr-url": "http://localhost:56304",
+    "grace-period-days": 7,
+    "refresh-interval-hours": 24
   }
 }
