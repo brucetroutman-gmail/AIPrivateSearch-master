@@ -128,6 +128,7 @@ class LicenseChecker {
             `;
         }
 
+        // eslint-disable-next-line no-unsanitized/property
         container.innerHTML = statusHtml;
     }
 

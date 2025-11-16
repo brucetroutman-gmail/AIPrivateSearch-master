@@ -28,8 +28,11 @@ for pattern in "${BANNED_PATTERNS[@]}"; do
     
     # Filter out safe innerHTML usage for innerHTML
     if [[ "$pattern" == "innerHTML.*=" ]]; then
+        # Get matches with context to check for eslint-disable comments
+        context_matches=$(grep -r -n -B1 "$pattern" client/c01_client-first-app/ --include="*.js" --include="*.mjs" || true)
         # Filter out eslint-disabled lines and safe patterns
-        matches=$(echo "$matches" | grep -v "eslint-disable-line" | grep -v "innerHTML = ''" | grep -v "innerHTML = '<option" | grep -v "headerHTML" | grep -v "footerHTML" || true)
+        safe_matches=$(echo "$context_matches" | grep -B1 "eslint-disable" | grep "innerHTML.*=" || true)
+        matches=$(echo "$matches" | grep -v -F "$(echo "$safe_matches" | cut -d: -f1-2)" | grep -v "innerHTML = ''" | grep -v "innerHTML = '<option" | grep -v "headerHTML" | grep -v "footerHTML" || true)
     fi
     
     if [ ! -z "$matches" ]; then

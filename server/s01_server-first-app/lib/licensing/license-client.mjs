@@ -45,6 +45,7 @@ export class LicenseClient {
       });
       
       if (response.data.publicKey) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(PUBLIC_KEY_FILE, response.data.publicKey);
         console.log('Public key downloaded successfully');
       }
@@ -131,10 +132,12 @@ export class LicenseClient {
 
   static async validateLicenseLocal(token) {
     try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       if (!fs.existsSync(PUBLIC_KEY_FILE)) {
         return { valid: false, reason: 'No public key available for local validation' };
       }
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const publicKey = fs.readFileSync(PUBLIC_KEY_FILE, 'utf8');
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
       

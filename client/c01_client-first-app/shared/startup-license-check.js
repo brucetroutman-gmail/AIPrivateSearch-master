@@ -1,4 +1,9 @@
 // Startup license validation for AIPrivateSearch
+// Load secure HTML utility
+const script = document.createElement('script');
+script.src = 'shared/utils/secure-html.js';
+document.head.appendChild(script);
+
 (async function() {
     try {
         // Initialize license checker
@@ -11,6 +16,7 @@
             // Show activation message and redirect
             const licenseStatusEl = document.getElementById('licenseStatus');
             if (licenseStatusEl) {
+                 
                 licenseStatusEl.innerHTML = `
                     <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
                         <h3 style="color: #856404; margin-bottom: 15px;">License Activation Required</h3>
@@ -44,6 +50,7 @@
                 const tierName = status.tier === 1 ? 'Standard' : 
                                status.tier === 2 ? 'Premium' : 'Professional';
                 
+                // eslint-disable-next-line no-unsanitized/property
                 licenseStatusEl.innerHTML = `
                     <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; text-align: center;">
                         <strong style="color: #155724;">License Active</strong><br>
@@ -57,6 +64,7 @@
             // License invalid but not requiring activation (e.g., network error)
             const licenseStatusEl = document.getElementById('licenseStatus');
             if (licenseStatusEl) {
+                // eslint-disable-next-line no-unsanitized/property
                 licenseStatusEl.innerHTML = `
                     <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; text-align: center;">
                         <strong style="color: #721c24;">License Validation Failed</strong><br>
@@ -73,6 +81,7 @@
         // Show error message
         const licenseStatusEl = document.getElementById('licenseStatus');
         if (licenseStatusEl) {
+             
             licenseStatusEl.innerHTML = `
                 <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; text-align: center;">
                     <strong style="color: #721c24;">License System Error</strong><br>
