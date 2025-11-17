@@ -6,6 +6,17 @@
   <title>Contact - AIPrivateSearch</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script type="module" src="shared/common.js"></script>
+  <script>
+    // Load theme immediately to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) {
+        localStorage.setItem('theme', theme);
+      }
+    })();
+  </script>
   <style>
     .contact-container {
       max-width: 800px;

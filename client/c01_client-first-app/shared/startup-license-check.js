@@ -24,7 +24,7 @@ document.head.appendChild(script);
                 console.log('🚀 STARTUP LICENSE: Step 6b - Showing activation message');
                  
                 licenseStatusEl.innerHTML = `
-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                    <div style="display: inline-block; background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <h3 style="color: #856404; margin-bottom: 15px;">License Activation Required</h3>
                         <p style="color: #856404; margin-bottom: 20px;">
                             To use AI Private Search, please activate your license with your email address.
@@ -45,13 +45,43 @@ document.head.appendChild(script);
             
         } else if (status.valid) {
             console.log('🚀 STARTUP LICENSE: Step 6a - License is valid');
-            // License is valid, show CTA buttons
+            
+            // Check authentication after license validation
+            const sessionId = localStorage.getItem('sessionId');
+            if (!sessionId) {
+                console.log('🚀 STARTUP LICENSE: Step 6b - No session found, redirecting to login');
+                window.location.href = './user-management.html';
+                return;
+            }
+            
+            // Verify session is still valid
+            try {
+                const authResponse = await fetch(`${window.API_BASE_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${sessionId}` }
+                });
+                
+                if (!authResponse.ok) {
+                    console.log('🚀 STARTUP LICENSE: Step 6c - Session expired, redirecting to login');
+                    localStorage.removeItem('sessionId');
+                    localStorage.removeItem('userEmail');
+                    window.location.href = './user-management.html';
+                    return;
+                }
+            } catch (error) {
+                console.log('🚀 STARTUP LICENSE: Step 6c - Auth check failed, redirecting to login');
+                localStorage.removeItem('sessionId');
+                localStorage.removeItem('userEmail');
+                window.location.href = './user-management.html';
+                return;
+            }
+            
+            // License is valid and user is authenticated, show CTA buttons
             const ctaButtons = document.getElementById('ctaButtons');
             if (ctaButtons) {
-                console.log('🚀 STARTUP LICENSE: Step 6b - Showing CTA buttons');
+                console.log('🚀 STARTUP LICENSE: Step 6d - Showing CTA buttons');
                 ctaButtons.style.display = 'flex';
             } else {
-                console.log('🚀 STARTUP LICENSE: Step 6b - CTA buttons element not found');
+                console.log('🚀 STARTUP LICENSE: Step 6d - CTA buttons element not found');
             }
             
             // Show license status
@@ -62,9 +92,9 @@ document.head.appendChild(script);
                 
                 // eslint-disable-next-line no-unsanitized/property
                 licenseStatusEl.innerHTML = `
-                    <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="display: inline-block; background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px;">
                         <strong style="color: #155724;">License Active</strong><br>
-                        <span style="color: #155724;">Tier: ${tierName} | Email: ${status.email}</span>
+                        <span style="color: #155724;">Tier: ${tierName} | Customer: ${status.email}</span>
                         ${status.gracePeriod ? '<br><em style="color: #856404;">Grace period active</em>' : ''}
                     </div>
                 `;
@@ -76,7 +106,7 @@ document.head.appendChild(script);
             if (licenseStatusEl) {
                 // eslint-disable-next-line no-unsanitized/property
                 licenseStatusEl.innerHTML = `
-                    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="display: inline-block; background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px;">
                         <strong style="color: #721c24;">License Validation Failed</strong><br>
                         <span style="color: #721c24;">${status.reason || 'Unable to validate license'}</span><br>
                         <a href="license-activation.html" style="color: #007bff; text-decoration: none;">Try Activation</a>
@@ -93,7 +123,7 @@ document.head.appendChild(script);
         if (licenseStatusEl) {
              
             licenseStatusEl.innerHTML = `
-                <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="display: inline-block; background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px;">
                     <strong style="color: #721c24;">License System Error</strong><br>
                     <span style="color: #721c24;">Unable to connect to licensing system</span><br>
                     <a href="license-activation.html" style="color: #007bff; text-decoration: none;">Try Activation</a>

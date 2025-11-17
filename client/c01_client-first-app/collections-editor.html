@@ -8,6 +8,17 @@
   <script src="csrf.js"></script>
   <script src="shared/utils/apiConfig.js"></script>
   <script type="module" src="shared/common.js"></script>
+  <script>
+    // Load theme immediately to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) {
+        localStorage.setItem('theme', theme);
+      }
+    })();
+  </script>
   <style>
     .editor-container {
       max-width: 1200px;

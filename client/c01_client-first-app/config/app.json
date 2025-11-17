@@ -5,7 +5,7 @@
   "bearer-token-timeout": 300,
   "subscription-tier": 3,
   "ports": {
-    "frontend": 53000,
-    "backend": 53001
+    "frontend": 56305,
+    "backend": 56306
   }
 }

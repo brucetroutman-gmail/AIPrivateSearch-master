@@ -78,12 +78,16 @@ Phase 3 - Role-Based Feature Control:
 293. Test log creation and mysql update. not all elements are being saved.
 294. Complete Guides page and move to marketing Guides page.
 
-296. Create testCodes for DocumentSearch performance
-298. After activate check app should come to login.
+296. Create testCodes for DocumentSearch performance 
+300. t
 
+
+## RECENTLY COMPLETED (v19.64)
 
 ## RECENTLY COMPLETED (v19.63)
 297. Create initial app step If no owner email, create email + pccode = key to tier. Registration app --done
+298. After activate check app should come to login --done
+299. Fix light-to-dark mode flash when switching pages by adding immediate theme loading script to all 23 HTML pages --done
 303. Fix licensing post-activation flow - after successful activation, home page shows "no activation" then redirects back to activation page. License checker state management needs debugging --done
 
 ## RECENTLY COMPLETED (v19.62)

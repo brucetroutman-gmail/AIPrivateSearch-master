@@ -10,6 +10,17 @@
   <script src="shared/license-checker.js"></script>
   <script src="shared/startup-license-check.js"></script>
   <script>
+    // Load theme immediately to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) {
+        localStorage.setItem('theme', theme);
+      }
+    })();
+  </script>
+  <script>
     console.log('🏠 HOME PAGE: Starting page load sequence');
     
     // Load app config and update title/heading

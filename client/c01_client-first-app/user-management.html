@@ -84,10 +84,19 @@
 
     <script src="./shared/utils/apiConfig.js"></script>
     <script>
-        // Load theme on page load
+        // Load theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const theme = savedTheme || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            if (!savedTheme) {
+                localStorage.setItem('theme', theme);
+            }
+        })();
+        
+        // Legacy function for compatibility
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            // Theme already loaded above
         }
         
         // Load shared components
@@ -533,7 +542,7 @@
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {
-            loadTheme();
+            // Theme already loaded in head
             
             // Check authentication first
             try {
