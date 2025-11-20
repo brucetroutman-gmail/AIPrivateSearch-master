@@ -79,8 +79,14 @@ Phase 3 - Role-Based Feature Control:
 294. Complete Guides page and move to marketing Guides page.
 
 296. Create testCodes for DocumentSearch performance 
-300. t
+300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
+301. t
 
+
+
+## RECENTLY COMPLETED (v19.66)
+308. Add custmgr location configuration to app.json and replace hardcoded URLs with dynamic config loading --done
+309. Remove "– Demo" from tab titles throughout the app --done
 
 ## RECENTLY COMPLETED (v19.65)
 

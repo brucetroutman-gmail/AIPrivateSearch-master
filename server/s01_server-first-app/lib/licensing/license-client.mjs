@@ -5,18 +5,21 @@ import path from 'path';
 import { getSystemInfo } from './hardware.mjs';
 import { LicenseStorage } from './license-storage.mjs';
 
-let CUSTMGR_BASE_URL = process.env.CUSTMGR_URL || 'http://localhost:56304';
+let CUSTMGR_BASE_URL;
 
 // Load custmgr URL from app.json config
 async function loadCustmgrConfig() {
   try {
     const fs = await import('fs/promises');
     const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
-    if (appConfig.licensing && appConfig.licensing['custmgr-url']) {
-      CUSTMGR_BASE_URL = appConfig.licensing['custmgr-url'];
+    if (appConfig.custmgr) {
+      CUSTMGR_BASE_URL = `http://${appConfig.custmgr.host}:${appConfig.custmgr.port}`;
       console.log('Using custmgr URL from config:', CUSTMGR_BASE_URL);
+    } else {
+      CUSTMGR_BASE_URL = process.env.CUSTMGR_URL || 'http://localhost:56303';
     }
   } catch (error) {
+    CUSTMGR_BASE_URL = process.env.CUSTMGR_URL || 'http://localhost:56303';
     console.warn('Could not load custmgr URL from config, using default:', CUSTMGR_BASE_URL);
   }
 }

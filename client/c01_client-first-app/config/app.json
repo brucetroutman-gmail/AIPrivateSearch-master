@@ -3,9 +3,13 @@
   "sources-location": "/Users/Shared/AIPrivateSearch/sources",
   "config-location": "/Users/Shared/AIPrivateSearch/config",
   "bearer-token-timeout": 300,
-  "subscription-tier": 3,
+  "subscription-tier": 1,
   "ports": {
     "frontend": 56305,
     "backend": 56306
+  },
+  "custmgr": {
+    "host": "92.112.184.206",
+    "port": 56303
   }
 }
