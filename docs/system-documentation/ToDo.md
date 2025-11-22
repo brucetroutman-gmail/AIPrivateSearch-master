@@ -84,6 +84,11 @@ Phase 3 - Role-Based Feature Control:
 
 
 
+## RECENTLY COMPLETED (v19.67)
+310. Fix custmgr licensing server authentication by adding /api/licensing/ endpoints to auth exclusion list --done
+311. Remove fallback defaults from license-client.mjs to force configuration-only operation --done
+312. Update custmgr configuration to use domain name (custmgr.aiprivatesearch.com) instead of IP address --done
+
 ## RECENTLY COMPLETED (v19.66)
 308. Add custmgr location configuration to app.json and replace hardcoded URLs with dynamic config loading --done
 309. Remove "– Demo" from tab titles throughout the app --done

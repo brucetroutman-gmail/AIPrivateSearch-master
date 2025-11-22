@@ -16,11 +16,10 @@ async function loadCustmgrConfig() {
       CUSTMGR_BASE_URL = `http://${appConfig.custmgr.host}:${appConfig.custmgr.port}`;
       console.log('Using custmgr URL from config:', CUSTMGR_BASE_URL);
     } else {
-      CUSTMGR_BASE_URL = process.env.CUSTMGR_URL || 'http://localhost:56303';
+      throw new Error('No custmgr configuration found in app.json');
     }
   } catch (error) {
-    CUSTMGR_BASE_URL = process.env.CUSTMGR_URL || 'http://localhost:56303';
-    console.warn('Could not load custmgr URL from config, using default:', CUSTMGR_BASE_URL);
+    throw new Error(`Failed to load custmgr configuration: ${error.message}`);
   }
 }
 

@@ -9,7 +9,7 @@
     "backend": 56306
   },
   "custmgr": {
-    "host": "92.112.184.206",
-    "port": 56303
+    "host": "custmgr.aiprivatesearch.com",
+    "port": 56304
   }
 }
