@@ -80,12 +80,18 @@ Phase 3 - Role-Based Feature Control:
 
 296. Create testCodes for DocumentSearch performance 
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
-301. Updated to serlock icons  --done
 302. t
 
 
 
+## RECENTLY COMPLETED (v19.69)
+316. Move inline styles to CSS classes across all three applications --done
+317. Add CSS classes for Sherlock icons, CTA buttons, and common UI elements --done
+318. Update all index.html files to use CSS classes instead of inline styles --done
+319. Copy updated styles.css to aiprivatesearchweb and aiprivatesearchcustmgr --done
+
 ## RECENTLY COMPLETED (v19.68)
+301. Updated to sherlock icons  --done
 313. Update index page icons to use AIPrivateSearch-Sherlock.png with 100px max-width --done
 314. Add Sherlock icons to aiprivatesearchweb and aiprivatesearchcustmgr index pages --done
 315. Copy AIPrivateSearch-Sherlock.png to assets folders for all three applications --done
