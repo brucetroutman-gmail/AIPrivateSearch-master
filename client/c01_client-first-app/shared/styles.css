@@ -290,7 +290,7 @@ body {
 }
 
 [data-theme="dark"] .footer-links a {
-  color: white;
+  color: #87ceeb;
 }
 
 [data-theme="dark"] .footer-links a:hover {

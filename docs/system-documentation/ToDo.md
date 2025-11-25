@@ -84,6 +84,9 @@ Phase 3 - Role-Based Feature Control:
 302. t
 
 
+## RECENTLY COMPLETED (v19.71)
+321. Update footer links in dark mode to use light blue (#87ceeb) color for Privacy Policy, Terms of Service, and Contact links --done
+
 ## RECENTLY COMPLETED (v19.70)
 320. Fix content alignment issues after footer implementation by restoring working styles.css and index.html from git commit b4cee5c --done
 
