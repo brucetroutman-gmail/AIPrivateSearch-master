@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Videos - AIPrivateSearch</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+    <script>
+        // Load theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const theme = savedTheme || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            if (!savedTheme) {
+                localStorage.setItem('theme', theme);
+            }
+        })();
+    </script>
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        
+        .demo-header h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: var(--text-color);
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .demo-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: transform 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .demo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--shadow-md);
+        }
+        
+        .demo-number {
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .demo-title {
+            color: var(--primary);
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .demo-description {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+        
+        .demo-duration {
+            background: var(--border-color);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .demo-video {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .demo-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--text-color);
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+        <div class="demo-container">
+            <div class="demo-header">
+                <h1>AIPrivateSearch Demo Videos</h1>
+                <p>Comprehensive system demonstrations - 30 seconds each</p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Demo Videos</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">7.5</div>
+                        <div class="stat-label">Total Minutes</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">30</div>
+                        <div class="stat-label">Seconds Each</div>
+                    </div>
+                </div>
+            </div>
+
+    <div class="demo-grid">
+        <div class="demo-card">
+            <div class="demo-number">01</div>
+            <div class="demo-title">Introduction & Privacy Hook</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Medical practices and law firms handle thousands of confidential documents daily. See how AIPrivateSearch processes everything locally with zero data transmission.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-01-Introduction.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-01-Introduction.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">02</div>
+            <div class="demo-title">One-Click Installation</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Installation takes just two minutes. Watch the automatic setup process that installs Node.js, Ollama AI models, and Chrome browser with no technical expertise required.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-02-Installation.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-02-Installation.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">03</div>
+            <div class="demo-title">Line Search with Highlighting</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Line Search finds exact text matches with highlighting. Perfect for finding specific terms in medical records. See the search for "hypertension treatment" with instant highlighting.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-03-LineSearch.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-03-LineSearch.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">04</div>
+            <div class="demo-title">AI Document Chat</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                AI Document Chat uses natural language queries. Watch as we ask "What are the recommended treatments for patients with high blood pressure?" and get intelligent responses with source citations.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-04-AIDocumentChat.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-04-AIDocumentChat.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">05</div>
+            <div class="demo-title">Document Index Search</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Document Index Search queries metadata and summaries. Incredibly fast and perfect for finding documents by topic or category. See instant results for "patient care protocols."
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-05-DocumentIndex.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-05-DocumentIndex.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">06</div>
+            <div class="demo-title">Performance Metrics</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Every search shows detailed performance metrics including processing time, tokens used, and model performance. This transparency helps optimize searches and understand resource usage.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-06-PerformanceMetrics.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-06-PerformanceMetrics.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">07</div>
+            <div class="demo-title">Collections Overview</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                The Collections Editor supports over 25 file formats including PDFs, Word documents, Excel spreadsheets, and medical imaging reports. Each collection organizes documents by topic.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-07-Collections.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-07-Collections.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">08</div>
+            <div class="demo-title">Document Processing Status</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Each collection shows all documents with processing status. Green badges indicate successful text extraction and embedding generation. Automatic searchable indexes and metadata creation.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-08-DocumentProcessing.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-08-DocumentProcessing.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">09</div>
+            <div class="demo-title">Adding New Documents</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Adding new documents is simple. Just drag and drop files into the source folder, then click Process Source Files. Automatic text extraction, chunking, and AI embedding generation.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-09-AddingDocuments.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-09-AddingDocuments.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">10</div>
+            <div class="demo-title">Network Privacy Verification</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Privacy is our top priority. Watch network activity monitoring during searches proving that no data leaves your machine. All network activity remains local with no external connections.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-10-NetworkPrivacy.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-10-NetworkPrivacy.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">11</div>
+            <div class="demo-title">User Management & Roles</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Enterprise security includes role-based access control. Administrators can create user accounts, assign roles, and manage subscription tiers. Perfect for medical practices with multiple staff.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-11-UserManagement.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-11-UserManagement.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">12</div>
+            <div class="demo-title">Model Configuration</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Configure AI models for optimal performance. Adjust temperature for creativity, context size for longer documents, and token limits for response length. All processing happens locally using Ollama.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-12-ModelConfiguration.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-12-ModelConfiguration.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">13</div>
+            <div class="demo-title">Performance Analytics</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Track usage patterns with comprehensive analytics. View search history, performance trends, and model efficiency. Export data to MySQL for advanced reporting and analysis.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-13-PerformanceAnalytics.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-13-PerformanceAnalytics.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">14</div>
+            <div class="demo-title">Custom Configurations</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                Customize system prompts, user prompts, and model parameters. Professional users can fine-tune the system for their specific industry needs, whether medical, legal, or business applications.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-14-CustomConfigurations.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-14-CustomConfigurations.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-number">15</div>
+            <div class="demo-title">Call to Action & Pricing</div>
+            <div class="demo-duration">30 seconds</div>
+            <div class="demo-description">
+                AIPrivateSearch delivers enterprise-grade document intelligence with complete privacy. Standard tier at $49/year or Professional for unlimited access. Download your free trial today.
+            </div>
+            <video class="demo-video" controls>
+                <source src="Demo-15-CallToAction.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="demo-actions">
+                <a href="Demo-15-CallToAction.mp4" class="btn btn-primary" download>Download</a>
+                <a href="#" class="btn btn-secondary">Share</a>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+</body>
+</html>

@@ -84,6 +84,9 @@ Phase 3 - Role-Based Feature Control:
 302. t
 
 
+## RECENTLY COMPLETED (v19.73)
+325. Convert demo page to use standard app template with header, footer, and all standard functionality --done
+
 ## RECENTLY COMPLETED (v19.72)
 322. Create comprehensive demo script and narration for YouTube video with step-by-step Snagit recording instructions --done
 323. Create executive summary document separate from technical specifications --done
