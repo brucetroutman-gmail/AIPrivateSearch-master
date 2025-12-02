@@ -84,6 +84,10 @@ Phase 3 - Role-Based Feature Control:
 302. t
 
 
+## RECENTLY COMPLETED (v19.74)
+326. Move demo page styles from inline CSS to shared styles.css for better maintainability --done
+327. Copy demo.html to aiprivatesearchweb repo for marketing site integration --done
+
 ## RECENTLY COMPLETED (v19.73)
 325. Convert demo page to use standard app template with header, footer, and all standard functionality --done
 
