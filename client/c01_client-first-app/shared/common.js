@@ -1,6 +1,8 @@
 import { DOMSanitizer } from './utils/domSanitizer.js';
 import AuthUtils from './utils/authUtils.js';
 import './utils/apiConfig.js';
+import './utils/appTokenManager.js';
+import './utils/secureUserManager.js';
 
 // Simple rate limiting
 let messageCallCount = 0;
@@ -231,21 +233,34 @@ function toggleDarkMode() {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
+  
+  // Use app token if available, fallback to localStorage
+  if (window.AppToken) {
+    window.AppToken.set('ui', 'theme', newTheme);
+  } else {
+    localStorage.setItem('theme', newTheme);
+  }
 }
 
 // Load saved theme
 function loadTheme() {
-  const savedTheme = localStorage.getItem('theme');
   let theme;
   
-  if (savedTheme) {
-    // Use saved preference
-    theme = savedTheme;
+  // Use app token if available, fallback to localStorage
+  if (window.AppToken) {
+    theme = window.AppToken.get('ui', 'theme');
   } else {
+    theme = localStorage.getItem('theme');
+  }
+  
+  if (!theme) {
     // First-time user - default to dark mode
     theme = 'dark';
-    localStorage.setItem('theme', theme);
+    if (window.AppToken) {
+      window.AppToken.set('ui', 'theme', theme);
+    } else {
+      localStorage.setItem('theme', theme);
+    }
   }
   
   document.documentElement.setAttribute('data-theme', theme);
@@ -284,7 +299,11 @@ async function setUserRole(role) {
     });
     
     if (response.ok) {
-      localStorage.setItem('userRole', role);
+      if (window.AppToken) {
+        window.AppToken.set('user', 'role', role);
+      } else {
+        localStorage.setItem('userRole', role);
+      }
       const userRole = getUserUserRole();
       await applyUserRole(role, userRole);
     }
@@ -294,11 +313,35 @@ async function setUserRole(role) {
 }
 
 function getUserRole() {
-  return localStorage.getItem('userRole') || 'professional'; // Default to professional for existing users
+  if (window.SecureUser) {
+    // Use cached version for performance
+    const cached = window.SecureUser.getUserRoleCached();
+    if (cached !== 'standard') return cached;
+    
+    // Fallback to async if no cache
+    window.SecureUser.getUserRole().then(role => {
+      // Cache will be updated automatically
+    });
+    return cached;
+  }
+  // Fallback for backward compatibility
+  return localStorage.getItem('userRole') || 'professional';
 }
 
 function getUserUserRole() {
-  return localStorage.getItem('userUserRole') || 'admin'; // Default to admin for existing users
+  if (window.SecureUser) {
+    // Use cached version for performance
+    const cached = window.SecureUser.getUserUserRoleCached();
+    if (cached !== 'searcher') return cached;
+    
+    // Fallback to async if no cache
+    window.SecureUser.getUserUserRole().then(role => {
+      // Cache will be updated automatically
+    });
+    return cached;
+  }
+  // Fallback for backward compatibility
+  return localStorage.getItem('userUserRole') || 'admin';
 }
 
 // Legacy function for backward compatibility
@@ -379,7 +422,12 @@ function loadDeveloperMode() {
 }
 
 // Email management
-function checkUserEmail() {
+async function checkUserEmail() {
+  if (window.SecureUser) {
+    const email = await window.SecureUser.getUserEmail();
+    return !!email;
+  }
+  // Fallback for backward compatibility
   const email = localStorage.getItem('userEmail');
   return !!email;
 }
@@ -394,7 +442,11 @@ async function promptForEmail() {
       continue;
     }
     if (email && validateEmail(email)) {
-      localStorage.setItem('userEmail', email);
+      if (window.AppToken) {
+        window.AppToken.set('user', 'email', email);
+      } else {
+        localStorage.setItem('userEmail', email);
+      }
       return true;
     } else if (email) {
       showUserMessage('Please enter a valid email address.', 'error');
@@ -407,7 +459,11 @@ function validateEmail(email) {
   return sanitized !== '';
 }
 
-function getUserEmail() {
+async function getUserEmail() {
+  if (window.SecureUser) {
+    return await window.SecureUser.getUserEmail() || '';
+  }
+  // Fallback for backward compatibility
   return localStorage.getItem('userEmail') || '';
 }
 
@@ -416,7 +472,11 @@ async function updateUserEmail() {
   const newEmail = await securePrompt('Enter your email address:', currentEmail);
   const sanitizedEmail = DOMSanitizer.sanitizeEmail(newEmail || '');
   if (newEmail !== null && sanitizedEmail) {
-    localStorage.setItem('userEmail', sanitizedEmail);
+    if (window.AppToken) {
+      window.AppToken.set('user', 'email', sanitizedEmail);
+    } else {
+      localStorage.setItem('userEmail', sanitizedEmail);
+    }
     showUserMessage('Email updated successfully!', 'success');
   } else if (newEmail) {
     showUserMessage('Please enter a valid email address.', 'error');
@@ -428,7 +488,11 @@ async function showUserInfo() {
 }
 
 async function handleLogout() {
-  AuthUtils.logout();
+  if (window.SecureUser) {
+    await window.SecureUser.logout();
+  } else {
+    AuthUtils.logout();
+  }
 }
 
 function setupLoginIcon() {
