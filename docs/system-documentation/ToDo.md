@@ -81,10 +81,13 @@ Phase 3 - Role-Based Feature Control:
 296. Create testCodes for DocumentSearch performance 
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
 302. Use this apps footer on aiprivatesearchweb and aiprivatesearchcustmgr copy any needed pages
-303. Add JWT app_token to fix local storage vulnerabilites. --done
-304. reseach unoconv+ libreoffice for document conversions.
+303. reseach unoconv+ libreoffice for document conversions.
+304. Test app_token 
 
 
+
+## RECENTLY COMPLETED (v19.76)
+329. Improve no-data-share.sh demo script with better network monitoring, Ollama-specific connection filtering, and clearer privacy demonstration output --done
 
 ## RECENTLY COMPLETED (v19.75)
 328. Create comprehensive test plan for app_token system implementation with unit tests, integration tests, performance benchmarks, security validation, and 8-day test schedule --done
