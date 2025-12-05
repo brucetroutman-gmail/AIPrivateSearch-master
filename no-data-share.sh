@@ -35,7 +35,9 @@ echo "   Question: What is the current news in France?"
 echo ""
 
 # Ask Ollama a question
-ollama run qwen2.5-coder:1.5b "What is the current news in France?" 2>/dev/null
+echo "🔄 Processing question with AI..."
+ollama run qwen2.5-coder:1.5b "What are the key benefits of running AI models locally instead of using cloud services? Give me 3 main points."
+echo "✅ AI processing complete"
 
 echo ""
 echo "⏱️  Checking network activity..."
