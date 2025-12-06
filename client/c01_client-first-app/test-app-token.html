@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Token Automated Tests - AIPrivateSearch</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-section { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .test-result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .test-pass { background: #28a745; color: white; }
+        .test-fail { background: #dc3545; color: white; }
+        .test-info { background: #17a2b8; color: white; }
+        .run-tests { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        .summary { font-size: 18px; font-weight: bold; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>App Token Automated Tests</h1>
+        <button class="run-tests" onclick="runAllTests()">🧪 Run All Tests</button>
+        
+        <div id="test-results"></div>
+        <div id="test-summary"></div>
+    </div>
+
+    <script src="shared/utils/appTokenManager.js"></script>
+    <script>
+        let testResults = [];
+        
+        function assert(condition, message) {
+            if (condition) {
+                testResults.push({ type: 'pass', message: '✅ ' + message });
+                return true;
+            } else {
+                testResults.push({ type: 'fail', message: '❌ ' + message });
+                return false;
+            }
+        }
+        
+        function info(message) {
+            testResults.push({ type: 'info', message: 'ℹ️ ' + message });
+        }
+        
+        function runAllTests() {
+            testResults = [];
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('test-summary').innerHTML = '';
+            
+            // Clear any existing token for clean tests
+            localStorage.removeItem('app_token');
+            localStorage.removeItem('app_token_migrated');
+            
+            info('Starting app_token automated tests...');
+            
+            testTokenCreation();
+            testDotNotationAPI();
+            testErrorHandling();
+            testMigration();
+            testValidation();
+            testPerformance();
+            
+            displayResults();
+        }
+        
+        function testTokenCreation() {
+            info('Testing token creation...');
+            
+            // Create new AppTokenManager instance
+            const manager = new AppTokenManager();
+            const token = manager.getToken();
+            
+            assert(token !== null, 'Token should be created');
+            assert(typeof token === 'object', 'Token should be an object');
+            assert(token.hasOwnProperty('ui'), 'Token should have ui section');
+            assert(token.hasOwnProperty('search'), 'Token should have search section');
+            assert(token.hasOwnProperty('models'), 'Token should have models section');
+            assert(token.hasOwnProperty('session'), 'Token should have session section');
+            assert(token.version === '1.0', 'Token should have correct version');
+        }
+        
+        function testDotNotationAPI() {
+            info('Testing dot notation API...');
+            
+            const manager = window.AppToken;
+            
+            // Test new dot notation
+            manager.set('ui.theme', 'light');
+            assert(manager.get('ui.theme') === 'light', 'Dot notation set/get should work');
+            
+            // Test old format compatibility
+            manager.set('ui', 'theme', 'dark');
+            assert(manager.get('ui', 'theme') === 'dark', 'Old format should still work');
+            
+            // Test nested paths
+            manager.set('search.selectedCollection', 'test-collection');
+            assert(manager.get('search.selectedCollection') === 'test-collection', 'Nested paths should work');
+            
+            // Test non-existent paths
+            assert(manager.get('nonexistent.path') === null, 'Non-existent paths should return null');
+        }
+        
+        function testErrorHandling() {
+            info('Testing error handling...');
+            
+            const manager = window.AppToken;
+            
+            // Test invalid JSON recovery
+            localStorage.setItem('app_token', 'invalid-json');
+            const newManager = new AppTokenManager();
+            const token = newManager.getToken();
+            assert(token.hasOwnProperty('ui'), 'Should recover from invalid JSON');
+            
+            // Test validation
+            assert(typeof manager.isValidToken === 'function', 'Validation method should exist');
+            assert(manager.isValidToken(token) === true, 'Valid token should pass validation');
+            assert(manager.isValidToken({}) === false, 'Invalid token should fail validation');
+            assert(manager.isValidToken(null) === false, 'Null should fail validation');
+        }
+        
+        function testMigration() {
+            info('Testing migration...');
+            
+            // Clear existing data
+            localStorage.removeItem('app_token');
+            localStorage.removeItem('app_token_migrated');
+            
+            // Set up legacy data
+            localStorage.setItem('theme', 'light');
+            localStorage.setItem('selectedCollection', 'legacy-collection');
+            localStorage.setItem('lastUsedModel', 'legacy-model');
+            
+            // Create new manager (should trigger migration)
+            const manager = new AppTokenManager();
+            
+            assert(manager.get('ui.theme') === 'light', 'Theme should be migrated');
+            assert(manager.get('search.selectedCollection') === 'legacy-collection', 'Collection should be migrated');
+            assert(manager.get('models.lastUsedModel') === 'legacy-model', 'Model should be migrated');
+            
+            // Check that legacy keys are removed
+            assert(localStorage.getItem('theme') === null, 'Legacy theme key should be removed');
+            assert(localStorage.getItem('selectedCollection') === null, 'Legacy collection key should be removed');
+        }
+        
+        function testValidation() {
+            info('Testing validation...');
+            
+            const manager = window.AppToken;
+            
+            // Test token size
+            const token = manager.getToken();
+            const tokenSize = JSON.stringify(token).length;
+            assert(tokenSize < 10240, `Token size (${tokenSize} bytes) should be under 10KB`);
+            
+            // Test structure validation
+            const validToken = manager.getDefaultToken();
+            assert(manager.isValidToken(validToken) === true, 'Default token should be valid');
+            
+            const invalidToken = { ui: 'not-an-object' };
+            assert(manager.isValidToken(invalidToken) === false, 'Invalid structure should fail validation');
+        }
+        
+        function testPerformance() {
+            info('Testing performance...');
+            
+            const manager = window.AppToken;
+            
+            // Test get performance
+            const start1 = performance.now();
+            for (let i = 0; i < 100; i++) {\n                manager.get('ui.theme');\n            }\n            const getTime = performance.now() - start1;\n            assert(getTime < 50, `100 get operations should take <50ms (took ${getTime.toFixed(2)}ms)`);\n            \n            // Test set performance\n            const start2 = performance.now();\n            for (let i = 0; i < 10; i++) {\n                manager.set('test.performance', i);\n            }\n            const setTime = performance.now() - start2;\n            assert(setTime < 100, `10 set operations should take <100ms (took ${setTime.toFixed(2)}ms)`);\n        }\n        \n        function displayResults() {\n            const resultsDiv = document.getElementById('test-results');\n            const summaryDiv = document.getElementById('test-summary');\n            \n            let passCount = 0;\n            let failCount = 0;\n            \n            testResults.forEach(result => {\n                const div = document.createElement('div');\n                div.className = `test-result test-${result.type}`;\n                div.textContent = result.message;\n                resultsDiv.appendChild(div);\n                \n                if (result.type === 'pass') passCount++;\n                if (result.type === 'fail') failCount++;\n            });\n            \n            const total = passCount + failCount;\n            const percentage = total > 0 ? Math.round((passCount / total) * 100) : 0;\n            \n            summaryDiv.innerHTML = `\n                <div class=\"summary ${failCount === 0 ? 'test-pass' : 'test-fail'}\">\n                    Test Results: ${passCount}/${total} passed (${percentage}%)\n                    ${failCount === 0 ? '🎉 All tests passed!' : '⚠️ Some tests failed'}\n                </div>\n            `;\n            \n            // Log results to console for CI/automation\n            console.log(`App Token Tests: ${passCount}/${total} passed (${percentage}%)`);\n            if (failCount > 0) {\n                console.error('Failed tests:', testResults.filter(r => r.type === 'fail'));\n            }\n        }\n        \n        // Auto-run tests on page load\n        document.addEventListener('DOMContentLoaded', runAllTests);\n    </script>\n</body>\n</html>

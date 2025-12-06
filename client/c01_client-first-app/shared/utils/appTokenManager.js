@@ -104,27 +104,88 @@ class AppTokenManager {
   // Save full token
   saveToken(token) {
     try {
+      // Validate before saving
+      if (!this.isValidToken(token)) {
+        throw new Error('Invalid token structure');
+      }
+      
       token.lastUpdated = new Date().toISOString();
-      localStorage.setItem(this.tokenKey, JSON.stringify(token));
+      const tokenStr = JSON.stringify(token);
+      
+      // Check size limit (10KB)
+      if (tokenStr.length > 10240) {
+        console.warn('Token size exceeds 10KB');
+        this.showUserMessage('Settings are too large, some data may be lost', 'warning');
+      }
+      
+      localStorage.setItem(this.tokenKey, tokenStr);
+      
     } catch (error) {
       console.error('Error saving app_token:', error);
+      
+      if (error.name === 'QuotaExceededError') {
+        this.showUserMessage('Storage quota exceeded, settings not saved', 'error');
+      } else {
+        this.showUserMessage('Failed to save settings: ' + error.message, 'error');
+      }
+      throw error;
     }
   }
 
-  // Get value from token
-  get(section, key) {
+  // Get value from token (supports dot notation)
+  get(path, key = null) {
     const token = this.getToken();
-    return token[section] ? token[section][key] : null;
+    
+    // Support both old format get('ui', 'theme') and new get('ui.theme')
+    if (key !== null) {
+      return token[path] ? token[path][key] : null;
+    }
+    
+    // Dot notation: 'ui.theme' -> token.ui.theme
+    const parts = path.split('.');
+    let current = token;
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in current) {
+        current = current[part];
+      } else {
+        return null;
+      }
+    }
+    return current;
   }
 
-  // Set value in token
-  set(section, key, value) {
+  // Set value in token (supports dot notation)
+  set(path, keyOrValue, value = null) {
     const token = this.getToken();
-    if (!token[section]) {
-      token[section] = {};
+    
+    // Support both old format set('ui', 'theme', 'dark') and new set('ui.theme', 'dark')
+    if (value !== null) {
+      // Old format: set(section, key, value)
+      if (!token[path]) {
+        token[path] = {};
+      }
+      token[path][keyOrValue] = value;
+    } else {
+      // New format: set('ui.theme', 'dark')
+      const parts = path.split('.');
+      const lastKey = parts.pop();
+      let current = token;
+      
+      // Navigate/create nested structure
+      for (const part of parts) {
+        if (!current[part] || typeof current[part] !== 'object') {
+          current[part] = {};
+        }
+        current = current[part];
+      }
+      current[lastKey] = keyOrValue;
     }
-    token[section][key] = value;
-    this.saveToken(token);
+    
+    try {
+      this.saveToken(token);
+    } catch (error) {
+      this.recoverFromError(error, 'set operation');
+    }
   }
 
   // Get entire section
@@ -146,30 +207,30 @@ class AppTokenManager {
     
     const migrations = {
       // UI preferences
-      'theme': ['ui', 'theme'],
-      'logSearchResults': ['ui', 'logSearchResults'],
+      'theme': 'ui.theme',
+      'logSearchResults': 'ui.logSearchResults',
       
       // Search state
-      'selectedCollection': ['search', 'selectedCollection'],
-      'selectedScoreModel': ['search', 'selectedScoreModel'],
-      'selectedSearchMethods': ['search', 'selectedSearchMethods'],
-      'multiModeSearchQuery': ['search', 'lastQuery'],
-      'useWildcards': ['search', 'useWildcards'],
-      'useWildcardsMulti': ['search', 'useWildcardsMulti'],
-      'addMetaPrompt': ['search', 'addMetaPrompt'],
-      'generateScores': ['search', 'generateScores'],
-      'lastSearchType': ['search', 'lastSearchType'],
-      'lastSourceType': ['search', 'lastSourceType'],
-      'lastCollection': ['search', 'selectedCollection'],
-      'lastAssistantType': ['search', 'lastAssistantType'],
+      'selectedCollection': 'search.selectedCollection',
+      'selectedScoreModel': 'search.selectedScoreModel',
+      'selectedSearchMethods': 'search.selectedSearchMethods',
+      'multiModeSearchQuery': 'search.lastQuery',
+      'useWildcards': 'search.useWildcards',
+      'useWildcardsMulti': 'search.useWildcardsMulti',
+      'addMetaPrompt': 'search.addMetaPrompt',
+      'generateScores': 'search.generateScores',
+      'lastSearchType': 'search.lastSearchType',
+      'lastSourceType': 'search.lastSourceType',
+      'lastCollection': 'search.selectedCollection',
+      'lastAssistantType': 'search.lastAssistantType',
       
       // Model settings
-      'lastUsedModel': ['models', 'lastUsedModel'],
-      'lastTemperature': ['models', 'temperature'],
-      'lastContext': ['models', 'context'],
-      'lastTokens': ['models', 'tokens'],
-      'lastVectorDB': ['models', 'vectorDB'],
-      'lastPrompt': ['models', 'lastPrompt'],
+      'lastUsedModel': 'models.lastUsedModel',
+      'lastTemperature': 'models.temperature',
+      'lastContext': 'models.context',
+      'lastTokens': 'models.tokens',
+      'lastVectorDB': 'models.vectorDB',
+      'lastPrompt': 'models.lastPrompt',
       
       // Note: userEmail, userRole, userUserRole are now server-side only
       // No longer stored in localStorage for security
@@ -178,15 +239,15 @@ class AppTokenManager {
     const token = this.getToken();
     let migrated = false;
 
-    Object.entries(migrations).forEach(([oldKey, [section, newKey]]) => {
+    Object.entries(migrations).forEach(([oldKey, newPath]) => {
       const oldValue = localStorage.getItem(oldKey);
       if (oldValue !== null) {
         try {
           const parsedValue = oldKey === 'selectedSearchMethods' ? JSON.parse(oldValue) : oldValue;
-          this.set(section, newKey, parsedValue);
+          this.set(newPath, parsedValue);
           localStorage.removeItem(oldKey);
           migrated = true;
-          console.log(`Migrated ${oldKey} -> app_token.${section}.${newKey}`);
+          console.log(`Migrated ${oldKey} -> app_token.${newPath}`);
         } catch (error) {
           console.error(`Error migrating ${oldKey}:`, error);
         }
@@ -204,9 +265,50 @@ class AppTokenManager {
     this.initializeToken();
   }
 
+  // Validate token structure
+  isValidToken(token) {
+    if (!token || typeof token !== 'object') return false;
+    
+    const requiredSections = ['ui', 'search', 'models', 'session'];
+    return requiredSections.every(section => 
+      token.hasOwnProperty(section) && typeof token[section] === 'object'
+    );
+  }
+  
+  // Show user-friendly messages
+  showUserMessage(message, type = 'info') {
+    const statusEl = document.getElementById('statusMessage') || document.getElementById('status');
+    if (statusEl) {
+      statusEl.textContent = message;
+      statusEl.className = `status-message status-${type}`;
+      statusEl.style.display = 'block';
+      setTimeout(() => statusEl.style.display = 'none', 5000);
+      return;
+    }
+    console.log(`[AppToken ${type.toUpperCase()}]: ${message}`);
+  }
+  
+  // Recovery helper
+  recoverFromError(error, operation) {
+    console.error(`AppToken error in ${operation}:`, error);
+    
+    try {
+      const backup = this.getToken();
+      localStorage.setItem('app_token_backup', JSON.stringify(backup));
+      this.saveToken(this.getDefaultToken());
+      this.showUserMessage(`Recovered from ${operation} error, settings reset`, 'warning');
+    } catch (recoveryError) {
+      console.error('Recovery failed:', recoveryError);
+      this.showUserMessage('Critical error: unable to recover settings', 'error');
+    }
+  }
+  
   // Debug helper
   debug() {
-    console.log('Current app_token:', this.getToken());
+    const token = this.getToken();
+    console.log('Current app_token:', token);
+    console.log('Token size:', JSON.stringify(token).length, 'bytes');
+    console.log('Valid structure:', this.isValidToken(token));
   }
 }
 
