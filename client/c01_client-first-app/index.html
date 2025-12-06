@@ -196,7 +196,36 @@
   </style>
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <header class="header">
+    <div class="header-content">
+      <a href="./index.html" class="logo" id="app-logo">AI Private Search</a>
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav class="nav-menu" id="navMenu">
+        <a href="./search.html" class="menu-search" style="display: none;">Search</a>
+        <a href="./multi-mode-search.html" class="menu-multi-mode" style="display: none;">Multi</a>
+        <a href="./test.html" class="pro-only menu-test" style="display: none;">Test</a>
+        <a href="./analyze-tests.html" class="pro-only menu-analyze" style="display: none;">Analyze</a>
+        <div class="dropdown menu-manage" style="display: none;">
+          <a href="#manage">Manage</a>
+          <div class="dropdown-content">
+            <a href="./collections.html" class="menu-manage-collections">Collections</a>
+            <a href="./model.html" class="menu-manage-models prem-only">Models</a>
+            <a href="./config.html" class="prem-only">Configurations</a>
+            <a href="./testcode-checker.html" class="pro-only">TestCode Checker</a>
+            <a href="./search-logs.html" class="menu-search-logs">Search Logs</a>
+            <a href="./user-management.html" class="admin-only menu-user-management">User Management</a>
+          </div>
+        </div>
+        <a href="./guides.html" class="menu-guides" style="display: none;">Guides</a>
+        <a href="./options.html" class="menu-options" style="display: none;">Options</a>
+        <div class="login-icon" title="User Info" style="display: none;"><img src="./assets/user_icon-icons.com_66546.png" alt="User" style="width: 24px; height: 24px; border-radius: 50%;"></div>
+      </nav>
+    </div>
+  </header>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -205,12 +234,12 @@
       <img src="./assets/AIPrivateSearch-Sherlock.png" alt="AI Private Search" style="max-width: 100px; height: auto; float: right; margin: 0 0 1rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow);">
       <h1>AI Private Search</h1>
       <p>Secure, private AI-powered search for your confidential documents. Perfect for medical practices, law firms, HR departments, and personal document collections. Your data never leaves your computer.</p>
-      <div class="cta-buttons" id="ctaButtons" style="display: none;">
+      <div class="cta-buttons" id="ctaButtons">
         <a href="./search.html" class="btn btn-primary">Search Your Documents</a>
-        <a href="./demo.html" class="btn btn-secondary">Watch Demos</a>
         <a href="./collections.html" class="btn btn-secondary">Manage Collections</a>
+        <a href="./demo.html" class="btn btn-secondary">Watch Demos</a>
       </div>
-      <div id="licenseStatus" style="margin-top: 2rem;"></div>
+
     </section>
 
     <section class="features">
@@ -253,7 +282,19 @@
     </section>
   </main>
 
-  <div id="footer-placeholder"></div>
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="./privacy-policy.html">Privacy Policy</a>
+        <a href="./terms-of-service.html">Terms of Service</a>
+        <a href="./contact.html">Contact</a>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 <a href="./group.html" class="footer-link" id="footer-group-link">AI Private Search Group</a>. All rights reserved.</p>
+        <p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" class="footer-link">Creative Commons Attribution-NonCommercial (CC BY-NC-ND)</a>.</p>
+      </div>
+    </div>
+  </footer>
 
 
 </body>

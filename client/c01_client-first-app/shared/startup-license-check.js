@@ -75,60 +75,25 @@ document.head.appendChild(script);
                 return;
             }
             
-            // License is valid and user is authenticated, show CTA buttons
+            // License is valid and user is authenticated, ensure CTA buttons are visible
             const ctaButtons = document.getElementById('ctaButtons');
             if (ctaButtons) {
-                console.log('🚀 STARTUP LICENSE: Step 6d - Showing CTA buttons');
+                console.log('🚀 STARTUP LICENSE: Step 6d - Ensuring CTA buttons are visible');
                 ctaButtons.style.display = 'flex';
             } else {
                 console.log('🚀 STARTUP LICENSE: Step 6d - CTA buttons element not found');
             }
             
-            // Show license status
-            const licenseStatusEl = document.getElementById('licenseStatus');
-            if (licenseStatusEl) {
-                const tierName = status.tier === 1 ? 'Standard' : 
-                               status.tier === 2 ? 'Premium' : 'Professional';
-                
-                // eslint-disable-next-line no-unsanitized/property
-                licenseStatusEl.innerHTML = `
-                    <div style="display: inline-block; background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px;">
-                        <strong style="color: #155724;">License Active</strong><br>
-                        <span style="color: #155724;">Tier: ${tierName} | Customer: ${status.email}</span>
-                        ${status.gracePeriod ? '<br><em style="color: #856404;">Grace period active</em>' : ''}
-                    </div>
-                `;
-            }
+            // License status is now displayed on user-management page
             
         } else {
             // License invalid but not requiring activation (e.g., network error)
-            const licenseStatusEl = document.getElementById('licenseStatus');
-            if (licenseStatusEl) {
-                // eslint-disable-next-line no-unsanitized/property
-                licenseStatusEl.innerHTML = `
-                    <div style="display: inline-block; background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px;">
-                        <strong style="color: #721c24;">License Validation Failed</strong><br>
-                        <span style="color: #721c24;">${status.reason || 'Unable to validate license'}</span><br>
-                        <a href="license-activation.html" style="color: #007bff; text-decoration: none;">Try Activation</a>
-                    </div>
-                `;
-            }
+            // License status is now displayed on user-management page
         }
         
     } catch (error) {
         console.error('🚀 STARTUP LICENSE: Step ERROR - Startup license check failed:', error);
         
-        // Show error message
-        const licenseStatusEl = document.getElementById('licenseStatus');
-        if (licenseStatusEl) {
-             
-            licenseStatusEl.innerHTML = `
-                <div style="display: inline-block; background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px;">
-                    <strong style="color: #721c24;">License System Error</strong><br>
-                    <span style="color: #721c24;">Unable to connect to licensing system</span><br>
-                    <a href="license-activation.html" style="color: #007bff; text-decoration: none;">Try Activation</a>
-                </div>
-            `;
-        }
+        // License status is now displayed on user-management page
     }
 })();

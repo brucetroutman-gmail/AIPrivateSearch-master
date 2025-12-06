@@ -48,6 +48,14 @@
                 </div>
             </div>
             
+            <div class="license-info" style="margin: 20px 0; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg);">
+                <h3>License Information</h3>
+                <div id="licenseStatus">Loading license status...</div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button id="refreshLicenseBtn" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Refresh License</button>
+                </div>
+            </div>
+            
             <div id="admin-panel" class="prem-only" style="display: none;">
                 <h3>User Management</h3>
                 <button id="showRegisterBtn">Add New User</button>
@@ -225,6 +233,7 @@
                 document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
                 document.getElementById('showRegisterBtn').addEventListener('click', () => this.toggleRegisterForm());
                 document.getElementById('updateProfileBtn').addEventListener('click', () => this.updateProfile());
+                document.getElementById('refreshLicenseBtn').addEventListener('click', () => this.refreshLicense());
             }
             
             async handleLogin(e) {
@@ -309,6 +318,9 @@
                 document.getElementById('currentUserEmail').textContent = this.currentUser.email;
                 document.getElementById('currentUserSubscription').textContent = this.currentUser.subscriptionTier;
                 document.getElementById('currentUserRole').textContent = this.currentUser.userRole;
+                
+                // Load license info
+                this.loadLicenseInfo();
                 
                 if (this.currentUser.userRole === 'admin') {
                     document.getElementById('admin-panel').style.display = 'block';
@@ -517,6 +529,70 @@
                 } catch (error) {
                     if (error.message === 'Session expired') return;
                     showMessage('Update failed');
+                }
+            }
+            
+            async loadLicenseInfo() {
+                try {
+                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status`);
+                    const status = await response.json();
+                    this.displayLicenseInfo(status);
+                } catch (error) {
+                    document.getElementById('licenseStatus').innerHTML = `
+                        <div style="color: #dc3545;">Failed to load license information</div>
+                    `;
+                }
+            }
+            
+            displayLicenseInfo(status) {
+                const container = document.getElementById('licenseStatus');
+                
+                if (status.valid) {
+                    const tierName = status.tier === 1 ? 'Standard' : 
+                                   status.tier === 2 ? 'Premium' : 'Professional';
+                    
+                    container.innerHTML = `
+                        <div style="color: #28a745; margin-bottom: 10px;"><strong>✓ License Active</strong></div>
+                        <div><strong>Tier:</strong> ${tierName}</div>
+                        <div><strong>Email:</strong> ${status.email}</div>
+                        ${status.gracePeriod ? '<div style="color: #ffc107;"><em>Grace period active</em></div>' : ''}
+                        ${status.expired ? '<div style="color: #ffc107;"><em>License expired but within grace period</em></div>' : ''}
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="color: #dc3545; margin-bottom: 10px;"><strong>⚠ License Issue</strong></div>
+                        <div><strong>Status:</strong> ${status.reason || 'Invalid license'}</div>
+                        ${status.requiresActivation ? '<div><a href="license-activation.html" style="color: #007bff;">Activate License</a></div>' : ''}
+                    `;
+                }
+            }
+            
+            async refreshLicense() {
+                const btn = document.getElementById('refreshLicenseBtn');
+                const originalText = btn.textContent;
+                
+                try {
+                    btn.textContent = 'Refreshing...';
+                    btn.disabled = true;
+                    
+                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/refresh`, {
+                        method: 'POST'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('License refreshed successfully', 'success');
+                        // Reload license info to show updated status
+                        await this.loadLicenseInfo();
+                    } else {
+                        showMessage(result.error || 'Failed to refresh license', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Failed to refresh license', 'error');
+                } finally {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
                 }
             }
         }

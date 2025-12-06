@@ -4,6 +4,8 @@ import { getSystemInfo } from './hardware.mjs';
 export class LicenseManager {
   static licenseStatus = null;
   static initialized = false;
+  static lastCheck = 0;
+  static cacheTimeout = 72 * 60 * 60 * 1000; // 72 hours cache
 
   static async initialize() {
     if (this.initialized) return true;
@@ -35,20 +37,32 @@ export class LicenseManager {
     }
   }
 
-  static async checkLicenseStatus() {
+  static async checkLicenseStatus(forceRefresh = false) {
+    const now = Date.now();
+    
+    // Return cached status unless forced refresh or cache expired
+    if (this.licenseStatus && !forceRefresh && (now - this.lastCheck) < this.cacheTimeout) {
+      console.log('🔐 LICENSE MANAGER: Using cached license status');
+      return this.licenseStatus;
+    }
+    
     try {
+      console.log('🔐 LICENSE MANAGER: Checking license status (cache expired or forced)');
       const result = await LicenseClient.checkLicense();
       this.licenseStatus = result;
+      this.lastCheck = now;
       return result;
     } catch (error) {
       console.error('License status check failed:', error);
       this.licenseStatus = { valid: false, reason: error.message };
+      this.lastCheck = now;
       return this.licenseStatus;
     }
   }
 
   static async requiresActivation() {
-    const status = await this.checkLicenseStatus();
+    // Use cached status if available, otherwise check
+    const status = this.licenseStatus || await this.checkLicenseStatus();
     return !status.valid || status.reason === 'No license found';
   }
 
@@ -56,7 +70,7 @@ export class LicenseManager {
     try {
       const result = await LicenseClient.activateLicense(email);
       if (result.success) {
-        await this.checkLicenseStatus();
+        await this.checkLicenseStatus(true); // Force refresh after activation
       }
       return result;
     } catch (error) {
@@ -68,7 +82,7 @@ export class LicenseManager {
     try {
       const result = await LicenseClient.refreshLicense();
       if (result.success) {
-        await this.checkLicenseStatus();
+        await this.checkLicenseStatus(true); // Force refresh after license refresh
       }
       return result;
     } catch (error) {

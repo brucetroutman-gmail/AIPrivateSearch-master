@@ -70,15 +70,18 @@ Phase 3 - Role-Based Feature Control:
 238. Implement search performance optimization and caching
 239. Create user onboarding tutorial/wizard
 
-
-
+### Current Tasks
 290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
-
-
 296. Create testCodes for DocumentSearch performance 
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
+335. Test login and roles. srch-std changes menu options is wrong after login then correct after user-management page
 
-
+## RECENTLY COMPLETED (v19.80)
+337. Implement 72-hour license caching to reduce server load and improve performance --done
+338. Add refresh license button to user-management page for tier upgrades --done
+339. Fix index page loading delay by inlining header/footer content --done
+340. Reorder CTA buttons on index page (Search, Manage Collections, Watch Demos) --done
+336. Move License info to user-management --done
 
 ## RECENTLY COMPLETED (v19.79)
 332. Fix search logs viewer to display correct data fields (prompt, collectionName, documentsFound, searchDurationSeconds) --done

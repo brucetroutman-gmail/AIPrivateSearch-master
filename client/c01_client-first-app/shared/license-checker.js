@@ -5,7 +5,7 @@ class LicenseChecker {
         this.apiBaseUrl = 'http://localhost:3001';
         this.initialized = false;
         this.lastCheck = 0;
-        this.cacheTimeout = 5000; // 5 seconds cache
+        this.cacheTimeout = 72 * 60 * 60 * 1000; // 72 hours cache
     }
 
     async initialize() {
