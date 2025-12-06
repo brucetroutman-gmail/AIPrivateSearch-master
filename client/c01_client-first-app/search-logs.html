@@ -260,11 +260,11 @@
                 row.innerHTML = `
                     <td>${formatDate(log.timestamp)}</td>
                     <td>${log.searchType || 'N/A'}</td>
-                    <td title="${log.query}">${log.query ? log.query.substring(0, 50) + (log.query.length > 50 ? '...' : '') : 'N/A'}</td>
-                    <td>${log.collection || 'N/A'}</td>
+                    <td title="${log.prompt || log.query || ''}">${(log.prompt || log.query) ? (log.prompt || log.query).substring(0, 50) + ((log.prompt || log.query).length > 50 ? '...' : '') : 'N/A'}</td>
+                    <td>${log.collectionName || log.collection || 'N/A'}</td>
                     <td>${log.searchModel || 'N/A'}</td>
-                    <td>${log.resultCount || 0}</td>
-                    <td>${log.duration ? log.duration + 'ms' : 'N/A'}</td>
+                    <td>${log.documentsFound || log.resultCount || 0}</td>
+                    <td>${log.searchDurationSeconds ? log.searchDurationSeconds.toFixed(1) + 's' : (log.duration ? (log.duration / 1000).toFixed(1) + 's' : 'N/A')}</td>
                     <td><span class="status ${getStatusClass(log)}">${getStatusText(log)}</span></td>
                 `;
                 

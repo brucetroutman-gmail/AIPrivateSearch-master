@@ -74,22 +74,26 @@ Phase 3 - Role-Based Feature Control:
 
 290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
 
-292. Create Search Logs feature, create export to mySQL feature -- select log files check if already loaded etc.
-293. Test log creation and mysql update. not all elements are being saved.
-294. Complete Guides page and move to marketing Guides page.
 
 296. Create testCodes for DocumentSearch performance 
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
-302. Use this apps footer on aiprivatesearchweb and aiprivatesearchcustmgr copy any needed pages
-303. reseach unoconv+ libreoffice for document conversions.
+
+
+
+## RECENTLY COMPLETED (v19.79)
+332. Fix search logs viewer to display correct data fields (prompt, collectionName, documentsFound, searchDurationSeconds) --done
+333. Change search logs duration display from milliseconds to seconds format --done
+303. Research unoconv+ libreoffice for document conversions --done
+292. Create Search Logs feature, create export to mySQL feature --done
+293. Test log creation and mysql update. not all elements are being saved --done
+294. Complete Guides page and move to marketing Guides page --done
+302. Use this apps footer on aiprivatesearchweb and aiprivatesearchcustmgr copy any needed pages --done
+
+## RECENTLY COMPLETED (v19.78)
 304. Test app_token --done
 305. Fix app_token API inconsistency - use dot notation for get/set methods --done
 306. Add comprehensive error handling and user feedback for app_token operations --done
 307. Implement automated tests for app_token migration and CRUD operations --done 
-
-
-
-## RECENTLY COMPLETED (v19.78)
 331. Complete app_token production readiness with dot notation API, comprehensive error handling, and automated test suite --done
 
 ## RECENTLY COMPLETED (v19.77)

@@ -98,7 +98,7 @@ router.post('/export-logs-to-database', async (req, res) => {
                 // Check if log already exists
                 const [existing] = await connection.execute(
                     'SELECT id FROM search_logs WHERE timestamp = ? AND query = ? AND search_model = ?',
-                    [log.timestamp, log.query, log.searchModel]
+                    [log.timestamp, log.prompt || log.query, log.searchModel]
                 );
                 
                 if (existing.length === 0) {
@@ -113,20 +113,20 @@ router.post('/export-logs-to-database', async (req, res) => {
                     `, [
                         log.timestamp,
                         log.searchType || null,
-                        log.query || null,
-                        log.collection || null,
+                        log.prompt || log.query || null,
+                        log.collectionName || log.collection || null,
                         log.searchModel || null,
                         log.scoreModel || null,
-                        log.resultCount || 0,
-                        log.duration || null,
+                        log.documentsFound || log.resultCount || 0,
+                        log.searchDurationSeconds ? Math.round(log.searchDurationSeconds * 1000) : (log.duration || null),
                         log.error || null,
                         log.userEmail || null,
                         log.sourceType || null,
                         log.assistantType || null,
-                        log.temperature || null,
-                        log.contextLength || null,
-                        log.maxTokens || null,
-                        log.generateScores || false,
+                        log.searchTemperature || log.temperature || null,
+                        log.searchContextSize || log.contextLength || null,
+                        log.searchTokenLimit || log.maxTokens || null,
+                        (log.scoreModel ? true : false),
                         log.testCode || null
                     ]);
                     
