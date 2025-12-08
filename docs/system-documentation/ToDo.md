@@ -80,6 +80,9 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.82)
+342. Rename demo page to videos.html and remove "Demo" from page title --done
+
 ## RECENTLY COMPLETED (v19.81)
 341. Change button text from "Watch Demos" to "Watch Videos" on index page --done
 
