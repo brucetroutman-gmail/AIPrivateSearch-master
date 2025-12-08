@@ -74,7 +74,14 @@ Phase 3 - Role-Based Feature Control:
 290. Update mysql tables for new column SearchMethodType. be sure the code reflects this column ie number of colums match.
 296. Create testCodes for DocumentSearch performance 
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
-335. Test login and roles. srch-std changes menu options is wrong after login then correct after user-management page
+335. Test multi search and view documents
+336. Test multi prompts and ascii characters.
+337. Test Login and roles... srch-std gets wrong menus after login
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.81)
+341. Change button text from "Watch Demos" to "Watch Videos" on index page --done
 
 ## RECENTLY COMPLETED (v19.80)
 337. Implement 72-hour license caching to reduce server load and improve performance --done
