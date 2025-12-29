@@ -1,7 +1,18 @@
  
  
 import dotenv from 'dotenv';
-dotenv.config({ path: '/Users/Shared/AIPrivateSearch/.env', quiet: true, debug: false });
+// Try multiple .env-aips locations
+const envPaths = [
+  '/Users/Shared/AIPrivateSearch/.env-aips',  // macOS
+  '/webs/AIPrivateSearch/.env-aips',          // Ubuntu
+  '.env'                                      // Local fallback
+];
+for (const envPath of envPaths) {
+  try {
+    dotenv.config({ path: envPath, quiet: true });
+    if (process.env.API_KEY) break;
+  } catch (e) {}
+}
 import express from 'express';
 import cors from 'cors';
 import path from 'path';

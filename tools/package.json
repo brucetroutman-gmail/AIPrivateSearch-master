@@ -1,0 +1,19 @@
+{
+  "name": "aiprivatesearch-tools",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AIPrivateSearch development tools",
+  "scripts": {
+    "tts": "node tts-generator.mjs",
+    "tts-interactive": "node tts-generator.mjs --interactive",
+    "tts-web": "node tts-server.mjs",
+    "start": "node tts-server.mjs"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test</title>
+</head>
+<body>
+    <h1>Audio File Test</h1>
+    <button onclick="testAudio()">Test Audio Generation</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testAudio() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/tts/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: 'Test audio',
+                        voice: 'Samantha',
+                        rate: 200
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <p>Success! File: ${data.filename}</p>
+                        <p>URL: ${data.audioUrl}</p>
+                        <audio controls src="${data.audioUrl}"></audio>
+                        <br><br>
+                        <a href="${data.audioUrl}" target="_blank">Direct link</a>
+                    `;
+                } else {
+                    result.innerHTML = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

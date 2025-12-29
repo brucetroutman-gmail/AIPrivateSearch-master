@@ -218,18 +218,8 @@
 
         // Check if already activated and redirect
         async function checkExistingLicense() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/licensing/status`);
-                const data = await response.json();
-                
-                if (data.valid && !data.requiresActivation) {
-                    // Already activated, redirect immediately
-                    window.location.href = 'index.html';
-                    return true;
-                }
-            } catch (error) {
-                // Continue with activation page
-            }
+            // Skip this check - let user activate even if license exists
+            // This prevents redirect loops
             return false;
         }
 

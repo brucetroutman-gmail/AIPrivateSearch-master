@@ -80,6 +80,15 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.83)
+343. Fixed license activation system with complete database schema setup --done
+344. Resolved CustMgr server database issues (customer_code, subscription_tier, licenses table, hw_hash column) --done
+345. Fixed client-side redirect loops in license activation flow --done
+346. Implemented proper user flow: index.html → Get Started → license-activation.html → activation success --done
+347. Updated TTS web interface with correct macOS voice options (Fred, Samantha, Daniel, Moira, etc.) --done
+348. Fixed startup-license-check.js to prevent automatic redirects for unlicensed users --done
+349. Corrected "Get Started" button to link to license-activation.html instead of user-management.html --done
+
 ## RECENTLY COMPLETED (v19.82)
 342. Rename demo page to videos.html and remove "Demo" from page title --done
 

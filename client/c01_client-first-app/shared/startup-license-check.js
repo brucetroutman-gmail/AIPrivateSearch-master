@@ -17,31 +17,9 @@ document.head.appendChild(script);
         console.log('🚀 STARTUP LICENSE: Step 5b - Status received:', status);
         
         if (status.requiresActivation) {
-            console.log('🚀 STARTUP LICENSE: Step 6a - License requires activation');
-            // Show activation message and redirect
-            const licenseStatusEl = document.getElementById('licenseStatus');
-            if (licenseStatusEl) {
-                console.log('🚀 STARTUP LICENSE: Step 6b - Showing activation message');
-                 
-                licenseStatusEl.innerHTML = `
-                    <div style="display: inline-block; background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <h3 style="color: #856404; margin-bottom: 15px;">License Activation Required</h3>
-                        <p style="color: #856404; margin-bottom: 20px;">
-                            To use AI Private Search, please activate your license with your email address.
-                        </p>
-                        <a href="license-activation.html" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                            Activate License
-                        </a>
-                    </div>
-                `;
-            }
-            
-            // Redirect after 3 seconds if not manually clicked
-            setTimeout(() => {
-                if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-                    window.location.href = 'license-activation.html';
-                }
-            }, 3000);
+            console.log('🚀 STARTUP LICENSE: Step 6a - License requires activation - staying on index page');
+            // Stay on index page, let user click "Get Started" to go to user-management
+            // No automatic redirect for new users
             
         } else if (status.valid) {
             console.log('🚀 STARTUP LICENSE: Step 6a - License is valid');
@@ -49,8 +27,8 @@ document.head.appendChild(script);
             // Check authentication after license validation
             const sessionId = localStorage.getItem('sessionId');
             if (!sessionId) {
-                console.log('🚀 STARTUP LICENSE: Step 6b - No session found, redirecting to login');
-                window.location.href = './user-management.html';
+                console.log('🚀 STARTUP LICENSE: Step 6b - No session found, staying on index page');
+                // Stay on index page, let user navigate manually
                 return;
             }
             
@@ -61,17 +39,17 @@ document.head.appendChild(script);
                 });
                 
                 if (!authResponse.ok) {
-                    console.log('🚀 STARTUP LICENSE: Step 6c - Session expired, redirecting to login');
+                    console.log('🚀 STARTUP LICENSE: Step 6c - Session expired, staying on index page');
                     localStorage.removeItem('sessionId');
                     localStorage.removeItem('userEmail');
-                    window.location.href = './user-management.html';
+                    // Stay on index page
                     return;
                 }
             } catch (error) {
-                console.log('🚀 STARTUP LICENSE: Step 6c - Auth check failed, redirecting to login');
+                console.log('🚀 STARTUP LICENSE: Step 6c - Auth check failed, staying on index page');
                 localStorage.removeItem('sessionId');
                 localStorage.removeItem('userEmail');
-                window.location.href = './user-management.html';
+                // Stay on index page
                 return;
             }
             

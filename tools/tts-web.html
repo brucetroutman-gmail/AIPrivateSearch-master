@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIPrivateSearch TTS Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, textarea:focus, input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .rate-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rate-control input {
+            width: 80px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .status.error {
+            background: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .status.info {
+            background: #d6eaf8;
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+
+        .audio-player {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 TTS Generator</h1>
+        
+        <form id="ttsForm">
+            <div class="form-group">
+                <label for="voiceSelect">Voice:</label>
+                <select id="voiceSelect">
+                    <option value="Fred">Fred (Male, US)</option>
+                    <option value="Samantha">Samantha (Female, US)</option>
+                    <option value="Daniel">Daniel (Male, UK)</option>
+                    <option value="Moira">Moira (Female, Irish)</option>
+                    <option value="Karen">Karen (Female, Australian)</option>
+                    <option value="Tessa">Tessa (Female, South African)</option>
+                    <option value="Rishi">Rishi (Male, Indian)</option>
+                    <option value="Albert">Albert (Male, US)</option>
+                    <option value="Kathy">Kathy (Female, US)</option>
+                    <option value="Ralph">Ralph (Male, US)</option>
+                    <option value="Eddy (English (US))">Eddy (Male, US)</option>
+                    <option value="Flo (English (US))">Flo (Female, US)</option>
+                    <option value="Grandma (English (US))">Grandma (Female, US)</option>
+                    <option value="Grandpa (English (US))">Grandpa (Male, US)</option>
+                </select>
+            </div>
+
+            <div class="controls">
+                <div class="form-group">
+                    <label for="rateSlider">Speech Rate:</label>
+                    <div class="rate-control">
+                        <input type="range" id="rateSlider" min="100" max="300" value="200">
+                        <input type="number" id="rateInput" min="100" max="300" value="200">
+                        <span>WPM</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filename">Filename (optional):</label>
+                    <input type="text" id="filename" placeholder="my-audio.aiff">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="textInput">Text to Convert:</label>
+                <textarea id="textInput" placeholder="Enter the text you want to convert to speech...">Welcome to AIPrivateSearch, the secure document intelligence platform. In this demonstration, we will show you how to search your confidential documents while keeping everything completely private on your local machine.</textarea>
+            </div>
+
+            <div class="buttons">
+                <button type="button" id="playBtn" class="btn-primary">🔊 Play</button>
+                <button type="button" id="saveBtn" class="btn-success">💾 Save</button>
+                <button type="button" id="stopBtn" class="btn-warning hidden">⏹️ Stop</button>
+            </div>
+        </form>
+
+        <div id="status" class="status hidden"></div>
+        
+        <div id="audioPlayer" class="audio-player hidden">
+            <audio id="audioElement" controls></audio>
+        </div>
+    </div>
+
+    <script>
+        class TTSWebInterface {
+            constructor() {
+                this.currentAudio = null;
+                this.isGenerating = false;
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.voiceSelect = document.getElementById('voiceSelect');
+                this.rateSlider = document.getElementById('rateSlider');
+                this.rateInput = document.getElementById('rateInput');
+                this.filename = document.getElementById('filename');
+                this.textInput = document.getElementById('textInput');
+                this.playBtn = document.getElementById('playBtn');
+                this.saveBtn = document.getElementById('saveBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.status = document.getElementById('status');
+                this.audioPlayer = document.getElementById('audioPlayer');
+                this.audioElement = document.getElementById('audioElement');
+            }
+
+            bindEvents() {
+                // Sync rate slider and input
+                this.rateSlider.addEventListener('input', () => {
+                    this.rateInput.value = this.rateSlider.value;
+                });
+                
+                this.rateInput.addEventListener('input', () => {
+                    this.rateSlider.value = this.rateInput.value;
+                });
+
+                // Button events
+                this.playBtn.addEventListener('click', () => this.playTTS());
+                this.saveBtn.addEventListener('click', () => this.saveTTS());
+                this.stopBtn.addEventListener('click', () => this.stopTTS());
+
+                // Audio events
+                this.audioElement.addEventListener('ended', () => {
+                    this.hideStop();
+                });
+            }
+
+            showStatus(message, type = 'info') {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+                this.status.classList.remove('hidden');
+            }
+
+            hideStatus() {
+                this.status.classList.add('hidden');
+            }
+
+            showStop() {
+                this.stopBtn.classList.remove('hidden');
+                this.playBtn.disabled = true;
+                this.saveBtn.disabled = true;
+            }
+
+            hideStop() {
+                this.stopBtn.classList.add('hidden');
+                this.playBtn.disabled = false;
+                this.saveBtn.disabled = false;
+            }
+
+            async generateTTS(saveOnly = false) {
+                const text = this.textInput.value.trim();
+                if (!text) {
+                    this.showStatus('Please enter some text to convert', 'error');
+                    return null;
+                }
+
+                if (this.isGenerating) {
+                    this.showStatus('Already generating audio...', 'info');
+                    return null;
+                }
+
+                this.isGenerating = true;
+                this.playBtn.disabled = true;
+                this.saveBtn.disabled = true;
+
+                try {
+                    this.showStatus('Generating audio...', 'info');
+
+                    const response = await fetch('/api/tts/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            voice: this.voiceSelect.value,
+                            rate: parseInt(this.rateInput.value),
+                            filename: this.filename.value || null,
+                            saveOnly: saveOnly
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        if (saveOnly) {
+                            this.showStatus(`Audio saved: ${result.filename}`, 'success');
+                        } else {
+                            this.showStatus('Audio generated successfully', 'success');
+                            return result.audioUrl;
+                        }
+                    } else {
+                        throw new Error(result.error || 'Generation failed');
+                    }
+
+                } catch (error) {
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                    return null;
+                } finally {
+                    this.isGenerating = false;
+                    this.playBtn.disabled = false;
+                    this.saveBtn.disabled = false;
+                }
+            }
+
+            async playTTS() {
+                const audioUrl = await this.generateTTS(false);
+                if (audioUrl) {
+                    this.audioElement.src = audioUrl;
+                    this.audioPlayer.classList.remove('hidden');
+                    this.showStop();
+                    
+                    try {
+                        await this.audioElement.play();
+                    } catch (error) {
+                        this.showStatus('Playback failed', 'error');
+                        this.hideStop();
+                    }
+                }
+            }
+
+            async saveTTS() {
+                await this.generateTTS(true);
+            }
+
+            stopTTS() {
+                if (this.audioElement) {
+                    this.audioElement.pause();
+                    this.audioElement.currentTime = 0;
+                }
+                this.hideStop();
+                this.showStatus('Playback stopped', 'info');
+            }
+        }
+
+        // Initialize the interface when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TTSWebInterface();
+        });
+    </script>
+</body>
+</html>
