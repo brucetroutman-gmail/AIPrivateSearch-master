@@ -110,7 +110,7 @@
 
         <form class="activation-form" id="activationForm">
             <div class="form-group">
-                <label for="email">Email Address:</label>
+                <label for="email">Customer Email Address:</label>
                 <input type="email" id="email" name="email" required 
                        placeholder="Enter your email address">
             </div>
@@ -128,7 +128,7 @@
     </div>
 
     <script>
-        let CUSTMGR_BASE_URL = 'http://custmgr.aiprivatesearch.com:56304';
+        let CUSTMGR_BASE_URL = 'https://custmgr.aiprivatesearch.com';
 
         // Load CustMgr configuration from app.json
         async function loadCustMgrConfig() {
@@ -136,7 +136,8 @@
                 const response = await fetch('./config/app.json');
                 const config = await response.json();
                 if (config.custmgr) {
-                    CUSTMGR_BASE_URL = `http://${config.custmgr.host}:${config.custmgr.port}`;
+                    const protocol = config.custmgr.protocol || 'https';
+                    CUSTMGR_BASE_URL = `${protocol}://${config.custmgr.host}`;
                 }
             } catch (error) {
                 console.warn('Could not load CustMgr config, using default');

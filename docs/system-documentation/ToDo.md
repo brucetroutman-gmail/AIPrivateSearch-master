@@ -80,6 +80,11 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.85)
+354. Updated AIPS client configuration to use HTTPS without port number for CustMgr connection --done
+355. Fixed CustMgr URL to use https://custmgr.aiprivatesearch.com instead of custmgr.aiprivatesearch.com:56304 --done
+356. Changed license activation form label from "Email Address" to "Customer Email Address" --done
+
 ## RECENTLY COMPLETED (v19.84)
 350. Updated license-activation.html to connect directly to CustMgr server instead of local backend --done
 351. Added proper hardware ID binding and CustMgr API integration for license activation --done
