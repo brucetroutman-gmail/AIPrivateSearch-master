@@ -80,6 +80,12 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.84)
+350. Updated license-activation.html to connect directly to CustMgr server instead of local backend --done
+351. Added proper hardware ID binding and CustMgr API integration for license activation --done
+352. Created comprehensive CustMgr license fix test plan (AIPS-custmgr-license-fix.md) --done
+353. Fixed license activation flow to bypass local server and connect directly to custmgr.aiprivatesearch.com:56304 --done
+
 ## RECENTLY COMPLETED (v19.83)
 343. Fixed license activation system with complete database schema setup --done
 344. Resolved CustMgr server database issues (customer_code, subscription_tier, licenses table, hw_hash column) --done

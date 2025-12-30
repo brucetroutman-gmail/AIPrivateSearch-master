@@ -128,25 +128,26 @@
     </div>
 
     <script>
-        let API_BASE_URL = 'http://localhost:3001';
+        let CUSTMGR_BASE_URL = 'http://custmgr.aiprivatesearch.com:56304';
 
-        // Load API configuration
-        async function loadAPIConfig() {
+        // Load CustMgr configuration from app.json
+        async function loadCustMgrConfig() {
             try {
                 const response = await fetch('./config/app.json');
                 const config = await response.json();
-                if (config.ports && config.ports.backend) {
-                    API_BASE_URL = `http://localhost:${config.ports.backend}`;
+                if (config.custmgr) {
+                    CUSTMGR_BASE_URL = `http://${config.custmgr.host}:${config.custmgr.port}`;
                 }
             } catch (error) {
-                console.warn('Could not load API config, using default');
+                console.warn('Could not load CustMgr config, using default');
             }
         }
 
-        // Load system information
+        // Load system information from local backend
         async function loadSystemInfo() {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/licensing/system-info`);
+                // Still get system info from local backend
+                const response = await fetch(`http://localhost:56306/api/licensing/system-info`);
                 const data = await response.json();
                 
                 document.getElementById('systemDetails').innerHTML = `
@@ -156,6 +157,17 @@
                 `;
             } catch (error) {
                 document.getElementById('systemDetails').textContent = 'Unable to load system information';
+            }
+        }
+
+        // Get hardware ID for activation
+        async function getHardwareId() {
+            try {
+                const response = await fetch('http://localhost:56306/api/licensing/system-info');
+                const data = await response.json();
+                return data.uuid || 'unknown-hardware-id';
+            } catch (error) {
+                return 'unknown-hardware-id';
             }
         }
 
@@ -183,12 +195,17 @@
             activateBtn.textContent = 'Activating...';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/licensing/activate`, {
+                const response = await fetch(`${CUSTMGR_BASE_URL}/api/licensing/activate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ 
+                        email,
+                        hwId: await getHardwareId(),
+                        appVersion: '19.83',
+                        appId: 'aiprivatesearch'
+                    })
                 });
 
                 const data = await response.json();
@@ -225,7 +242,7 @@
 
         // Initialize page
         async function init() {
-            await loadAPIConfig();
+            await loadCustMgrConfig();
             
             // Check if already activated first
             const alreadyActivated = await checkExistingLicense();
