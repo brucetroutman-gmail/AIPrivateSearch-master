@@ -59,6 +59,10 @@ router.post('/activate', async (req, res) => {
 // POST /refresh - Refresh current license
 router.post('/refresh', async (req, res) => {
   try {
+    // Force clear cache before refresh
+    LicenseManager.licenseStatus = null;
+    LicenseManager.lastCheck = 0;
+    
     const result = await LicenseManager.refreshLicense();
     
     if (result.success) {

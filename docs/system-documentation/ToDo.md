@@ -80,6 +80,12 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.86)
+358. Modify license activation flow: After license activation, user must still login, then can access all menu items. Removed auto-login functionality and redirect to user-management.html for proper login flow. --done
+357. Fix license activation loop: Users get stuck in activation cycle (Get Started → activate → Search → login → Search → activation form again). Integrated CustMgr license system with local user authentication system by adding license check before auth in common.js. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v19.85)
 354. Updated AIPS client configuration to use HTTPS without port number for CustMgr connection --done
 355. Fixed CustMgr URL to use https://custmgr.aiprivatesearch.com instead of custmgr.aiprivatesearch.com:56304 --done

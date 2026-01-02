@@ -97,6 +97,18 @@ export class UserManager {
     return userWithoutPassword;
   }
 
+  async getUserByEmail(email) {
+    const users = await this.loadUsers();
+    const user = users.find(u => u.email === email && u.active);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { passwordHash, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
   async getTokenTimeout() {
     try {
       const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');

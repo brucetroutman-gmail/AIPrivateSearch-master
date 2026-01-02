@@ -214,15 +214,23 @@
                 if (data.success) {
                     showStatus(`License activated successfully! Tier: ${data.tier === 1 ? 'Standard' : data.tier === 2 ? 'Premium' : 'Professional'}`);
                     
+                    // Clear local license cache by calling refresh endpoint
+                    try {
+                        await fetch('http://localhost:56306/api/licensing/refresh', { method: 'POST' });
+                    } catch (error) {
+                        console.warn('Could not refresh local license cache:', error);
+                    }
+                    
                     // Clear any existing license checker intervals to prevent conflicts
                     if (window.licenseChecker) {
                         window.licenseChecker.licenseStatus = null;
+                        window.licenseChecker.lastCheck = 0;
                     }
                     
-                    // Wait longer for license to propagate and redirect
+                    // Wait for license to propagate and redirect to login
                     setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 3000);
+                        window.location.href = 'user-management.html';
+                    }, 2000);
                 } else {
                     showStatus(data.error || 'Activation failed', true);
                 }

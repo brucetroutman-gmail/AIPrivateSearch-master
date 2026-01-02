@@ -763,6 +763,15 @@ document.addEventListener('DOMContentLoaded', async function() {
   const licensingPages = ['license-activation.html', 'index.html'];
   
   if (!licensingPages.includes(currentPage)) {
+    // Check license status first
+    if (window.licenseChecker) {
+      const licenseStatus = await window.licenseChecker.checkLicenseStatus();
+      if (licenseStatus.requiresActivation && !licenseStatus.fallback) {
+        window.location.href = './license-activation.html';
+        return;
+      }
+    }
+    
     // Check authentication status - require login with fallback
     const user = await AuthUtils.requireAuth();
     if (!user) {
