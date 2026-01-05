@@ -80,6 +80,11 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.87)
+359. Debug activation loop: After activation → login → activation again → login → search → activation. Added comprehensive debugging to track license/auth state, localStorage monitoring, and created DebugUtils for troubleshooting the flow. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v19.86)
 358. Modify license activation flow: After license activation, user must still login, then can access all menu items. Removed auto-login functionality and redirect to user-management.html for proper login flow. --done
 357. Fix license activation loop: Users get stuck in activation cycle (Get Started → activate → Search → login → Search → activation form again). Integrated CustMgr license system with local user authentication system by adding license check before auth in common.js. --done

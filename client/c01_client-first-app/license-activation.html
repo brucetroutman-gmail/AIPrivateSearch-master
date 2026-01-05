@@ -212,23 +212,34 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    console.log('🔐 ACTIVATION DEBUG: License activation successful:', data);
                     showStatus(`License activated successfully! Tier: ${data.tier === 1 ? 'Standard' : data.tier === 2 ? 'Premium' : 'Professional'}`);
                     
                     // Clear local license cache by calling refresh endpoint
                     try {
+                        console.log('🔐 ACTIVATION DEBUG: Refreshing local license cache...');
                         await fetch('http://localhost:56306/api/licensing/refresh', { method: 'POST' });
+                        console.log('🔐 ACTIVATION DEBUG: License cache refreshed');
                     } catch (error) {
-                        console.warn('Could not refresh local license cache:', error);
+                        console.warn('🔐 ACTIVATION DEBUG: Could not refresh local license cache:', error);
                     }
                     
                     // Clear any existing license checker intervals to prevent conflicts
                     if (window.licenseChecker) {
+                        console.log('🔐 ACTIVATION DEBUG: Clearing license checker cache');
                         window.licenseChecker.licenseStatus = null;
                         window.licenseChecker.lastCheck = 0;
                     }
                     
+                    console.log('🔐 ACTIVATION DEBUG: localStorage before redirect:', {
+                        sessionId: localStorage.getItem('sessionId'),
+                        userEmail: localStorage.getItem('userEmail'),
+                        userRole: localStorage.getItem('userRole')
+                    });
+                    
                     // Wait for license to propagate and redirect to login
                     setTimeout(() => {
+                        console.log('🔐 ACTIVATION DEBUG: Redirecting to user-management.html');
                         window.location.href = 'user-management.html';
                     }, 2000);
                 } else {

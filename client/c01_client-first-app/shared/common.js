@@ -1,5 +1,6 @@
 import { DOMSanitizer } from './utils/domSanitizer.js';
 import AuthUtils from './utils/authUtils.js';
+import DebugUtils from './utils/debugUtils.js';
 import './utils/apiConfig.js';
 import './utils/appTokenManager.js';
 import './utils/secureUserManager.js';
@@ -748,6 +749,9 @@ export { loadScoreModels, exportToDatabase };
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
+  console.log('🚀 COMMON.JS: DOMContentLoaded fired');
+  DebugUtils.logFullState('DOMContentLoaded start');
+  
   // Load tier access manager
   try {
     const { default: tierAccessManager } = await import('./utils/tierAccessManager.js');
@@ -762,19 +766,41 @@ document.addEventListener('DOMContentLoaded', async function() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   const licensingPages = ['license-activation.html', 'index.html'];
   
+  console.log('🚀 COMMON.JS: Current page check:', { currentPage, isLicensingPage: licensingPages.includes(currentPage) });
+  
   if (!licensingPages.includes(currentPage)) {
+    console.log('🔐 AUTH DEBUG: Page requires auth check:', currentPage);
+    console.log('🔐 AUTH DEBUG: localStorage state:', {
+      sessionId: localStorage.getItem('sessionId') ? 'exists' : 'missing',
+      userEmail: localStorage.getItem('userEmail'),
+      userRole: localStorage.getItem('userRole'),
+      userUserRole: localStorage.getItem('userUserRole')
+    });
+    
     // Check license status first
     if (window.licenseChecker) {
+      console.log('🔐 AUTH DEBUG: Checking license status before auth...');
       const licenseStatus = await window.licenseChecker.checkLicenseStatus();
+      console.log('🔐 AUTH DEBUG: License status result:', licenseStatus);
+      
       if (licenseStatus.requiresActivation && !licenseStatus.fallback) {
+        console.log('🔐 AUTH DEBUG: License requires activation, redirecting to activation page');
         window.location.href = './license-activation.html';
         return;
+      } else {
+        console.log('🔐 AUTH DEBUG: License OK, proceeding to auth check');
       }
+    } else {
+      console.log('🔐 AUTH DEBUG: No license checker available');
     }
     
     // Check authentication status - require login with fallback
+    console.log('🔐 AUTH DEBUG: Calling AuthUtils.requireAuth()');
     const user = await AuthUtils.requireAuth();
+    console.log('🔐 AUTH DEBUG: AuthUtils.requireAuth() result:', user);
+    
     if (!user) {
+      console.log('🔐 AUTH DEBUG: No user returned, clearing session and redirecting to login');
       // Clear invalid session data and redirect to login
       localStorage.removeItem('sessionId');
       localStorage.removeItem('userEmail');

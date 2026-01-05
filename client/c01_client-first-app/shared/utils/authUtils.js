@@ -5,19 +5,31 @@
 class AuthUtils {
   static async checkAuth() {
     const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) return null;
+    console.log('🔐 AUTH DEBUG: checkAuth called, sessionId:', sessionId ? 'exists' : 'missing');
+    
+    if (!sessionId) {
+      console.log('🔐 AUTH DEBUG: No sessionId in localStorage');
+      return null;
+    }
     
     try {
+      console.log('🔐 AUTH DEBUG: Validating session with backend...');
       const response = await fetch(`${window.API_BASE_URL}/api/auth/me`, {
         headers: { 'Authorization': `Bearer ${sessionId}` }
       });
       
+      console.log('🔐 AUTH DEBUG: Backend response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('🔐 AUTH DEBUG: Valid session, user data:', data.user);
         return data.user;
+      } else {
+        console.log('🔐 AUTH DEBUG: Invalid session, backend rejected');
+        return null;
       }
-      return null;
     } catch (error) {
+      console.log('🔐 AUTH DEBUG: Session validation error:', error.message);
       return null;
     }
   }
@@ -60,8 +72,12 @@ class AuthUtils {
   }
   
   static async requireAuth() {
+    console.log('🔐 AUTH DEBUG: requireAuth called');
     const user = await this.checkAuth();
+    console.log('🔐 AUTH DEBUG: checkAuth returned:', user);
+    
     if (!user) {
+      console.log('🔐 AUTH DEBUG: No valid user, clearing session data and redirecting');
       // Clear all session data when authentication fails
       localStorage.removeItem('sessionId');
       localStorage.removeItem('userEmail');
@@ -70,6 +86,7 @@ class AuthUtils {
       window.location.href = './user-management.html';
       return null;
     }
+    console.log('🔐 AUTH DEBUG: Valid user found, returning user data');
     return user;
   }
 }
