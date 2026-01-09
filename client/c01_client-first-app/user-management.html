@@ -23,6 +23,7 @@
                 <div style="margin-top: 10px; text-align: center;">
                     <button onclick="debugAdminAccount()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Debug Admin Account</button>
                     <button onclick="showDefaultCredentials()" style="background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Show Default Credentials</button>
+                    <button onclick="clearSession()" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Clear Session</button>
                     <br><br>
                     <button onclick="createTestAdmin()" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Create Test Admin</button>
                 </div>
@@ -734,6 +735,20 @@
         
         // Make testLogout globally available
         window.testLogout = testLogout;
+        
+        // Function to clear invalid session
+        function clearSession() {
+            console.log('🔐 SESSION DEBUG: Clearing session from localStorage');
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userUserRole');
+            showMessage('Session cleared. Please login again.', 'info');
+            window.location.reload();
+        }
+        
+        // Make clearSession globally available
+        window.clearSession = clearSession;
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {

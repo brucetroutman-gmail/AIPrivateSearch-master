@@ -151,4 +151,66 @@ router.delete('/users/:userId', requireAuth, async (req, res) => {
   }
 });
 
+// Debug endpoints for troubleshooting
+router.get('/debug-users', async (req, res) => {
+  try {
+    const users = await userManager.getAllUsers();
+    res.json({ users, count: users.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message, users: [], count: 0 });
+  }
+});
+
+router.post('/create-test-admin', async (req, res) => {
+  try {
+    const adminEmail = 'adm-std@a.com';
+    const adminPassword = '123';
+    
+    // Check if admin already exists
+    const existingUsers = await userManager.getAllUsers();
+    const existingAdmin = existingUsers.find(user => user.email === adminEmail);
+    
+    if (existingAdmin) {
+      return res.json({ success: true, message: 'Admin already exists', user: existingAdmin });
+    }
+    
+    // Create admin user
+    const adminUser = await userManager.createUser(adminEmail, adminPassword, 'standard', 'admin');
+    res.json({ success: true, message: 'Admin created', user: adminUser });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create admin and auto-login (for license activation)
+router.post('/create-and-login-admin', async (req, res) => {
+  try {
+    const { email, password, userRole, subscriptionTier } = req.body;
+    const adminEmail = email || 'adm-std@a.com';
+    const adminPassword = password || '123';
+    const tier = subscriptionTier || 'professional';
+    
+    // Check if admin already exists
+    const existingUsers = await userManager.getAllUsers();
+    let adminUser = existingUsers.find(user => user.email === adminEmail);
+    
+    if (!adminUser) {
+      // Create admin user
+      adminUser = await userManager.createUser(adminEmail, adminPassword, tier, 'admin');
+    }
+    
+    // Create session for auto-login
+    const sessionId = await userManager.createSession(adminUser.id);
+    
+    res.json({ 
+      success: true, 
+      message: 'Admin created and logged in', 
+      user: adminUser,
+      sessionId 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

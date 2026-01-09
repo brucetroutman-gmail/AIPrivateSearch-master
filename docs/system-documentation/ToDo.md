@@ -76,7 +76,7 @@ Phase 3 - Role-Based Feature Control:
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
 335. Test multi search and view documents
 336. Test multi prompts and ascii characters.
-337. Test Login and roles... srch-std gets wrong menus after loginv19.93: Implemented admin account auto-creation after license activation with comprehensive login troubleshooting tools
+337. Test Login and roles... srch-std gets wrong menus after loginv19.94: Added create-and-login-admin endpoint to complete license activation auto-login flow
 
 340. What changes to load aips.command if repo is made private?
 360. Create aips-test-licensing-plan260108.md: Comprehensive test plan to solve flow from no license to license, no device to device registration under license. --done
@@ -87,7 +87,8 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
-## RECENTLY COMPLETED (v19.93)
+## RECENTLY COMPLETED (v19.94)
+367. Added create-and-login-admin endpoint: Completed the license activation auto-login flow by adding the missing API endpoint that creates admin account and returns session for seamless user experience after license activation. --done
 366. Implemented admin account auto-creation after license activation: Changed strategy from preserving admin accounts during clean installs to creating admin account automatically after successful license activation with auto-login, eliminating login failures and providing seamless user experience. --done
 366. Added comprehensive login troubleshooting tools: Fixed clean test installer admin account preservation bug, added debug buttons to check users.json content, create test admin account, and auto-fill correct credentials (adm-std@a.com / 123). --done
 
