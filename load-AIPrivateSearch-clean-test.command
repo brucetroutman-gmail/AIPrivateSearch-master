@@ -35,28 +35,11 @@ fi
 # Clear all AIPrivateSearch data
 echo "🗑️  Clearing all AIPrivateSearch data..."
 
-# Remove data files (users, sessions, license cache) but preserve admin account
+# Remove data files (users, sessions, license cache)
 if [ -d "/Users/Shared/AIPrivateSearch/data" ]; then
-    echo "   Removing user data, sessions, and license cache (preserving admin account)..."
-    
-    # Backup admin account if it exists
-    ADMIN_BACKUP=""
-    if [ -f "/Users/Shared/AIPrivateSearch/data/users.json" ]; then
-        ADMIN_BACKUP=$(grep -o '"adm-std@a.com":[^}]*}' "/Users/Shared/AIPrivateSearch/data/users.json" 2>/dev/null || echo "")
-    fi
-    
-    # Clear all data
+    echo "   Removing user data, sessions, and license cache..."
     rm -rf /Users/Shared/AIPrivateSearch/data/*
-    
-    # Restore admin account if it existed
-    if [ ! -z "$ADMIN_BACKUP" ]; then
-        echo "   Restoring admin account..."
-        mkdir -p "/Users/Shared/AIPrivateSearch/data"
-        echo "{$ADMIN_BACKUP}" > "/Users/Shared/AIPrivateSearch/data/users.json"
-        echo "   ✅ Admin account preserved"
-    fi
-    
-    echo "   ✅ Data directory cleared (admin account preserved)"
+    echo "   ✅ Data directory cleared"
 fi
 
 # Remove .env file
@@ -298,19 +281,10 @@ if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
             echo "   ✅ Config files copied"
         fi
         
-        # Create fresh data files (but preserve admin account if it exists)
-        echo "📁 Creating fresh data files..."
-        
-        # Only create users.json if admin account wasn't preserved
-        if [ ! -f "/Users/Shared/AIPrivateSearch/data/users.json" ]; then
-            echo "[]" > "/Users/Shared/AIPrivateSearch/data/users.json"
-            echo "   ✅ Fresh users.json created"
-        else
-            echo "   ✅ Preserved existing users.json with admin account"
-        fi
-        
-        echo "{}" > "/Users/Shared/AIPrivateSearch/data/sessions.json"
-        echo "   ✅ Fresh sessions.json created"
+        # Create fresh data directory structure
+        echo "📁 Creating fresh data directory..."
+        mkdir -p "/Users/Shared/AIPrivateSearch/data"
+        echo "   ✅ Data directory ready (admin account will be created after licensing)"
         
         # Pull required AI models
         echo "🤖 Pulling required AI models..."

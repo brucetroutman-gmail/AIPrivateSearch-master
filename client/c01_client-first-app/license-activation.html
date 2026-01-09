@@ -224,24 +224,46 @@
                         console.warn('🔐 ACTIVATION DEBUG: Could not refresh local license cache:', error);
                     }
                     
-                    // Clear any existing license checker intervals to prevent conflicts
-                    if (window.licenseChecker) {
-                        console.log('🔐 ACTIVATION DEBUG: Clearing license checker cache');
-                        window.licenseChecker.licenseStatus = null;
-                        window.licenseChecker.lastCheck = 0;
+                    // Create admin account and auto-login
+                    try {
+                        console.log('🔐 ACTIVATION DEBUG: Creating admin account and auto-login...');
+                        const createResponse = await fetch('http://localhost:56306/api/auth/create-and-login-admin', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: 'adm-std@a.com',
+                                password: '123',
+                                userRole: 'admin',
+                                subscriptionTier: data.tier === 1 ? 'standard' : data.tier === 2 ? 'premium' : 'professional'
+                            })
+                        });
+                        
+                        const createData = await createResponse.json();
+                        console.log('🔐 ACTIVATION DEBUG: Create and login result:', createData);
+                        
+                        if (createData.success && createData.sessionId) {
+                            // Store session and redirect to main app
+                            localStorage.setItem('sessionId', createData.sessionId);
+                            localStorage.setItem('userEmail', 'adm-std@a.com');
+                            localStorage.setItem('userRole', createData.user.subscriptionTier);
+                            localStorage.setItem('userUserRole', 'admin');
+                            
+                            console.log('🔐 ACTIVATION DEBUG: Auto-login successful, redirecting to index.html');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 2000);
+                        } else {
+                            console.log('🔐 ACTIVATION DEBUG: Auto-login failed, redirecting to manual login');
+                            setTimeout(() => {
+                                window.location.href = 'user-management.html';
+                            }, 2000);
+                        }
+                    } catch (error) {
+                        console.warn('🔐 ACTIVATION DEBUG: Auto-login failed:', error);
+                        setTimeout(() => {
+                            window.location.href = 'user-management.html';
+                        }, 2000);
                     }
-                    
-                    console.log('🔐 ACTIVATION DEBUG: localStorage before redirect:', {
-                        sessionId: localStorage.getItem('sessionId'),
-                        userEmail: localStorage.getItem('userEmail'),
-                        userRole: localStorage.getItem('userRole')
-                    });
-                    
-                    // Wait for license to propagate and redirect to login
-                    setTimeout(() => {
-                        console.log('🔐 ACTIVATION DEBUG: Redirecting to user-management.html');
-                        window.location.href = 'user-management.html';
-                    }, 2000);
                 } else {
                     showStatus(data.error || 'Activation failed', true);
                 }
