@@ -79,6 +79,14 @@ Phase 3 - Role-Based Feature Control:
 337. Test Login and roles... srch-std gets wrong menus after login
 340. What changes to load aips.command if repo is made private?
 360. Create aips-test-licensing-plan260108.md: Comprehensive test plan to solve flow from no license to license, no device to device registration under license. --done
+362. Add license creation capability to registration page - users need ability to create new license before device registration
+363. Add device registration functionality to registration page - complete the license → device registration flow
+364. Hide main menu and user info on index page when not licensed/registered - menu should only show after successful license activation and login --done
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.90)
+364. Hide main menu and user info on index page when not licensed/registered - menu now only shows after successful license activation and login, providing cleaner experience for new users. --done
 
 =======================================================
 

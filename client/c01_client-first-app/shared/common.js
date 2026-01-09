@@ -506,6 +506,15 @@ function setupLoginIcon() {
   }
 }
 
+// Show licensed content (menu and user info)
+function showLicensedContent() {
+  console.log('🔓 MENU: Showing licensed content');
+  const licensedElements = document.querySelectorAll('.licensed-only');
+  licensedElements.forEach(element => {
+    element.style.display = '';
+  });
+}
+
 // Common score model loading function
 async function loadScoreModels(selectElementId) {
   try {
@@ -737,6 +746,7 @@ if (typeof window !== 'undefined') {
   window.toggleMenu = toggleMenu;
   window.collectionsUtils = collectionsUtils;
   window.handleLogout = handleLogout;
+  window.showLicensedContent = showLicensedContent;
   window.testLogout = () => {
     if (confirm('Logout for testing?')) {
       handleLogout();
@@ -820,6 +830,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     setTimeout(async () => {
       await applyUserRole(user.subscriptionTier, user.userRole);
     }, 100);
+    
+    // Show menu after successful auth (for non-index pages)
+    showLicensedContent();
+  } else if (currentPage === 'index.html') {
+    // For index page, check license and auth status to show menu
+    let showMenu = false;
+    
+    // Check license status
+    if (window.licenseChecker) {
+      const licenseStatus = await window.licenseChecker.checkLicenseStatus();
+      if (licenseStatus.valid || licenseStatus.fallback) {
+        // Check if user is authenticated
+        const user = await AuthUtils.checkAuth();
+        if (user) {
+          showMenu = true;
+          // Set role from authenticated user
+          setUserRole(user.subscriptionTier);
+          localStorage.setItem('userUserRole', user.userRole);
+          localStorage.setItem('userEmail', user.email);
+        }
+      }
+    }
+    
+    if (showMenu) {
+      showLicensedContent();
+      setTimeout(async () => {
+        await applyUserRole();
+      }, 100);
+    }
   }
 
   
