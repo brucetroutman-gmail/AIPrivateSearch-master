@@ -8,6 +8,10 @@ import { USER_DEFAULTS, VALID_SUBSCRIPTION_TIERS, VALID_USER_ROLES } from '../li
 const router = express.Router();
 const userManager = new UserManager();
 
+// Default admin credentials from .env-aips file
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL;
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD;
+
 // Register new user
 router.post('/register', requireAuth, async (req, res) => {
   try {
@@ -163,19 +167,16 @@ router.get('/debug-users', async (req, res) => {
 
 router.post('/create-test-admin', async (req, res) => {
   try {
-    const adminEmail = 'adm-std@a.com';
-    const adminPassword = '123';
-    
     // Check if admin already exists
     const existingUsers = await userManager.getAllUsers();
-    const existingAdmin = existingUsers.find(user => user.email === adminEmail);
+    const existingAdmin = existingUsers.find(user => user.email === DEFAULT_ADMIN_EMAIL);
     
     if (existingAdmin) {
       return res.json({ success: true, message: 'Admin already exists', user: existingAdmin });
     }
     
     // Create admin user
-    const adminUser = await userManager.createUser(adminEmail, adminPassword, 'standard', 'admin');
+    const adminUser = await userManager.createUser(DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD, 'standard', 'admin');
     res.json({ success: true, message: 'Admin created', user: adminUser });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -186,8 +187,8 @@ router.post('/create-test-admin', async (req, res) => {
 router.post('/create-and-login-admin', async (req, res) => {
   try {
     const { email, password, userRole, subscriptionTier } = req.body;
-    const adminEmail = email || 'adm-std@a.com';
-    const adminPassword = password || '123';
+    const adminEmail = email || DEFAULT_ADMIN_EMAIL;
+    const adminPassword = password || DEFAULT_ADMIN_PASSWORD;
     const tier = subscriptionTier || 'professional';
     
     // Check if admin already exists
