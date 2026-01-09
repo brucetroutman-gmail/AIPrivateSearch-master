@@ -20,6 +20,10 @@
                     <input type="password" id="loginPassword" placeholder="Password" required>
                     <button type="submit">Login</button>
                 </form>
+                <div style="margin-top: 10px; text-align: center;">
+                    <button onclick="debugAdminAccount()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Debug Admin Account</button>
+                    <button onclick="showDefaultCredentials()" style="background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Show Default Credentials</button>
+                </div>
             </div>
             
             <div id="register-form" class="auth-form" style="display: none;">
@@ -205,24 +209,38 @@
             }
             
             async checkAuthStatus() {
+                console.log('🔐 AUTH DEBUG: checkAuthStatus called');
                 try {
                     const sessionId = localStorage.getItem('sessionId');
+                    console.log('🔐 AUTH DEBUG: SessionId from localStorage:', sessionId ? 'exists' : 'missing');
+                    
                     if (!sessionId) {
+                        console.log('🔐 AUTH DEBUG: No sessionId, showing login form');
                         this.showLogin();
                         return;
                     }
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`, {
+                    
+                    const authUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`;
+                    console.log('🔐 AUTH DEBUG: Checking auth at:', authUrl);
+                    
+                    const response = await fetch(authUrl, {
                         headers: { 'Authorization': `Bearer ${sessionId}` }
                     });
+                    
+                    console.log('🔐 AUTH DEBUG: Auth check response status:', response.status);
+                    
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('🔐 AUTH DEBUG: Auth check successful, user:', data.user);
                         this.currentUser = data.user;
                         // If user is authenticated, go directly to dashboard
                         this.showDashboard();
                     } else {
+                        console.log('🔐 AUTH DEBUG: Auth check failed, showing login');
                         this.showLogin();
                     }
                 } catch (error) {
+                    console.log('🔐 AUTH DEBUG: Auth check error:', error);
                     this.showLogin();
                 }
             }
@@ -241,23 +259,43 @@
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
                 
+                console.log('🔐 LOGIN DEBUG: Login attempt started');
+                console.log('🔐 LOGIN DEBUG: Email:', email);
+                console.log('🔐 LOGIN DEBUG: Password length:', password.length);
+                console.log('🔐 LOGIN DEBUG: API_BASE_URL:', window.API_BASE_URL);
+                
                 try {
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/login`, {
+                    const loginUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/login`;
+                    console.log('🔐 LOGIN DEBUG: Making request to:', loginUrl);
+                    
+                    const requestBody = { email, password };
+                    console.log('🔐 LOGIN DEBUG: Request body:', requestBody);
+                    
+                    const response = await fetch(loginUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify(requestBody)
                     });
                     
+                    console.log('🔐 LOGIN DEBUG: Response status:', response.status);
+                    console.log('🔐 LOGIN DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
+                    
                     const data = await response.json();
+                    console.log('🔐 LOGIN DEBUG: Response data:', data);
+                    
                     if (data.success) {
+                        console.log('🔐 LOGIN DEBUG: Login successful, storing session');
                         localStorage.setItem('sessionId', data.sessionId);
                         this.currentUser = data.user;
+                        console.log('🔐 LOGIN DEBUG: Redirecting to index.html');
                         window.location.href = '/index.html';
                     } else {
+                        console.log('🔐 LOGIN DEBUG: Login failed:', data.error);
                         showMessage(data.error || 'Login failed');
                     }
                 } catch (error) {
-                    showMessage('Login failed');
+                    console.log('🔐 LOGIN DEBUG: Network error:', error);
+                    showMessage('Login failed: ' + error.message);
                 }
             }
             
@@ -596,6 +634,41 @@
                 }
             }
         }
+        
+        // Debug function to show default credentials
+        function showDefaultCredentials() {
+            console.log('🔐 CREDS DEBUG: Default admin credentials');
+            console.log('🔐 CREDS DEBUG: Email: adm-std@a.com');
+            console.log('🔐 CREDS DEBUG: Password: admin123 (if using default)');
+            
+            // Auto-fill the form with default credentials
+            document.getElementById('loginEmail').value = 'adm-std@a.com';
+            document.getElementById('loginPassword').value = 'admin123';
+            
+            showMessage('Default credentials filled. Check console for details.', 'info');
+        }
+        
+        // Make function available globally
+        window.showDefaultCredentials = showDefaultCredentials;
+        
+        // Debug function to check admin account
+        async function debugAdminAccount() {
+            console.log('🔐 ADMIN DEBUG: Checking admin account status');
+            try {
+                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/debug-admin`, {
+                    method: 'GET'
+                });
+                const data = await response.json();
+                console.log('🔐 ADMIN DEBUG: Admin account info:', data);
+                return data;
+            } catch (error) {
+                console.log('🔐 ADMIN DEBUG: Error checking admin account:', error);
+                return null;
+            }
+        }
+        
+        // Make debug function available globally
+        window.debugAdminAccount = debugAdminAccount;
         
         // Simple logout function for testing
         function testLogout() {

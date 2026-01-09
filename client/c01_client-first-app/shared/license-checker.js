@@ -147,7 +147,7 @@ class LicenseChecker {
     }
 
     // Redirect to activation if required
-    async enforceActivation(exemptPages = ['license-activation.html', 'index.html', 'user-management.html']) {
+    async enforceActivation(exemptPages = ['license-activation.html', 'index.html', 'user-management.html', 'videos.html']) {
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         if (exemptPages.includes(currentPage)) return false;
 
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         console.log('🔐 LICENSE CHECKER: Step 2b - Current page:', currentPage);
         
-        const userAuthPages = ['user-management.html', 'login.html', 'register.html'];
+        const userAuthPages = ['user-management.html', 'login.html', 'register.html', 'videos.html'];
         const skipEnforcement = userAuthPages.includes(currentPage) || 
                                status.fallback || 
                                (status.valid && !status.requiresActivation);

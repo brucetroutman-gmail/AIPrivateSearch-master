@@ -82,6 +82,12 @@ Phase 3 - Role-Based Feature Control:
 362. Add license creation capability to registration page - users need ability to create new license before device registration
 363. Add device registration functionality to registration page - complete the license → device registration flow
 364. Hide main menu and user info on index page when not licensed/registered - menu should only show after successful license activation and login --done
+365. Fix post-registration login flow: After device registration, user is redirected to login but admin account password is unknown. Need to either auto-login admin account or provide known default password.
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.91)
+365. Enhanced login debugging: Added comprehensive debugging to user-management.html login process with detailed console logging, auth status tracking, and debug buttons to troubleshoot post-registration login failures. --done
 
 =======================================================
 

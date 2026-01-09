@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Skip authentication check on licensing pages
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const licensingPages = ['license-activation.html', 'index.html'];
+  const licensingPages = ['license-activation.html', 'index.html', 'videos.html'];
   
   console.log('🚀 COMMON.JS: Current page check:', { currentPage, isLicensingPage: licensingPages.includes(currentPage) });
   
