@@ -23,6 +23,8 @@
                 <div style="margin-top: 10px; text-align: center;">
                     <button onclick="debugAdminAccount()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Debug Admin Account</button>
                     <button onclick="showDefaultCredentials()" style="background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Show Default Credentials</button>
+                    <br><br>
+                    <button onclick="createTestAdmin()" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Create Test Admin</button>
                 </div>
             </div>
             
@@ -639,14 +641,48 @@
         function showDefaultCredentials() {
             console.log('🔐 CREDS DEBUG: Default admin credentials');
             console.log('🔐 CREDS DEBUG: Email: adm-std@a.com');
-            console.log('🔐 CREDS DEBUG: Password: admin123 (if using default)');
+            console.log('🔐 CREDS DEBUG: Password: 123 (3 characters)');
             
             // Auto-fill the form with default credentials
             document.getElementById('loginEmail').value = 'adm-std@a.com';
-            document.getElementById('loginPassword').value = 'admin123';
+            document.getElementById('loginPassword').value = '123';
             
-            showMessage('Default credentials filled. Check console for details.', 'info');
+            showMessage('Default credentials filled: adm-std@a.com / 123', 'info');
         }
+        
+        // Function to create admin account for testing
+        async function createTestAdmin() {
+            console.log('🔐 CREATE DEBUG: Creating test admin account');
+            try {
+                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/create-test-admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'adm-std@a.com',
+                        password: '123',
+                        userRole: 'admin',
+                        subscriptionTier: 'professional'
+                    })
+                });
+                const data = await response.json();
+                console.log('🔐 CREATE DEBUG: Create admin result:', data);
+                
+                if (data.success) {
+                    showMessage('Test admin account created successfully!', 'success');
+                } else {
+                    showMessage('Failed to create admin: ' + (data.error || 'Unknown error'), 'error');
+                }
+                
+                return data;
+            } catch (error) {
+                console.log('🔐 CREATE DEBUG: Error creating admin account:', error);
+                showMessage('Error creating admin account: ' + error.message, 'error');
+                return null;
+            }
+        }
+        
+        // Make function available globally
+        window.createTestAdmin = createTestAdmin;
         
         // Make function available globally
         window.showDefaultCredentials = showDefaultCredentials;
@@ -655,14 +691,24 @@
         async function debugAdminAccount() {
             console.log('🔐 ADMIN DEBUG: Checking admin account status');
             try {
-                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/debug-admin`, {
+                // First check if users.json exists and what's in it
+                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/debug-users`, {
                     method: 'GET'
                 });
                 const data = await response.json();
-                console.log('🔐 ADMIN DEBUG: Admin account info:', data);
+                console.log('🔐 ADMIN DEBUG: Users file content:', data);
+                
+                // Show in UI
+                const message = `Users found: ${data.users ? data.users.length : 0}\n` +
+                               `Admin account exists: ${data.users && data.users.find(u => u.email === 'adm-std@a.com') ? 'YES' : 'NO'}\n` +
+                               `File path: ${data.filePath || 'unknown'}\n` +
+                               `Check console for full details`;
+                showMessage(message, 'info');
+                
                 return data;
             } catch (error) {
                 console.log('🔐 ADMIN DEBUG: Error checking admin account:', error);
+                showMessage('Error checking admin account: ' + error.message, 'error');
                 return null;
             }
         }

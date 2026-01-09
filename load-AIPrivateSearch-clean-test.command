@@ -298,11 +298,19 @@ if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
             echo "   ✅ Config files copied"
         fi
         
-        # Create fresh data files
+        # Create fresh data files (but preserve admin account if it exists)
         echo "📁 Creating fresh data files..."
-        echo "[]" > "/Users/Shared/AIPrivateSearch/data/users.json"
+        
+        # Only create users.json if admin account wasn't preserved
+        if [ ! -f "/Users/Shared/AIPrivateSearch/data/users.json" ]; then
+            echo "[]" > "/Users/Shared/AIPrivateSearch/data/users.json"
+            echo "   ✅ Fresh users.json created"
+        else
+            echo "   ✅ Preserved existing users.json with admin account"
+        fi
+        
         echo "{}" > "/Users/Shared/AIPrivateSearch/data/sessions.json"
-        echo "   ✅ Fresh data files created"
+        echo "   ✅ Fresh sessions.json created"
         
         # Pull required AI models
         echo "🤖 Pulling required AI models..."
