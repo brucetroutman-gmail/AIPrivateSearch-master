@@ -1,6 +1,6 @@
 {
   "name": "ai-search-score-server",
-  "version": "19.87",
+  "version": "19.89",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
@@ -21,7 +21,7 @@
     "mammoth": "^1.11.0",
     "mime-types": "^3.0.1",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.14.3",
+    "mysql2": "^3.16.0",
     "natural": "^8.1.0",
     "ollama": "^0.5.0",
     "sql.js": "^1.10.3",

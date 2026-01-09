@@ -77,6 +77,18 @@ Phase 3 - Role-Based Feature Control:
 335. Test multi search and view documents
 336. Test multi prompts and ascii characters.
 337. Test Login and roles... srch-std gets wrong menus after login
+340. What changes to load aips.command if repo is made private?
+360. Create aips-test-licensing-plan260108.md: Comprehensive test plan to solve flow from no license to license, no device to device registration under license. --done
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.89)
+362. Fix clean test installer to preserve admin account (adm-std@a.com) while clearing other test data to prevent activation loop issues after device registration. --done
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.88)
+361. Create clean test installer and selective browser clearing: Enhanced load command to clear only AIPS-related data while preserving other browser data. Added automated browser cache clearing via AppleScript and manual selective clearing scripts. --done
 
 =======================================================
 

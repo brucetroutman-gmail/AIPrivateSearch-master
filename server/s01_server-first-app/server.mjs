@@ -29,6 +29,7 @@ import testResultsRouter from './routes/testResults.mjs';
 import tierAccessRouter from './routes/tierAccess.mjs';
 import searchLogsRouter from './routes/searchLogs.mjs';
 import licensingRouter from './routes/licensing.mjs';
+import membersRouter from './routes/members.mjs';
 import cookieParser from 'cookie-parser';
 import { LicenseManager } from './lib/licensing/license-manager.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
@@ -163,6 +164,7 @@ app.use('/api/tier-access', validateOrigin, tierAccessRouter);
 // Simplified search-logs route (no middleware)
 app.use('/api/search-logs', searchLogsRouter);
 app.use('/api/licensing', licensingRouter);
+app.use('/api', membersRouter);
 app.use('/api', testResultsRouter);
 
 // Catch-all for unmatched API routes

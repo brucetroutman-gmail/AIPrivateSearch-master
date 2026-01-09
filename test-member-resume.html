@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Resume Test</title>
+</head>
+<body>
+    <h1>Member Resume Test</h1>
+    
+    <input type="email" id="emailInput" placeholder="Enter member email" value="bruce.troutman@gmail.com">
+    <button onclick="testMemberResume()">Test Member Resume</button>
+    
+    <div id="result" style="margin-top: 20px; white-space: pre-wrap; font-family: monospace;"></div>
+
+    <script>
+        async function testMemberResume() {
+            const email = document.getElementById('emailInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const response = await fetch(`http://localhost:56306/api/member-resume?email=${email}`);
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

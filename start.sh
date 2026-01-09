@@ -94,21 +94,21 @@ MODELS_UPDATED=false
 echo "🔧 Starting servers..."
 cd server/s01_server-first-app
 
-# Check for .env file in /Users/Shared/AIPrivateSearch
-if [ ! -f /Users/Shared/AIPrivateSearch/.env ]; then
-    echo "⚠️  .env file not found in /Users/Shared/AIPrivateSearch!"
-    echo "Please create /Users/Shared/AIPrivateSearch/.env with your database configuration."
-    echo "Example .env file contents:"
+# Check for .env-aips file in /Users/Shared/AIPrivateSearch
+if [ ! -f /Users/Shared/AIPrivateSearch/.env-aips ]; then
+    echo "⚠️  .env-aips file not found in /Users/Shared/AIPrivateSearch!"
+    echo "Please create /Users/Shared/AIPrivateSearch/.env-aips with your database configuration."
+    echo "Example .env-aips file contents:"
     echo "NODE_ENV=development"
     echo "DB_HOST=your.database.host"
     echo "DB_PORT=3306"
     echo "DB_USERNAME=your_username"
     echo "DB_PASSWORD=your_password"
-    echo "DB_DATABASE=aiprivatesearch"
+    echo "DB_DATABASE=iodd2"
     echo ""
     read -p "Press Enter to continue without database functionality..."
 else
-    echo "✅ .env file found in /Users/Shared/AIPrivateSearch"
+    echo "✅ .env-aips file found in /Users/Shared/AIPrivateSearch"
 fi
 
 # Check for data files in /Users/Shared/AIPrivateSearch/data
