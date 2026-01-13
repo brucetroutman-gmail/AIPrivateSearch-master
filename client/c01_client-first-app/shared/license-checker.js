@@ -45,8 +45,14 @@ class LicenseChecker {
         
         try {
             console.log('🔐 LICENSE DEBUG: Fetching fresh license status from:', `${this.apiBaseUrl}/api/licensing/status`);
-            const response = await fetch(`${this.apiBaseUrl}/api/licensing/status`);
+            
+            // Get stored email for device validation
+            const email = localStorage.getItem('userEmail') || localStorage.getItem('licenseEmail');
+            const url = email ? `${this.apiBaseUrl}/api/licensing/status?email=${encodeURIComponent(email)}` : `${this.apiBaseUrl}/api/licensing/status`;
+            
+            const response = await fetch(url);
             const data = await response.json();
+            
             this.licenseStatus = data;
             this.lastCheck = Date.now();
             console.log('🔐 LICENSE DEBUG: Fresh license status received:', data);
@@ -120,6 +126,14 @@ class LicenseChecker {
                     Tier: ${tierName}<br>
                     Email: ${this.licenseStatus.email}
                     ${this.licenseStatus.gracePeriod ? '<br><em>Grace period active</em>' : ''}
+                </div>
+            `;
+        } else if (this.licenseStatus.expired) {
+            statusHtml = `
+                <div class="license-status license-expired" style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; text-align: center;">
+                    <strong style="color: #721c24;">License Expired</strong><br>
+                    <span style="color: #721c24;">Your license has expired. Please renew to continue using AIPrivateSearch.</span><br>
+                    <a href="license-activation.html" style="color: #721c24; text-decoration: underline;">Renew License</a>
                 </div>
             `;
         } else {

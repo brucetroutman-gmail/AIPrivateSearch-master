@@ -76,14 +76,16 @@ Phase 3 - Role-Based Feature Control:
 300. As of  11/20/25 login and tier checking via license check are not connected. We need this disabled for testing. We will need to obtain tier level  from licence check  after testing.
 335. Test multi search and view documents
 336. Test multi prompts and ascii characters.
-337. Test Login and roles... srch-std gets wrong menus after loginv19.94: Added create-and-login-admin endpoint to complete license activation auto-login flow
-
+337. Test Login and roles... srch-std gets wrong menus after login
 340. What changes to load aips.command if repo is made private?
-360. Create aips-test-licensing-plan260108.md: Comprehensive test plan to solve flow from no license to license, no device to device registration under license. --done
-362. Add license creation capability to registration page - users need ability to create new license before device registration
-363. Add device registration functionality to registration page - complete the license → device registration flow
-364. Hide main menu and user info on index page when not licensed/registered - menu should only show after successful license activation and login --done
-365. Fix post-registration login flow: After device registration, user is redirected to login but admin account password is unknown. Need to either auto-login admin account or provide known default password. --done (changed strategy to create admin account after licensing and auto-login)
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.95)
+368. Implemented device-based licensing system: Replaced JWT token-based licensing with device UUID + email validation system, eliminating JWT expiration issues and activation loops. Created DeviceLicenseClient, device registration endpoints, and seamless auto-login flow after device activation. --done
+369. Fixed JWT token expiration activation loops: Solved the core issue where users got stuck in activation cycles due to expired JWT tokens by implementing a token-free device registration system that never expires. --done
+370. Enhanced license activation user experience: Added auto-fill credentials after device registration, improved error handling, and created clean localStorage management tools for testing. --done
+371. Created localStorage cleaning utilities: Added clear-storage.sh script for easy testing environment reset and localStorage management during development. --done
 
 =======================================================
 

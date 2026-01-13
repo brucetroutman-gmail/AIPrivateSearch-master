@@ -840,7 +840,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check license status
     if (window.licenseChecker) {
       const licenseStatus = await window.licenseChecker.checkLicenseStatus();
-      if (licenseStatus.valid || licenseStatus.fallback) {
+      console.log('🔐 INDEX DEBUG: License status for menu display:', licenseStatus);
+      
+      // Show menu if license is valid, expired (but not requiring activation), or in fallback mode
+      if (licenseStatus.valid || licenseStatus.expired || licenseStatus.fallback) {
         // Check if user is authenticated
         const user = await AuthUtils.checkAuth();
         if (user) {

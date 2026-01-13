@@ -28,10 +28,9 @@ import subscriptionRouter from './routes/subscription.mjs';
 import testResultsRouter from './routes/testResults.mjs';
 import tierAccessRouter from './routes/tierAccess.mjs';
 import searchLogsRouter from './routes/searchLogs.mjs';
-import licensingRouter from './routes/licensing.mjs';
+import licensingRouter from './routes/device-licensing.mjs';
 import membersRouter from './routes/members.mjs';
 import cookieParser from 'cookie-parser';
-import { LicenseManager } from './lib/licensing/license-manager.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
 import { validateOrigin } from './middleware/auth.mjs';
@@ -190,14 +189,7 @@ try {
 }
 const server = app.listen(PORT, async () => {
   logger.log(`Server running on port ${PORT}`);
-  
-  // Initialize licensing system
-  try {
-    await LicenseManager.initialize();
-    logger.log('Licensing system initialized');
-  } catch (error) {
-    logger.error('Failed to initialize licensing system:', error);
-  }
+  logger.log('Device-based licensing system ready');
 });
 
 server.on('error', (err) => {

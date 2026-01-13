@@ -213,6 +213,20 @@
             
             async checkAuthStatus() {
                 console.log('🔐 AUTH DEBUG: checkAuthStatus called');
+                
+                // Check for auto-fill credentials from license activation
+                const autoFillEmail = localStorage.getItem('autoFillEmail');
+                const autoFillPassword = localStorage.getItem('autoFillPassword');
+                if (autoFillEmail && autoFillPassword) {
+                    console.log('🔐 AUTH DEBUG: Auto-filling credentials from license activation');
+                    document.getElementById('loginEmail').value = autoFillEmail;
+                    document.getElementById('loginPassword').value = autoFillPassword;
+                    // Clear the auto-fill data
+                    localStorage.removeItem('autoFillEmail');
+                    localStorage.removeItem('autoFillPassword');
+                    showMessage('Credentials auto-filled from license activation. Click Login to continue.', 'info');
+                }
+                
                 try {
                     const sessionId = localStorage.getItem('sessionId');
                     console.log('🔐 AUTH DEBUG: SessionId from localStorage:', sessionId ? 'exists' : 'missing');
@@ -575,7 +589,13 @@
             
             async loadLicenseInfo() {
                 try {
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status`);
+                    // Get stored license email for device validation
+                    const licenseEmail = localStorage.getItem('licenseEmail') || localStorage.getItem('userEmail');
+                    const url = licenseEmail ? 
+                        `${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status?email=${encodeURIComponent(licenseEmail)}` :
+                        `${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status`;
+                    
+                    const response = await fetch(url);
                     const status = await response.json();
                     this.displayLicenseInfo(status);
                 } catch (error) {

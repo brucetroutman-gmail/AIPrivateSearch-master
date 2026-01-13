@@ -193,36 +193,26 @@
             }
 
             activateBtn.disabled = true;
-            activateBtn.textContent = 'Activating...';
+            activateBtn.textContent = 'Registering Device...';
 
             try {
-                const response = await fetch(`${CUSTMGR_BASE_URL}/api/licensing/activate`, {
+                // Use local backend for device registration
+                const response = await fetch('http://localhost:56306/api/licensing/activate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        email,
-                        hwId: await getHardwareId(),
-                        appVersion: '19.83',
-                        appId: 'aiprivatesearch'
-                    })
+                    body: JSON.stringify({ email })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    console.log('🔐 ACTIVATION DEBUG: License activation successful:', data);
-                    showStatus(`License activated successfully! Tier: ${data.tier === 1 ? 'Standard' : data.tier === 2 ? 'Premium' : 'Professional'}`);
+                    console.log('🔐 ACTIVATION DEBUG: Device registration successful:', data);
+                    showStatus(`Device registered successfully! License tier: ${data.license?.tier === 1 ? 'Standard' : data.license?.tier === 2 ? 'Premium' : 'Professional'}`);
                     
-                    // Clear local license cache by calling refresh endpoint
-                    try {
-                        console.log('🔐 ACTIVATION DEBUG: Refreshing local license cache...');
-                        await fetch('http://localhost:56306/api/licensing/refresh', { method: 'POST' });
-                        console.log('🔐 ACTIVATION DEBUG: License cache refreshed');
-                    } catch (error) {
-                        console.warn('🔐 ACTIVATION DEBUG: Could not refresh local license cache:', error);
-                    }
+                    // Store email for future license checks
+                    localStorage.setItem('licenseEmail', email);
                     
                     // Create admin account and auto-login
                     try {
@@ -231,10 +221,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                email: 'adm-std@a.com',
-                                password: '123',
-                                userRole: 'admin',
-                                subscriptionTier: data.tier === 1 ? 'standard' : data.tier === 2 ? 'premium' : 'professional'
+                                subscriptionTier: data.license?.tier === 1 ? 'standard' : data.license?.tier === 2 ? 'premium' : 'professional'
                             })
                         });
                         
@@ -244,7 +231,7 @@
                         if (createData.success && createData.sessionId) {
                             // Store session and redirect to main app
                             localStorage.setItem('sessionId', createData.sessionId);
-                            localStorage.setItem('userEmail', 'adm-std@a.com');
+                            localStorage.setItem('userEmail', createData.user.email);
                             localStorage.setItem('userRole', createData.user.subscriptionTier);
                             localStorage.setItem('userUserRole', 'admin');
                             
@@ -253,22 +240,28 @@
                                 window.location.href = 'index.html';
                             }, 2000);
                         } else {
-                            console.log('🔐 ACTIVATION DEBUG: Auto-login failed, redirecting to manual login');
+                            console.log('🔐 ACTIVATION DEBUG: Auto-login failed, redirecting to manual login with credentials');
+                            // Store credentials for auto-fill
+                            localStorage.setItem('autoFillEmail', 'adm-std@a.com');
+                            localStorage.setItem('autoFillPassword', '123');
                             setTimeout(() => {
                                 window.location.href = 'user-management.html';
                             }, 2000);
                         }
                     } catch (error) {
                         console.warn('🔐 ACTIVATION DEBUG: Auto-login failed:', error);
+                        // Store credentials for auto-fill
+                        localStorage.setItem('autoFillEmail', 'adm-std@a.com');
+                        localStorage.setItem('autoFillPassword', '123');
                         setTimeout(() => {
                             window.location.href = 'user-management.html';
                         }, 2000);
                     }
                 } else {
-                    showStatus(data.error || 'Activation failed', true);
+                    showStatus(data.error || 'Device registration failed', true);
                 }
             } catch (error) {
-                showStatus('Network error: Unable to connect to licensing server', true);
+                showStatus('Network error: Unable to register device', true);
             } finally {
                 activateBtn.disabled = false;
                 activateBtn.textContent = 'Activate License';
