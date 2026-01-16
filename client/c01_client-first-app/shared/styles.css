@@ -289,11 +289,29 @@ body {
   color: white;
 }
 
+.footer-group-member {
+  color: #87ceeb;
+  text-decoration: none;
+}
+
+.footer-group-member:hover {
+  color: white;
+  text-decoration: underline;
+}
+
 [data-theme="dark"] .footer-links a {
   color: #87ceeb;
 }
 
 [data-theme="dark"] .footer-links a:hover {
+  color: white;
+}
+
+[data-theme="dark"] .footer-group-member {
+  color: #87ceeb;
+}
+
+[data-theme="dark"] .footer-group-member:hover {
   color: white;
 }
 

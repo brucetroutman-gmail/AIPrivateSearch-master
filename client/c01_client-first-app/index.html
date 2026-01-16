@@ -36,10 +36,31 @@
         document.title = config['app-name'] + ' - AI Private Searching Platform';
         document.querySelector('.hero h1').textContent = config['app-name'];
         console.log('🏠 HOME PAGE: Step 1c - Page title updated');
+        
+        // Load footer members
+        loadFooterMembers();
       })
       .catch(error => {
         console.error('🏠 HOME PAGE: Step 1 ERROR - Failed to load app config:', error);
       });
+      
+    // Function to load footer members
+    function loadFooterMembers() {
+      fetch('/api/group-members')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.members && data.members.length > 0) {
+            const footerMembers = document.getElementById('footer-members');
+            const memberLinks = data.members.map(member => 
+              `<a href="./group-member-profile.html?email=${member.Email}" target="_blank" class="footer-group-member">${member.FirstName} ${member.LastName}</a>`
+            ).join(' • ');
+            footerMembers.innerHTML = `Team: ${memberLinks}`;
+          }
+        })
+        .catch(error => {
+          console.log('Footer members not loaded:', error.message);
+        });
+    }
   </script>
   <style>
     
@@ -291,6 +312,7 @@
       <div class="copyright">
         <p>&copy; 2025 <a href="./group.html" class="footer-link" id="footer-group-link">AI Private Search Group</a>. All rights reserved.</p>
         <p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" class="footer-link">Creative Commons Attribution-NonCommercial (CC BY-NC-ND)</a>.</p>
+        <div id="footer-members" style="margin-top: 0.5rem; font-size: 0.8rem;"></div>
       </div>
     </div>
   </footer>

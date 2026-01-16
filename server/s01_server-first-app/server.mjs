@@ -30,6 +30,7 @@ import tierAccessRouter from './routes/tierAccess.mjs';
 import searchLogsRouter from './routes/searchLogs.mjs';
 import licensingRouter from './routes/device-licensing.mjs';
 import membersRouter from './routes/members.mjs';
+import groupMembersRouter from './routes/group-members.mjs';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
@@ -54,14 +55,15 @@ app.use((req, res, next) => {
 
 // Security headers
 app.use((req, res, next) => {
-  // Content Security Policy
+  // Content Security Policy - more permissive for external links
   res.setHeader('Content-Security-Policy', 
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline'; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data:; " +
-    "connect-src 'self' http://localhost:11434; " +
-    "font-src 'self'; " +
+    "style-src 'self' 'unsafe-inline' https://iodd.com; " +
+    "img-src 'self' data: https://iodd.com; " +
+    "connect-src 'self' http://localhost:11434 https://iodd.com; " +
+    "font-src 'self' https://iodd.com data:; " +
+    "frame-src https://iodd.com; " +
     "object-src 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self'"
@@ -164,6 +166,7 @@ app.use('/api/tier-access', validateOrigin, tierAccessRouter);
 app.use('/api/search-logs', searchLogsRouter);
 app.use('/api/licensing', licensingRouter);
 app.use('/api', membersRouter);
+app.use('/api', groupMembersRouter);
 app.use('/api', testResultsRouter);
 
 // Catch-all for unmatched API routes

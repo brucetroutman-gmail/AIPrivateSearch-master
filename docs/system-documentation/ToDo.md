@@ -81,6 +81,13 @@ Phase 3 - Role-Based Feature Control:
 
 =======================================================
 
+## RECENTLY COMPLETED (v19.96)
+372. Added member-resume.mjs endpoint for footer team member display: Created database-driven member information system with MySQL integration, proper route registration, and test infrastructure for displaying AIPrivateSearch Group member details. --done
+373. Fixed MySQL database connection issues: Resolved .env file conflicts, updated start script to use .env-aips, installed mysql2 dependency, and corrected database credentials for member data access. --done
+374. Formatted MySQL uninstall/reinstall documentation: Converted poorly formatted text into proper markdown with clear headers, code blocks, and improved readability for system maintenance procedures. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v19.95)
 368. Implemented device-based licensing system: Replaced JWT token-based licensing with device UUID + email validation system, eliminating JWT expiration issues and activation loops. Created DeviceLicenseClient, device registration endpoints, and seamless auto-login flow after device activation. --done
 369. Fixed JWT token expiration activation loops: Solved the core issue where users got stuck in activation cycles due to expired JWT tokens by implementing a token-free device registration system that never expires. --done

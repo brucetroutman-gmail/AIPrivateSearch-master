@@ -75,6 +75,54 @@
       color: #87ceeb;
     }
   </style>
+  <script>
+    // Load group members from API
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/group-members');
+        const data = await response.json();
+        
+        if (data.success && data.members) {
+          // For now, display all members in primary team
+          // You can modify this logic to categorize members
+          const primaryTeam = document.getElementById('primary-team');
+          
+          data.members.forEach(member => {
+            const memberCard = document.createElement('div');
+            memberCard.className = 'member-card';
+            const memberLink = `./group-member-profile.html?email=${member.Email}`;
+            memberCard.innerHTML = `<strong><a href="${memberLink}" target="_blank" style="color: var(--text-color); text-decoration: none;">${member.FirstName} ${member.LastName}</a></strong>`;
+            primaryTeam.appendChild(memberCard);
+          });
+        } else {
+          // Fallback to static members if API fails
+          loadStaticMembers();
+        }
+      } catch (error) {
+        console.error('Failed to load group members:', error);
+        loadStaticMembers();
+      }
+    });
+    
+    function loadStaticMembers() {
+      const teams = {
+        'primary-team': [{ name: 'Robin Mattern', email: 'robin.mattern@gmail.com' }, { name: 'Bruce Troutman', email: 'bruce.troutman@gmail.com' }],
+        'secondary-team': [{ name: 'Richard Schinner', email: 'richard.schinner@gmail.com' }, { name: 'Alan McConnell', email: 'alan.mcconnell@gmail.com' }],
+        'support-team': [{ name: 'Ken Fussell', email: 'ken.fussell@gmail.com' }, { name: 'Ladi Goc', email: 'ladi.goc@gmail.com' }, { name: 'Joe Benin', email: 'joe.benin@gmail.com' }]
+      };
+      
+      Object.entries(teams).forEach(([teamId, members]) => {
+        const teamElement = document.getElementById(teamId);
+        members.forEach(member => {
+          const memberCard = document.createElement('div');
+          memberCard.className = 'member-card';
+          const memberLink = `./group-member-profile.html?email=${member.email}`;
+          memberCard.innerHTML = `<strong><a href="${memberLink}" target="_blank" style="color: var(--text-color); text-decoration: none;">${member.name}</a></strong>`;
+          teamElement.appendChild(memberCard);
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <div id="header-placeholder"></div>
@@ -87,40 +135,22 @@
         
         <div class="team-section">
           <h2>Primary Team</h2>
-          <div class="team-members">
-            <div class="member-card">
-              <strong>Robin Mattern</strong>
-            </div>
-            <div class="member-card">
-              <strong>Bruce Troutman</strong>
-            </div>
+          <div class="team-members" id="primary-team">
+            <!-- Members loaded dynamically -->
           </div>
         </div>
         
         <div class="team-section">
           <h2>Secondary Team</h2>
-          <div class="team-members">
-            <div class="member-card">
-              <strong>Richard Schinner</strong>
-            </div>
-            <div class="member-card">
-              <strong>Alan McConnell</strong>
-            </div>
+          <div class="team-members" id="secondary-team">
+            <!-- Members loaded dynamically -->
           </div>
         </div>
         
         <div class="team-section">
           <h2>Support Team</h2>
-          <div class="team-members">
-            <div class="member-card">
-              <strong>Ken Fussell</strong>
-            </div>
-            <div class="member-card">
-              <strong>Ladi Goc</strong>
-            </div>
-            <div class="member-card">
-              <strong>Joe Benin</strong>
-            </div>
+          <div class="team-members" id="support-team">
+            <!-- Members loaded dynamically -->
           </div>
         </div>
         

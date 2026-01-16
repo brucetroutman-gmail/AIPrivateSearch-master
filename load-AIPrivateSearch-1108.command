@@ -283,30 +283,37 @@ if [ $? -eq 0 ] && [ -f aiprivatesearch.zip ]; then
     if [ -d "aiprivatesearch" ]; then
         echo "   ✅ Repository downloaded successfully"
         
-        # Delete existing .env file and create new one
-        if [ -f "/Users/Shared/AIPrivateSearch/.env" ]; then
-            echo "🗑️  Removing existing .env file..."
-            rm -f "/Users/Shared/AIPrivateSearch/.env"
+        # Delete existing .env-aips file and create new one
+        if [ -f "/Users/Shared/AIPrivateSearch/.env-aips" ]; then
+            echo "🗑️  Removing existing .env-aips file..."
+            rm -f "/Users/Shared/AIPrivateSearch/.env-aips"
         fi
         
-        echo "📝 Creating .env configuration file..."
-        echo "# API Keys" > "/Users/Shared/AIPrivateSearch/.env"
-        echo "API_KEY=dev-key" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "ADMIN_KEY=admin-key" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "NODE_ENV=development" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "# Database Configuration" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_HOST=92.112.184.206" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_PORT=3306" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_DATABASE=aiprivatesearch" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_USERNAME=nimdas" >> "/Users/Shared/AIPrivateSearch/.env"
-        echo "DB_PASSWORD=FormR!1234" >> "/Users/Shared/AIPrivateSearch/.env"
+        echo "📝 Creating .env-aips configuration file..."
+        echo "# AI Private Search Application Environment Variables" > "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "# API Keys" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "API_KEY=dev-key" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "ADMIN_KEY=admin-key" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "NODE_ENV=development" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "# Default Admin Account" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DEFAULT_ADMIN_EMAIL=adm-std@a.com" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DEFAULT_ADMIN_PASSWORD=123" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "# Member Database Configuration" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DB_HOST=92.112.184.206" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DB_PORT=3306" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DB_DATABASE=iodd2" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DB_USERNAME=iodd-api" >> "/Users/Shared/AIPrivateSearch/.env-aips"
+        echo "DB_PASSWORD=IODD@Api" >> "/Users/Shared/AIPrivateSearch/.env-aips"
         
-        if [ -f "/Users/Shared/AIPrivateSearch/.env" ]; then
-            echo "   ✅ .env file created at /Users/Shared/AIPrivateSearch/.env"
+        if [ -f "/Users/Shared/AIPrivateSearch/.env-aips" ]; then
+            echo "   ✅ .env-aips file created at /Users/Shared/AIPrivateSearch/.env-aips"
             echo "   💡 Database configured for remote MySQL server"
+            echo "   🔐 Admin credentials: adm-std@a.com / 123"
         else
-            echo "   ❌ Failed to create .env file - check permissions"
+            echo "   ❌ Failed to create .env-aips file - check permissions"
         fi
         
         # Check and copy local-documents if needed
