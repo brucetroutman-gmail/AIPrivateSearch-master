@@ -89,10 +89,3 @@ queryMembers()
     console.error('Script failed:', error);
     process.exit(1);
   });
- 
-Yesterday 1:32 PM Meeting ended: 3h 7m 14s 
-
- 
-10:24 AM Meeting started
-
- 
