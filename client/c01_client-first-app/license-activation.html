@@ -115,6 +115,11 @@
                        placeholder="Enter your email address">
             </div>
             
+            <button type="button" class="activate-btn" id="createLicenseBtn" 
+                    style="background: var(--secondary-color); margin-bottom: 10px;">
+                Create Customer License
+            </button>
+            
             <button type="submit" class="activate-btn" id="activateBtn">
                 Activate License
             </button>
@@ -179,6 +184,43 @@
             statusEl.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
             statusEl.style.display = 'block';
         }
+
+        // Handle create license button
+        document.getElementById('createLicenseBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const createBtn = document.getElementById('createLicenseBtn');
+            
+            if (!email) {
+                showStatus('Please enter a valid email address', true);
+                return;
+            }
+
+            createBtn.disabled = true;
+            createBtn.textContent = 'Creating License...';
+
+            try {
+                const response = await fetch(`${CUSTMGR_BASE_URL}/api/licensing/create-license`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(`License created successfully for ${email}!`);
+                } else {
+                    showStatus(data.error || 'License creation failed', true);
+                }
+            } catch (error) {
+                showStatus('Network error: Unable to create license', true);
+            } finally {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Create Customer License';
+            }
+        });
 
         // Handle form submission
         document.getElementById('activationForm').addEventListener('submit', async (e) => {

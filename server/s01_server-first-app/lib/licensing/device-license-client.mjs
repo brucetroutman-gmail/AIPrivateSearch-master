@@ -60,7 +60,7 @@ class DeviceLicenseClient {
             const response = await axios.post(`${this.custmgrUrl}/api/licensing/validate-device`, {
                 email: email,
                 deviceUuid: this.deviceUuid,
-                deviceName: this.getDeviceName()
+                deviceName: await this.getDeviceName()
             }, {
                 timeout: 10000,
                 headers: {
@@ -98,10 +98,29 @@ class DeviceLicenseClient {
         try {
             console.log('🔐 DEVICE LICENSE: Registering device:', { email, deviceUuid: this.deviceUuid });
             
+            // Step 1: Try to create license if it doesn't exist
+            try {
+                console.log('🔐 DEVICE LICENSE: Attempting to create license for:', email);
+                const createResponse = await axios.post(`${this.custmgrUrl}/api/licensing/create-license`, {
+                    email: email
+                }, {
+                    timeout: 15000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('🔐 DEVICE LICENSE: License creation response:', createResponse.data);
+            } catch (createError) {
+                // License might already exist, continue with device registration
+                console.log('🔐 DEVICE LICENSE: License creation failed (may already exist):', createError.response?.data || createError.message);
+            }
+            
+            // Step 2: Register device
             const response = await axios.post(`${this.custmgrUrl}/api/licensing/register-device`, {
                 email: email,
                 deviceUuid: this.deviceUuid,
-                deviceName: this.getDeviceName()
+                deviceName: await this.getDeviceName()
             }, {
                 timeout: 15000,
                 headers: {
@@ -131,11 +150,24 @@ class DeviceLicenseClient {
         }
     }
 
-    getDeviceName() {
+    async getDeviceName() {
         try {
-            const computerName = execSync('scutil --get ComputerName', { encoding: 'utf8' }).trim();
-            return computerName || os.hostname() || 'Unknown Mac';
+            // Import systemInfo to get PC details
+            const { getSystemInfo } = await import('../utils/systemInfo.mjs');
+            const systemInfo = await getSystemInfo();
+            
+            // Create device name from PC info: PcCode-PcCPU-PcGraphics-PcRAM-PcOS
+            const deviceName = [
+                systemInfo.pcCode,
+                systemInfo.systemInfo.chip,
+                systemInfo.systemInfo.graphics,
+                systemInfo.systemInfo.ram,
+                systemInfo.systemInfo.os
+            ].filter(Boolean).join('-');
+            
+            return deviceName || (os.hostname() + '-Unknown');
         } catch (error) {
+            console.warn('🔐 DEVICE LICENSE: Could not create device name:', error.message);
             return os.hostname() || 'Unknown Mac';
         }
     }

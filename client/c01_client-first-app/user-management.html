@@ -20,7 +20,7 @@
                     <input type="password" id="loginPassword" placeholder="Password" required>
                     <button type="submit">Login</button>
                 </form>
-                <div style="margin-top: 10px; text-align: center;">
+                <div style="margin-top: 10px; text-align: center; display: none;">
                     <button onclick="debugAdminAccount()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Debug Admin Account</button>
                     <button onclick="showDefaultCredentials()" style="background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Show Default Credentials</button>
                     <button onclick="clearSession()" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Clear Session</button>
@@ -50,7 +50,7 @@
                 <p>Subscription: <span id="currentUserSubscription"></span></p>
                 <p>Role: <span id="currentUserRole"></span></p>
                 <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.location.href='/index.html'" style="background: #28a745;">Go to Application</button>
+                    <button onclick="window.location.href='index.html'" style="background: #28a745;">Go to Application</button>
                     <button id="logoutBtn">Logout</button>
                 </div>
             </div>
@@ -250,7 +250,8 @@
                         const data = await response.json();
                         console.log('🔐 AUTH DEBUG: Auth check successful, user:', data.user);
                         this.currentUser = data.user;
-                        // If user is authenticated, go directly to dashboard
+                        // Don't redirect - just show dashboard
+                        console.log('🔐 AUTH DEBUG: User authenticated, showing dashboard');
                         this.showDashboard();
                     } else {
                         console.log('🔐 AUTH DEBUG: Auth check failed, showing login');
@@ -304,8 +305,11 @@
                         console.log('🔐 LOGIN DEBUG: Login successful, storing session');
                         localStorage.setItem('sessionId', data.sessionId);
                         this.currentUser = data.user;
-                        console.log('🔐 LOGIN DEBUG: Redirecting to index.html');
-                        window.location.href = '/index.html';
+                        console.log('🔐 LOGIN DEBUG: About to redirect to index.html');
+                        console.log('🔐 LOGIN DEBUG: Current URL:', window.location.href);
+                        console.log('🔐 LOGIN DEBUG: Redirecting now...');
+                        window.location.href = 'index.html';
+                        console.log('🔐 LOGIN DEBUG: Redirect command executed');
                     } else {
                         console.log('🔐 LOGIN DEBUG: Login failed:', data.error);
                         showMessage(data.error || 'Login failed');

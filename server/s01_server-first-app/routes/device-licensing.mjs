@@ -87,7 +87,7 @@ router.get('/system-info', async (req, res) => {
     const client = await initializeLicenseClient();
     res.json({
       deviceUuid: client.getSystemHardwareId(),
-      deviceName: client.getDeviceName()
+      deviceName: await client.getDeviceName()
     });
   } catch (error) {
     console.error('System info request failed:', error);

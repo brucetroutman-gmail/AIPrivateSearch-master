@@ -61,6 +61,88 @@
           console.log('Footer members not loaded:', error.message);
         });
     }
+    
+    // Function to check authentication status and show appropriate content
+    function checkAuthAndDevice() {
+      console.log('🏠 INDEX DEBUG: checkAuthAndDevice called');
+      
+      // First check if user is already authenticated
+      const sessionId = localStorage.getItem('sessionId');
+      console.log('🏠 INDEX DEBUG: SessionId exists:', !!sessionId);
+      
+      if (sessionId) {
+        // User has session, verify it's valid
+        fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`, {
+          headers: { 'Authorization': `Bearer ${sessionId}` }
+        })
+        .then(response => {
+          console.log('🏠 INDEX DEBUG: Auth check response:', response.status);
+          if (response.ok) {
+            console.log('🏠 INDEX DEBUG: User authenticated, showing app interface');
+            showAppInterface();
+          } else {
+            console.log('🏠 INDEX DEBUG: Invalid session, checking device registration');
+            checkDeviceRegistration();
+          }
+        })
+        .catch(error => {
+          console.log('🏠 INDEX DEBUG: Auth check failed:', error);
+          checkDeviceRegistration();
+        });
+      } else {
+        console.log('🏠 INDEX DEBUG: No session, checking device registration');
+        checkDeviceRegistration();
+      }
+    }
+    
+    function checkDeviceRegistration() {
+      const licenseEmail = localStorage.getItem('licenseEmail');
+      console.log('🏠 INDEX DEBUG: licenseEmail from localStorage:', licenseEmail);
+      
+      if (licenseEmail) {
+        console.log('🏠 INDEX DEBUG: License email found, checking status...');
+        fetch(`http://localhost:56306/api/licensing/status?email=${encodeURIComponent(licenseEmail)}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('🏠 INDEX DEBUG: License status data:', data);
+            if (data.valid) {
+              console.log('🏠 INDEX DEBUG: Device registered but not logged in, redirecting to login');
+              window.location.href = './user-management.html';
+            } else {
+              console.log('🏠 INDEX DEBUG: Device not registered, showing landing page');
+              showLandingPage();
+            }
+          })
+          .catch(error => {
+            console.log('🏠 INDEX DEBUG: License check failed, showing landing page');
+            showLandingPage();
+          });
+      } else {
+        console.log('🏠 INDEX DEBUG: No license email, showing landing page');
+        showLandingPage();
+      }
+    }
+    
+    function showLandingPage() {
+      console.log('🏠 INDEX DEBUG: Showing landing page');
+      // Landing page is already visible by default
+    }
+    
+    function showAppInterface() {
+      console.log('🏠 INDEX DEBUG: Showing app interface with navigation');
+      // Show navigation menu for authenticated users but keep landing page content
+      document.getElementById('navMenu').style.display = 'flex';
+      // Hide Get Started button for authenticated users
+      const getStartedBtn = document.querySelector('a[href="./license-activation.html"]');
+      if (getStartedBtn) {
+        getStartedBtn.style.display = 'none';
+      }
+    }
+    
+    // Check device registration when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuthAndDevice();
+    });
   </script>
   <style>
     

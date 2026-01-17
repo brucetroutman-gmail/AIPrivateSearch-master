@@ -79,6 +79,22 @@ Phase 3 - Role-Based Feature Control:
 337. Test Login and roles... srch-std gets wrong menus after login
 340. What changes to load aips.command if repo is made private?
 
+### Comprehensive User Flow Test Plan
+375. Execute complete user flow testing scenarios: --completed
+
+**COMPLETED: Fixed Redirect Loop Issue**
+- Fixed infinite redirect loop between index.html and user-management.html
+- Index page now checks authentication first, then device registration
+- User-management page shows dashboard instead of redirecting back to index
+- Pages no longer flash between each other
+- Added logic to hide "Get Started" button for authenticated users
+- Preserved access to landing page content including "Watch Videos" for all users
+
+=======================================================
+
+## RECENTLY COMPLETED (v19.97)
+376. Fixed redirect loop between index and user-management pages: Resolved infinite redirect loop by implementing proper authentication flow - index page checks auth first then device registration, user-management shows dashboard instead of redirecting back. Added logic to hide "Get Started" button for authenticated users while preserving access to landing page content including "Watch Videos". --done
+
 =======================================================
 
 ## RECENTLY COMPLETED (v19.96)
