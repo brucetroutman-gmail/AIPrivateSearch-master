@@ -52,7 +52,7 @@
           if (data.success && data.members && data.members.length > 0) {
             const footerMembers = document.getElementById('footer-members');
             const memberLinks = data.members.map(member => 
-              `<a href="./member-resume?email=${member.Email}" target="_blank" class="footer-group-member">${member.FirstName} ${member.LastName}</a>`
+              `<a href="./group-member-profile.html?email=${member.Email}" target="_blank" class="footer-group-member">${member.FirstName} ${member.LastName}</a>`
             ).join(' • ');
             footerMembers.innerHTML = `Team: ${memberLinks}`;
           }

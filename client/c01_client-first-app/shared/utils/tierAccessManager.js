@@ -124,22 +124,46 @@ class TierAccessManager {
     }
   }
 
-  // Utility method to get current user's tier and role
-  getCurrentUserInfo() {
-    const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
-    const userRole = localStorage.getItem('userRole') || 'professional';
-    const userUserRole = localStorage.getItem('userUserRole') || 'admin';
+  // Utility method to get current user's tier and role from license system
+  async getCurrentUserInfo() {
+    // First try to get tier from license system
+    let tier = 1; // default to standard
+    let tierName = 'standard';
+    
+    try {
+      // Get tier from license checker if available
+      if (window.licenseChecker) {
+        await window.licenseChecker.initialize();
+        const licenseStatus = await window.licenseChecker.checkLicenseStatus();
+        if (licenseStatus && licenseStatus.valid) {
+          tier = licenseStatus.tier || 1;
+          const tierNames = { 1: 'standard', 2: 'premium', 3: 'professional' };
+          tierName = tierNames[tier] || 'standard';
+        }
+      }
+    } catch (error) {
+      console.warn('Could not get tier from license system, using localStorage fallback:', error);
+      // Fallback to localStorage if license system fails
+      const userRole = localStorage.getItem('userRole') || 'standard';
+      const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
+      tier = tierMap[userRole] || 1;
+      tierName = userRole;
+    }
+    
+    // Get role from localStorage (this should be set during login)
+    const userUserRole = localStorage.getItem('userUserRole') || 'searcher';
     
     return {
-      tier: tierMap[userRole] || 3,
+      tier: tier,
       role: userUserRole,
-      tierName: userRole
+      tierName: tierName
     };
   }
 
   // Apply access control to current page
   async applyAccessControl() {
-    const userInfo = this.getCurrentUserInfo();
+    const userInfo = await this.getCurrentUserInfo();
+    console.log('🔐 TIER ACCESS: Applying access control for user:', userInfo);
     await this.applyCSSClasses(userInfo.tier, userInfo.role);
   }
 }

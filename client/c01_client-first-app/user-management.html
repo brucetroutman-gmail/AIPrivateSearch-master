@@ -50,7 +50,7 @@
                 <p>Subscription: <span id="currentUserSubscription"></span></p>
                 <p>Role: <span id="currentUserRole"></span></p>
                 <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.location.href='index.html'" style="background: #28a745;">Go to Application</button>
+                    <button onclick="window.location.href='search.html'" style="background: #28a745;">Go to Search</button>
                     <button id="logoutBtn">Logout</button>
                 </div>
             </div>
@@ -241,6 +241,10 @@
                     if (response.ok) {
                         const data = await response.json();
                         this.currentUser = data.user;
+                        // Store user role information for tier access manager
+                        localStorage.setItem('userRole', data.user.subscriptionTier);
+                        localStorage.setItem('userUserRole', data.user.userRole);
+                        localStorage.setItem('userEmail', data.user.email);
                         // Don't redirect - just show dashboard
                         this.showDashboard();
                     } else {
@@ -280,6 +284,10 @@
                     
                     if (data.success) {
                         localStorage.setItem('sessionId', data.sessionId);
+                        // Store user role information for tier access manager
+                        localStorage.setItem('userRole', data.user.subscriptionTier);
+                        localStorage.setItem('userUserRole', data.user.userRole);
+                        localStorage.setItem('userEmail', data.user.email);
                         this.currentUser = data.user;
                         window.location.href = 'index.html';
                     } else {
@@ -327,7 +335,11 @@
                             headers: { 'Authorization': `Bearer ${sessionId}` }
                         });
                     }
+                    // Clear all user-related data
                     localStorage.removeItem('sessionId');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userUserRole');
+                    localStorage.removeItem('userEmail');
                     this.currentUser = null;
                     this.showLogin();
                 } catch (error) {
@@ -360,6 +372,13 @@
                     document.getElementById('user-profile').style.display = 'block';
                     this.loadUserProfile();
                 }
+                
+                // Apply tier access control after dashboard is shown
+                setTimeout(async () => {
+                    if (window.tierAccessManager) {
+                        await window.tierAccessManager.applyAccessControl();
+                    }
+                }, 100);
             }
             
             toggleRegisterForm() {
@@ -751,7 +770,12 @@
                 console.warn('Auth check failed:', error);
             }
             
-            loadSharedComponents();
+            loadSharedComponents().then(async () => {
+                // Apply tier access control after components are loaded
+                if (window.tierAccessManager) {
+                    await window.tierAccessManager.applyAccessControl();
+                }
+            });
         });
         
         const authManager = new AuthManager();

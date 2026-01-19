@@ -367,11 +367,14 @@ async function applyUserRole(role = null, userRole = null) {
     userRole = getUserUserRole();
   }
   
+  console.log('🔐 ROLE DEBUG: Applying user role:', { role, userRole });
+  
   // Try to use tier access manager if available
   if (window.tierAccessManager) {
     try {
       const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
-      const tier = tierMap[role] || 3;
+      const tier = tierMap[role] || 1;
+      console.log('🔐 ROLE DEBUG: Using tier access manager with tier:', tier, 'role:', userRole);
       await window.tierAccessManager.applyCSSClasses(tier, userRole);
       return;
     } catch (error) {
@@ -379,6 +382,7 @@ async function applyUserRole(role = null, userRole = null) {
     }
   }
   
+  console.log('🔐 ROLE DEBUG: Using fallback role application');
   // Fallback to original logic
   const showAdvanced = role !== 'standard';
   const isAdmin = userRole === 'admin';
@@ -828,7 +832,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     localStorage.setItem('userEmail', user.email);
     // Apply role-based restrictions (but wait for header to load)
     setTimeout(async () => {
-      await applyUserRole(user.subscriptionTier, user.userRole);
+      if (window.tierAccessManager) {
+        await window.tierAccessManager.applyAccessControl();
+      } else {
+        await applyUserRole(user.subscriptionTier, user.userRole);
+      }
     }, 100);
     
     // Show menu after successful auth (for non-index pages)
@@ -859,7 +867,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (showMenu) {
       showLicensedContent();
       setTimeout(async () => {
-        await applyUserRole();
+        if (window.tierAccessManager) {
+          await window.tierAccessManager.applyAccessControl();
+        } else {
+          await applyUserRole();
+        }
       }, 100);
     }
   }

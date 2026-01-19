@@ -1,5 +1,15 @@
 // db-query.mjs
 import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env-aips from /Users/Shared/AIPrivateSearch/
+const envPath = '/Users/Shared/AIPrivateSearch/.env-aips';
+dotenv.config({ path: envPath, quiet: true, debug: false });
  
 async function queryMembers( req, res ) {  // A express route or endpoint handler, e.g. "/getResume?email=bruce.troutman@gmail.com"
   let connection;
@@ -10,10 +20,11 @@ async function queryMembers( req, res ) {  // A express route or endpoint handle
   try {
     // Create connection
     connection = await mysql.createConnection({
-      host: '92.112.184.206',
-      user: 'iodd-api',
-      password: 'IODD@Api',
-      database: 'iodd2'
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USERNAME || 'aips-readwrite',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_DATABASE || 'aiprivatesearch'
     });
  
     console.log('Connected to MySQL database');

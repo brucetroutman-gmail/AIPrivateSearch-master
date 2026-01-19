@@ -21,7 +21,7 @@ router.get('/group-members', async (req, res) => {
     
     for (const email of aipsMembers) {
       try {
-        const response = await fetch(`https://iodd.com/api2/member-resume?email=${email}`);
+        const response = await fetch(`https://iodd.com/api2/members?email=${email}`);
         if (response.ok) {
           const memberData = await response.json();
           members.push(memberData);

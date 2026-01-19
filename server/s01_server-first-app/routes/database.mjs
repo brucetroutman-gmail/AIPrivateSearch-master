@@ -12,8 +12,8 @@ import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from /Users/Shared
-const envPath = '/Users/Shared/AIPrivateSearch/.env';
+// Load .env-aips from /Users/Shared/AIPrivateSearch/
+const envPath = '/Users/Shared/AIPrivateSearch/.env-aips';
 dotenv.config({ path: envPath, quiet: true, debug: false });
 
 const router = express.Router();
@@ -21,7 +21,7 @@ const router = express.Router();
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USERNAME || 'root',
+  user: process.env.DB_USERNAME || 'aips-readwrite',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'aiprivatesearch',
   connectionLimit: 10,

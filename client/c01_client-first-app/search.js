@@ -229,9 +229,14 @@ if (showChunksToggle) showChunksToggle.checked = false;
 Promise.all([
   loadSourceTypes(),
   loadVisibilityConfig()
-]).then(() => {
+]).then(async () => {
   // Update field visibility after both configs are loaded
   updateFieldVisibility();
+  
+  // Apply tier access control
+  if (window.tierAccessManager) {
+    await window.tierAccessManager.applyAccessControl();
+  }
   
   // Handle collection loading if documents are involved
   if (sourceTypeEl.value.includes('Docu')) {
