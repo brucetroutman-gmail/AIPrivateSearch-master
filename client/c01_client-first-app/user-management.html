@@ -212,13 +212,10 @@
             }
             
             async checkAuthStatus() {
-                console.log('🔐 AUTH DEBUG: checkAuthStatus called');
-                
                 // Check for auto-fill credentials from license activation
                 const autoFillEmail = localStorage.getItem('autoFillEmail');
                 const autoFillPassword = localStorage.getItem('autoFillPassword');
                 if (autoFillEmail && autoFillPassword) {
-                    console.log('🔐 AUTH DEBUG: Auto-filling credentials from license activation');
                     document.getElementById('loginEmail').value = autoFillEmail;
                     document.getElementById('loginPassword').value = autoFillPassword;
                     // Clear the auto-fill data
@@ -229,36 +226,27 @@
                 
                 try {
                     const sessionId = localStorage.getItem('sessionId');
-                    console.log('🔐 AUTH DEBUG: SessionId from localStorage:', sessionId ? 'exists' : 'missing');
                     
                     if (!sessionId) {
-                        console.log('🔐 AUTH DEBUG: No sessionId, showing login form');
                         this.showLogin();
                         return;
                     }
                     
                     const authUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`;
-                    console.log('🔐 AUTH DEBUG: Checking auth at:', authUrl);
                     
                     const response = await fetch(authUrl, {
                         headers: { 'Authorization': `Bearer ${sessionId}` }
                     });
                     
-                    console.log('🔐 AUTH DEBUG: Auth check response status:', response.status);
-                    
                     if (response.ok) {
                         const data = await response.json();
-                        console.log('🔐 AUTH DEBUG: Auth check successful, user:', data.user);
                         this.currentUser = data.user;
                         // Don't redirect - just show dashboard
-                        console.log('🔐 AUTH DEBUG: User authenticated, showing dashboard');
                         this.showDashboard();
                     } else {
-                        console.log('🔐 AUTH DEBUG: Auth check failed, showing login');
                         this.showLogin();
                     }
                 } catch (error) {
-                    console.log('🔐 AUTH DEBUG: Auth check error:', error);
                     this.showLogin();
                 }
             }
@@ -277,17 +265,10 @@
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
                 
-                console.log('🔐 LOGIN DEBUG: Login attempt started');
-                console.log('🔐 LOGIN DEBUG: Email:', email);
-                console.log('🔐 LOGIN DEBUG: Password length:', password.length);
-                console.log('🔐 LOGIN DEBUG: API_BASE_URL:', window.API_BASE_URL);
-                
                 try {
                     const loginUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/login`;
-                    console.log('🔐 LOGIN DEBUG: Making request to:', loginUrl);
                     
                     const requestBody = { email, password };
-                    console.log('🔐 LOGIN DEBUG: Request body:', requestBody);
                     
                     const response = await fetch(loginUrl, {
                         method: 'POST',
@@ -295,27 +276,16 @@
                         body: JSON.stringify(requestBody)
                     });
                     
-                    console.log('🔐 LOGIN DEBUG: Response status:', response.status);
-                    console.log('🔐 LOGIN DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
-                    
                     const data = await response.json();
-                    console.log('🔐 LOGIN DEBUG: Response data:', data);
                     
                     if (data.success) {
-                        console.log('🔐 LOGIN DEBUG: Login successful, storing session');
                         localStorage.setItem('sessionId', data.sessionId);
                         this.currentUser = data.user;
-                        console.log('🔐 LOGIN DEBUG: About to redirect to index.html');
-                        console.log('🔐 LOGIN DEBUG: Current URL:', window.location.href);
-                        console.log('🔐 LOGIN DEBUG: Redirecting now...');
                         window.location.href = 'index.html';
-                        console.log('🔐 LOGIN DEBUG: Redirect command executed');
                     } else {
-                        console.log('🔐 LOGIN DEBUG: Login failed:', data.error);
                         showMessage(data.error || 'Login failed');
                     }
                 } catch (error) {
-                    console.log('🔐 LOGIN DEBUG: Network error:', error);
                     showMessage('Login failed: ' + error.message);
                 }
             }
@@ -664,10 +634,6 @@
         
         // Debug function to show default credentials
         function showDefaultCredentials() {
-            console.log('🔐 CREDS DEBUG: Default admin credentials');
-            console.log('🔐 CREDS DEBUG: Email: adm-std@a.com');
-            console.log('🔐 CREDS DEBUG: Password: 123 (3 characters)');
-            
             // Auto-fill the form with default credentials
             document.getElementById('loginEmail').value = 'adm-std@a.com';
             document.getElementById('loginPassword').value = '123';
@@ -677,7 +643,6 @@
         
         // Function to create admin account for testing
         async function createTestAdmin() {
-            console.log('🔐 CREATE DEBUG: Creating test admin account');
             try {
                 const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/create-test-admin`, {
                     method: 'POST',
@@ -690,7 +655,6 @@
                     })
                 });
                 const data = await response.json();
-                console.log('🔐 CREATE DEBUG: Create admin result:', data);
                 
                 if (data.success) {
                     showMessage('Test admin account created successfully!', 'success');
@@ -700,7 +664,6 @@
                 
                 return data;
             } catch (error) {
-                console.log('🔐 CREATE DEBUG: Error creating admin account:', error);
                 showMessage('Error creating admin account: ' + error.message, 'error');
                 return null;
             }
@@ -714,14 +677,12 @@
         
         // Debug function to check admin account
         async function debugAdminAccount() {
-            console.log('🔐 ADMIN DEBUG: Checking admin account status');
             try {
                 // First check if users.json exists and what's in it
                 const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/debug-users`, {
                     method: 'GET'
                 });
                 const data = await response.json();
-                console.log('🔐 ADMIN DEBUG: Users file content:', data);
                 
                 // Show in UI
                 const message = `Users found: ${data.users ? data.users.length : 0}\n` +
@@ -732,7 +693,6 @@
                 
                 return data;
             } catch (error) {
-                console.log('🔐 ADMIN DEBUG: Error checking admin account:', error);
                 showMessage('Error checking admin account: ' + error.message, 'error');
                 return null;
             }
@@ -762,7 +722,6 @@
         
         // Function to clear invalid session
         function clearSession() {
-            console.log('🔐 SESSION DEBUG: Clearing session from localStorage');
             localStorage.removeItem('sessionId');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userRole');
