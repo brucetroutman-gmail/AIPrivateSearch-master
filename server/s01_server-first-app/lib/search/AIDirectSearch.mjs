@@ -149,7 +149,7 @@ Answer:`;
       
       const relevanceScore = this.calculateRelevanceScore(query, documentContent, aiResponse, isNoMatch);
       
-      const documentPath = `http://localhost:3001/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
+      const documentPath = `http://localhost:56306/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
       
       return {
         id: `ai_${filename}_${Date.now()}`,
@@ -162,7 +162,7 @@ Answer:`;
       };
     } catch (error) {
       
-      const documentPath = `http://localhost:3001/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
+      const documentPath = `http://localhost:56306/api/documents/${collectionName}/${encodeURIComponent(filename)}/view`;
       
       return {
         id: `ai_${filename}_${Date.now()}`,

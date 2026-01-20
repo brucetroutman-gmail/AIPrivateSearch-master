@@ -78,7 +78,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
           }
           
           const docCollection = result.collection || collection || 'default';
-          const filenameLink = `[${result.title}](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          const filenameLink = `[${result.title}](http://localhost:56306/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
           
           return `**Result ${index + 1}: ${filenameLink}**\n${result.excerpt}\n`;
         }).join('\n---\n\n');
@@ -94,7 +94,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
           }
           
           const docCollection = result.collection || collection || 'default';
-          const filenameLink = `[${result.title}](http://localhost:3001/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
+          const filenameLink = `[${result.title}](http://localhost:56306/api/documents/${docCollection}/${encodeURIComponent(filename)}/view)`;
           
           return `**Result ${index + 1}: ${filenameLink}**\n${result.excerpt}\n---\n`;
         }).join('\n');

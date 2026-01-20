@@ -26,7 +26,7 @@ window.documentIndexSearchCommon = {
     },
 
     // Format document index search results using common formatter
-    formatDocumentIndexSearchResults(results, collection = 'default') {
+    formatDocumentIndexSearchResults(results, collection = 'unknown') {
         return CommonResultFormatter.formatSearchResults(results, {
             resultType: 'document-index',
             showScore: true,

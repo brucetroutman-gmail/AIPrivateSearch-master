@@ -889,6 +889,16 @@ function render(result) {
   
   // Convert result to multi-mode format and render
   const multiModeResult = window.responseDisplayCommon.convertToMultiModeFormat(result, result.searchType);
+  
+  // If we have original results with documentPath, use those for links
+  if (result.results && result.results.length > 0) {
+    multiModeResult.results.forEach((formattedResult, index) => {
+      if (result.results[index] && result.results[index].documentPath) {
+        formattedResult.documentPath = result.results[index].documentPath;
+      }
+    });
+  }
+  
   window.responseDisplayCommon.renderSearchResults(answerDiv, multiModeResult, result.collection);
   
   outputEl.append(answerH, answerDiv);
@@ -1237,6 +1247,7 @@ form.addEventListener('submit', async (e) => {
         sourceType: sourceTypeEl.value,
         testCode,
         createdAt: new Date().toISOString(),
+        results: data.results, // Include original results with documentPath
         metrics: {
           search: {
             model: 'Line Search',

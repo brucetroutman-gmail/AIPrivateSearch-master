@@ -36,11 +36,11 @@ class DocumentSearchCommon {
   }
 
   // Format document search results using common formatter
-  formatDocumentSearchResults(results) {
+  formatDocumentSearchResults(results, collection = 'unknown') {
     return CommonResultFormatter.formatSearchResults(results, {
       resultType: 'document-search',
       showScore: true,
-      defaultCollection: 'default'
+      defaultCollection: collection
     });
   }
 

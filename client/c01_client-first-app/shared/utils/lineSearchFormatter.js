@@ -100,11 +100,11 @@ function processInlineMarkdown(text) {
 }
 
 // Format Line Search results using common formatter
-function formatLineSearchResults(results) {
+function formatLineSearchResults(results, collection = 'unknown') {
     return CommonResultFormatter.formatSearchResults(results, {
         resultType: 'line-search',
         showScore: true,
-        defaultCollection: 'default'
+        defaultCollection: collection
     });
 }
 

@@ -71,7 +71,7 @@ export class AIDocumentChat {
     
     chunks.slice(0, 3).forEach((chunk, index) => {
       const similarity = chunk.similarity ? ` (${(chunk.similarity * 100).toFixed(1)}% match)` : '';
-      const docLink = `[View Document](http://localhost:3001/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
+      const docLink = `[View Document](http://localhost:56306/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
       response += `### ${index + 1}. ${chunk.filename}${similarity}\n\n`;
       response += `${chunk.content.substring(0, 500)}...\n\n`;
       response += `${docLink}\n\n`;
@@ -94,7 +94,7 @@ export class AIDocumentChat {
     
     let sourceSection = '\n\n---\n\n**Source Documents:**\n\n';
     Array.from(uniqueFiles.values()).forEach((chunk, index) => {
-      const docLink = `[${chunk.filename}](http://localhost:3001/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
+      const docLink = `[${chunk.filename}](http://localhost:56306/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
       sourceSection += `${index + 1}. ${docLink}\n`;
     });
     

@@ -164,7 +164,7 @@ app.use('/api/subscription', subscriptionRouter);
 app.use('/api/tier-access', validateOrigin, tierAccessRouter);
 // Simplified search-logs route (no middleware)
 app.use('/api/search-logs', searchLogsRouter);
-app.use('/api/licensing', licensingRouter);
+app.use('/api/device-licensing', licensingRouter);
 app.use('/api', membersRouter);
 app.use('/api', groupMembersRouter);
 app.use('/api', testResultsRouter);

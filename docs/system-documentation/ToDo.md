@@ -8,8 +8,8 @@ to do AIPrivateSearch
 2-003. Update MySQL table searches with new column SearchMethodType - ensure code reflects this column and number of columns match --not needed
 2-004. Test multi search and view documents functionality
 2-005. Test multi prompts and ASCII characters handling
-2-041. Remove Database from Export Download on search page --completed
-2-042. Test Search page: document view is not working
+2-041. Remove Database from Export Download on search page , return to export--completed
+2-042. Test Search page: document view is not working --completed
 
 ### Core System Improvements
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)
@@ -59,6 +59,11 @@ to do AIPrivateSearch
 2-038. Create competitive analysis and positioning documents
 2-039. Develop partner program for resellers (medical/legal consultants)
 2-040. Create case studies for medical practices and law firms
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.00)
+379. Fixed authentication issues and session timeout configuration: Resolved "not licensed" app status by identifying expired sessions due to short 5-minute timeout. Increased session timeout from 300 seconds to 3600 seconds (1 hour) in app.json bearer-token-timeout setting. Created valid session with proper localStorage setup for seamless user authentication flow. --done
 
 =======================================================
 

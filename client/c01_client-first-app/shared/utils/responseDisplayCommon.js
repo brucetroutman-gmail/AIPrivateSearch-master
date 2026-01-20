@@ -16,13 +16,13 @@ window.responseDisplayCommon = {
         
         // Use existing formatters for specific search types
         if (searchResult.method === 'line-search') {
-            const formattedElement = window.lineSearchFormatter.formatLineSearchResults(searchResult.results);
+            const formattedElement = window.lineSearchFormatter.formatLineSearchResults(searchResult.results, collection);
             container.appendChild(formattedElement);
             return;
         }
         
         if (searchResult.method === 'document-search') {
-            const formattedElement = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results);
+            const formattedElement = window.documentSearchCommon.formatDocumentSearchResults(searchResult.results, collection);
             container.appendChild(formattedElement);
             return;
         }
@@ -33,12 +33,12 @@ window.responseDisplayCommon = {
             return;
         }
         
-        // Use common formatter for AI Direct to ensure consistent filename links
-        if (searchResult.method === 'ai-direct') {
+        // Use common formatter for search types that need document links
+        if (searchResult.method === 'ai-direct' || searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
             const formattedElement = window.CommonResultFormatter.formatSearchResults(searchResult.results, {
-                resultType: 'ai-direct',
+                resultType: searchResult.method,
                 showScore: true,
-                defaultCollection: collection || 'default'
+                defaultCollection: collection || searchResult.collection || 'unknown'
             });
             container.appendChild(formattedElement);
             return;
@@ -115,10 +115,24 @@ window.responseDisplayCommon = {
                         source = decodeURIComponent(pathParts[pathParts.length - 2]); // Filename before /view
                     } else {
                         title = cleanTitle;
+                        source = cleanTitle; // Use title as source when no link found
+                    }
+                } else {
+                    // Look for markdown links in the excerpt to extract document name
+                    const excerpt = lines.slice(1).join('\n').trim();
+                    const linkMatch = excerpt.match(/\[View Document\]\(([^\)]+)\)/);
+                    if (linkMatch) {
+                        const urlPath = linkMatch[1];
+                        const pathParts = urlPath.split('/');
+                        const filename = decodeURIComponent(pathParts[pathParts.length - 2]);
+                        title = filename; // Use actual filename as title
+                        source = filename;
                     }
                 }
                 
-                const excerpt = lines.slice(1).join('\n').trim();
+                let excerpt = lines.slice(1).join('\n').trim();
+                // Remove markdown links from excerpt
+                excerpt = excerpt.replace(/\[View Document\]\([^\)]+\)/g, '');
                 
                 return {
                     title,

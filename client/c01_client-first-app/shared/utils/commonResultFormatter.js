@@ -6,7 +6,7 @@ class CommonResultFormatter {
     const { 
       resultType = 'search',
       showScore = true,
-      defaultCollection = 'default'
+      defaultCollection = 'unknown'
     } = options;
     
     const container = document.createElement('div');
@@ -33,6 +33,11 @@ class CommonResultFormatter {
         const collection = result.collection || defaultCollection;
         let filename = result.source || result.filename || result.title;
         
+        // For smart-search and hybrid-search, use source as the actual filename
+        if ((resultType === 'smart-search' || resultType === 'hybrid-search') && result.source) {
+          filename = result.source;
+        }
+        
         // Extract line number from excerpt or source
         let lineNumber = null;
         
@@ -51,14 +56,27 @@ class CommonResultFormatter {
           }
         }
         
-        const resultText = document.createTextNode(`Result ${index + 1}: `);
-        title.appendChild(resultText);
-        
-        const linkOptions = lineNumber ? { lineNumber: parseInt(lineNumber) } : {};
-        const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename, linkOptions);
-        filenameLink.textContent = result.title;
-        filenameLink.className = 'filename-link';
-        title.appendChild(filenameLink);
+        // Use documentPath if available (from line-search results)
+        if (result.documentPath) {
+          const resultText = document.createTextNode(`Result ${index + 1}: `);
+          title.appendChild(resultText);
+          
+          const filenameLink = document.createElement('a');
+          filenameLink.href = result.documentPath;
+          filenameLink.target = '_blank';
+          filenameLink.className = 'filename-link';
+          filenameLink.textContent = result.title;
+          title.appendChild(filenameLink);
+        } else {
+          const resultText = document.createTextNode(`Result ${index + 1}: `);
+          title.appendChild(resultText);
+          
+          const linkOptions = lineNumber ? { lineNumber: parseInt(lineNumber) } : {};
+          const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename, linkOptions);
+          filenameLink.textContent = filename; // Use filename instead of result.title
+          filenameLink.className = 'filename-link';
+          title.appendChild(filenameLink);
+        }
       } else {
         title.textContent = result.title ? 
           `Result ${index + 1}: ${result.title}` : 
