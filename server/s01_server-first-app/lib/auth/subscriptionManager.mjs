@@ -13,47 +13,38 @@ export class SubscriptionManager {
   async loadTierAccessConfig() {
     if (this.tierAccessConfig) return this.tierAccessConfig;
     
-    try {
-      const configData = await secureFs.readFile(this.tierAccessPath, 'utf8');
-      this.tierAccessConfig = JSON.parse(configData);
-      return this.tierAccessConfig;
-    } catch (error) {
-      console.error('Failed to load tier-access.json, using fallback config:', error);
-      // Fallback to hardcoded config if file doesn't exist
-      this.tierAccessConfig = this.getFallbackConfig();
-      return this.tierAccessConfig;
-    }
+    const configData = await secureFs.readFile(this.tierAccessPath, 'utf8');
+    this.tierAccessConfig = JSON.parse(configData);
+    return this.tierAccessConfig;
   }
 
   getFallbackConfig() {
-    return {
-      tiers: {
-        1: { name: 'standard', features: { canModifyDocIndex: false, canChangeModelParams: false } },
-        2: { name: 'premium', features: { canModifyDocIndex: true, canChangeModelParams: true } },
-        3: { name: 'professional', features: { canModifyDocIndex: true, canChangeModelParams: true } }
-      },
-      config: { enabled: true, defaultTier: 1 }
-    };
+    throw new Error('tier-access.json configuration file is required but not found');
   }
 
   async getSubscriptionTier() {
-    try {
-      const configData = await secureFs.readFile(this.configPath, 'utf8');
-      const config = JSON.parse(configData);
-      return config['subscription-tier'] || 1;
-    } catch (error) {
-      return 1;
+    const configData = await secureFs.readFile(this.configPath, 'utf8');
+    const config = JSON.parse(configData);
+    if (!config['subscription-tier']) {
+      throw new Error('subscription-tier not found in app.json configuration');
     }
+    return config['subscription-tier'];
   }
 
   async getTierName(tier) {
     const config = await this.loadTierAccessConfig();
-    return config.tiers[tier]?.name || 'standard';
+    if (!config.tiers[tier]) {
+      throw new Error(`Tier ${tier} not found in tier-access.json configuration`);
+    }
+    return config.tiers[tier].name;
   }
 
   async getTierFeatures(tier) {
     const config = await this.loadTierAccessConfig();
-    const tierConfig = config.tiers[tier] || config.tiers[1];
+    const tierConfig = config.tiers[tier];
+    if (!tierConfig) {
+      throw new Error(`Tier ${tier} configuration not found`);
+    }
     
     return {
       name: tierConfig.displayName || tierConfig.name,
@@ -69,14 +60,14 @@ export class SubscriptionManager {
     const config = await this.loadTierAccessConfig();
     
     if (!config.config.enabled) {
-      return true; // If tier access is disabled, allow everything
+      throw new Error('Tier access configuration is disabled - cannot check feature access');
     }
     
     const tier = await this.getSubscriptionTier();
     const featureGate = config.featureGates[featureName];
     
     if (!featureGate) {
-      return true; // If feature not defined, allow by default
+      throw new Error(`Feature '${featureName}' not defined in tier access configuration`);
     }
     
     // Check tier requirement
@@ -95,16 +86,30 @@ export class SubscriptionManager {
   async getAccessMatrix(tier, role) {
     const config = await this.loadTierAccessConfig();
     const tierName = await this.getTierName(tier);
-    return config.accessMatrix[tierName]?.[role] || { menuAccess: [], features: [], restrictions: [] };
+    const accessMatrix = config.accessMatrix[tierName]?.[role];
+    if (!accessMatrix) {
+      throw new Error(`Access matrix not found for tier '${tierName}' and role '${role}'`);
+    }
+    return accessMatrix;
   }
 
   async getCSSClassMapping(tier, role) {
     const config = await this.loadTierAccessConfig();
     const tierName = await this.getTierName(tier);
     
+    const tierClasses = config.cssClassMapping['tier-based'][tierName];
+    const roleClasses = config.cssClassMapping['role-based'][role];
+    
+    if (!tierClasses) {
+      throw new Error(`CSS class mapping not found for tier '${tierName}'`);
+    }
+    if (!roleClasses) {
+      throw new Error(`CSS class mapping not found for role '${role}'`);
+    }
+    
     return {
-      tierClasses: config.cssClassMapping['tier-based'][tierName] || { show: [], hide: [] },
-      roleClasses: config.cssClassMapping['role-based'][role] || { show: [], hide: [] }
+      tierClasses,
+      roleClasses
     };
   }
 }

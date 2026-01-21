@@ -232,7 +232,7 @@
                         return;
                     }
                     
-                    const authUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`;
+                    const authUrl = `${window.API_BASE_URL}/api/auth/me`;
                     
                     const response = await fetch(authUrl, {
                         headers: { 'Authorization': `Bearer ${sessionId}` }
@@ -270,7 +270,7 @@
                 const password = document.getElementById('loginPassword').value;
                 
                 try {
-                    const loginUrl = `${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/login`;
+                    const loginUrl = `${window.API_BASE_URL}/api/auth/login`;
                     
                     const requestBody = { email, password };
                     
@@ -330,7 +330,7 @@
                 try {
                     const sessionId = localStorage.getItem('sessionId');
                     if (sessionId) {
-                        await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/logout`, { 
+                        await fetch(`${window.API_BASE_URL}/api/auth/logout`, { 
                             method: 'POST',
                             headers: { 'Authorization': `Bearer ${sessionId}` }
                         });
@@ -389,7 +389,7 @@
             async loadUsers() {
                 try {
                     const sessionId = localStorage.getItem('sessionId');
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/users`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/auth/users`, {
                         headers: { 'Authorization': `Bearer ${sessionId}` }
                     });
                     if (response.ok) {
@@ -433,7 +433,7 @@
             async updateUserRole(userId, userRole) {
                 try {
                     const sessionId = localStorage.getItem('sessionId');
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/users/${userId}`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/auth/users/${userId}`, {
                         method: 'PUT',
                         headers: { 
                             'Content-Type': 'application/json',
@@ -455,7 +455,7 @@
             async toggleUserStatus(userId, isActive) {
                 try {
                     const sessionId = localStorage.getItem('sessionId');
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/users/${userId}`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/auth/users/${userId}`, {
                         method: 'PUT',
                         headers: { 
                             'Content-Type': 'application/json',
@@ -482,7 +482,7 @@
                 
                 try {
                     const sessionId = localStorage.getItem('sessionId');
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/users/${userId}`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/auth/users/${userId}`, {
                         method: 'DELETE',
                         headers: { 
                             'Authorization': `Bearer ${sessionId}`
@@ -511,7 +511,7 @@
                     const updates = { email: newEmail };
                     if (newPassword) updates.password = newPassword;
                     
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/users/${userId}`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/auth/users/${userId}`, {
                         method: 'PUT',
                         headers: { 
                             'Content-Type': 'application/json',
@@ -585,8 +585,8 @@
                     // Get stored license email for device validation
                     const licenseEmail = localStorage.getItem('licenseEmail') || localStorage.getItem('userEmail');
                     const url = licenseEmail ? 
-                        `${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status?email=${encodeURIComponent(licenseEmail)}` :
-                        `${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/status`;
+                        `${window.API_BASE_URL}/api/licensing/status?email=${encodeURIComponent(licenseEmail)}` :
+                        `${window.API_BASE_URL}/api/licensing/status`;
                     
                     const response = await fetch(url);
                     const status = await response.json();
@@ -629,7 +629,7 @@
                     btn.textContent = 'Refreshing...';
                     btn.disabled = true;
                     
-                    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/licensing/refresh`, {
+                    const response = await fetch(`${window.API_BASE_URL}/api/licensing/refresh`, {
                         method: 'POST'
                     });
                     
@@ -663,7 +663,7 @@
         // Function to create admin account for testing
         async function createTestAdmin() {
             try {
-                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/create-test-admin`, {
+                const response = await fetch(`${window.API_BASE_URL}/api/auth/create-test-admin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -698,7 +698,7 @@
         async function debugAdminAccount() {
             try {
                 // First check if users.json exists and what's in it
-                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/debug-users`, {
+                const response = await fetch(`${window.API_BASE_URL}/api/auth/debug-users`, {
                     method: 'GET'
                 });
                 const data = await response.json();
@@ -725,7 +725,7 @@
             if (confirm('Logout for testing?')) {
                 const sessionId = localStorage.getItem('sessionId');
                 if (sessionId) {
-                    fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/logout`, { 
+                    fetch(`${window.API_BASE_URL}/api/auth/logout`, { 
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${sessionId}` }
                     });

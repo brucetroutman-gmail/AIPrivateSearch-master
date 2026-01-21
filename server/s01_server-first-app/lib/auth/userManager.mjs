@@ -114,7 +114,7 @@ export class UserManager {
       const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
       const configData = await secureFs.readFile(configPath, 'utf8');
       const config = JSON.parse(configData);
-      return (config['bearer-token-timeout'] || 300) * 1000; // Convert seconds to milliseconds
+      return (config['bearer-token-timeout']) * 1000; // Convert seconds to milliseconds
     } catch (error) {
       return 300 * 1000; // Default 300 seconds if config fails
     }

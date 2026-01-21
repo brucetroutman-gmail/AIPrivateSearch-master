@@ -121,7 +121,11 @@ export class SentenceTransformerService {
   }
 
   getModelInfo(modelKey) {
-    return this.availableModels[modelKey] || null;
+    const modelInfo = this.availableModels[modelKey];
+    if (!modelInfo) {
+      throw new Error(`Model '${modelKey}' not found in available models`);
+    }
+    return modelInfo;
   }
 }
 

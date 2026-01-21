@@ -1,7 +1,5 @@
 // API Configuration - reads backend port from app.json
 (function() {
-  let API_BASE_URL = 'http://localhost:3001';
-  
   // Load API configuration from app.json synchronously
   try {
     const xhr = new XMLHttpRequest();
@@ -11,15 +9,18 @@
       const config = JSON.parse(xhr.responseText);
       console.log('Loaded config:', config);
       if (config.ports && config.ports.backend) {
-        API_BASE_URL = `http://localhost:${config.ports.backend}`;
-        console.log('Set API_BASE_URL to:', API_BASE_URL);
+        window.API_BASE_URL = `http://localhost:${config.ports.backend}`;
+        console.log('Set API_BASE_URL to:', window.API_BASE_URL);
+      } else {
+        throw new Error('Backend port not found in configuration');
       }
+    } else {
+      throw new Error(`Failed to load config: HTTP ${xhr.status}`);
     }
   } catch (error) {
-    console.warn('Could not load API config, using default port 3001:', error);
+    console.error('CRITICAL: Cannot load app.json configuration:', error);
+    // Redirect to error page instead of using defaults
+    window.location.href = `./config-error.html?error=${encodeURIComponent(error.message)}`;
+    return;
   }
-  
-  // Set global API base URL
-  window.API_BASE_URL = API_BASE_URL;
-  console.log('Final API_BASE_URL:', window.API_BASE_URL);
 })();

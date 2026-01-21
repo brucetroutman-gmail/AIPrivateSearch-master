@@ -887,19 +887,37 @@ function render(result) {
   answerH.textContent = 'Answer';
   const answerDiv = document.createElement('div');
   
-  // Convert result to multi-mode format and render
-  const multiModeResult = window.responseDisplayCommon.convertToMultiModeFormat(result, result.searchType);
-  
-  // If we have original results with documentPath, use those for links
-  if (result.results && result.results.length > 0) {
-    multiModeResult.results.forEach((formattedResult, index) => {
-      if (result.results[index] && result.results[index].documentPath) {
-        formattedResult.documentPath = result.results[index].documentPath;
-      }
+  // For smart-search and hybrid-search, use CommonResultFormatter directly
+  if ((result.searchType === 'smart-search' || result.searchType === 'hybrid-search') && result.results) {
+    const formattedElement = window.CommonResultFormatter.formatSearchResults(result.results, {
+      resultType: result.searchType,
+      showScore: true,
+      defaultCollection: result.collection || 'unknown'
     });
+    answerDiv.appendChild(formattedElement);
+  } else {
+    // Convert result to multi-mode format and render for other search types
+    const multiModeResult = window.responseDisplayCommon.convertToMultiModeFormat(result, result.searchType);
+    
+    // If we have original results with source info, use those for links
+    if (result.results && result.results.length > 0) {
+      multiModeResult.results.forEach((formattedResult, index) => {
+        if (result.results[index]) {
+          const originalResult = result.results[index];
+          // For smart-search and hybrid-search, create document path from source
+          if (originalResult.source && result.collection) {
+            formattedResult.documentPath = `http://localhost:56306/api/documents/${result.collection}/${encodeURIComponent(originalResult.source)}/view`;
+          }
+          // For line-search results, use existing documentPath
+          else if (originalResult.documentPath) {
+            formattedResult.documentPath = originalResult.documentPath;
+          }
+        }
+      });
+    }
+    
+    window.responseDisplayCommon.renderSearchResults(answerDiv, multiModeResult, result.collection);
   }
-  
-  window.responseDisplayCommon.renderSearchResults(answerDiv, multiModeResult, result.collection);
   
   outputEl.append(answerH, answerDiv);
 
@@ -1303,6 +1321,7 @@ form.addEventListener('submit', async (e) => {
         sourceType: sourceTypeEl.value,
         testCode,
         createdAt: new Date().toISOString(),
+        results: searchResult.results, // Include original results with proper source info
         metrics: {
           search: {
             model: 'Smart Search (Vector)',
@@ -1328,6 +1347,7 @@ form.addEventListener('submit', async (e) => {
         sourceType: sourceTypeEl.value,
         testCode,
         createdAt: new Date().toISOString(),
+        results: searchResult.results, // Include original results with proper source info
         metrics: {
           search: {
             model: 'Hybrid Search (Keyword + Vector)',

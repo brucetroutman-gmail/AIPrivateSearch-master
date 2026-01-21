@@ -15,36 +15,54 @@ export class AppConfig {
       console.error(`[AppConfig] Failed to load config from ${configPath}:`, error.message);
     }
     
-    throw new Error(`Config file not found at ${configPath}. Please ensure AIPrivateSearch is properly installed and config files are copied to the config location.`);
+    throw new Error(`CRITICAL: Config file not found at ${configPath}. AIPrivateSearch cannot start without proper configuration.`);
   }
 
   static getSourcesLocation() {
     const config = this.getConfig();
-    return config['sources-location'] || '/Users/Shared/AIPrivateSearch/sources';
+    if (!config['sources-location']) {
+      throw new Error('sources-location not found in configuration');
+    }
+    return config['sources-location'];
   }
 
   static getConfigLocation() {
     const config = this.getConfig();
-    return config['config-location'] || '/Users/Shared/AIPrivateSearch/config';
+    if (!config['config-location']) {
+      throw new Error('config-location not found in configuration');
+    }
+    return config['config-location'];
   }
 
   static getAppName() {
     const config = this.getConfig();
-    return config['app-name'] || 'AI Private Search';
+    if (!config['app-name']) {
+      throw new Error('app-name not found in configuration');
+    }
+    return config['app-name'];
   }
 
   static getPorts() {
     const config = this.getConfig();
-    return config['ports'] || { frontend: 3000, backend: 3001 };
+    if (!config['ports'] || !config['ports'].frontend || !config['ports'].backend) {
+      throw new Error('ports configuration not found or incomplete');
+    }
+    return config['ports'];
   }
 
   static getSubscriptionTier() {
     const config = this.getConfig();
-    return config['subscription-tier'] || 3;
+    if (config['subscription-tier'] === undefined) {
+      throw new Error('subscription-tier not found in configuration');
+    }
+    return config['subscription-tier'];
   }
 
   static getBearerTokenTimeout() {
     const config = this.getConfig();
-    return config['bearer-token-timeout'] || 300;
+    if (!config['bearer-token-timeout']) {
+      throw new Error('bearer-token-timeout not found in configuration');
+    }
+    return config['bearer-token-timeout'];
   }
 }

@@ -69,7 +69,7 @@
       
       if (sessionId) {
         // User has session, verify it's valid
-        fetch(`${window.API_BASE_URL || 'http://localhost:3001'}/api/auth/me`, {
+        fetch(`${window.API_BASE_URL}/api/auth/me`, {
           headers: { 'Authorization': `Bearer ${sessionId}` }
         })
         .then(response => {

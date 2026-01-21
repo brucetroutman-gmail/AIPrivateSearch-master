@@ -11,13 +11,8 @@ class ModelConfig {
 
   async loadModels() {
     if (!this.models) {
-      try {
-        const data = await readFile(this.modelsPath, 'utf8');
-        this.models = JSON.parse(data);
-      } catch (error) {
-        console.error('[ModelConfig] Failed to load models list:', error);
-        this.models = { models: [] };
-      }
+      const data = await readFile(this.modelsPath, 'utf8');
+      this.models = JSON.parse(data);
     }
     return this.models;
   }
@@ -25,7 +20,10 @@ class ModelConfig {
   async getEmbeddingModel() {
     const modelsData = await this.loadModels();
     const embedModel = modelsData.models.find(model => model.category === 'embed');
-    return embedModel ? embedModel.modelName : 'nomic-embed-text'; // fallback
+    if (!embedModel) {
+      throw new Error('No embedding model found in models-list.json configuration');
+    }
+    return embedModel.modelName;
   }
 
   async getModelsByCategory(category) {

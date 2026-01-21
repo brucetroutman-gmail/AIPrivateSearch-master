@@ -928,17 +928,13 @@ Content: ${content.substring(0, 3000)}`;
         const shortPrompt = `Analyze this document briefly:\n\nTitle: ${filename}\nContent: ${content.substring(0, 1000)}\n\nProvide:\n1. Author:\n2. Type:\n3. Summary (1 sentence):\n4. Topics:\n5. Key phrases:`;
         
         // Get document-index model from config
-        let docIndexModel = 'qwen2:1.5b'; // fallback
-        try {
-          const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');
-          const modelList = JSON.parse(fs.readFileSync(modelListPath, 'utf8'));
-          const docIndexModels = modelList.models.filter(m => m.category === 'document-index');
-          if (docIndexModels.length > 0) {
-            docIndexModel = docIndexModels[0].modelName;
-          }
-        } catch (configError) {
-          console.log('Using fallback model for document indexing:', docIndexModel);
+        const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');
+        const modelList = JSON.parse(fs.readFileSync(modelListPath, 'utf8'));
+        const docIndexModels = modelList.models.filter(m => m.category === 'document-index');
+        if (docIndexModels.length === 0) {
+          throw new Error('No document-index model found in models-list.json configuration');
         }
+        const docIndexModel = docIndexModels[0].modelName;
         
         // Use timeout to prevent hanging
         const aiResponse = await Promise.race([
