@@ -46,20 +46,21 @@
       
     // Function to load footer members
     function loadFooterMembers() {
-      fetch('/api/group-members')
-        .then(response => response.json())
-        .then(data => {
-          if (data.success && data.members && data.members.length > 0) {
-            const footerMembers = document.getElementById('footer-members');
-            const memberLinks = data.members.map(member => 
-              `<a href="./group-member-profile.html?email=${member.Email}" target="_blank" class="footer-group-member">${member.FirstName} ${member.LastName}</a>`
-            ).join(' • ');
-            footerMembers.innerHTML = `Team: ${memberLinks}`;
-          }
-        })
-        .catch(error => {
-          console.log('Footer members not loaded:', error.message);
-        });
+      const members = [
+        { name: 'Robin Mattern', email: 'robin.mattern@gmail.com' },
+        { name: 'Bruce Troutman', email: 'bruce.troutman@gmail.com' },
+        { name: 'Richard Schinner', email: 'richard.schinner@gmail.com' },
+        { name: 'Alan McConnell', email: 'alan.mcconnell@gmail.com' },
+        { name: 'Ken Fussell', email: 'ken.fussell@gmail.com' },
+        { name: 'Ladi Goc', email: 'ladi.goc@gmail.com' },
+        { name: 'Joe Benin', email: 'joe.benin@gmail.com' }
+      ];
+      
+      const footerMembers = document.getElementById('footer-members');
+      const memberLinks = members.map(member => 
+        `<a href="./group-member-profile.html?email=${member.email}" target="_blank" class="footer-group-member">${member.name}</a>`
+      ).join(' • ');
+      footerMembers.innerHTML = `Team: ${memberLinks}`;
     }
     
     // Function to check authentication status and show appropriate content
@@ -91,7 +92,7 @@
       const licenseEmail = localStorage.getItem('licenseEmail');
       
       if (licenseEmail) {
-        fetch(`http://localhost:56306/api/licensing/status?email=${encodeURIComponent(licenseEmail)}`)
+      fetch(`${window.API_BASE_URL}/api/licensing/status?email=${encodeURIComponent(licenseEmail)}`)
           .then(response => response.json())
           .then(data => {
             if (data.valid) {

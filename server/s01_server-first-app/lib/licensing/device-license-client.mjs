@@ -11,6 +11,8 @@ class DeviceLicenseClient {
         this.licenseStatus = null;
         this.lastCheck = 0;
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes cache
+        this.cachedDeviceName = null;
+        this.cachedPcCode = null;
     }
 
     async initialize(custmgrConfig) {
@@ -25,49 +27,67 @@ class DeviceLicenseClient {
     }
 
     getDeviceUuid() {
+        // Use cached UUID if available
+        if (this.deviceUuid) return this.deviceUuid;
+        
         try {
-            // Try to get Mac serial number + hardware UUID for unique device ID
-            const serialNumber = execSync('system_profiler SPHardwareDataType | grep "Serial Number" | awk \'{print $4}\'', { encoding: 'utf8' }).trim();
-            const hardwareUuid = execSync('system_profiler SPHardwareDataType | grep "Hardware UUID" | awk \'{print $3}\'', { encoding: 'utf8' }).trim();
+            // Get hardware identifiers using ioreg (instant)
+            const ioregOutput = execSync('ioreg -rd1 -c IOPlatformExpertDevice', { encoding: 'utf8' });
             
-            if (serialNumber && hardwareUuid) {
-                // Create consistent device UUID from hardware info
-                const deviceString = `${serialNumber}-${hardwareUuid}`;
-                return crypto.createHash('sha256').update(deviceString).digest('hex').substring(0, 32);
+            // Extract UUID and Serial Number
+            const uuidMatch = ioregOutput.match(/"IOPlatformUUID"\s*=\s*"([A-F0-9-]+)"/i);
+            const serialMatch = ioregOutput.match(/"IOPlatformSerialNumber"\s*=\s*"([^"]+)"/i);
+            
+            if (uuidMatch && serialMatch) {
+                // Create consistent device UUID from platform UUID + serial number
+                const deviceId = uuidMatch[1] + serialMatch[1];
+                this.deviceUuid = crypto.createHash('md5').update(deviceId).digest('hex');
+                console.log('🔐 DEVICE LICENSE: Using platform UUID + serial for device ID');
+                return this.deviceUuid;
             }
         } catch (error) {
-            console.warn('🔐 DEVICE LICENSE: Could not get hardware info:', error.message);
+            console.error('🔐 DEVICE LICENSE: Failed to get platform identifiers:', error.message);
         }
         
-        // Fallback: generate and store UUID
-        const stored = process.env.DEVICE_UUID;
-        if (stored) return stored;
-        
-        const newUuid = crypto.randomUUID();
-        console.log('🔐 DEVICE LICENSE: Generated new device UUID:', newUuid);
-        return newUuid;
+        // Fallback to machine ID
+        const machineId = os.hostname() + os.platform() + os.arch();
+        this.deviceUuid = crypto.createHash('md5').update(machineId).digest('hex');
+        return this.deviceUuid;
     }
 
     async validateDevice(email) {
+        const startTime = Date.now();
+        console.log('🔐 TIMING: validateDevice START');
+        
         if (!email || !this.deviceUuid) {
             console.log('🔐 DEVICE LICENSE: Missing email or device UUID');
             return { valid: false, reason: 'Missing email or device UUID' };
         }
 
         try {
+            console.log('🔐 TIMING: About to call getDeviceName');
+            const deviceNameStart = Date.now();
+            const deviceName = await this.getDeviceName();
+            console.log(`🔐 TIMING: getDeviceName took ${Date.now() - deviceNameStart}ms`);
+            
             console.log('🔐 DEVICE LICENSE: Validating device:', { email, deviceUuid: this.deviceUuid });
+            
+            console.log('🔐 TIMING: About to make axios POST request');
+            const axiosStart = Date.now();
             
             const response = await axios.post(`${this.custmgrUrl}/api/licensing/validate-device`, {
                 email: email,
                 deviceUuid: this.deviceUuid,
-                deviceName: await this.getDeviceName()
+                deviceName: deviceName
             }, {
-                timeout: 10000,
+                timeout: 1000,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Connection': 'close'
                 }
             });
-
+            
+            console.log(`🔐 TIMING: axios POST took ${Date.now() - axiosStart}ms`);
             console.log('🔐 DEVICE LICENSE: Device validation response:', response.data);
             
             if (response.data.valid) {
@@ -80,12 +100,15 @@ class DeviceLicenseClient {
                     lastValidated: Date.now()
                 };
                 this.lastCheck = Date.now();
+                console.log(`🔐 TIMING: validateDevice TOTAL took ${Date.now() - startTime}ms`);
                 return this.licenseStatus;
             } else {
+                console.log(`🔐 TIMING: validateDevice TOTAL took ${Date.now() - startTime}ms`);
                 return { valid: false, reason: response.data.reason || 'Device not registered' };
             }
         } catch (error) {
             console.error('🔐 DEVICE LICENSE: Device validation failed:', error.message);
+            console.log(`🔐 TIMING: validateDevice TOTAL (ERROR) took ${Date.now() - startTime}ms`);
             return { valid: false, reason: `Validation failed: ${error.message}` };
         }
     }
@@ -104,7 +127,7 @@ class DeviceLicenseClient {
                 const createResponse = await axios.post(`${this.custmgrUrl}/api/licensing/create-license`, {
                     email: email
                 }, {
-                    timeout: 15000,
+                    timeout: 5000,
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -122,7 +145,7 @@ class DeviceLicenseClient {
                 deviceUuid: this.deviceUuid,
                 deviceName: await this.getDeviceName()
             }, {
-                timeout: 15000,
+                timeout: 5000,
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -151,24 +174,42 @@ class DeviceLicenseClient {
     }
 
     async getDeviceName() {
+        // Use cached device name if available
+        if (this.cachedDeviceName) {
+            return this.cachedDeviceName;
+        }
+        
         try {
-            // Import systemInfo to get PC details
-            const { getSystemInfo } = await import('../utils/systemInfo.mjs');
-            const systemInfo = await getSystemInfo();
+            // Get device info using fast sysctl and system commands
+            const computerName = execSync('scutil --get ComputerName', { encoding: 'utf8' }).trim();
+            const hwModel = execSync('sysctl -n hw.model', { encoding: 'utf8' }).trim();
+            const cpuBrand = execSync('sysctl -n machdep.cpu.brand_string', { encoding: 'utf8' }).trim();
+            const memBytes = parseInt(execSync('sysctl -n hw.memsize', { encoding: 'utf8' }).trim());
+            const memGB = Math.round(memBytes / (1024 * 1024 * 1024));
+            const osVersion = execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
             
-            // Create device name from PC info: PcCode-PcCPU-PcGraphics-PcRAM-PcOS
-            const deviceName = [
-                systemInfo.pcCode,
-                systemInfo.systemInfo.chip,
-                systemInfo.systemInfo.graphics,
-                systemInfo.systemInfo.ram,
-                systemInfo.systemInfo.os
-            ].filter(Boolean).join('-');
+            // Get serial number using ioreg (instant)
+            let serialNumber = 'Unknown';
+            try {
+                const serialOutput = execSync('ioreg -l | grep IOPlatformSerialNumber', { encoding: 'utf8' }).trim();
+                // Match the actual serial number: "IOPlatformSerialNumber" = "C02G6912MD6R"
+                const serialMatch = serialOutput.match(/"IOPlatformSerialNumber"\s*=\s*"([^"]+)"/i);
+                if (serialMatch) {
+                    serialNumber = serialMatch[1];
+                }
+            } catch (serialError) {
+                console.warn('🔐 DEVICE LICENSE: Could not get serial number:', serialError.message);
+            }
             
-            return deviceName || (os.hostname() + '-Unknown');
+            // Format: SerialNumber-ComputerName-HWModel-CPU-Memory-macOS Version
+            this.cachedDeviceName = `${serialNumber}-${computerName}-${hwModel}-${cpuBrand}-${memGB} GB-macOS ${osVersion}`;
+            console.log('🔐 DEVICE LICENSE: Generated device name:', this.cachedDeviceName);
+            return this.cachedDeviceName;
         } catch (error) {
-            console.warn('🔐 DEVICE LICENSE: Could not create device name:', error.message);
-            return os.hostname() || 'Unknown Mac';
+            console.error('🔐 DEVICE LICENSE: Failed to get device info:', error.message);
+            // Fallback to basic info
+            this.cachedDeviceName = `${os.hostname()}-${os.platform()}-${os.arch()}`;
+            return this.cachedDeviceName;
         }
     }
 
@@ -194,6 +235,77 @@ class DeviceLicenseClient {
 
     getSystemHardwareId() {
         return this.deviceUuid;
+    }
+
+    getPcCode() {
+        // Use cached PC code if available
+        if (this.cachedPcCode) {
+            return this.cachedPcCode;
+        }
+        
+        try {
+            // Get serial number using ioreg (instant)
+            const serialOutput = execSync('ioreg -l | grep IOPlatformSerialNumber', { encoding: 'utf8' }).trim();
+            // Match the actual serial number: "IOPlatformSerialNumber" = "C02G6912MD6R"
+            const serialMatch = serialOutput.match(/"IOPlatformSerialNumber"\s*=\s*"([^"]+)"/i);
+            
+            if (serialMatch && serialMatch[1]) {
+                const serialNumber = serialMatch[1];
+                // Create PC code: first 3 digits + last 3 digits of serial number (all caps)
+                if (serialNumber.length >= 6) {
+                    this.cachedPcCode = (serialNumber.substring(0, 3) + serialNumber.substring(serialNumber.length - 3)).toUpperCase();
+                } else {
+                    // If serial is too short, use the whole serial
+                    this.cachedPcCode = serialNumber.toUpperCase();
+                }
+                console.log('🔐 DEVICE LICENSE: Serial number:', serialNumber);
+                console.log('🔐 DEVICE LICENSE: Generated PC code:', this.cachedPcCode);
+                return this.cachedPcCode;
+            }
+        } catch (error) {
+            console.error('🔐 DEVICE LICENSE: Failed to get serial number for PC code:', error.message);
+        }
+        
+        // Fallback to hostname-based code
+        const hostname = os.hostname();
+        this.cachedPcCode = hostname.substring(0, Math.min(6, hostname.length)).toUpperCase();
+        return this.cachedPcCode;
+    }
+
+    async getSystemInfo() {
+        try {
+            let chip = 'Unknown';
+            let graphics = 'Unknown';
+            let ram = 'Unknown';
+            let osInfo = 'Unknown';
+            
+            if (process.platform === 'darwin') {
+                try {
+                    chip = execSync('sysctl -n machdep.cpu.brand_string', { encoding: 'utf8' }).trim();
+                    const memBytes = execSync('sysctl -n hw.memsize', { encoding: 'utf8' }).trim();
+                    ram = `${Math.round(parseInt(memBytes) / (1024 ** 3))} GB`;
+                    osInfo = `macOS ${execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim()}`;
+                } catch (e) {
+                    chip = os.cpus()[0]?.model || 'Unknown';
+                    ram = `${Math.round(os.totalmem() / (1024 ** 3))} GB`;
+                    osInfo = `${os.type()} ${os.release()}`;
+                }
+            } else {
+                chip = os.cpus()[0]?.model || 'Unknown';
+                ram = `${Math.round(os.totalmem() / (1024 ** 3))} GB`;
+                osInfo = `${os.type()} ${os.release()}`;
+            }
+            
+            return {
+                systemInfo: { chip, graphics, ram, os: osInfo },
+                pcCode: this.getPcCode()
+            };
+        } catch (error) {
+            return {
+                systemInfo: { chip: 'Unknown', graphics: 'Unknown', ram: 'Unknown', os: 'Unknown' },
+                pcCode: 'Unknown'
+            };
+        }
     }
 }
 

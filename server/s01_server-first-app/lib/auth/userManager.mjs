@@ -111,11 +111,12 @@ export class UserManager {
 
   async getTokenTimeout() {
     try {
-      const configPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/app.json');
+      const configPath = '/Users/Shared/AIPrivateSearch/config/app.json';
       const configData = await secureFs.readFile(configPath, 'utf8');
       const config = JSON.parse(configData);
       return (config['bearer-token-timeout']) * 1000; // Convert seconds to milliseconds
     } catch (error) {
+      console.error('Failed to read token timeout from config:', error.message);
       return 300 * 1000; // Default 300 seconds if config fails
     }
   }

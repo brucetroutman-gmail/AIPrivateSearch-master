@@ -30,21 +30,21 @@ class LicenseChecker {
         await this.initialize();
         
         const now = Date.now();
-        console.log('🔐 LICENSE DEBUG: checkLicenseStatus called', {
-            forceRefresh,
-            hasCachedStatus: !!this.licenseStatus,
-            cacheAge: this.licenseStatus ? now - this.lastCheck : 'no cache',
-            cacheTimeout: this.cacheTimeout
-        });
+        // console.log('🔐 LICENSE DEBUG: checkLicenseStatus called', {
+        //     forceRefresh,
+        //     hasCachedStatus: !!this.licenseStatus,
+        //     cacheAge: this.licenseStatus ? now - this.lastCheck : 'no cache',
+        //     cacheTimeout: this.cacheTimeout
+        // });
         
         // Return cached status unless forced refresh or cache expired
         if (this.licenseStatus && !forceRefresh && (now - this.lastCheck) < this.cacheTimeout) {
-            console.log('🔐 LICENSE DEBUG: Using cached status:', this.licenseStatus);
+            // console.log('🔐 LICENSE DEBUG: Using cached status:', this.licenseStatus);
             return this.licenseStatus;
         }
         
         try {
-            console.log('🔐 LICENSE DEBUG: Fetching fresh license status from:', `${this.apiBaseUrl}/api/licensing/status`);
+            // console.log('🔐 LICENSE DEBUG: Fetching fresh license status from:', `${this.apiBaseUrl}/api/licensing/status`);
             
             // Get stored email for device validation
             const email = localStorage.getItem('userEmail') || localStorage.getItem('licenseEmail');
@@ -55,7 +55,7 @@ class LicenseChecker {
             
             this.licenseStatus = data;
             this.lastCheck = Date.now();
-            console.log('🔐 LICENSE DEBUG: Fresh license status received:', data);
+            // console.log('🔐 LICENSE DEBUG: Fresh license status received:', data);
             return data;
         } catch (error) {
             console.warn('🔐 LICENSE DEBUG: License status check failed:', error.message);
@@ -67,7 +67,7 @@ class LicenseChecker {
                 requiresActivation: false,
                 fallback: true 
             };
-            console.log('🔐 LICENSE DEBUG: Using fallback status:', this.licenseStatus);
+            // console.log('🔐 LICENSE DEBUG: Using fallback status:', this.licenseStatus);
             return this.licenseStatus;
         }
     }

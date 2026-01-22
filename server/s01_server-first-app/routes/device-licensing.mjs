@@ -27,12 +27,12 @@ router.get('/status', async (req, res) => {
   try {
     console.log('🔐 DEVICE LICENSE API: Status check requested');
     
-    const client = await initializeLicenseClient();
     const email = req.query.email || req.headers['x-user-email'];
     
     console.log('🔐 DEVICE LICENSE API: Checking status for email:', email);
     
     if (!email) {
+      console.log('🔐 DEVICE LICENSE API: No email provided - failing fast');
       return res.json({
         valid: false,
         reason: 'No email provided',
@@ -40,6 +40,7 @@ router.get('/status', async (req, res) => {
       });
     }
     
+    const client = await initializeLicenseClient();
     const status = await client.checkLicenseStatus(email);
     console.log('🔐 DEVICE LICENSE API: Status result:', status);
     
