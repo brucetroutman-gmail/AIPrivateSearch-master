@@ -27,21 +27,11 @@ router.get('/status', async (req, res) => {
   try {
     console.log('🔐 DEVICE LICENSE API: Status check requested');
     
-    const email = req.query.email || req.headers['x-user-email'];
-    
-    console.log('🔐 DEVICE LICENSE API: Checking status for email:', email);
-    
-    if (!email) {
-      console.log('🔐 DEVICE LICENSE API: No email provided - failing fast');
-      return res.json({
-        valid: false,
-        reason: 'No email provided',
-        requiresActivation: true
-      });
-    }
-    
     const client = await initializeLicenseClient();
-    const status = await client.checkLicenseStatus(email);
+    
+    // Device-based licensing - no email needed, uses device UUID
+    console.log('🔐 DEVICE LICENSE API: Checking device license status');
+    const status = await client.checkLicenseStatus();
     console.log('🔐 DEVICE LICENSE API: Status result:', status);
     
     res.json(status);

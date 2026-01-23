@@ -62,6 +62,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.03)
+382. Implemented persistent device-based licensing with email storage: Fixed device licensing to work across system restarts by storing customerEmail in app.json configuration. Device UUID now uses platform UUID + serial number for consistent identification. License validation automatically uses stored email after device activation, eliminating need for repeated authentication. System properly detects when device activation is required based on customerEmail presence in configuration. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.02)
 381. Optimized system profiler performance and consolidated device identification: Replaced slow system_profiler calls (10+ seconds) with fast sysctl and ioreg commands (0.006s). Created unified PC code generation using first 3 + last 3 digits of Mac serial number (e.g., C02D6R). Consolidated systemInfo.mjs functionality into DeviceLicenseClient, eliminating redundant code and ensuring consistent device identification across all system info requests. Fixed module import errors in search routes. --done
 

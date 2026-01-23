@@ -24,6 +24,9 @@ class DeviceLicenseClient {
         // Generate or load device UUID
         this.deviceUuid = this.getDeviceUuid();
         console.log('🔐 DEVICE LICENSE: Device UUID:', this.deviceUuid);
+        
+        // Load stored customer email if exists
+        await this.loadStoredEmail();
     }
 
     getDeviceUuid() {
@@ -155,6 +158,7 @@ class DeviceLicenseClient {
             
             if (response.data.success) {
                 this.customerEmail = email;
+                await this.saveEmail(email); // Persist email to disk
                 this.licenseStatus = {
                     valid: true,
                     email: email,
@@ -222,11 +226,11 @@ class DeviceLicenseClient {
             return this.licenseStatus;
         }
 
-        // Use stored email if not provided
+        // Use provided email or stored customer email
         const checkEmail = email || this.customerEmail;
         if (!checkEmail) {
-            console.log('🔐 DEVICE LICENSE: No email available for license check');
-            return { valid: false, reason: 'No email provided', requiresActivation: true };
+            console.log('🔐 DEVICE LICENSE: No customer email available - device requires activation');
+            return { valid: false, reason: 'Device not activated', requiresActivation: true };
         }
 
         console.log('🔐 DEVICE LICENSE: Checking license status for:', checkEmail);
@@ -305,6 +309,34 @@ class DeviceLicenseClient {
                 systemInfo: { chip: 'Unknown', graphics: 'Unknown', ram: 'Unknown', os: 'Unknown' },
                 pcCode: 'Unknown'
             };
+        }
+    }
+
+    async loadStoredEmail() {
+        try {
+            const fs = await import('fs/promises');
+            const configFile = '/Users/Shared/AIPrivateSearch/config/app.json';
+            const config = JSON.parse(await fs.readFile(configFile, 'utf8'));
+            if (config.customerEmail) {
+                this.customerEmail = config.customerEmail;
+                console.log('🔐 DEVICE LICENSE: Loaded stored email from config:', this.customerEmail);
+            }
+        } catch (error) {
+            console.log('🔐 DEVICE LICENSE: No stored email found in config');
+        }
+    }
+
+    async saveEmail(email) {
+        try {
+            const fs = await import('fs/promises');
+            const configFile = '/Users/Shared/AIPrivateSearch/config/app.json';
+            const config = JSON.parse(await fs.readFile(configFile, 'utf8'));
+            config.customerEmail = email;
+            await fs.writeFile(configFile, JSON.stringify(config, null, 2), 'utf8');
+            this.customerEmail = email;
+            console.log('🔐 DEVICE LICENSE: Saved email to config:', email);
+        } catch (error) {
+            console.error('🔐 DEVICE LICENSE: Failed to save email to config:', error.message);
         }
     }
 }

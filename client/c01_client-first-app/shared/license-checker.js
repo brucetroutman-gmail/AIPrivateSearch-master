@@ -46,11 +46,8 @@ class LicenseChecker {
         try {
             // console.log('🔐 LICENSE DEBUG: Fetching fresh license status from:', `${this.apiBaseUrl}/api/licensing/status`);
             
-            // Get stored email for device validation
-            const email = localStorage.getItem('userEmail') || localStorage.getItem('licenseEmail');
-            const url = email ? `${this.apiBaseUrl}/api/licensing/status?email=${encodeURIComponent(email)}` : `${this.apiBaseUrl}/api/licensing/status`;
-            
-            const response = await fetch(url);
+            // Device-based license check - no email needed
+            const response = await fetch(`${this.apiBaseUrl}/api/licensing/status`);
             const data = await response.json();
             
             this.licenseStatus = data;
