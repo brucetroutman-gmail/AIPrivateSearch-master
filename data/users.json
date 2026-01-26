@@ -1,12 +1,12 @@
 [
   {
     "id": "ad966ae1-0d42-43b8-ab9e-11b87d366a14",
-    "email": "adm-std@a.com",
+    "email": "adm@a.com",
     "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
     "subscriptionTier": "standard",
     "userRole": "admin",
     "createdAt": "2025-10-28T23:36:53.052Z",
-    "lastLogin": "2026-01-19T18:45:28.578Z",
+    "lastLogin": "2026-01-26T23:27:57.759Z",
     "active": true
   },
   {
@@ -16,22 +16,12 @@
     "subscriptionTier": "premium",
     "userRole": "admin",
     "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": "2025-11-25T14:54:35.427Z",
-    "active": true
-  },
-  {
-    "id": "d7e195d3-2f67-5db1-c25e-9c20ge588c49",
-    "email": "adm-prof@a.com",
-    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-    "subscriptionTier": "professional",
-    "userRole": "admin",
-    "createdAt": "2025-10-30T20:00:00.000Z",
-    "lastLogin": "2026-01-22T21:42:10.646Z",
+    "lastLogin": "2026-01-26T23:06:35.794Z",
     "active": true
   },
   {
     "id": "378019d0-465e-47f9-a558-c6c788a91fdc",
-    "email": "srch-std@a.com",
+    "email": "srch@a.com",
     "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
     "subscriptionTier": "standard",
     "userRole": "searcher",
@@ -47,16 +37,6 @@
     "userRole": "searcher",
     "createdAt": "2025-11-02T17:02:05.945Z",
     "lastLogin": "2025-11-04T14:43:47.711Z",
-    "active": true
-  },
-  {
-    "id": "f3aee9d9-e299-48f1-a44d-9ccf87c608e2",
-    "email": "srch-prof@a.com",
-    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-    "subscriptionTier": "professional",
-    "userRole": "searcher",
-    "createdAt": "2025-11-04T14:30:50.291Z",
-    "lastLogin": "2025-11-04T14:31:05.480Z",
     "active": true
   }
 ]

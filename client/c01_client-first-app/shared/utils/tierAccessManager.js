@@ -126,12 +126,12 @@ class TierAccessManager {
 
   // Utility method to get current user's tier and role from license system
   async getCurrentUserInfo() {
-    // First try to get tier from license system
+    // Get tier from license system
     let tier = 1; // default to standard
     let tierName = 'standard';
     
     try {
-      // Get tier from license checker if available
+      // Get tier from license checker
       if (window.licenseChecker) {
         await window.licenseChecker.initialize();
         const licenseStatus = await window.licenseChecker.checkLicenseStatus();
@@ -139,19 +139,16 @@ class TierAccessManager {
           tier = licenseStatus.tier || 1;
           const tierNames = { 1: 'standard', 2: 'premium', 3: 'professional' };
           tierName = tierNames[tier] || 'standard';
+          console.log('🔐 TIER ACCESS: Got tier from license system:', { tier, tierName });
         }
       }
     } catch (error) {
-      console.warn('Could not get tier from license system, using localStorage fallback:', error);
-      // Fallback to localStorage if license system fails
-      const userRole = localStorage.getItem('userRole') || 'standard';
-      const tierMap = { 'standard': 1, 'premium': 2, 'professional': 3 };
-      tier = tierMap[userRole] || 1;
-      tierName = userRole;
+      console.warn('Could not get tier from license system:', error);
     }
     
     // Get role from localStorage (this should be set during login)
     const userUserRole = localStorage.getItem('userUserRole') || 'searcher';
+    console.log('🔐 TIER ACCESS: Got role from localStorage:', userUserRole);
     
     return {
       tier: tier,
