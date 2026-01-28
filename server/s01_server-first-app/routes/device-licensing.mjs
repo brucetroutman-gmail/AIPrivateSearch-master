@@ -1,4 +1,5 @@
 import express from 'express';
+import { publicIpv4 } from 'public-ip';
 import { DeviceLicenseClient } from '../lib/licensing/device-license-client.mjs';
 
 const router = express.Router();
@@ -59,7 +60,16 @@ router.post('/activate', async (req, res) => {
     }
     
     const client = await initializeLicenseClient();
-    const result = await client.registerDevice(email);
+    
+    // Get public IP address
+    let publicIp = 'unknown';
+    try {
+      publicIp = await publicIpv4();
+    } catch (error) {
+      // Silent fail for public IP
+    }
+    
+    const result = await client.registerDevice(email, publicIp);
     
     console.log('🔐 DEVICE LICENSE API: Registration result:', result);
     res.json(result);

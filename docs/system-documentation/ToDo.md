@@ -10,6 +10,7 @@ to do AIPrivateSearch
 2-005. Test multi prompts and ASCII characters handling
 2-041. Remove Database from Export Download on search page , return to export--completed
 2-042. Test Search page: document view is not working --completed
+2-044. Collect public IP address during device registration using npm public-ip package and store in custmgr database --completed
 
 ### Core System Improvements
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)
@@ -62,7 +63,12 @@ to do AIPrivateSearch
 
 =======================================================
 
-## RECENTLY COMPLETED (v20.03)
+## RECENTLY COMPLETED (v20.05)
+383. Implemented public IP address collection during device registration: Added npm public-ip package to collect external IP addresses during device activation. Updated device licensing system to capture and store public IP addresses in custmgr database ip_address field alongside PC codes. Removed local IP collection to focus only on public internet-facing addresses for better device tracking and analytics. System now captures both PC code (format: C02D6R) and public IP during registration with clean error handling. --done
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.04)
 382. Implemented persistent device-based licensing with email storage: Fixed device licensing to work across system restarts by storing customerEmail in app.json configuration. Device UUID now uses platform UUID + serial number for consistent identification. License validation automatically uses stored email after device activation, eliminating need for repeated authentication. System properly detects when device activation is required based on customerEmail presence in configuration. --done
 
 =======================================================

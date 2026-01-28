@@ -116,13 +116,13 @@ class DeviceLicenseClient {
         }
     }
 
-    async registerDevice(email) {
+    async registerDevice(email, publicIp = null) {
         if (!email || !this.deviceUuid) {
             return { success: false, error: 'Missing email or device UUID' };
         }
 
         try {
-            console.log('🔐 DEVICE LICENSE: Registering device:', { email, deviceUuid: this.deviceUuid });
+            console.log('🔐 DEVICE LICENSE: Registering device:', { email, deviceUuid: this.deviceUuid, publicIp });
             
             // Step 1: Try to create license if it doesn't exist
             try {
@@ -142,12 +142,21 @@ class DeviceLicenseClient {
                 console.log('🔐 DEVICE LICENSE: License creation failed (may already exist):', createError.response?.data || createError.message);
             }
             
-            // Step 2: Register device
-            const response = await axios.post(`${this.custmgrUrl}/api/licensing/register-device`, {
+            // Step 2: Register device with public IP and PC code
+            const deviceData = {
                 email: email,
                 deviceUuid: this.deviceUuid,
-                deviceName: await this.getDeviceName()
-            }, {
+                deviceName: await this.getDeviceName(),
+                pcCode: this.getPcCode()
+            };
+            
+            if (publicIp) {
+                deviceData.ipAddress = publicIp;
+            }
+            
+            console.log('🔐 DEVICE LICENSE: Sending device data:', deviceData);
+            
+            const response = await axios.post(`${this.custmgrUrl}/api/licensing/register-device`, deviceData, {
                 timeout: 5000,
                 headers: {
                     'Content-Type': 'application/json'
