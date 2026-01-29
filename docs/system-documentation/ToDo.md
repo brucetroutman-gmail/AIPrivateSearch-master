@@ -35,6 +35,7 @@ to do AIPrivateSearch
 2-021. Review processing of each search type - create 3 prompts for sourcetype, collection, searchtype and store prompts in .json configs
 2-022. Implement search performance optimization and caching
 2-023. Create API documentation for potential integrations
+2-045. Upgrade RAG system from Level 2 to Level 4: Implement hybrid search (semantic + BM25 keyword matching with alpha tuning), add cross-encoder reranking to improve "correct chunk in top 3" from ~68% to ~89%, and add confidence scoring for production reliability. Priority: Reranking first (biggest accuracy gain), then hybrid search, then confidence thresholds.
 
 ### Analytics & Monitoring
 2-024. Create admin dashboard with usage analytics
@@ -60,6 +61,11 @@ to do AIPrivateSearch
 2-038. Create competitive analysis and positioning documents
 2-039. Develop partner program for resellers (medical/legal consultants)
 2-040. Create case studies for medical practices and law firms
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.06)
+384. Fixed tier-based menu access system across all navigation pages: Added license checker to all main pages (test.html, analyze-tests.html, multi-mode-search.html, collections.html, model.html, config.html, testcode-checker.html, search-logs.html, options.html) to ensure tier access manager correctly detects user tiers. Fixed issue where Professional tier users lost Test/Analyze menu visibility when navigating between pages. Enhanced user-management page by changing "Go to Search" button to "Go to Application" linking to index.html for better user flow. --done
 
 =======================================================
 

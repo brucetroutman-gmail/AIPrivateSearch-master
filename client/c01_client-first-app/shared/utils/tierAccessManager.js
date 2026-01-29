@@ -135,26 +135,34 @@ class TierAccessManager {
       if (window.licenseChecker) {
         await window.licenseChecker.initialize();
         const licenseStatus = await window.licenseChecker.checkLicenseStatus();
+        console.log('🔐 TIER ACCESS DEBUG: License status from checker:', licenseStatus);
         if (licenseStatus && licenseStatus.valid) {
           tier = licenseStatus.tier || 1;
           const tierNames = { 1: 'standard', 2: 'premium', 3: 'professional' };
           tierName = tierNames[tier] || 'standard';
-          console.log('🔐 TIER ACCESS: Got tier from license system:', { tier, tierName });
+          console.log('🔐 TIER ACCESS DEBUG: Got tier from license system:', { tier, tierName });
+        } else {
+          console.log('🔐 TIER ACCESS DEBUG: License not valid, using default tier 1');
         }
+      } else {
+        console.log('🔐 TIER ACCESS DEBUG: No license checker available');
       }
     } catch (error) {
-      console.warn('Could not get tier from license system:', error);
+      console.warn('🔐 TIER ACCESS DEBUG: Could not get tier from license system:', error);
     }
     
     // Get role from localStorage (this should be set during login)
     const userUserRole = localStorage.getItem('userUserRole') || 'searcher';
-    console.log('🔐 TIER ACCESS: Got role from localStorage:', userUserRole);
+    console.log('🔐 TIER ACCESS DEBUG: Got role from localStorage:', userUserRole);
     
-    return {
+    const result = {
       tier: tier,
       role: userUserRole,
       tierName: tierName
     };
+    
+    console.log('🔐 TIER ACCESS DEBUG: Final user info:', result);
+    return result;
   }
 
   // Apply access control to current page
