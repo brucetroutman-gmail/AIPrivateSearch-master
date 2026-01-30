@@ -64,6 +64,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.08)
+386. Version bump maintenance release: Updated version numbers across all configuration files for consistent release tracking. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.07)
 385. Created AIPS installer documentation framework: Added aips-installer-claude.md to system documentation for future installer development and distribution planning. --done
 
