@@ -64,6 +64,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.07)
+385. Created AIPS installer documentation framework: Added aips-installer-claude.md to system documentation for future installer development and distribution planning. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.06)
 384. Fixed tier-based menu access system across all navigation pages: Added license checker to all main pages (test.html, analyze-tests.html, multi-mode-search.html, collections.html, model.html, config.html, testcode-checker.html, search-logs.html, options.html) to ensure tier access manager correctly detects user tiers. Fixed issue where Professional tier users lost Test/Analyze menu visibility when navigating between pages. Enhanced user-management page by changing "Go to Search" button to "Go to Application" linking to index.html for better user flow. --done
 
