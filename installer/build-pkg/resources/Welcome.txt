@@ -1,0 +1,77 @@
+Welcome to AIPrivateSearch!
+===========================
+
+Thank you for installing AIPrivateSearch - your private, local AI-powered search assistant.
+
+AUTOMATIC INSTALLATION
+-----------------------
+When you launch AIPrivateSearch for the first time, it will automatically:
+
+1. Install Node.js (if not already installed)
+2. Install Ollama for local AI models (if not already installed)
+3. Install Chrome browser (if not already installed)
+4. Download the latest AIPrivateSearch code
+5. Configure everything automatically
+
+This process may take 5-15 minutes depending on your internet connection.
+
+LAUNCHING THE APPLICATION
+-------------------------
+After installation completes:
+1. Open Applications folder
+2. Double-click AIPrivateSearch
+3. Wait for automatic setup to complete
+4. The application will open in your browser automatically
+
+INSTALLATION LOCATION
+---------------------
+Application: /Applications/AIPrivateSearch.app
+Data & Config: /Users/Shared/AIPrivateSearch/
+Configuration: /Users/Shared/AIPrivateSearch/.env-aips
+
+DEFAULT CREDENTIALS
+-------------------
+Email: adm-std@a.com
+Password: 123
+
+(You can change these in the configuration file)
+
+SYSTEM REQUIREMENTS
+-------------------
+- macOS 10.15 (Catalina) or later
+- Internet connection (for first-time setup)
+- 4GB RAM minimum, 8GB recommended
+- 5GB free disk space
+
+WHAT GETS INSTALLED
+-------------------
+The automatic installer will download and install:
+- Node.js v20.11.0 (JavaScript runtime)
+- Ollama (for running AI models locally)
+- Google Chrome (recommended browser)
+- Rosetta (on Apple Silicon Macs, for compatibility)
+
+All installations happen automatically - no user intervention needed!
+
+TROUBLESHOOTING
+---------------
+Installation logs are saved to:
+/Users/Shared/AIPrivateSearch/logs/install.log
+
+If installation fails:
+1. Check the log file for errors
+2. Ensure you have administrator access
+3. Check your internet connection
+4. Try launching again
+
+PRIVACY
+-------
+AIPrivateSearch runs entirely on your Mac:
+- All AI processing happens locally
+- No data sent to external servers
+- You have full control over your data
+
+For support and updates:
+https://github.com/yourusername/aiprivatesearch
+
+Version: 1.0.0

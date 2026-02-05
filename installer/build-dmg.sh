@@ -10,7 +10,7 @@ echo "================================"
 
 APP_NAME="AIPrivateSearch"
 VERSION="1.0.0"
-DMG_NAME="$APP_NAME-$VERSION"
+DMG_NAME="aiprivatesearch-installer"
 BUILD_DIR="./build"
 DMG_DIR="./build-dmg"
 
@@ -90,15 +90,40 @@ hdiutil create \
 
 # Mount the temporary DMG
 echo "📂 Mounting DMG..."
-MOUNT_DIR=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_NAME-temp.dmg" | egrep '^/dev/' | sed 1q | awk '{print $3}')
+MOUNT_OUTPUT=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_NAME-temp.dmg" 2>/dev/null)
+MOUNT_DIR=$(echo "$MOUNT_OUTPUT" | egrep '^/dev/' | sed 1q | awk '{print $3}')
+
+if [ -z "$MOUNT_DIR" ]; then
+    echo "❌ Failed to mount DMG. Creating simple DMG without styling..."
+    # Clean up temp file and create simple DMG directly
+    rm -f "$DMG_NAME-temp.dmg"
+    
+    # Create simple DMG directly from folder
+    hdiutil create \
+        -srcfolder "$DMG_DIR" \
+        -volname "$APP_NAME" \
+        -fs HFS+ \
+        -format UDZO \
+        -imagekey zlib-level=9 \
+        "$DMG_NAME.dmg"
+    
+    if [ -f "$DMG_NAME.dmg" ]; then
+        echo "✅ Simple DMG created: $DMG_NAME.dmg"
+        echo "📏 Size: $(du -h "$DMG_NAME.dmg" | awk '{print $1}')"
+    else
+        echo "❌ Failed to create DMG"
+        exit 1
+    fi
+    exit 0
+fi
 
 echo "Mounted at: $MOUNT_DIR"
 
 # Set DMG window properties using AppleScript
 echo "🎨 Configuring DMG window..."
-osascript << APPLESCRIPT
+osascript << 'APPLESCRIPT'
 tell application "Finder"
-    tell disk "$APP_NAME"
+    tell disk "AIPrivateSearch"
         open
         set current view of container window to icon view
         set toolbar visible of container window to false
@@ -107,10 +132,9 @@ tell application "Finder"
         set viewOptions to the icon view options of container window
         set arrangement of viewOptions to not arranged
         set icon size of viewOptions to 128
-        set background picture of viewOptions to file ".background:background.png"
         
         -- Position icons
-        set position of item "$APP_NAME.app" of container window to {150, 200}
+        set position of item "AIPrivateSearch.app" of container window to {150, 200}
         set position of item "Applications" of container window to {450, 200}
         
         close
@@ -119,12 +143,19 @@ tell application "Finder"
         delay 2
     end tell
 end tell
-APPLESCRIPT 2>/dev/null || echo "⚠️  AppleScript configuration failed (this is OK for demo)"
+APPLESCRIPT
 
 # Unmount
 echo "📤 Unmounting DMG..."
 sleep 2
-hdiutil detach "$MOUNT_DIR" || true
+if [ -n "$MOUNT_DIR" ] && [ -d "$MOUNT_DIR" ]; then
+    hdiutil detach "$MOUNT_DIR" 2>/dev/null || {
+        echo "⚠️  Force unmounting..."
+        hdiutil detach "$MOUNT_DIR" -force 2>/dev/null || true
+    }
+else
+    echo "⚠️  Mount directory not found, skipping unmount"
+fi
 
 # Convert to compressed, read-only DMG
 echo "🗜️  Compressing DMG..."
@@ -142,6 +173,20 @@ echo ""
 echo "✅ DMG created successfully!"
 echo "📦 Location: $DMG_NAME.dmg"
 echo "📏 Size: $(du -h "$DMG_NAME.dmg" | awk '{print $1}')"
+
+# Copy to marketing website downloads
+MARKETING_DOWNLOADS="/Users/Shared/AIPrivateSearch/repo/aiprivatesearchweb/client/c01_client-marketing/downloads"
+if [ -d "$MARKETING_DOWNLOADS" ]; then
+    echo ""
+    echo "📋 Copying DMG to marketing website..."
+    cp "$DMG_NAME.dmg" "$MARKETING_DOWNLOADS/"
+    echo "✓ DMG copied to: $MARKETING_DOWNLOADS"
+else
+    echo ""
+    echo "⚠️  Marketing downloads directory not found:"
+    echo "   $MARKETING_DOWNLOADS"
+    echo "   DMG not copied to marketing site"
+fi
 echo ""
 echo "Next steps:"
 echo "1. Test the DMG on a clean system"

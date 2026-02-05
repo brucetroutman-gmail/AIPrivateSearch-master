@@ -8,7 +8,7 @@ set -e
 echo "📦 Building AIPrivateSearch.pkg Installer (Auto-Install Version)"
 echo "================================================================="
 
-PKG_NAME="AIPrivateSearch"
+PKG_NAME="aiprivatesearch-installer"
 VERSION="1.0.0"
 IDENTIFIER="com.aiprivatesearch.installer"
 BUILD_DIR="./build-pkg"
@@ -19,7 +19,7 @@ RESOURCES_DIR="$BUILD_DIR/resources"
 # Clean previous build
 echo "🧹 Cleaning previous build..."
 rm -rf "$BUILD_DIR"
-rm -f "$PKG_NAME-$VERSION.pkg"
+rm -f "aiprivatesearch-installer.pkg"
 
 # Create directory structure
 echo "📁 Creating package structure..."
@@ -249,11 +249,11 @@ productbuild \
     --distribution "$BUILD_DIR/Distribution.xml" \
     --resources "$RESOURCES_DIR" \
     --package-path "$BUILD_DIR" \
-    "$PKG_NAME-$VERSION.pkg"
+    "aiprivatesearch-installer.pkg"
 
 echo ""
 echo "✅ Package created successfully!"
-echo "📦 Location: $PKG_NAME-$VERSION.pkg"
+echo "📦 Location: aiprivatesearch-installer.pkg"
 echo ""
 echo "⚠️  IMPORTANT: This installer will automatically:"
 echo "   • Install Node.js"
@@ -264,5 +264,5 @@ echo "   • Configure everything"
 echo ""
 echo "First launch may take 5-15 minutes."
 echo ""
-echo "To distribute: Double-click to test, then distribute $PKG_NAME-$VERSION.pkg"
+echo "To distribute: Double-click to test, then distribute aiprivatesearch-installer.pkg"
 echo ""
