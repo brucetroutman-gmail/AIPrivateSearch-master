@@ -64,7 +64,12 @@ to do AIPrivateSearch
 
 =======================================================
 
-## RECENTLY COMPLETED (v20.08)
+## RECENTLY COMPLETED (v20.10)
+387. Fixed PATH configuration issues for Node.js and Ollama commands in installer: Resolved installer architecture detection problems on M4 Mac Mini by using runtime detection instead of build-time variables. Fixed centralized password management for Ollama installation with proper AppleScript dialogs. Corrected PATH configuration to ensure both Node.js and Ollama commands work properly in terminal after installation. Enhanced installer with proper error handling and verification steps for successful prerequisite installation. --done
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.09)
 386. Version bump maintenance release: Updated version numbers across all configuration files for consistent release tracking. --done
 
 =======================================================

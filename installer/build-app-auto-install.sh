@@ -19,7 +19,7 @@ echo "🏗️  Building AIPrivateSearch.app Bundle (Auto-Install Version)"
 echo "Version: $NEW_VERSION"
 echo "=============================================================="
 
-APP_NAME="AIPrivateSearch"
+APP_NAME="AIPrivateSearch-installer"
 VERSION="1.0.0"
 BUNDLE_ID="com.aiprivatesearch.app"
 BUILD_DIR="./build"
@@ -44,7 +44,7 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleExecutable</key>
-    <string>AIPrivateSearch</string>
+    <string>AIPrivateSearch-installer</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
@@ -52,7 +52,7 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>AIPrivateSearch</string>
+    <string>AIPrivateSearch-installer</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -104,6 +104,46 @@ show_dialog() {
             display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
         end tell
 APPLESCRIPT
+}
+
+# Function to get admin password once and reuse
+get_admin_password() {
+    if [ -z "\$ADMIN_PASSWORD" ]; then
+        echo "🔐 Requesting administrator password for installations..."
+        
+        show_dialog "Administrator Access Required" \\
+            "AIPrivateSearch installer needs administrator privileges to install:
+
+• Ollama (AI models)
+• Chrome browser (if needed)
+• System components
+
+You will be prompted for your password once.
+This password is only used during installation and not stored." \\
+            "caution"
+        
+        ADMIN_PASSWORD=\$(osascript -e 'display dialog "Enter your administrator password:" default answer "" with hidden answer' -e 'text returned of result' 2>/dev/null)
+        
+        if [ -n "\$ADMIN_PASSWORD" ]; then
+            echo "✅ Administrator password provided"
+            # Test password validity
+            TEMP_TEST_FILE="/tmp/aips_test_$$"
+            echo "\$ADMIN_PASSWORD" > "\$TEMP_TEST_FILE"
+            if sudo -S -v < "\$TEMP_TEST_FILE" 2>/dev/null; then
+                rm -f "\$TEMP_TEST_FILE"
+                echo "✅ Password verified"
+            else
+                rm -f "\$TEMP_TEST_FILE"
+                echo "❌ Invalid password provided"
+                ADMIN_PASSWORD=""
+                return 1
+            fi
+        else
+            echo "❌ No password provided"
+            return 1
+        fi
+    fi
+    return 0
 }
 
 # Show welcome dialog
@@ -199,6 +239,10 @@ else
         if [ -d "\$NODE_DIR" ]; then
             mv "\$NODE_DIR" "\$APP_SUPPORT/node"
             
+            # Fix permissions on Node.js binaries
+            chmod +x "\$APP_SUPPORT/node/bin/node"
+            chmod +x "\$APP_SUPPORT/node/bin/npm"
+            
             # Add to PATH for this session
             export PATH="\$APP_SUPPORT/node/bin:\$PATH"
             
@@ -207,6 +251,22 @@ else
             # Verify installation
             if "\$APP_SUPPORT/node/bin/node" --version; then
                 echo "✅ Node.js verification successful"
+                
+                # Add Node.js to PATH
+                echo "🛤️ Adding Node.js to PATH..."
+                SHELL_RC="\$HOME/.zshrc"
+                if [ -f "\$HOME/.bash_profile" ]; then
+                    SHELL_RC="\$HOME/.bash_profile"
+                fi
+                
+                # Check if Node.js PATH entry already exists
+                if ! grep -q "/Users/Shared/AIPrivateSearch/node/bin" "\$SHELL_RC" 2>/dev/null; then
+                    echo '# AIPrivateSearch Node.js' >> "\$SHELL_RC"
+                    echo 'export PATH="/Users/Shared/AIPrivateSearch/node/bin:\$PATH"' >> "\$SHELL_RC"
+                    echo "✅ Node.js added to \$SHELL_RC"
+                else
+                    echo "✅ Node.js PATH already configured"
+                fi
             else
                 echo "❌ Node.js verification failed"
             fi
@@ -223,16 +283,140 @@ fi
 
 echo "✅ Step 2 completed!"
 echo ""
-echo "🎉 Node.js installation test completed!"
-echo "Next: Add remaining installation steps"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  🤖 Step 3: Ollama Installation"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
-show_dialog "Step 2 Complete" \\
-    "Node.js installation completed!
+# Check if Ollama already installed (system-wide)
+if command -v ollama &> /dev/null; then
+    echo "✅ Ollama already installed"
+    OLLAMA_VERSION=\$(ollama --version)
+    echo "📝 Current version: \$OLLAMA_VERSION"
+    
+    # Check if Ollama service is running
+    if pgrep -f "ollama serve" > /dev/null; then
+        echo "✅ Ollama service is running"
+    else
+        echo "🔄 Starting Ollama service..."
+        nohup ollama serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+        sleep 2
+        echo "✅ Ollama service started"
+    fi
+else
+    echo "📥 Installing Ollama..."
+    
+    cd "\$APP_SUPPORT"
+    
+    # Clean up any previous failed installation
+    rm -f ollama
+    rm -rf ollama
+    
+    # Get admin password for Ollama installation
+    if get_admin_password; then
+        echo "🌐 Installing Ollama with administrator privileges..."
+        
+        # Use a different approach - download and modify the installer
+        echo "🌐 Downloading Ollama installer script..."
+        
+        if curl -fsSL https://ollama.com/install.sh -o /tmp/ollama_install.sh; then
+            chmod +x /tmp/ollama_install.sh
+            
+            # Create expect script to handle password prompt
+            cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
+#!/bin/bash
+TEMP_PASS_FILE="/tmp/aips_pass_$$"
+echo "$ADMIN_PASSWORD" > "$TEMP_PASS_FILE"
+
+# Run installer with password file
+export SUDO_ASKPASS=/tmp/aips_askpass.sh
+echo '#!/bin/bash' > /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_$$' >> /tmp/aips_askpass.sh
+chmod +x /tmp/aips_askpass.sh
+
+# Run installer with SUDO_ASKPASS
+/tmp/ollama_install.sh
+
+# Cleanup
+rm -f /tmp/aips_pass_$$ /tmp/aips_askpass.sh
+EXPECT_EOF
+            
+            chmod +x /tmp/ollama_expect.sh
+            
+            # Run the installer
+            if /tmp/ollama_expect.sh; then
+                rm -f /tmp/ollama_install.sh /tmp/ollama_expect.sh
+                echo "✅ Ollama installed successfully"
+                
+                # Verify installation - check both PATH and direct app location
+                if command -v ollama &> /dev/null; then
+                    echo "✅ Ollama verification successful (in PATH)"
+                    OLLAMA_VERSION=\$(ollama --version)
+                    echo "📝 Ollama version: \$OLLAMA_VERSION"
+                elif [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
+                    echo "✅ Ollama app installed successfully"
+                    OLLAMA_VERSION=\$(/Applications/Ollama.app/Contents/Resources/ollama --version)
+                    echo "📝 Ollama version: \$OLLAMA_VERSION"
+                    
+                    # Create symlink to make ollama available
+                    echo "🔗 Creating ollama symlink..."
+                    ln -sf /Applications/Ollama.app/Contents/Resources/ollama "\$APP_SUPPORT/ollama"
+                    echo "✅ Ollama available at: \$APP_SUPPORT/ollama"
+                    
+                    # Add to user's PATH
+                    echo "🛤️ Adding AIPrivateSearch tools to PATH..."
+                    SHELL_RC="\$HOME/.zshrc"
+                    if [ -f "\$HOME/.bash_profile" ]; then
+                        SHELL_RC="\$HOME/.bash_profile"
+                    fi
+                    
+                    # Check if PATH entry already exists
+                    if ! grep -q "/Users/Shared/AIPrivateSearch" "\$SHELL_RC" 2>/dev/null; then
+                        echo '# AIPrivateSearch tools' >> "\$SHELL_RC"
+                        echo 'export PATH="/Users/Shared/AIPrivateSearch:\$PATH"' >> "\$SHELL_RC"
+                        echo "✅ Added to \$SHELL_RC"
+                        echo "📝 Note: Restart terminal or run 'source \$SHELL_RC' to use 'ollama' command"
+                    else
+                        echo "✅ PATH already configured"
+                    fi
+                else
+                    echo "❌ Ollama not found after installation"
+                fi
+                
+                # Start Ollama service (try both PATH and local)
+                echo "🔄 Starting Ollama service..."
+                if command -v ollama &> /dev/null; then
+                    nohup ollama serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+                elif [ -f "\$APP_SUPPORT/ollama" ]; then
+                    nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+                fi
+                sleep 3
+                echo "✅ Ollama service started"
+            else
+                rm -f /tmp/ollama_install.sh /tmp/ollama_expect.sh
+                echo "❌ Ollama installation failed"
+            fi
+        else
+            echo "❌ Failed to download Ollama installer"
+        fi
+    else
+        echo "❌ Administrator password required for Ollama installation"
+        echo "Please install Ollama manually from https://ollama.com"
+    fi
+fi
+
+echo "✅ Step 3 completed!"
+echo ""
+echo "🎉 Ollama installation test completed!"
+echo "Next: Add model download and app setup"
+
+show_dialog "Step 3 Complete" \\
+    "Ollama installation completed!
 
 Check the log for details:
 \$LOG_FILE
 
-Next: Add Ollama and app setup" \\
+Next: Add model download and GitHub setup" \\
     "note"
 LAUNCHER_EOF
 

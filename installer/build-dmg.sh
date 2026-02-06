@@ -8,7 +8,7 @@ set -e
 echo "💿 Building AIPrivateSearch DMG"
 echo "================================"
 
-APP_NAME="AIPrivateSearch"
+APP_NAME="AIPrivateSearch-installer"
 VERSION="1.0.0"
 DMG_NAME="aiprivatesearch-installer"
 BUILD_DIR="./build"
@@ -30,7 +30,7 @@ if [ -d "$BUILD_DIR/$APP_NAME.app" ]; then
     cp -R "$BUILD_DIR/$APP_NAME.app" "$DMG_DIR/"
 else
     echo "❌ Error: $APP_NAME.app not found in $BUILD_DIR"
-    echo "Please run build-app.sh first"
+    echo "Please run build-app-auto-install.sh first"
     exit 1
 fi
 
@@ -123,19 +123,19 @@ echo "Mounted at: $MOUNT_DIR"
 echo "🎨 Configuring DMG window..."
 osascript << 'APPLESCRIPT'
 tell application "Finder"
-    tell disk "AIPrivateSearch"
+    tell disk "AIPrivateSearch-installer"
         open
         set current view of container window to icon view
         set toolbar visible of container window to false
         set statusbar visible of container window to false
-        set the bounds of container window to {400, 100, 1000, 500}
+        set the bounds of container window to {400, 100, 1200, 600}
         set viewOptions to the icon view options of container window
         set arrangement of viewOptions to not arranged
-        set icon size of viewOptions to 128
+        set icon size of viewOptions to 256
         
         -- Position icons
-        set position of item "AIPrivateSearch.app" of container window to {150, 200}
-        set position of item "Applications" of container window to {450, 200}
+        set position of item "AIPrivateSearch-installer.app" of container window to {200, 250}
+        set position of item "Applications" of container window to {600, 250}
         
         close
         open

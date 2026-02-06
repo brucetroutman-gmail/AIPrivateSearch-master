@@ -28,11 +28,11 @@ mkdir -p "$SCRIPTS_DIR"
 mkdir -p "$RESOURCES_DIR"
 
 # Copy the .app bundle
-if [ -d "./build/AIPrivateSearch.app" ]; then
-    echo "📋 Copying AIPrivateSearch.app..."
-    cp -R "./build/AIPrivateSearch.app" "$PKG_ROOT/Applications/"
+if [ -d "./build/AIPrivateSearch-installer.app" ]; then
+    echo "📋 Copying AIPrivateSearch-installer.app..."
+    cp -R "./build/AIPrivateSearch-installer.app" "$PKG_ROOT/Applications/"
 else
-    echo "⚠️  Warning: AIPrivateSearch.app not found. Run build-app-auto-install.sh first."
+    echo "⚠️  Warning: AIPrivateSearch-installer.app not found. Run build-app-auto-install.sh first."
     exit 1
 fi
 
@@ -90,7 +90,7 @@ osascript <<-APPLESCRIPT
     tell application "System Events"
         display dialog "AIPrivateSearch has been installed successfully!
 
-Location: /Applications/AIPrivateSearch.app
+Location: /Applications/AIPrivateSearch-installer.app
 
 When you launch AIPrivateSearch, it will:
 • Automatically install Node.js (if needed)
@@ -104,7 +104,7 @@ The first launch may take several minutes.
 Ready to launch AIPrivateSearch?" with title "Installation Complete" buttons {"Not Now", "Launch Now"} default button "Launch Now"
         
         if button returned of result is "Launch Now" then
-            do shell script "open -a AIPrivateSearch"
+            do shell script "open -a AIPrivateSearch-installer"
         end if
     end tell
 APPLESCRIPT

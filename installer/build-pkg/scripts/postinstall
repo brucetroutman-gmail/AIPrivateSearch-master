@@ -17,7 +17,7 @@ osascript <<-APPLESCRIPT
     tell application "System Events"
         display dialog "AIPrivateSearch has been installed successfully!
 
-Location: /Applications/AIPrivateSearch.app
+Location: /Applications/AIPrivateSearch-installer.app
 
 When you launch AIPrivateSearch, it will:
 • Automatically install Node.js (if needed)
@@ -31,7 +31,7 @@ The first launch may take several minutes.
 Ready to launch AIPrivateSearch?" with title "Installation Complete" buttons {"Not Now", "Launch Now"} default button "Launch Now"
         
         if button returned of result is "Launch Now" then
-            do shell script "open -a AIPrivateSearch"
+            do shell script "open -a AIPrivateSearch-installer"
         end if
     end tell
 APPLESCRIPT
