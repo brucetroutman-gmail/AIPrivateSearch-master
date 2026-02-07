@@ -407,11 +407,76 @@ fi
 
 echo "✅ Step 3 completed!"
 echo ""
-echo "🎉 Ollama installation test completed!"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  🌐 Step 4: Chrome Installation"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check if Chrome already installed
+if [ -d "/Applications/Google Chrome.app" ]; then
+    echo "✅ Chrome already installed"
+    CHROME_VERSION=\$(/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --version 2>/dev/null || echo "Unknown version")
+    echo "📝 Current version: \$CHROME_VERSION"
+else
+    echo "📥 Installing Chrome..."
+    
+    cd "\$APP_SUPPORT"
+    
+    # Use Chrome PKG installer (like Ollama approach)
+    CHROME_URL="https://dl.google.com/chrome/mac/universal/stable/gcem/GoogleChrome.pkg"
+    echo "📦 Chrome target: Universal PKG installer"
+    echo "🌐 Download URL: \$CHROME_URL"
+    
+    # Get admin password for Chrome installation
+    if get_admin_password; then
+        echo "🌐 Installing Chrome with administrator privileges..."
+        
+        # Download Chrome PKG
+        CHROME_PKG="GoogleChrome.pkg"
+        echo "🌐 Downloading Chrome..."
+        
+        if curl -L -o "\$CHROME_PKG" "\$CHROME_URL"; then
+            echo "✅ Chrome download completed"
+            
+            # Install PKG with admin password
+            echo "📦 Installing Chrome PKG..."
+            
+            # Use direct sudo with password (same as working pattern)
+            echo "\$ADMIN_PASSWORD" | sudo -S installer -pkg "\$CHROME_PKG" -target / 2>/dev/null
+            
+            if [ \$? -eq 0 ]; then
+                echo "✅ Chrome installed successfully"
+                
+                # Verify installation
+                if [ -d "/Applications/Google Chrome.app" ]; then
+                    echo "✅ Chrome verification successful"
+                    CHROME_VERSION=\$(/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --version 2>/dev/null || echo "Installed successfully")
+                    echo "📝 Chrome version: \$CHROME_VERSION"
+                else
+                    echo "❌ Chrome not found after installation"
+                fi
+            else
+                echo "❌ Chrome installation failed"
+            fi
+            
+            # Cleanup PKG
+            rm -f "\$CHROME_PKG"
+        else
+            echo "❌ Chrome download failed"
+        fi
+    else
+        echo "❌ Administrator password required for Chrome installation"
+        echo "Please install Chrome manually from https://www.google.com/chrome"
+    fi
+fi
+
+echo "✅ Step 4 completed!"
+echo ""
+echo "🎉 Chrome installation test completed!"
 echo "Next: Add model download and app setup"
 
-show_dialog "Step 3 Complete" \\
-    "Ollama installation completed!
+show_dialog "Step 4 Complete" \\
+    "Chrome installation completed!
 
 Check the log for details:
 \$LOG_FILE

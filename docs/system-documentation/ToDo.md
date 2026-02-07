@@ -64,6 +64,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.11)
+388. Implemented Chrome installation in installer using PKG method: Added Chrome as Step 4 in installer using official Google Chrome PKG installer. Fixed initial issues with DMG mounting and ZIP extraction by switching to PKG approach which installs silently without GUI dialogs. Chrome installation now uses same admin password pattern as Ollama installation with proper verification and error handling. Installer now successfully installs Node.js, Ollama, and Chrome prerequisites automatically. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.10)
 387. Fixed PATH configuration issues for Node.js and Ollama commands in installer: Resolved installer architecture detection problems on M4 Mac Mini by using runtime detection instead of build-time variables. Fixed centralized password management for Ollama installation with proper AppleScript dialogs. Corrected PATH configuration to ensure both Node.js and Ollama commands work properly in terminal after installation. Enhanced installer with proper error handling and verification steps for successful prerequisite installation. --done
 

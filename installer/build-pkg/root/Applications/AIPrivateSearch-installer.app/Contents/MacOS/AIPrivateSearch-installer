@@ -3,7 +3,7 @@
 # AIPrivateSearch Simple Test Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="5.1"
+INSTALLER_VERSION="5.6"
 
 # Create directories
 mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
@@ -51,7 +51,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_99913"
+            TEMP_TEST_FILE="/tmp/aips_test_51593"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -163,6 +163,10 @@ else
         if [ -d "$NODE_DIR" ]; then
             mv "$NODE_DIR" "$APP_SUPPORT/node"
             
+            # Fix permissions on Node.js binaries
+            chmod +x "$APP_SUPPORT/node/bin/node"
+            chmod +x "$APP_SUPPORT/node/bin/npm"
+            
             # Add to PATH for this session
             export PATH="$APP_SUPPORT/node/bin:$PATH"
             
@@ -245,20 +249,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_99913"
+TEMP_PASS_FILE="/tmp/aips_pass_51593"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_99913' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_51593' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_99913 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_51593 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
@@ -327,11 +331,76 @@ fi
 
 echo "✅ Step 3 completed!"
 echo ""
-echo "🎉 Ollama installation test completed!"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  🌐 Step 4: Chrome Installation"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check if Chrome already installed
+if [ -d "/Applications/Google Chrome.app" ]; then
+    echo "✅ Chrome already installed"
+    CHROME_VERSION=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version 2>/dev/null || echo "Unknown version")
+    echo "📝 Current version: $CHROME_VERSION"
+else
+    echo "📥 Installing Chrome..."
+    
+    cd "$APP_SUPPORT"
+    
+    # Use Chrome PKG installer (like Ollama approach)
+    CHROME_URL="https://dl.google.com/chrome/mac/universal/stable/gcem/GoogleChrome.pkg"
+    echo "📦 Chrome target: Universal PKG installer"
+    echo "🌐 Download URL: $CHROME_URL"
+    
+    # Get admin password for Chrome installation
+    if get_admin_password; then
+        echo "🌐 Installing Chrome with administrator privileges..."
+        
+        # Download Chrome PKG
+        CHROME_PKG="GoogleChrome.pkg"
+        echo "🌐 Downloading Chrome..."
+        
+        if curl -L -o "$CHROME_PKG" "$CHROME_URL"; then
+            echo "✅ Chrome download completed"
+            
+            # Install PKG with admin password
+            echo "📦 Installing Chrome PKG..."
+            
+            # Use direct sudo with password (same as working pattern)
+            echo "$ADMIN_PASSWORD" | sudo -S installer -pkg "$CHROME_PKG" -target / 2>/dev/null
+            
+            if [ $? -eq 0 ]; then
+                echo "✅ Chrome installed successfully"
+                
+                # Verify installation
+                if [ -d "/Applications/Google Chrome.app" ]; then
+                    echo "✅ Chrome verification successful"
+                    CHROME_VERSION=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version 2>/dev/null || echo "Installed successfully")
+                    echo "📝 Chrome version: $CHROME_VERSION"
+                else
+                    echo "❌ Chrome not found after installation"
+                fi
+            else
+                echo "❌ Chrome installation failed"
+            fi
+            
+            # Cleanup PKG
+            rm -f "$CHROME_PKG"
+        else
+            echo "❌ Chrome download failed"
+        fi
+    else
+        echo "❌ Administrator password required for Chrome installation"
+        echo "Please install Chrome manually from https://www.google.com/chrome"
+    fi
+fi
+
+echo "✅ Step 4 completed!"
+echo ""
+echo "🎉 Chrome installation test completed!"
 echo "Next: Add model download and app setup"
 
-show_dialog "Step 3 Complete" \
-    "Ollama installation completed!
+show_dialog "Step 4 Complete" \
+    "Chrome installation completed!
 
 Check the log for details:
 $LOG_FILE
