@@ -64,6 +64,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.13)
+390. Enhanced installer with dependency installation and AI model download: Added Step 6 for npm install of main project and server dependencies using installed Node.js. Added Step 7 for AI model download that reads from models-list.json configuration file and downloads all specified models using ollama pull commands. Fixed JSON parsing to use "modelName" field and enforced strict configuration requirement without fallback. Installer now completes full 7-step automated setup process. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.12)
 389. Fixed installer repository download and Ollama detection issues: Corrected GitHub repository URL to use brucetroutman-gmail/AIPrivateSearch-master instead of incorrect username. Fixed shell script syntax error by removing extra fi statement. Enhanced Ollama detection to check multiple installation locations (system PATH, application bundle, local symlink) to prevent unnecessary reinstallation. Repository now downloads fresh 75MB ZIP file and extracts all files correctly without conflicts. --done
 

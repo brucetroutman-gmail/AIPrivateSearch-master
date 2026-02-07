@@ -3,7 +3,7 @@
 # AIPrivateSearch Simple Test Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="6.4"
+INSTALLER_VERSION="6.9"
 
 # Create directories
 mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
@@ -51,7 +51,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_93842"
+            TEMP_TEST_FILE="/tmp/aips_test_18783"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -260,20 +260,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_93842"
+TEMP_PASS_FILE="/tmp/aips_pass_18783"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_93842' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_18783' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_93842 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_18783 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
@@ -483,14 +483,148 @@ fi
 
 echo "✅ Step 5 completed!"
 echo ""
-echo "🎉 Repository setup completed!"
-echo "Next: Install dependencies and start servers"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  📦 Step 6: Dependency Installation"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
-show_dialog "Step 5 Complete" \
-    "Repository setup completed!
+# Install dependencies using our installed Node.js
+echo "📦 Installing project dependencies..."
+
+# Ensure we're in the repository directory
+cd "$APP_SUPPORT/repo/aiprivatesearch"
+
+# Add Node.js to PATH for this session
+export PATH="$APP_SUPPORT/node/bin:$PATH"
+
+# Verify Node.js is available
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js not found in PATH"
+    echo "Please ensure Node.js installation completed successfully"
+else
+    NODE_VERSION=$(node --version)
+    NPM_VERSION=$(npm --version)
+    echo "✅ Node.js $NODE_VERSION and npm $NPM_VERSION available"
+    
+    # Install main project dependencies
+    echo "📦 Installing main project dependencies..."
+    if npm install; then
+        echo "✅ Main project dependencies installed successfully"
+    else
+        echo "❌ Main project dependency installation failed"
+    fi
+    
+    # Install server dependencies
+    echo "📦 Installing server dependencies..."
+    cd "server/s01_server-first-app"
+    
+    if npm install; then
+        echo "✅ Server dependencies installed successfully"
+    else
+        echo "❌ Server dependency installation failed"
+    fi
+    
+    # Return to main directory
+    cd "$APP_SUPPORT/repo/aiprivatesearch"
+fi
+
+echo "✅ Step 6 completed!"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  🤖 Step 7: AI Model Download"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Download AI models from model-list.json
+echo "🤖 Downloading AI models from configuration..."
+
+# Verify Ollama is available
+if command -v ollama &> /dev/null; then
+    OLLAMA_CMD="ollama"
+elif [ -f "$APP_SUPPORT/ollama" ]; then
+    OLLAMA_CMD="$APP_SUPPORT/ollama"
+elif [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
+    OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
+else
+    echo "❌ Ollama not found - cannot download models"
+    echo "Please ensure Ollama installation completed successfully"
+    echo "✅ Step 7 completed!"
+    echo ""
+    echo "🎉 AI model download completed!"
+    echo "Next: Start servers"
+    
+    show_dialog "Step 7 Complete" \
+        "AI model download completed!
 
 Check the log for details:
 $LOG_FILE
 
-Next: Install dependencies and start servers" \
+Next: Start servers" \
+        "note"
+    exit 0
+fi
+
+echo "✅ Ollama available at: $OLLAMA_CMD"
+
+# Read models from models-list.json
+MODEL_LIST_FILE="$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/models-list.json"
+
+if [ -f "$MODEL_LIST_FILE" ]; then
+    echo "📝 Reading models from $MODEL_LIST_FILE"
+    
+    # Extract model names from JSON (simple grep approach)
+    MODELS=$(grep '"modelName"' "$MODEL_LIST_FILE" | sed 's/.*"modelName"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | sort -u)
+    
+    if [ -n "$MODELS" ]; then
+        echo "📥 Found models to download:"
+        echo "$MODELS" | while read -r model; do
+            echo "  - $model"
+        done
+        
+        # Download each model
+        echo "$MODELS" | while read -r model; do
+            if [ -n "$model" ]; then
+                echo "📥 Downloading $model..."
+                if "$OLLAMA_CMD" pull "$model"; then
+                    echo "✅ $model downloaded successfully"
+                else
+                    echo "❌ $model download failed"
+                fi
+            fi
+        done
+    else
+        echo "❌ No models found in $MODEL_LIST_FILE"
+    fi
+else
+    echo "❌ Model list file not found: $MODEL_LIST_FILE"
+    echo "❌ Cannot proceed without model configuration"
+    echo "❌ Installation failed - missing model-list.json"
+    
+    show_dialog "Installation Error" \
+        "Model configuration file missing!
+
+Required file: $MODEL_LIST_FILE
+
+Installation cannot continue." \
+        "stop"
+    
+    exit 1
+fi
+
+# List available models
+echo "📝 Available models:"
+"$OLLAMA_CMD" list
+
+echo "✅ Step 7 completed!"
+echo ""
+echo "🎉 AI model download completed!"
+echo "Next: Start servers"
+
+show_dialog "Step 7 Complete" \
+    "AI model download completed!
+
+Check the log for details:
+$LOG_FILE
+
+Next: Start servers" \
     "note"
