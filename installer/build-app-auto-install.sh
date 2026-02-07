@@ -288,10 +288,21 @@ echo "  🤖 Step 3: Ollama Installation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Check if Ollama already installed (system-wide)
-if command -v ollama &> /dev/null; then
+# Check if Ollama already installed (check multiple locations)
+if command -v ollama &> /dev/null || [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ] || [ -f "\$APP_SUPPORT/ollama" ]; then
     echo "✅ Ollama already installed"
-    OLLAMA_VERSION=\$(ollama --version)
+    
+    # Get version from available location
+    if command -v ollama &> /dev/null; then
+        OLLAMA_VERSION=\$(ollama --version 2>/dev/null || echo "Unknown version")
+    elif [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
+        OLLAMA_VERSION=\$(/Applications/Ollama.app/Contents/Resources/ollama --version 2>/dev/null || echo "Unknown version")
+    elif [ -f "\$APP_SUPPORT/ollama" ]; then
+        OLLAMA_VERSION=\$("\$APP_SUPPORT/ollama" --version 2>/dev/null || echo "Unknown version")
+    else
+        OLLAMA_VERSION="Unknown version"
+    fi
+    
     echo "📝 Current version: \$OLLAMA_VERSION"
     
     # Check if Ollama service is running
@@ -472,16 +483,92 @@ fi
 
 echo "✅ Step 4 completed!"
 echo ""
-echo "🎉 Chrome installation test completed!"
-echo "Next: Add model download and app setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  📦 Step 5: Repository Setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
-show_dialog "Step 4 Complete" \\
-    "Chrome installation completed!
+# Always download fresh repository (no existing check)
+echo "📥 Downloading fresh AIPrivateSearch repository..."
+
+cd "\$APP_SUPPORT"
+
+# Clean up any existing repo directory first
+if [ -d "repo/aiprivatesearch" ]; then
+    echo "🧹 Removing existing repository..."
+    rm -rf "repo/aiprivatesearch"
+fi
+    
+    # Download repository as ZIP (corrected URL)
+    REPO_ZIP_URL="https://github.com/brucetroutman-gmail/AIPrivateSearch-master/archive/refs/heads/main.zip"
+    REPO_ZIP="AIPrivateSearch-master-main.zip"
+    echo "🌐 Repository URL: \$REPO_ZIP_URL"
+    
+    if curl -L -o "\$REPO_ZIP" "\$REPO_ZIP_URL"; then
+        # Check if download was successful (file size > 1000 bytes)
+        if [ -f "\$REPO_ZIP" ] && [ \$(stat -f%z "\$REPO_ZIP" 2>/dev/null || echo 0) -gt 1000 ]; then
+            echo "✅ Repository download completed (\$(stat -f%z "\$REPO_ZIP" 2>/dev/null || echo 0) bytes)"
+            
+            # Extract ZIP
+            echo "📦 Extracting repository..."
+            
+            # Clean up any existing extracted directory too
+            if [ -d "AIPrivateSearch-master-main" ]; then
+                echo "🧹 Removing existing extracted files..."
+                rm -rf "AIPrivateSearch-master-main"
+            fi
+            
+            if unzip -q "\$REPO_ZIP"; then
+                echo "✅ Repository extracted successfully"
+                
+                # Move to expected location
+                if [ -d "AIPrivateSearch-master-main" ]; then
+                    mkdir -p "repo"
+                    mv "AIPrivateSearch-master-main" "repo/aiprivatesearch"
+                    
+                    cd "repo/aiprivatesearch"
+                    
+                    # Verify repository structure
+                    if [ -f "package.json" ] && [ -d "server" ]; then
+                        echo "✅ Repository structure verified"
+                        
+                        # Show repository info
+                        if [ -f "README.md" ]; then
+                            VERSION_LINE=\$(grep "Version.*|" README.md | head -1)
+                            echo "📝 Repository: \$VERSION_LINE"
+                        fi
+                    else
+                        echo "❌ Repository structure verification failed"
+                    fi
+                else
+                    echo "❌ Extracted directory not found"
+                fi
+            else
+                echo "❌ Failed to extract repository ZIP"
+            fi
+            
+            # Cleanup ZIP
+            rm -f "\$REPO_ZIP"
+        else
+            echo "❌ Repository download failed - file too small or missing"
+            rm -f "\$REPO_ZIP"
+        fi
+    else
+        echo "❌ Repository download failed"
+    fi
+
+echo "✅ Step 5 completed!"
+echo ""
+echo "🎉 Repository setup completed!"
+echo "Next: Install dependencies and start servers"
+
+show_dialog "Step 5 Complete" \\
+    "Repository setup completed!
 
 Check the log for details:
 \$LOG_FILE
 
-Next: Add model download and GitHub setup" \\
+Next: Install dependencies and start servers" \\
     "note"
 LAUNCHER_EOF
 

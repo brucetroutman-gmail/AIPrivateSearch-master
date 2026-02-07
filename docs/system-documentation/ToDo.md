@@ -64,6 +64,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.12)
+389. Fixed installer repository download and Ollama detection issues: Corrected GitHub repository URL to use brucetroutman-gmail/AIPrivateSearch-master instead of incorrect username. Fixed shell script syntax error by removing extra fi statement. Enhanced Ollama detection to check multiple installation locations (system PATH, application bundle, local symlink) to prevent unnecessary reinstallation. Repository now downloads fresh 75MB ZIP file and extracts all files correctly without conflicts. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.11)
 388. Implemented Chrome installation in installer using PKG method: Added Chrome as Step 4 in installer using official Google Chrome PKG installer. Fixed initial issues with DMG mounting and ZIP extraction by switching to PKG approach which installs silently without GUI dialogs. Chrome installation now uses same admin password pattern as Ollama installation with proper verification and error handling. Installer now successfully installs Node.js, Ollama, and Chrome prerequisites automatically. --done
 
