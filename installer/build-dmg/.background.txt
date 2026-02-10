@@ -1,4 +1,0 @@
-For a professional DMG, create a background image:
-- Size: 600x400 pixels (or 1200x800 for Retina)
-- Include arrow pointing from app to Applications
-- Save as .background/background.png
