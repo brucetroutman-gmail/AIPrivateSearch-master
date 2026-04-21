@@ -58,6 +58,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.15)
+392. Fixed device registration: Removed dead create-license call that always 404'd and added unnecessary latency. Improved error surfacing to show actual server error (error.response?.data?.error) instead of generic axios message. Fixed pre-commit hook and setup-hooks.sh to reference scripts in security/ folder. Installed root ESLint dependencies. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.14)
 391. Cleanup: Removed obsolete installer command files (load-AIPrivateSearch-1108.command, load-AIPrivateSearch-clean-test.command) and workspace file from repo - installers now hosted in web repo. Synced sources and data. --done
 

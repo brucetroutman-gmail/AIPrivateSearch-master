@@ -124,25 +124,7 @@ class DeviceLicenseClient {
         try {
             console.log('🔐 DEVICE LICENSE: Registering device:', { email, deviceUuid: this.deviceUuid, publicIp });
             
-            // Step 1: Try to create license if it doesn't exist
-            try {
-                console.log('🔐 DEVICE LICENSE: Attempting to create license for:', email);
-                const createResponse = await axios.post(`${this.custmgrUrl}/api/licensing/create-license`, {
-                    email: email
-                }, {
-                    timeout: 5000,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                console.log('🔐 DEVICE LICENSE: License creation response:', createResponse.data);
-            } catch (createError) {
-                // License might already exist, continue with device registration
-                console.log('🔐 DEVICE LICENSE: License creation failed (may already exist):', createError.response?.data || createError.message);
-            }
-            
-            // Step 2: Register device with public IP and PC code
+            // Register device with public IP and PC code
             const deviceData = {
                 email: email,
                 deviceUuid: this.deviceUuid,
@@ -182,7 +164,8 @@ class DeviceLicenseClient {
             }
         } catch (error) {
             console.error('🔐 DEVICE LICENSE: Device registration failed:', error.message);
-            return { success: false, error: `Registration failed: ${error.message}` };
+            const serverError = error.response?.data?.error || error.message;
+            return { success: false, error: `Registration failed: ${serverError}` };
         }
     }
 
