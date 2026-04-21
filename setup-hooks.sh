@@ -12,7 +12,7 @@ echo "🔒 Running pre-commit checks..."
 
 # Run ESLint first
 echo "🔍 Running ESLint..."
-./lint.sh
+./security/lint.sh
 
 if [ $? -ne 0 ]; then
     echo "❌ Commit blocked due to ESLint errors"
@@ -22,7 +22,7 @@ fi
 
 # Run security validation
 echo "🔒 Running security checks..."
-./security-check.sh
+./security/security-check.sh
 
 if [ $? -ne 0 ]; then
     echo "❌ Commit blocked due to security violations"
