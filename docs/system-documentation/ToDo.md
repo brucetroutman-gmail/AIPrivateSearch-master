@@ -3,14 +3,8 @@ to do AIPrivateSearch
 ## PENDING TASKS
 
 ### Immediate Priority (Next Sprint)
-2-001. Connect login and tier checking via license check system - currently disabled for testing, need to obtain tier level from license check after testing completion --completed
-2-002. Test Login and roles - srch-std gets wrong menus after login, fix role-based menu display --completed
-2-003. Update MySQL table searches with new column SearchMethodType - ensure code reflects this column and number of columns match --not needed
 2-004. Test multi search and view documents functionality
 2-005. Test multi prompts and ASCII characters handling
-2-041. Remove Database from Export Download on search page , return to export--completed
-2-042. Test Search page: document view is not working --completed
-2-044. Collect public IP address during device registration using npm public-ip package and store in custmgr database --completed
 
 ### Core System Improvements
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)
@@ -61,6 +55,11 @@ to do AIPrivateSearch
 2-038. Create competitive analysis and positioning documents
 2-039. Develop partner program for resellers (medical/legal consultants)
 2-040. Create case studies for medical practices and law firms
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.14)
+391. Cleanup: Removed obsolete installer command files (load-AIPrivateSearch-1108.command, load-AIPrivateSearch-clean-test.command) and workspace file from repo - installers now hosted in web repo. Synced sources and data. --done
 
 =======================================================
 
