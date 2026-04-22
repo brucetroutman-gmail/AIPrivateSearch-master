@@ -133,7 +133,8 @@ DELETE FROM devices WHERE device_uuid = 'test-device-uuid-00000000000000';
 
 | Repo | File | Change | Status |
 |------|------|--------|--------|
-| custmgr | `routes/licensing.mjs` | Surface actual SQL error in register-device catch block | To do |
+| custmgr | `routes/licensing.mjs` | Surface actual SQL error in register-device catch block | Done |
+| custmgr | `devices` table | Changed UNIQUE index from `device_uuid` to `(customer_id, device_uuid)` | Done |
 | aips | `lib/licensing/device-license-client.mjs` | Remove dead create-license call, improve error messages | Done |
 
 ## Key Insight

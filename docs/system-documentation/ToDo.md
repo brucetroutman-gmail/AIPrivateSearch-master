@@ -59,7 +59,7 @@ to do AIPrivateSearch
 =======================================================
 
 ## RECENTLY COMPLETED (v20.15)
-392. Fixed device registration: Removed dead create-license call that always 404'd and added unnecessary latency. Improved error surfacing to show actual server error (error.response?.data?.error) instead of generic axios message. Fixed pre-commit hook and setup-hooks.sh to reference scripts in security/ folder. Installed root ESLint dependencies. --done
+392. Fixed device registration: Removed dead create-license call that always 404'd and added unnecessary latency. Improved error surfacing to show actual server error (error.response?.data?.error) instead of generic axios message. Fixed pre-commit hook and setup-hooks.sh to reference scripts in security/ folder. Installed root ESLint dependencies. On custmgr: deployed improved error logging, fixed UNIQUE index on devices table from device_uuid to (customer_id, device_uuid) to match code lookup. Registration now succeeds end-to-end. --done
 
 =======================================================
 
