@@ -18,7 +18,7 @@ to do AIPrivateSearch
    - [x] Step 12: Test with multiple collections — switch collections, run searches, confirm results are collection-specific
    - [x] Step 13: Test error handling — search with no query, no collection selected, no model selected — confirm user-friendly error messages
    - [x] Step 14: Test performance table sorting — click column headers (Method, Results, Time, Score) and verify sort toggles asc/desc
-2-004.1 For all results show first 5 with link to show all results --done
+2-004.1 For all results show first 5 with link to show all results --done --verified on remote Mac
 2-005. Test multi prompts and ASCII characters handling (Remote Mac)
    - [ ] Step 1: Verify user prompts load on Search page — select "Local Model Only" source type, confirm 5 prompts appear in dropdown (KNOWLEDGE, REASON, CREATE, CODE, INSTRUCT)
    - [ ] Step 2: Test prompt selection fills query — select each prompt, confirm query field populates with full prompt text

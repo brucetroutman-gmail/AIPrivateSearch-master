@@ -864,6 +864,10 @@ function render(result) {
       defaultCollection: result.collection || 'unknown'
     });
     answerDiv.appendChild(formattedElement);
+  } else if ((result.searchType === 'line-search' || result.searchType === 'document-search' || result.searchType === 'document-index') && result.results) {
+    // Render directly using same path as multi-mode page
+    const searchResult = { results: result.results, method: result.searchType };
+    window.responseDisplayCommon.renderSearchResults(answerDiv, searchResult, result.collection);
   } else {
     // Convert result to multi-mode format and render for other search types
     const multiModeResult = window.responseDisplayCommon.convertToMultiModeFormat(result, result.searchType);
@@ -873,13 +877,13 @@ function render(result) {
       multiModeResult.results.forEach((formattedResult, index) => {
         if (result.results[index]) {
           const originalResult = result.results[index];
-          // For smart-search and hybrid-search, create document path from source
-          if (originalResult.source && result.collection) {
-            formattedResult.documentPath = `http://localhost:56306/api/documents/${result.collection}/${encodeURIComponent(originalResult.source)}/view`;
-          }
           // For line-search results, use existing documentPath
-          else if (originalResult.documentPath) {
+          if (originalResult.documentPath) {
             formattedResult.documentPath = originalResult.documentPath;
+          }
+          // For smart-search and hybrid-search, create document path from source
+          else if (originalResult.source && result.collection) {
+            formattedResult.documentPath = `${window.API_BASE_URL}/api/documents/${result.collection}/${encodeURIComponent(originalResult.source)}/view`;
           }
         }
       });
