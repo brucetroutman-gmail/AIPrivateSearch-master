@@ -3,22 +3,6 @@ to do AIPrivateSearch
 ## PENDING TASKS
 
 ### Immediate Priority (Next Sprint)
-2-004. Test multi search and view documents functionality (Remote Mac)
-   - [x] Step 1: Verify app starts cleanly — launch aiprivatesearch.app, confirm frontend (localhost:56305) and backend (localhost:56306) are accessible
-   - [x] Step 2: Navigate to Multi-Mode Search page — confirm page loads, collections populate, models populate
-   - [x] Step 3: Select a collection and verify user prompts filter correctly for that collection
-   - [x] Step 4: Test Non-AI methods only — check Document Index Cards, Line Search, Document Search, Smart Search, Hybrid Search with a simple query (e.g., "constitution")
-   - [x] Step 5: Test AI methods only — check AI Direct and AI Document Chat return responses with selected model
-   - [x] Step 6: Test "Select All" checkboxes — verify Select All Non-AI and Select All AI toggle their groups correctly
-   - [x] Step 7: Run all 7 methods simultaneously — confirm performance table populates with time/results/score for each method
-   - [x] Step 8: Test View Document — click on highlighted document name in results, confirm document viewer opens with line numbers and match highlighting (Note: highlighting only applies to exact match searches like Line Search) **FIXED: Unified search term highlighting in document viewer**
-   - [x] Step 9: Test View Document from Document Index Cards — confirm index card metadata displays correctly
-   - [x] Step 10: Wildcard/substring matching is now always ON for Line Search, Document Search, and Document Index Cards. Wildcard checkbox removed. **FIXED: "poli" will now find "policy"**
-   - [x] Step 11: Verify localStorage persistence — reload page, confirm selected methods, query, model, and collection are restored
-   - [x] Step 12: Test with multiple collections — switch collections, run searches, confirm results are collection-specific
-   - [x] Step 13: Test error handling — search with no query, no collection selected, no model selected — confirm user-friendly error messages
-   - [x] Step 14: Test performance table sorting — click column headers (Method, Results, Time, Score) and verify sort toggles asc/desc
-2-004.1 For all results show first 5 with link to show all results --done --verified on remote Mac
 2-005. Test multi prompts and ASCII characters handling (Remote Mac)
    - [ ] Step 1: Verify user prompts load on Search page — select "Local Model Only" source type, confirm 5 prompts appear in dropdown (KNOWLEDGE, REASON, CREATE, CODE, INSTRUCT)
    - [ ] Step 2: Test prompt selection fills query — select each prompt, confirm query field populates with full prompt text
@@ -63,11 +47,11 @@ to do AIPrivateSearch
 2-027. Implement backup/restore functionality for user data and collections 
 
 ### Business & Deployment
-2-028. Create marketing website/landing page for AIPrivateSearch  --done
+2-028. Create marketing website/landing page for AIPrivateSearch
 2-029. Create professional product screenshots and demo videos
-2-030. Develop pricing strategy and subscription management system  --done
-2-031. Create installer packages for easy deployment  --done
-2-032. Implement license key management system  --done
+2-030. Develop pricing strategy and subscription management system
+2-031. Create installer packages for easy deployment
+2-032. Implement license key management system
 2-033. Develop customer support system and documentation
 
 
@@ -76,6 +60,18 @@ to do AIPrivateSearch
 2-038. Create competitive analysis and positioning documents
 2-039. Develop partner program for resellers (medical/legal consultants)
 2-040. Create case studies for medical practices and law firms
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.16)
+393. Unified document viewer highlighting: Search terms now highlighted consistently across all search types when clicking document links. Server endpoint accepts ?search= param and highlights all occurrences with scroll-to-first-match. Removed hardcoded port from LineSearch documentPath. --done
+394. Always-on wildcard matching: Line Search, Document Search, and Document Index Cards now always use substring matching ("poli" finds "policy"). Removed wildcard checkbox UI and all related toggle logic from client and server. --done
+395. Show first 5 results with "Show all" link: All search result lists now display first 5 results with a clickable link to expand and show all. Applied consistently across CommonResultFormatter and responseDisplayCommon. --done
+396. Fixed search page line-search document links: Reordered documentPath check to use existing path before building from source, preventing filename:lineNumber from being encoded into URL. Replaced hardcoded localhost with window.API_BASE_URL. --done
+397. Unified search page rendering: Line Search, Document Search, and Document Index Cards on search page now render directly through responseDisplayCommon (same as multi-mode) instead of roundtripping through convertToMultiModeFormat. --done
+398. Fixed Document Index Cards excerpt highlighting: ExcerptFormatter now passes useWildcards=true to HighlightFormatter so partial search terms are highlighted in results. --done
+399. Added update-aips.sh script for quick repo refresh on remote Mac testing. --done
+400. Completed 2-004 testing (14/14 steps passed) on remote Mac via aiprivatesearch.app. --done
 
 =======================================================
 
