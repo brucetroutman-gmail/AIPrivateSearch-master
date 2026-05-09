@@ -18,8 +18,18 @@ to do AIPrivateSearch
    - [x] Step 12: Test with multiple collections — switch collections, run searches, confirm results are collection-specific
    - [x] Step 13: Test error handling — search with no query, no collection selected, no model selected — confirm user-friendly error messages
    - [x] Step 14: Test performance table sorting — click column headers (Method, Results, Time, Score) and verify sort toggles asc/desc
-2-004.1 For results show first 5 with links to show all   
-2-005. Test multi prompts and ASCII characters handling
+2-004.1 For all results show first 5 with link to show all results --done
+2-005. Test multi prompts and ASCII characters handling (Remote Mac)
+   - [ ] Step 1: Verify user prompts load on Search page — select "Local Model Only" source type, confirm 5 prompts appear in dropdown (KNOWLEDGE, REASON, CREATE, CODE, INSTRUCT)
+   - [ ] Step 2: Test prompt selection fills query — select each prompt, confirm query field populates with full prompt text
+   - [ ] Step 3: Test collection-specific prompts — switch to "Local Documents Only", select USA-History collection, confirm 5 USA-specific prompts appear
+   - [ ] Step 4: Test prompt switching between collections — change collection to Family-Documents, confirm prompts update to FAM- prefixed prompts
+   - [ ] Step 5: Test prompts on Multi-Mode Search page — select a collection, confirm prompts filter correctly for that collection
+   - [ ] Step 6: Test ASCII special characters in query — enter queries with: quotes (“test”), ampersand (&), angle brackets (<>), apostrophe (’s)
+   - [ ] Step 7: Test Unicode/extended characters — enter queries with: accented chars (é, ñ, ü), em-dash (—), curly quotes (“”), bullet (•)
+   - [ ] Step 8: Test query persistence with special chars — enter special character query, reload page, confirm query restores correctly from localStorage
+   - [ ] Step 9: Test prompt with special chars in results — run a search that returns content containing special characters, confirm display is correct (no HTML entities showing)
+   - [ ] Step 10: Test empty/no prompts state — select a collection with no configured prompts, confirm dropdown shows "Select a prompt..." without errors
 
 ### Core System Improvements
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)

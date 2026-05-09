@@ -45,9 +45,16 @@ window.responseDisplayCommon = {
         }
         
         // Format other search types with consistent styling
-        searchResult.results.forEach((result) => {
+        const totalResults = searchResult.results.length;
+        const INITIAL_COUNT = 5;
+        
+        searchResult.results.forEach((result, index) => {
             const div = document.createElement('div');
             div.className = 'result-item';
+            if (index >= INITIAL_COUNT) {
+                div.classList.add('hidden-result');
+                div.style.display = 'none';
+            }
             
             const header = document.createElement('div');
             header.className = 'result-header';
@@ -87,6 +94,23 @@ window.responseDisplayCommon = {
             div.appendChild(meta);
             container.appendChild(div);
         });
+        
+        // Add "Show all" link if there are more results
+        if (totalResults > INITIAL_COUNT) {
+            const showAllLink = document.createElement('a');
+            showAllLink.href = '#';
+            showAllLink.className = 'show-all-results-link';
+            showAllLink.textContent = `Show all ${totalResults} results`;
+            showAllLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                container.querySelectorAll('.hidden-result').forEach(item => {
+                    item.classList.remove('hidden-result');
+                    item.style.display = '';
+                });
+                showAllLink.style.display = 'none';
+            });
+            container.appendChild(showAllLink);
+        }
     },
 
     // Convert search result to multi-mode format

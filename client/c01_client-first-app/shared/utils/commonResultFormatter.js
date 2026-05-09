@@ -1,6 +1,8 @@
 // Common result formatter for Line Search, Document Search, and Document Index Search
 
 class CommonResultFormatter {
+  static INITIAL_DISPLAY_COUNT = 5;
+
   // Format search results with consistent structure
   static formatSearchResults(results, options = {}) {
     const { 
@@ -18,8 +20,40 @@ class CommonResultFormatter {
     }
 
     container.className = `${resultType}-results`;
+    const totalResults = results.length;
     
     results.forEach((result, index) => {
+      const item = this.createResultItem(result, index, resultType, showScore, defaultCollection);
+      // Hide items beyond the initial display count
+      if (index >= this.INITIAL_DISPLAY_COUNT) {
+        item.classList.add('hidden-result');
+        item.style.display = 'none';
+      }
+      container.appendChild(item);
+    });
+    
+    // Add "Show all" link if there are more results
+    if (totalResults > this.INITIAL_DISPLAY_COUNT) {
+      const showAllLink = document.createElement('a');
+      showAllLink.href = '#';
+      showAllLink.className = 'show-all-results-link';
+      showAllLink.textContent = `Show all ${totalResults} results`;
+      showAllLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        container.querySelectorAll('.hidden-result').forEach(item => {
+          item.classList.remove('hidden-result');
+          item.style.display = '';
+        });
+        showAllLink.style.display = 'none';
+      });
+      container.appendChild(showAllLink);
+    }
+    
+    return container;
+  }
+
+  // Create a single result item element
+  static createResultItem(result, index, resultType, showScore, defaultCollection) {
       const item = document.createElement('div');
       item.className = 'result-item';
       
@@ -113,10 +147,7 @@ class CommonResultFormatter {
       
       item.appendChild(header);
       item.appendChild(excerpt);
-      container.appendChild(item);
-    });
-    
-    return container;
+      return item;
   }
 }
 

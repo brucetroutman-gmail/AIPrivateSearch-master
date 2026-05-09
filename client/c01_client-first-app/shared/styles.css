@@ -1298,6 +1298,24 @@ mark.search-highlight,
   color: #b0e0e6 !important;
 }
 
+.show-all-results-link {
+  display: block;
+  margin: 12px 0;
+  padding: 8px 12px;
+  color: #0066cc;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.show-all-results-link:hover {
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .show-all-results-link {
+  color: #87ceeb;
+}
+
 /* User Management Styles */
 .container {
   max-width: 1200px;
