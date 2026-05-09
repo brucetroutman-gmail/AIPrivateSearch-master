@@ -1217,6 +1217,10 @@ form.addEventListener('submit', async (e) => {
     updateProgress('Searching');
     const trimmedQuery = DOMSanitizer.sanitizeText(queryEl.value.trim());
     const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
+    
+    // Store query globally for document viewer highlighting
+    window._lastSearchQuery = trimmedQuery;
+    
     let result;
     if (searchType === 'document-search') {
       // Use same endpoint as multi-mode for document-search searches

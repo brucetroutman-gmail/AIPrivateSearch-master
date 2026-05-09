@@ -3,7 +3,22 @@ to do AIPrivateSearch
 ## PENDING TASKS
 
 ### Immediate Priority (Next Sprint)
-2-004. Test multi search and view documents functionality
+2-004. Test multi search and view documents functionality (Remote Mac)
+   - [x] Step 1: Verify app starts cleanly — launch aiprivatesearch.app, confirm frontend (localhost:56305) and backend (localhost:56306) are accessible
+   - [x] Step 2: Navigate to Multi-Mode Search page — confirm page loads, collections populate, models populate
+   - [x] Step 3: Select a collection and verify user prompts filter correctly for that collection
+   - [x] Step 4: Test Non-AI methods only — check Document Index Cards, Line Search, Document Search, Smart Search, Hybrid Search with a simple query (e.g., "constitution")
+   - [x] Step 5: Test AI methods only — check AI Direct and AI Document Chat return responses with selected model
+   - [x] Step 6: Test "Select All" checkboxes — verify Select All Non-AI and Select All AI toggle their groups correctly
+   - [x] Step 7: Run all 7 methods simultaneously — confirm performance table populates with time/results/score for each method
+   - [x] Step 8: Test View Document — click on highlighted document name in results, confirm document viewer opens with line numbers and match highlighting (Note: highlighting only applies to exact match searches like Line Search) **FIXED: Unified search term highlighting in document viewer**
+   - [x] Step 9: Test View Document from Document Index Cards — confirm index card metadata displays correctly
+   - [ ] Step 10: Test wildcard toggle — enable wildcards, run Line Search with pattern (e.g., "constit*"), confirm wildcard matching works **ISSUE: Wildcard checkbox is invisible, wildcard searching is off ("poli" not found, "policy" is found)**
+   - [x] Step 11: Verify localStorage persistence — reload page, confirm selected methods, query, model, and collection are restored
+   - [x] Step 12: Test with multiple collections — switch collections, run searches, confirm results are collection-specific
+   - [x] Step 13: Test error handling — search with no query, no collection selected, no model selected — confirm user-friendly error messages
+   - [x] Step 14: Test performance table sorting — click column headers (Method, Results, Time, Score) and verify sort toggles asc/desc
+2-004.1 For results show first 5 with links to show all   
 2-005. Test multi prompts and ASCII characters handling
 
 ### Core System Improvements
@@ -11,7 +26,7 @@ to do AIPrivateSearch
 2-007. Make Response matches and View Document consistent across all types, add View Index Card to Doc Index Cards response
 2-008. Create testCodes for DocumentSearch performance optimization
 2-009. Review chunking strategy - analyze chunk size for small and large documents (many documents are only 2 chunks), evaluate pros and cons of changing chunk sizes
-2-010. Enhance database saving to add documents only
+2-010. Enhance database saving to add documents only 
 
 ### User Experience & Interface
 2-011. Create comprehensive quick start video
@@ -32,23 +47,19 @@ to do AIPrivateSearch
 2-045. Upgrade RAG system from Level 2 to Level 4: Implement hybrid search (semantic + BM25 keyword matching with alpha tuning), add cross-encoder reranking to improve "correct chunk in top 3" from ~68% to ~89%, and add confidence scoring for production reliability. Priority: Reranking first (biggest accuracy gain), then hybrid search, then confidence thresholds.
 
 ### Analytics & Monitoring
-2-024. Create admin dashboard with usage analytics
+2-024. Create admin dashboard with usage analytics 
 2-025. Implement usage analytics and telemetry (privacy-compliant)
-2-026. Implement search result export (PDF/CSV) functionality
-2-027. Implement backup/restore functionality for user data and collections
+2-026. Implement search result export (PDF/CSV) functionality 
+2-027. Implement backup/restore functionality for user data and collections 
 
 ### Business & Deployment
-2-028. Create marketing website/landing page for AIPrivateSearch
+2-028. Create marketing website/landing page for AIPrivateSearch  --done
 2-029. Create professional product screenshots and demo videos
-2-030. Develop pricing strategy and subscription management system
-2-031. Create installer packages for easy deployment
-2-032. Implement license key management system
+2-030. Develop pricing strategy and subscription management system  --done
+2-031. Create installer packages for easy deployment  --done
+2-032. Implement license key management system  --done
 2-033. Develop customer support system and documentation
-2-034. What changes to load aips.command if repo is made private?
 
-### Advanced Features
-2-035. Create Electron app for local macOS deployment
-2-036. Create app for load-AIPrivateSearch-xxxx.command
 
 ### Compliance & Legal
 2-037. Create HIPAA compliance documentation and certification

@@ -159,6 +159,9 @@ async function performAllSearches() {
         return;
     }
     
+    // Store query globally for document viewer highlighting
+    window._lastSearchQuery = query;
+    
     if (!collection) {
         window.showUserMessage('Please select a collection', 'error');
         return;

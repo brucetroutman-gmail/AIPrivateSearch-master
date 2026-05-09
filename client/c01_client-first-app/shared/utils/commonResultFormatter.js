@@ -56,13 +56,25 @@ class CommonResultFormatter {
           }
         }
         
+        // Get search term from the current query for document viewer highlighting
+        const searchTerm = result.searchTerm || window._lastSearchQuery || null;
+        
         // Use documentPath if available (from line-search results)
         if (result.documentPath) {
           const resultText = document.createTextNode(`Result ${index + 1}: `);
           title.appendChild(resultText);
           
           const filenameLink = document.createElement('a');
-          filenameLink.href = result.documentPath;
+          // Append search term to existing documentPath if not already present
+          let docUrl = result.documentPath;
+          // Prepend API base URL if path is relative
+          if (docUrl.startsWith('/api/')) {
+            docUrl = window.API_BASE_URL + docUrl;
+          }
+          if (searchTerm && !docUrl.includes('search=')) {
+            docUrl += (docUrl.includes('?') ? '&' : '?') + 'search=' + encodeURIComponent(searchTerm);
+          }
+          filenameLink.href = docUrl;
           filenameLink.target = '_blank';
           filenameLink.className = 'filename-link';
           filenameLink.textContent = result.title;
@@ -71,7 +83,9 @@ class CommonResultFormatter {
           const resultText = document.createTextNode(`Result ${index + 1}: `);
           title.appendChild(resultText);
           
-          const linkOptions = lineNumber ? { lineNumber: parseInt(lineNumber) } : {};
+          const linkOptions = {};
+          if (lineNumber) linkOptions.lineNumber = parseInt(lineNumber);
+          if (searchTerm) linkOptions.searchTerm = searchTerm;
           const filenameLink = window.documentViewerCommon.createViewDocumentLink(collection, filename, linkOptions);
           filenameLink.textContent = filename; // Use filename instead of result.title
           filenameLink.className = 'filename-link';

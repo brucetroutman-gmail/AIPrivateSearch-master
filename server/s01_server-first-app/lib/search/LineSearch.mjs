@@ -134,7 +134,8 @@ export class LineSearch {
           score: this.calculateRelevanceScore(line.text, query),
           source: `${path.basename(filePath)}:${line.number}`,
           lineNumber: line.number,
-          documentPath: `http://localhost:56306/api/documents/${collection.name}/${path.basename(filePath)}/view?line=${line.number}`
+          searchTerm: query,
+          documentPath: `/api/documents/${collection.name}/${encodeURIComponent(path.basename(filePath))}/view?line=${line.number}&search=${encodeURIComponent(query)}`
         });
       }
     }
