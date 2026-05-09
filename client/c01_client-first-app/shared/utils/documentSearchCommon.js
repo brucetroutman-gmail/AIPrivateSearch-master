@@ -7,7 +7,7 @@ class DocumentSearchCommon {
   }
 
   // Perform document search using the document-search endpoint
-  async performDocumentSearch(query, collection, useWildcards = false) {
+  async performDocumentSearch(query, collection) {
     const startTime = Date.now();
     
     try {
@@ -17,8 +17,7 @@ class DocumentSearchCommon {
         body: JSON.stringify({ 
           query, 
           options: { 
-            collection, 
-            useWildcards 
+            collection
           } 
         })
       });
@@ -59,8 +58,8 @@ class DocumentSearchCommon {
   }
 
   // Handle document search in search page context
-  async handleSearchPageDocumentSearch(query, collection, useWildcards = false) {
-    const searchResult = await this.performDocumentSearch(query, collection, useWildcards);
+  async handleSearchPageDocumentSearch(query, collection) {
+    const searchResult = await this.performDocumentSearch(query, collection);
     
     if (!searchResult.results || searchResult.results.length === 0) {
       return 'No relevant documents found using Document Search.';

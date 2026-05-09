@@ -14,7 +14,8 @@ export class LineSearch {
   }
 
   async search(query, options = {}) {
-    const { caseSensitive = false, wholeWords = false, collection = null, useWildcards = false } = options;
+    const { caseSensitive = false, wholeWords = false, collection = null } = options;
+    const useWildcards = true; // Always use wildcard/substring matching
     const results = [];
     
     // Process natural language queries into keywords

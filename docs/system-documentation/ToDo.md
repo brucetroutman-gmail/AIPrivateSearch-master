@@ -13,7 +13,7 @@ to do AIPrivateSearch
    - [x] Step 7: Run all 7 methods simultaneously — confirm performance table populates with time/results/score for each method
    - [x] Step 8: Test View Document — click on highlighted document name in results, confirm document viewer opens with line numbers and match highlighting (Note: highlighting only applies to exact match searches like Line Search) **FIXED: Unified search term highlighting in document viewer**
    - [x] Step 9: Test View Document from Document Index Cards — confirm index card metadata displays correctly
-   - [ ] Step 10: Test wildcard toggle — enable wildcards, run Line Search with pattern (e.g., "constit*"), confirm wildcard matching works **ISSUE: Wildcard checkbox is invisible, wildcard searching is off ("poli" not found, "policy" is found)**
+   - [x] Step 10: Wildcard/substring matching is now always ON for Line Search, Document Search, and Document Index Cards. Wildcard checkbox removed. **FIXED: "poli" will now find "policy"**
    - [x] Step 11: Verify localStorage persistence — reload page, confirm selected methods, query, model, and collection are restored
    - [x] Step 12: Test with multiple collections — switch collections, run searches, confirm results are collection-specific
    - [x] Step 13: Test error handling — search with no query, no collection selected, no model selected — confirm user-friendly error messages

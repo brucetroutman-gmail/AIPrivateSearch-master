@@ -69,7 +69,7 @@ class SearchManager {
           result = await this.performLineSearch(query, options);
           break;
         case 'document-search':
-          result = await window.documentSearchCommon.performDocumentSearch(query, options.collection, options.useWildcards);
+          result = await window.documentSearchCommon.performDocumentSearch(query, options.collection);
           break;
         case 'smart-search':
           result = await window.smartSearchCommon.performSmartSearch(query, options.collection, 5);

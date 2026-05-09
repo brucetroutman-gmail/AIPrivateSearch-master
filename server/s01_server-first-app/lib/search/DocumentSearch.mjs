@@ -15,7 +15,8 @@ export class DocumentSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null, useWildcards = false } = options;
+    const { collection = null } = options;
+    const useWildcards = true; // Always use wildcard/substring matching
     
 
     try {

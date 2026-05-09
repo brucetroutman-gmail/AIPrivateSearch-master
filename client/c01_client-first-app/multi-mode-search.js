@@ -20,8 +20,6 @@ const performanceTableBody = document.getElementById('performanceTableBody');
 const selectAllNonAICheckbox = document.getElementById('selectAllNonAI');
 const selectAllAICheckbox = document.getElementById('selectAllAI');
 const methodCheckboxes = document.querySelectorAll('.method-checkbox');
-const wildcardOption = document.getElementById('wildcardOption');
-const useWildcardsMulti = document.getElementById('useWildcardsMulti');
 
 // Search methods configuration (names only - endpoints are hardcoded in functions)
 const searchMethods = {
@@ -176,9 +174,8 @@ async function performAllSearches() {
     searchAllBtn.textContent = 'Searching...';
     searchAllBtn.disabled = true;
     
-    // Get selected methods and wildcard setting
+    // Get selected methods
     const selectedMethods = getSelectedMethods();
-    const useWildcards = useWildcardsMulti ? useWildcardsMulti.checked : false;
     
     if (selectedMethods.length === 0) {
         window.showUserMessage('Please select at least one search method', 'error');
@@ -215,7 +212,7 @@ async function performAllSearches() {
         const methodMap = {};
         
         selectedMethods.forEach(method => {
-            const options = { collection, useWildcards, model, temperature, contextSize, tokenLimit };
+            const options = { collection, model, temperature, contextSize, tokenLimit };
             searchPromises.push(window.searchManager.executeSearch(method, query, options));
             methodMap[method] = searchPromises.length - 1;
         });
@@ -260,7 +257,6 @@ selectAllNonAICheckbox.addEventListener('change', function() {
         checkbox.checked = this.checked;
     });
     updateResultColumnVisibility();
-    updateWildcardVisibility();
     saveSelectedMethods();
 });
 
@@ -271,7 +267,6 @@ selectAllAICheckbox.addEventListener('change', function() {
         checkbox.checked = this.checked;
     });
     updateResultColumnVisibility();
-    updateWildcardVisibility();
     saveSelectedMethods();
 });
 
@@ -297,38 +292,12 @@ function restoreSelectedMethods() {
             updateGroupSelectAllStates();
             
             updateResultColumnVisibility();
-            updateWildcardVisibility();
         } catch (error) {
             console.error('Failed to restore selected methods:', error);
         }
     }
 }
 
-// Function to show/hide wildcard option based on selected methods
-function updateWildcardVisibility() {
-    const selectedMethods = getSelectedMethods();
-    const hasSearchMethods = selectedMethods.includes('line-search') || selectedMethods.includes('document-search');
-    
-    if (wildcardOption) {
-        wildcardOption.style.display = hasSearchMethods ? 'block' : 'none';
-        if (!hasSearchMethods && useWildcardsMulti) {
-            useWildcardsMulti.checked = false;
-        }
-    }
-}
-
-// Save wildcard setting
-if (useWildcardsMulti) {
-    useWildcardsMulti.addEventListener('change', () => {
-        localStorage.setItem('useWildcardsMulti', useWildcardsMulti.checked);
-    });
-    
-    // Restore wildcard setting
-    const wildcardSetting = localStorage.getItem('useWildcardsMulti');
-    if (wildcardSetting === 'true') {
-        useWildcardsMulti.checked = true;
-    }
-}
 
 // Update result column visibility based on selected methods
 function updateResultColumnVisibility() {
@@ -482,7 +451,6 @@ async function loadSearchTypes() {
             checkbox.addEventListener('change', function() {
                 updateGroupSelectAllStates();
                 updateResultColumnVisibility();
-                updateWildcardVisibility();
                 saveSelectedMethods();
             });
         });

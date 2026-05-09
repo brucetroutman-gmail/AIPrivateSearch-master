@@ -32,8 +32,6 @@ const searchTypeSection = document.getElementById('searchTypeSection');
 const vectorDBEl = document.getElementById('vectorDB');
 const vectorDBSection = document.getElementById('vectorDBSection');
 const addMetaPromptEl = document.getElementById('addMetaPrompt');
-const wildcardSection = document.getElementById('wildcardSection');
-const useWildcardsEl = document.getElementById('useWildcards');
 
 let systemPrompts = [];
 let visibilityConfig = null;
@@ -502,14 +500,6 @@ function updateFieldVisibility() {
   applyVisibilityRule('searchTypeSection', searchTypeSection, rules.searchTypeSection);
   if (vectorDBSection) applyVisibilityRule('vectorDBSection', vectorDBSection, rules.searchTypeSection); // Same as searchType
   
-  // Wildcard checkbox
-  if (wildcardSection) {
-    applyVisibilityRule('wildcardCheckbox', wildcardSection, rules.wildcardCheckbox);
-    if (rules.wildcardCheckbox === 'N' && useWildcardsEl) {
-      useWildcardsEl.checked = false;
-    }
-  }
-  
   // Model field
   const modelField = modelEl.parentElement;
   if (modelField) {
@@ -594,15 +584,6 @@ function updateFieldVisibilityFallback() {
   searchTypeSection.style.display = hasDocuments ? 'block' : 'none';
   if (vectorDBSection) vectorDBSection.style.display = hasDocuments ? 'block' : 'none';
   
-  // Wildcard checkbox
-  if (wildcardSection) {
-    const showWildcard = hasDocuments && (searchType === 'line-search' || searchType === 'document-search');
-    wildcardSection.style.display = showWildcard ? 'block' : 'none';
-    if (!showWildcard && useWildcardsEl) {
-      useWildcardsEl.checked = false;
-    }
-  }
-  
   // Model fields
   const modelField = modelEl.parentElement;
   if (modelField) {
@@ -650,18 +631,6 @@ function toggleWildcardVisibility() { updateFieldVisibility(); }
 function toggleModelFieldsVisibility() { updateFieldVisibility(); }
 function toggleGenerateScoresVisibility() { updateFieldVisibility(); }
 
-// Save wildcard setting
-if (useWildcardsEl) {
-  useWildcardsEl.addEventListener('change', () => {
-    localStorage.setItem('useWildcards', useWildcardsEl.checked);
-  });
-  
-  // Restore wildcard setting
-  const wildcardSetting = localStorage.getItem('useWildcards');
-  if (wildcardSetting === 'true') {
-    useWildcardsEl.checked = true;
-  }
-}
 
 // Save meta prompt checkbox state
 if (addMetaPromptEl) {
@@ -1216,7 +1185,6 @@ form.addEventListener('submit', async (e) => {
     
     updateProgress('Searching');
     const trimmedQuery = DOMSanitizer.sanitizeText(queryEl.value.trim());
-    const useWildcards = useWildcardsEl ? useWildcardsEl.checked : false;
     
     // Store query globally for document viewer highlighting
     window._lastSearchQuery = trimmedQuery;
@@ -1225,7 +1193,7 @@ form.addEventListener('submit', async (e) => {
     if (searchType === 'document-search') {
       // Use same endpoint as multi-mode for document-search searches
       const searchStartTime = Date.now();
-      const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection, useWildcards);
+      const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection);
       const searchEndTime = Date.now();
       
       const responseText = searchResult.results.map((r, i) => `**Result ${i + 1}: ${r.title}**\n${r.excerpt}\n---`).join('\n\n');
@@ -1255,7 +1223,7 @@ form.addEventListener('submit', async (e) => {
       const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/line-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmedQuery, options: { collection, useWildcards } })
+        body: JSON.stringify({ query: trimmedQuery, options: { collection } })
       });
       const data = await response.json();
       const searchEndTime = Date.now();
@@ -1284,7 +1252,7 @@ form.addEventListener('submit', async (e) => {
       };
     } else if (searchType === 'ai-document-chat') {
       // Use main search endpoint for AI Document Chat searches to support scoring
-      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, useWildcards);
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
     } else if (searchType === 'document-index') {
       // Use metadata search common utility
       const searchStartTime = Date.now();
@@ -1395,7 +1363,7 @@ form.addEventListener('submit', async (e) => {
     } else {
       // Default to ai-document-chat for Local Model Only or fallback
       const finalSearchType = sourceTypeEl.value === 'Local Model Only' ? 'ai-document-chat' : searchType;
-      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, finalSearchType, useWildcards);
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, finalSearchType);
     }
 
     
