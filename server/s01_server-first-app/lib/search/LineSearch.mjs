@@ -123,6 +123,7 @@ export class LineSearch {
     
     // Deduplicate: merge matches within 4 lines of each other into one result
     const mergedGroups = this.mergeAdjacentMatches(matchedIndices, 4);
+    const totalLines = lines.length;
     
     for (const group of mergedGroups) {
       const firstMatchIdx = group[0];
@@ -144,7 +145,7 @@ export class LineSearch {
         id: `${path.basename(filePath)}_${primaryLine.number}`,
         title: path.basename(filePath),
         excerpt: HighlightFormatter.highlightMatches(contextLines.join('\n'), query, options.useWildcards),
-        score: this.calculateRelevanceScore(primaryLine.text, query) + (matchCount > 1 ? 0.1 : 0),
+        score: this.calculateRelevanceScore(primaryLine.text, query, primaryLine.number, totalLines) + (matchCount > 1 ? 0.1 : 0),
         source: `${path.basename(filePath)}:${primaryLine.number}`,
         lineNumber: primaryLine.number,
         matchCount,
@@ -266,25 +267,58 @@ export class LineSearch {
     return regex.test(text);
   }
 
-  calculateRelevanceScore(text, query) {
-    const queryLower = query.toLowerCase();
+  calculateRelevanceScore(text, query, lineNumber = 1, totalLines = 100) {
     const textLower = text.toLowerCase();
     
-    // Exact match gets highest score
-    if (textLower === queryLower) return 1.0;
+    // Parse query into individual terms (strip Boolean operators)
+    const terms = query
+      .replace(/\b(AND|OR|NOT)\b/gi, ' ')
+      .replace(/[&|!*]/g, ' ')
+      .split(/\s+/)
+      .filter(t => t.length > 1)
+      .map(t => t.toLowerCase());
     
-    // Count word boundary occurrences for exact matching
-    const regex = new RegExp(`\\b${this.escapeRegex(queryLower)}\\b`, 'g');
-    const occurrences = (textLower.match(regex) || []).length;
-    const maxScore = Math.min(occurrences * 0.3, 0.9);
+    if (terms.length === 0) return 0.3;
     
-    // Bonus for query at start of line (with word boundary)
-    const startRegex = new RegExp(`^\\b${this.escapeRegex(queryLower)}\\b`, 'i');
-    if (startRegex.test(textLower)) {
-      return Math.min(maxScore + 0.1, 1.0);
+    let score = 0;
+    let termsMatched = 0;
+    
+    for (const term of terms) {
+      // Check for full word match (higher value)
+      const wordBoundaryRegex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, 'gi');
+      const fullMatches = (textLower.match(wordBoundaryRegex) || []).length;
+      
+      if (fullMatches > 0) {
+        // Full word match: 0.4 base + 0.1 per additional occurrence (cap 0.2)
+        score += 0.4 + Math.min(fullMatches - 1, 2) * 0.1;
+        termsMatched++;
+      } else if (textLower.includes(term)) {
+        // Substring match: lower value
+        score += 0.25;
+        termsMatched++;
+      }
     }
     
-    return maxScore;
+    // Normalize by number of terms
+    score = score / terms.length;
+    
+    // Term coverage bonus: all terms matched = boost
+    if (terms.length > 1 && termsMatched === terms.length) {
+      score += 0.15;
+    }
+    
+    // Line density: shorter lines with matches are more relevant (likely headings)
+    const lineLength = text.trim().length;
+    if (lineLength < 80 && lineLength > 0) {
+      score += 0.1;
+    }
+    
+    // Position bonus: matches in first 20% of file get slight boost
+    if (totalLines > 0 && lineNumber / totalLines < 0.2) {
+      score += 0.05;
+    }
+    
+    return Math.min(Math.max(score, 0.05), 1.0);
   }
 
   extractExcerpt(text, query, maxLength = 200) {
