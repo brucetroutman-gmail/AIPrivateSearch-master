@@ -14,7 +14,7 @@ export class LineSearch {
   }
 
   async search(query, options = {}) {
-    const { caseSensitive = false, wholeWords = false, collection = null } = options;
+    const { caseSensitive = false, wholeWords = false, collection = null, maxResults = 50 } = options;
     const useWildcards = true; // Always use wildcard/substring matching
     const results = [];
     
@@ -37,10 +37,14 @@ export class LineSearch {
         results.push(...collectionResults);
       }
       
+      const sorted = results.sort((a, b) => b.score - a.score);
+      const limited = sorted.slice(0, maxResults);
+      
       return {
-        results: results.sort((a, b) => b.score - a.score),
+        results: limited,
         method: 'traditional',
-        total: results.length
+        total: results.length,
+        limited: results.length > maxResults
       };
     } catch (error) {
       throw new Error(`Traditional search failed: ${error.message}`);
@@ -109,39 +113,63 @@ export class LineSearch {
       lines.push({ number: lineNumber, text: line });
     }
     
-    // Second pass: find matches and add context
+    // Second pass: find matches
+    const matchedIndices = [];
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (this.matchesQuery(line.text, query, options)) {
-        const contextLines = [];
-        
-        // Add 2 lines before
-        for (let j = Math.max(0, i - 2); j < i; j++) {
-          contextLines.push(`${lines[j].number}: ${lines[j].text}`);
-        }
-        
-        // Add the matching line
-        contextLines.push(`${line.number}: ${line.text}`);
-        
-        // Add 2 lines after
-        for (let j = i + 1; j <= Math.min(lines.length - 1, i + 2); j++) {
-          contextLines.push(`${lines[j].number}: ${lines[j].text}`);
-        }
-        
-        results.push({
-          id: `${path.basename(filePath)}_${line.number}`,
-          title: path.basename(filePath),
-          excerpt: HighlightFormatter.highlightMatches(contextLines.join('\n'), query, options.useWildcards),
-          score: this.calculateRelevanceScore(line.text, query),
-          source: `${path.basename(filePath)}:${line.number}`,
-          lineNumber: line.number,
-          searchTerm: query,
-          documentPath: `/api/documents/${collection.name}/${encodeURIComponent(path.basename(filePath))}/view?line=${line.number}&search=${encodeURIComponent(query)}`
-        });
+      if (this.matchesQuery(lines[i].text, query, options)) {
+        matchedIndices.push(i);
       }
     }
     
+    // Deduplicate: merge matches within 4 lines of each other into one result
+    const mergedGroups = this.mergeAdjacentMatches(matchedIndices, 4);
+    
+    for (const group of mergedGroups) {
+      const firstMatchIdx = group[0];
+      const lastMatchIdx = group[group.length - 1];
+      
+      // Build context: 2 lines before first match to 2 lines after last match
+      const contextStart = Math.max(0, firstMatchIdx - 2);
+      const contextEnd = Math.min(lines.length - 1, lastMatchIdx + 2);
+      
+      const contextLines = [];
+      for (let j = contextStart; j <= contextEnd; j++) {
+        contextLines.push(`${lines[j].number}: ${lines[j].text}`);
+      }
+      
+      const primaryLine = lines[firstMatchIdx];
+      const matchCount = group.length;
+      
+      results.push({
+        id: `${path.basename(filePath)}_${primaryLine.number}`,
+        title: path.basename(filePath),
+        excerpt: HighlightFormatter.highlightMatches(contextLines.join('\n'), query, options.useWildcards),
+        score: this.calculateRelevanceScore(primaryLine.text, query) + (matchCount > 1 ? 0.1 : 0),
+        source: `${path.basename(filePath)}:${primaryLine.number}`,
+        lineNumber: primaryLine.number,
+        matchCount,
+        searchTerm: query,
+        documentPath: `/api/documents/${collection.name}/${encodeURIComponent(path.basename(filePath))}/view?line=${primaryLine.number}&search=${encodeURIComponent(query)}`
+      });
+    }
+    
     return results;
+  }
+
+  // Merge match indices that are within `gap` lines of each other
+  mergeAdjacentMatches(indices, gap) {
+    if (indices.length === 0) return [];
+    
+    const groups = [[indices[0]]];
+    for (let i = 1; i < indices.length; i++) {
+      const lastGroup = groups[groups.length - 1];
+      if (indices[i] - lastGroup[lastGroup.length - 1] <= gap) {
+        lastGroup.push(indices[i]);
+      } else {
+        groups.push([indices[i]]);
+      }
+    }
+    return groups;
   }
 
   matchesQuery(text, query, options) {

@@ -106,7 +106,7 @@ release 19
 This command:
 1. **Minor bump** (`release`): Increments version by 0.01 (e.g., 18.03 → 18.04)
 2. **Major bump** (`release N`): Sets version to N.00 (e.g., `release 19` → 19.00)
-3. Updates version in README.md and both package.json files
+3. Updates version in README.md, both package.json files, and footer.html
 4. **Copies sources**: Syncs `/Users/Shared/AIPrivateSearch/sources/` to `sources/` in repo
 5. **Copies data**: Syncs `/Users/Shared/AIPrivateSearch/data/` to `data/` in repo
 6. **Checks Git security hooks**: Verifies pre-commit hooks are installed for ESLint/security validation
@@ -121,4 +121,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 20.16 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch
+**Version**: 20.17 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND) ](https://creativecommons.org/licenses/by-nc-nd/4.0/)| **Website**: AIPrivateSearch

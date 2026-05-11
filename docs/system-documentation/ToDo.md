@@ -63,6 +63,14 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.17)
+401. Line Search deduplication: Adjacent matches within 4 lines are merged into a single result with expanded context, eliminating near-duplicate results. Adds matchCount to result metadata. --done
+402. QueryProcessor default to AND: Natural language queries now require all keywords to be present ("insurance AND policy") instead of OR. Reduces irrelevant hits significantly. Users can still explicitly use OR. --done
+403. Line Search max results cap: Limited to 50 results by default, sorted by score. Returns total count and limited flag for UI awareness. --done
+404. Added version number (v20.17) to app footer visible on all pages. Updated release process to include footer.html. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.16)
 393. Unified document viewer highlighting: Search terms now highlighted consistently across all search types when clicking document links. Server endpoint accepts ?search= param and highlights all occurrences with scroll-to-first-match. Removed hardcoded port from LineSearch documentPath. --done
 394. Always-on wildcard matching: Line Search, Document Search, and Document Index Cards now always use substring matching ("poli" finds "policy"). Removed wildcard checkbox UI and all related toggle logic from client and server. --done

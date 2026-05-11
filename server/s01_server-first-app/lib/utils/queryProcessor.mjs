@@ -17,8 +17,8 @@ export class QueryProcessor {
       .split(/\s+/)
       .filter(word => word.length > 2 && !stopWords.includes(word));
     
-    // Convert multiple keywords to OR search for better matching
-    return words.length > 1 ? words.join(' OR ') : words[0] || query;
+    // Default to AND — require all keywords to be present
+    return words.length > 1 ? words.join(' AND ') : words[0] || query;
   }
   
   static shouldProcessQuery(query) {

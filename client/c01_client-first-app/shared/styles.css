@@ -315,6 +315,11 @@ body {
   color: white;
 }
 
+.app-version {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
 .copyright {
   font-size: 0.9rem;
   color: #bdc3c7;
