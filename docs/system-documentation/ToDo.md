@@ -68,6 +68,7 @@ to do AIPrivateSearch
 402. QueryProcessor default to AND: Natural language queries now require all keywords to be present ("insurance AND policy") instead of OR. Reduces irrelevant hits significantly. Users can still explicitly use OR. --done
 403. Line Search max results cap: Limited to 50 results by default, sorted by score. Returns total count and limited flag for UI awareness. --done
 404. Added version number (v20.17) to app footer visible on all pages. Updated release process to include footer.html. --done
+405. Completed Fabric server install on formr Ubuntu server: Go 1.23, Fabric latest, configured with Anthropic API key, running on port 8081 via systemd, exposed via Caddy at https://fabric.formr.net. PM2 does not work with Go binaries - systemd used instead. Created aips-fabric-install.md and aips-fabric-integration.md. --done
 
 =======================================================
 
