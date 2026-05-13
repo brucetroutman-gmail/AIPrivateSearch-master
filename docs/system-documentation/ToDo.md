@@ -63,6 +63,11 @@ to do AIPrivateSearch
 
 =======================================================
 
+## RECENTLY COMPLETED (v20.19)
+406. Enhanced Fabric integration plan: Added safeDomainContext.json for sanitized domain templates, pattern versioning, FabricService resilience (timeout/retry/circuit breaker), query sanitization, no-logging policy, pattern existence cache, Fabric version pinning, expanded test cases, graceful degradation toast, spinner with cancel, enhance level options, auto-enhance toggle. --done
+
+=======================================================
+
 ## RECENTLY COMPLETED (v20.17)
 401. Line Search deduplication: Adjacent matches within 4 lines are merged into a single result with expanded context, eliminating near-duplicate results. Adds matchCount to result metadata. --done
 402. QueryProcessor default to AND: Natural language queries now require all keywords to be present ("insurance AND policy") instead of OR. Reduces irrelevant hits significantly. Users can still explicitly use OR. --done

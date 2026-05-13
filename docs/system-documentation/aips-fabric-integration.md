@@ -55,7 +55,7 @@ User clicks Submit → existing SearchOrchestrator → Ollama (local) → answer
 
 | File | Addition |
 |------|----------|
-| `.env-aips` | `FABRIC_URL`, `FABRIC_API_KEY` |
+| `.env-aips` | `FABRIC_URL=https://fabric.formr.net`, `FABRIC_API_KEY=your_secret_key` |
 | `app.json` | `fabricEnabled: true/false` toggle |
 
 ---
@@ -104,11 +104,39 @@ Examples: `enhance_USA-History`, `enhance_Family-Documents`, `enhance_Law-Office
 The pattern generation should be fire-and-forget (non-blocking) so it doesn't slow down the user's action.
 
 ### Pattern content (built from existing meta-prompts.json)
-The `generatePattern.mjs` script reads the collection's entry in `meta-prompts.json` and builds a Fabric system prompt that includes:
-- Collection name and document count
-- Document types and topics
-- Key terms and vocabulary
-- Instructions for prompt enhancement specific to that domain
+The `generatePattern.mjs` script reads the collection's entry in `meta-prompts.json` and builds a **sanitized** Fabric system prompt. 
+
+**What IS sent to Fabric (safe):**
+- Collection name
+- Document count
+- Document types (legal, medical, HR, general)
+- Topic categories
+- Generic domain vocabulary and terminology
+
+**What is NEVER sent to Fabric:**
+- Filenames (may contain real names, case numbers, patient IDs)
+- AI-generated summaries (may contain names, diagnoses, financial figures)
+- Keywords extracted from content (may contain PII)
+- DocIDs, timestamps, word counts
+- Any specific names, numbers, or values from documents
+
+### PII Risk by Collection
+
+| Collection | Risk Level | Action |
+|------------|-----------|--------|
+| USA-History, My-Literature, A-Poem | None | Full topic/keyword context safe to send |
+| Family-Documents | High | Domain context only (insurance, legal, financial) — no filenames or summaries |
+| Medical-Practice | High | Domain context only (medical records, treatments) — no patient data |
+| Law-Office | High | Domain context only (estate planning, contracts) — no client data |
+| Human-Resources | High | Domain context only (HR, compliance, CDL) — no employee data |
+
+### Sanitization approach
+`generatePattern.mjs` will build patterns from a **hardcoded domain template** per collection type rather than from the actual metadata content. The template describes the domain vocabulary and query enhancement strategy without referencing any real document content.
+
+Domain templates will be stored in `client/c01_client-first-app/config/safeDomainContext.json` — a dedicated config file mapping collection types to safe vocabulary and enhancement instructions.
+
+### Pattern versioning
+Patterns are named `enhance_[collection-name]` and updated in place. If breaking changes are needed, use `enhance_[collection-name]_v2` to avoid disrupting existing references.
 
 ---
 
@@ -118,11 +146,12 @@ No changes needed to the server setup. Follow `aips-fabric-install.md`:
 1. Install Go
 2. Install Fabric
 3. Get Anthropic API key
-4. Configure Fabric with `fabric --setup`
-5. Configure DNS (GoDaddy A record for fabric.formr.net)
-6. Start Fabric with systemd (`--serve --address :8081 --api-key`)
-7. Configure Caddy reverse proxy (`/etc/caddy/sites/fabric-formr-net.caddy`)
-8. Test with `curl`
+4. Generate Fabric secret key: `openssl rand -hex 32` — use this same key in the systemd service file on the server and in `.env-aips` on the Mac
+5. Configure Fabric with `fabric --setup`
+6. Configure DNS (GoDaddy A record for fabric.formr.net)
+7. Start Fabric with systemd (`--serve --address :8081 --api-key`)
+8. Configure Caddy reverse proxy (`/etc/caddy/sites/fabric-formr-net.caddy`)
+9. Test with `curl`
 
 > **Note**: PM2 does not work with Go binaries. Fabric runs as a systemd service.
 
@@ -143,31 +172,45 @@ No changes needed to the server setup. Follow `aips-fabric-install.md`:
 ## Security Considerations (AIPS-Specific)
 
 - **API key storage**: `FABRIC_API_KEY` goes in `.env-aips` (already gitignored, already used for DB credentials)
-- **No document content sent to Fabric**: Only the user's query text is sent for enhancement. Collection metadata in patterns is uploaded once during generation (summaries only, not full documents)
+- **No document content sent to Fabric**: Only the user's query text is sent for enhancement. Fabric patterns are built from sanitized domain templates — no filenames, summaries, or extracted keywords from actual documents are ever transmitted
+- **No PII in patterns**: For sensitive collections (Medical, Law, HR, Family), patterns use generic domain vocabulary only. Real names, case numbers, patient data, and financial figures never leave the local machine
 - **Fail-fast**: If Fabric is unreachable, the enhance button shows an error. Search still works normally with the raw query
 - **Input validation**: Collection name validated against `CollectionsUtil.getCollectionNames()` before building pattern name (prevents injection)
-- **Rate limiting**: Add to the `/api/fabric/enhance` route to prevent cost runaway
+- **Rate limiting**: Add to the `/api/fabric/enhance` route to prevent cost runaway (10 enhancements/minute per user is sufficient)
+- **Query sanitization**: Validate raw query before sending to Fabric — enforce max length and strip control characters
+- **No query logging**: Never log full user queries or enhanced prompts server-side in case they contain sensitive information
+- **Pattern cache**: Cache pattern existence checks locally with a last-checked timestamp to avoid unnecessary round trips to the Fabric server
+- **Fabric version pinning**: Document the installed Fabric version and test before upgrading — Fabric evolves quickly with new Claude model support
 
 ---
 
 ## Implementation Priority
 
 ### Phase 1: Core Integration
-1. Create `FabricService.mjs` (enhance prompt, check pattern exists, SSE collection)
-2. Create `/api/fabric/enhance` route
-3. Add "Enhance" button to search UI
+1. Create `FabricService.mjs` (enhance prompt, check pattern exists, SSE collection) with 8-10s timeout, 1-2 retries, and circuit breaker after repeated failures
+2. Create `/api/fabric/enhance` route with rate limiting and query sanitization
+3. Add "Enhance" button to search UI with "Enhancing with Claude Haiku..." spinner and cancel option
 4. Add Fabric config to `.env-aips` and `app.json`
+5. Graceful degradation: if Fabric is unreachable, auto-fall back to `addMetaPrompt` and show toast "Remote enhancement unavailable — using local context"
+6. **Test**: 
+   - Simple collection (USA-History) — confirm enhanced prompt returns
+   - Sensitive collection (Medical or Law) — confirm no PII in pattern
+   - Offline mode — confirm fallback works and search still completes
+   - Malformed collection name — confirm validation rejects it
 
 ### Phase 2: Pattern Management
-5. Create `generatePattern.mjs` using existing `meta-prompts.json` data
-6. Add "Generate Pattern" button to Collections page
-7. Auto-generate pattern when Document Index Cards are created
+6. Create `generatePattern.mjs` using existing `meta-prompts.json` data
+7. Add "Generate Pattern" button to Collections page
+8. Auto-generate pattern when Document Index Cards are created
+9. **Test**: Generate pattern for USA-History collection, confirm `enhance_USA-History` appears in `curl https://fabric.formr.net/patterns/names`, run Enhance with a USA-History query and verify domain-specific improvement
 
 ### Phase 3: Polish
-8. Cache pattern existence checks
-9. Add enhance level option (light/detailed)
-10. Show enhancement diff (before/after)
-11. Local fallback using Ollama if Fabric is down
+10. Cache pattern existence checks with last-checked timestamp
+11. Add enhance level option (Concise / Balanced / Thorough) mapping to different pattern variants
+12. Show enhancement diff (before/after) so users see why it improved
+13. Local fallback using Ollama if Fabric is down
+14. Auto-enhance toggle per collection (with warning shown for sensitive collections)
+15. **Test**: Disable Fabric server, confirm search still works with raw query and fallback toast is shown
 
 ---
 
