@@ -4,6 +4,16 @@ to do AIPrivateSearch
 
 ### Immediate Priority (Next Sprint)
 2-005. Test multi prompts and ASCII characters handling (Remote Mac)
+2-046. Rename and restructure main menu navigation: Replace Search and Multi pages with Exact Search and AI Search
+   - **Concept**: search.html is removed. Both new pages are based on multi-mode-search layout.
+   - **Exact Search** (exact-search.html): Multi-Mode layout showing Non-AI methods only (Document Index Cards, Line Search, Document Search). No AI group, no scoring.
+   - **AI Search** (ai-search.html): Multi-Mode layout showing AI methods only (Smart Search, Hybrid Search, AI Direct, AI Document Chat). No Non-AI group. Scoring stays here.
+   - **Implementation approach**: Copy multi-mode-search.html twice, filter groups per page. Update multi-mode-search.js to accept a mode config (exact/ai) to avoid duplicating JS logic.
+   - **Files to change:** header.html (nav links), tier-access.json (page names), all pages linking to search.html or multi-mode-search.html
+   - **Files to delete:** search.html, search.js
+   - **Files to create:** exact-search.html, ai-search.html
+   - **localStorage:** Use separate keys per page (selectedExactMethods, selectedAIMethods)
+   - **Analyze before coding** - confirm approach and check for any missed dependencies
    - [ ] Step 1: Verify user prompts load on Search page — select "Local Model Only" source type, confirm 5 prompts appear in dropdown (KNOWLEDGE, REASON, CREATE, CODE, INSTRUCT)
    - [ ] Step 2: Test prompt selection fills query — select each prompt, confirm query field populates with full prompt text
    - [ ] Step 3: Test collection-specific prompts — switch to "Local Documents Only", select USA-History collection, confirm 5 USA-specific prompts appear
@@ -16,6 +26,34 @@ to do AIPrivateSearch
    - [ ] Step 10: Test empty/no prompts state — select a collection with no configured prompts, confirm dropdown shows "Select a prompt..." without errors
 
 ### Core System Improvements
+2-047. Fabric Integration Implementation
+   **Phase 1: Core Integration**
+   - [ ] Create `FabricService.mjs` in `server/s01_server-first-app/lib/services/` with enhance prompt, pattern exists check, SSE collection, 8-10s timeout, 1-2 retries, circuit breaker
+   - [ ] Create `fabric.mjs` route in `server/s01_server-first-app/routes/` with rate limiting and query sanitization
+   - [ ] Register fabric route in `server.mjs`
+   - [ ] Add `FABRIC_URL=https://fabric.formr.net` and `FABRIC_API_KEY` to `.env-aips`
+   - [ ] Add `fabricEnabled: true/false` toggle to `app.json`
+   - [ ] Add "Enhance" button to `search.html` and `multi-mode-search.html` with spinner and cancel
+   - [ ] Implement graceful degradation — fallback to `addMetaPrompt` with toast if Fabric unreachable
+   - [ ] Test Phase 1: USA-History query, sensitive collection, offline mode, malformed collection name
+
+   **Phase 2: Pattern Management**
+   - [ ] Create `safeDomainContext.json` in `client/c01_client-first-app/config/` with sanitized domain templates per collection type
+   - [ ] Create `generatePattern.mjs` in `server/s01_server-first-app/scripts/` using `safeDomainContext.json` (no PII)
+   - [ ] Add pattern generation trigger to `POST /collections/create` in `documents.mjs` (fire-and-forget)
+   - [ ] Add pattern generation trigger to `POST /collections/:collection/upload` in `documents.mjs`
+   - [ ] Add pattern generation trigger to `DELETE /collections/:collection/files/:filename` in `documents.mjs`
+   - [ ] Add pattern generation trigger to `POST /document-index-create` in `multiSearch.mjs`
+   - [ ] Add "Generate Pattern" button to `collections.html`
+   - [ ] Test Phase 2: Generate pattern for USA-History, verify `enhance_USA-History` in Fabric, run Enhance and verify domain-specific improvement
+
+   **Phase 3: Polish**
+   - [ ] Add local pattern existence cache with last-checked timestamp
+   - [ ] Add enhance level selector (Concise / Balanced / Thorough)
+   - [ ] Show before/after diff of enhanced prompt
+   - [ ] Add auto-enhance toggle per collection (with warning for sensitive collections)
+   - [ ] Test Phase 3: Disable Fabric, confirm fallback toast shown and search completes normally
+
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)
 2-007. Make Response matches and View Document consistent across all types, add View Index Card to Doc Index Cards response
 2-008. Create testCodes for DocumentSearch performance optimization
@@ -60,6 +98,16 @@ to do AIPrivateSearch
 2-038. Create competitive analysis and positioning documents
 2-039. Develop partner program for resellers (medical/legal consultants)
 2-040. Create case studies for medical practices and law firms
+
+=======================================================
+
+## RECENTLY COMPLETED (v20.20)
+407. Added Exact Search page (exact-search.html) — Multi-Mode without AI methods (Document Index Cards, Line Search, Document Search only). --done
+408. Added AI Search page (ai-search.html) — Multi-Mode without exact match methods (Smart Search, Hybrid Search, AI Direct, AI Document Chat only). --done
+409. Updated multi-mode-search.js to detect page mode by filename and hide irrelevant method groups and result columns. --done
+410. Updated header.html with Exact Search and AI Search menu links. Search and Multi pages preserved. --done
+411. Updated tier-access.json to include .menu-exact-search and .menu-ai-search for all user types. --done
+412. Added Fabric test script (test-fabric.mjs) and test results comparison doc. Full Fabric+Ollama pipeline tested and working. --done
 
 =======================================================
 

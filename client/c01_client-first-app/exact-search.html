@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exact Search - AIPrivateSearch</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <style>
+        .method-selection {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .method-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .group-header {
+            margin-bottom: 10px;
+        }
+        
+        .group-header label {
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .method-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-left: 20px;
+        }
+        .method-checkboxes label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #333;
+        }
+        .method-checkboxes input[type="checkbox"] {
+            margin: 0;
+        }
+        
+        /* Dark mode styles */
+        [data-theme="dark"] .method-selection {
+            background-color: #2a2a2a;
+            border-color: #555;
+        }
+        [data-theme="dark"] .method-group {
+            background-color: #333;
+            border-color: #555;
+        }
+        [data-theme="dark"] .method-checkboxes label,
+        [data-theme="dark"] .group-header label {
+            color: #e0e0e0;
+        }
+        [data-theme="dark"] .method-selection h3 {
+            color: #e0e0e0;
+        }
+        
+        .param-select {
+            padding: 8px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+        }
+        
+        [data-theme="dark"] .param-select {
+            background: #333;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        
+        .controls-container {
+            display: flex !important;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
+        }
+        
+        .controls-container select {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .field {
+            margin-bottom: 1rem;
+        }
+        
+        .field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .field select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        [data-theme="dark"] .search-input {
+            background: #333;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        
+        /* Sortable table styles */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .sortable:hover {
+            background-color: #f0f0f0;
+        }
+        
+        [data-theme="dark"] .sortable:hover {
+            background-color: #444;
+        }
+        
+        .sort-arrow {
+            margin-left: 5px;
+            opacity: 0.3;
+        }
+        
+        .sortable.asc .sort-arrow::after {
+            content: '▲';
+            opacity: 1;
+        }
+        
+        .sortable.desc .sort-arrow::after {
+            content: '▼';
+            opacity: 1;
+        }
+    </style>
+    <script src="./shared/utils/apiConfig.js"></script>
+    <script src="shared/license-checker.js"></script>
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+    <script>
+        // Load theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const theme = savedTheme || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            if (!savedTheme) {
+                localStorage.setItem('theme', theme);
+            }
+        })();
+    </script>
+    <script src="shared/utils/documentViewerCommon.js"></script>
+    <script src="shared/utils/lineSearchFormatter.js"></script>
+    <script src="shared/utils/queryProcessor.js"></script>
+    <script src="shared/utils/documentSearchCommon.js"></script>
+    <script src="shared/utils/documentIndexSearchCommon.js"></script>
+    <script src="shared/utils/smartSearchCommon.js"></script>
+    <script src="shared/utils/hybridSearchCommon.js"></script>
+    <script src="shared/utils/responseDisplayCommon.js"></script>
+    <script src="shared/utils/searchResultFormatter.js"></script>
+    <script src="shared/utils/aiDirectCommon.js"></script>
+    <script src="shared/utils/searchManager.js"></script>
+    <script src="shared/utils/parameterManager.js"></script>
+
+    <script src="shared/utils/highlightRenderer.js"></script>
+    <script src="shared/utils/commonResultFormatter.js"></script>
+    <script type="module" src="shared/utils/domSanitizer.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1>Exact Search</h1>
+        <p>Compare exact match search methods side by side</p>
+
+        <!-- Search Input -->
+        <div class="search-section">
+            <div class="field">
+                <label for="collectionSelect">Collection</label>
+                <select id="collectionSelect" class="collection-select" required>
+                    <option value="" disabled selected>Select Collection</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="userPrompts">User Prompts</label>
+                <select id="userPrompts">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            <div class="search-input-container">
+                <input type="text" id="searchQuery" placeholder="Enter your search query..." class="search-input">
+            </div>
+            <div class="controls-container">
+                <select id="modelSelect" class="model-select" required>
+                    <option value="" disabled selected>Select Model</option>
+                </select>
+                <select id="temperatureSelect" class="param-select prem-only">
+                    <option value="0.3" selected>Predictable</option>
+                    <option value="0.6">Balanced</option>
+                    <option value="0.9">Creative</option>
+                </select>
+                <select id="contextSelect" class="param-select prem-only">
+                    <option value="1024" selected>1024</option>
+                    <option value="2048">2048</option>
+                    <option value="4096">4096</option>
+                    <option value="8192">8192</option>
+                </select>
+                <select id="tokensSelect" class="param-select prem-only">
+                    <option value="No Limit" selected>No Limit</option>
+                    <option value="250">250</option>
+                    <option value="500">500</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Method Selection -->
+        <div class="method-selection">
+            <h3>Select Search Methods:</h3>
+            
+            <div class="method-group">
+                <div class="group-header">
+                    <label><input type="checkbox" id="selectAllNonAI"> Select All Non-AI</label>
+                </div>
+                <div class="method-checkboxes" id="nonAICheckboxes">
+                    <!-- Non-AI checkboxes will be populated here -->
+                </div>
+            </div>
+            
+            <div class="method-group">
+                <div class="group-header">
+                    <label><input type="checkbox" id="selectAllAI"> Select All AI</label>
+                </div>
+                <div class="method-checkboxes" id="aiCheckboxes">
+                    <!-- AI checkboxes will be populated here -->
+                </div>
+            </div>
+            
+
+            <button id="searchAllBtn" class="search-button">Search Selected Methods</button>
+        </div>
+
+
+
+        <!-- Results Grid -->
+        <div class="results-grid">
+            <div class="result-column" id="document-index-results">
+                <h3>Document Index Cards</h3>
+                <div class="method-description">Structured queries using document index cards</div>
+                <div class="results-container" id="document-index-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="line-search-results">
+                <h3>Line Search</h3>
+                <div class="method-description">Line-by-line search with context and Boolean logic</div>
+                <div class="results-container" id="line-search-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="document-search-results">
+                <h3>Document Search</h3>
+                <div class="method-description">Document-wide search with ranking and Boolean logic</div>
+                <div class="results-container" id="document-search-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="smart-search-results">
+                <h3>Smart Search</h3>
+                <div class="method-description">Semantic similarity using embeddings</div>
+                <div class="results-container" id="smart-search-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="hybrid-search-results">
+                <h3>Hybrid Search</h3>
+                <div class="method-description">Combined traditional and vector methods</div>
+                <div class="results-container" id="hybrid-search-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="ai-direct-results">
+                <h3>AI Direct</h3>
+                <div class="method-description">Question-answering models for contextual understanding</div>
+                <div class="results-container" id="ai-direct-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+
+            <div class="result-column" id="ai-document-chat-results">
+                <h3>AI Document Chat</h3>
+                <div class="method-description">Chunked documents with AI retrieval</div>
+                <div class="results-container" id="ai-document-chat-container">
+                    <div class="no-results">Click "Search All Methods" to see results</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Comparison -->
+        <div class="performance-section hidden" id="performanceSection">
+            <h3>Performance Comparison</h3>
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="method">Method <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="results">Results <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="time">Time (s) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort="score">Relevance Score <span class="sort-arrow"></span></th>
+                    </tr>
+                </thead>
+                <tbody id="performanceTableBody">
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script type="module" src="multi-mode-search.js?mode=exact"></script>
+</body>
+</html>
