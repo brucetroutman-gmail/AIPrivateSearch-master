@@ -88,14 +88,18 @@ class TierAccessManager {
     
     // Show elements
     (userType.cssShow || []).forEach(className => {
-      document.querySelectorAll(className).forEach(el => {
+      const els = document.querySelectorAll(className);
+      console.log(`🔐 TIER CSS SHOW: ${className} → found ${els.length} elements`);
+      els.forEach(el => {
         el.classList.remove('nav-hidden');
       });
     });
 
     // Hide elements
     (userType.cssHide || []).forEach(className => {
-      document.querySelectorAll(className).forEach(el => {
+      const els = document.querySelectorAll(className);
+      console.log(`🔐 TIER CSS HIDE: ${className} → found ${els.length} elements`);
+      els.forEach(el => {
         el.classList.add('nav-hidden');
       });
     });
