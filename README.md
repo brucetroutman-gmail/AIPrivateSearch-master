@@ -109,6 +109,7 @@ This command:
 3. Updates version in README.md, both package.json files, and footer.html
 4. **Copies sources**: Syncs `/Users/Shared/AIPrivateSearch/sources/` to `sources/` in repo
 5. **Copies data**: Syncs `/Users/Shared/AIPrivateSearch/data/` to `data/` in repo
+6. **Copies config**: Syncs `/Users/Shared/AIPrivateSearch/config/` to `client/c01_client-first-app/config/` in repo
 6. **Checks Git security hooks**: Verifies pre-commit hooks are installed for ESLint/security validation
 7. **Organizes ToDo.md**: Updates completed items and moves completed tasks out of pending section
 8. Generates commit message in format: `vX.XX: [description of changes]`
