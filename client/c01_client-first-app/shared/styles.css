@@ -157,6 +157,10 @@ body {
   align-items: center;
 }
 
+.nav-hidden {
+  display: none !important;
+}
+
 .nav-menu a {
   color: white;
   text-decoration: none;

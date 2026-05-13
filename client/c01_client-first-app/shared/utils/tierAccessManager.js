@@ -89,14 +89,14 @@ class TierAccessManager {
     // Show elements
     (userType.cssShow || []).forEach(className => {
       document.querySelectorAll(className).forEach(el => {
-        el.style.display = '';
+        el.classList.remove('nav-hidden');
       });
     });
 
     // Hide elements
     (userType.cssHide || []).forEach(className => {
       document.querySelectorAll(className).forEach(el => {
-        el.style.display = 'none';
+        el.classList.add('nav-hidden');
       });
     });
   }
