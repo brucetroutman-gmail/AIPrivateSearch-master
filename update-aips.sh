@@ -12,13 +12,8 @@ rm -rf "$REPO_DIR"
 cd "$PARENT_DIR"
 git clone https://github.com/brucetroutman-gmail/AIPrivateSearch-master.git aiprivatesearch
 
-# Sync config, sources, and data from repo to parent folder
+# Sync config from repo to parent folder (app reads config from here)
 mkdir -p "$AIPS_DIR/config"
-mkdir -p "$AIPS_DIR/sources"
-mkdir -p "$AIPS_DIR/data"
-
 cp -r "$REPO_DIR/client/c01_client-first-app/config/" "$AIPS_DIR/config/"
-cp -r "$REPO_DIR/sources/" "$AIPS_DIR/sources/"
-cp -r "$REPO_DIR/data/" "$AIPS_DIR/data/"
 
 echo "✅ Done"
