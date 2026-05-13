@@ -180,14 +180,14 @@ class LicenseChecker {
         // Hide premium-only features for standard tier
         if (tier < 2) {
             document.querySelectorAll('.prem-only').forEach(el => {
-                el.style.display = 'none';
+                el.classList.add('nav-hidden');
             });
         }
 
         // Hide professional-only features for non-professional tiers
         if (tier < 3) {
             document.querySelectorAll('.pro-only').forEach(el => {
-                el.style.display = 'none';
+                el.classList.add('nav-hidden');
             });
         }
     }
