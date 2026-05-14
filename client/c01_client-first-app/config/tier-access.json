@@ -10,7 +10,7 @@
       "menuAccess": ["search", "multi-mode", "manage-collections", "options", "user-management"],
       "features": ["search", "scoring", "collections", "user-add"],
       "restrictions": ["no-model-params", "no-doc-index-edit", "no-config-edit"],
-      "cssShow": [".admin-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-user-management", ".menu-guides", ".menu-options", ".login-icon"],
+      "cssShow": [".admin-only", ".menu-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-user-management", ".menu-guides", ".menu-options", ".login-icon"],
       "cssHide": [".searcher-only", ".prem-only", ".pro-only", ".menu-test", ".menu-analyze", ".menu-manage-models", ".doc-index-edit-only"]
     },
     "standard-searcher": {
@@ -23,7 +23,7 @@
       "menuAccess": ["search", "multi-mode", "manage-collections", "options"],
       "features": ["search", "scoring", "collections"],
       "restrictions": ["no-model-params", "no-doc-index-edit", "no-config-edit", "no-user-management"],
-      "cssShow": [".searcher-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-guides", ".menu-options", ".login-icon"],
+      "cssShow": [".searcher-only", ".menu-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-guides", ".menu-options", ".login-icon"],
       "cssHide": [".admin-only", ".prem-only", ".pro-only", ".menu-test", ".menu-analyze", ".menu-manage-models", ".menu-user-management", ".doc-index-edit-only"]
     },
     "premium-admin": {
@@ -36,7 +36,7 @@
       "menuAccess": ["search", "multi-mode", "manage-collections", "manage-models", "modify-config", "options", "user-management"],
       "features": ["search", "scoring", "collections", "model-management", "config-edit", "doc-index-edit", "user-add"],
       "restrictions": [],
-      "cssShow": [".admin-only", ".prem-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-manage-models", ".menu-user-management", ".menu-guides", ".menu-options", ".doc-index-edit-only", ".login-icon"],
+      "cssShow": [".admin-only", ".prem-only", ".menu-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-manage-models", ".menu-user-management", ".menu-guides", ".menu-options", ".doc-index-edit-only", ".login-icon"],
       "cssHide": [".searcher-only", ".menu-test", ".menu-analyze", ".pro-only"]
     },
     "premium-searcher": {
@@ -49,7 +49,7 @@
       "menuAccess": ["search", "multi-mode", "manage-collections", "options"],
       "features": ["search", "scoring", "collections", "config-edit", "doc-index-edit"],
       "restrictions": ["no-user-management", "no-model-management"],
-      "cssShow": [".searcher-only", ".prem-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-guides", ".menu-options", ".doc-index-edit-only", ".login-icon"],
+      "cssShow": [".searcher-only", ".prem-only", ".menu-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-guides", ".menu-options", ".doc-index-edit-only", ".login-icon"],
       "cssHide": [".admin-only", ".menu-user-management", ".menu-manage-models", ".menu-test", ".menu-analyze"]
     },
     "professional-admin": {
@@ -62,7 +62,7 @@
       "menuAccess": "all",
       "features": "all",
       "restrictions": [],
-      "cssShow": [".admin-only", ".prem-only", ".pro-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-manage-models", ".menu-user-management", ".menu-test", ".menu-analyze", ".menu-guides", ".menu-options", ".login-icon"],
+      "cssShow": [".admin-only", ".prem-only", ".pro-only", ".menu-search", ".menu-multi-mode", ".menu-manage", ".menu-manage-collections", ".menu-manage-models", ".menu-user-management", ".menu-test", ".menu-analyze", ".menu-guides", ".menu-options", ".login-icon"],
       "cssHide": [".searcher-only"]
     },
     "professional-searcher": {
@@ -75,7 +75,7 @@
       "menuAccess": "all-except-user-management",
       "features": "all-except-user-management",
       "restrictions": ["no-user-management"],
-      "cssShow": [".searcher-only", ".prem-only", ".pro-only", ".menu-search", ".menu-exact-search", ".menu-ai-search", ".menu-multi-mode", ".menu-manage-collections", ".menu-manage-models", ".menu-test", ".menu-analyze", ".menu-guides", ".menu-options", ".login-icon"],
+      "cssShow": [".searcher-only", ".prem-only", ".pro-only", ".menu-search", ".menu-multi-mode", ".menu-manage-collections", ".menu-manage-models", ".menu-test", ".menu-analyze", ".menu-guides", ".menu-options", ".login-icon"],
       "cssHide": [".admin-only", ".menu-user-management"]
     }
   },
