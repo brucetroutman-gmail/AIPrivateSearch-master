@@ -37,31 +37,10 @@
         document.querySelector('.hero h1').textContent = config['app-name'];
         console.log('🏠 HOME PAGE: Step 1c - Page title updated');
         
-        // Load footer members
-        loadFooterMembers();
       })
       .catch(error => {
         console.error('🏠 HOME PAGE: Step 1 ERROR - Failed to load app config:', error);
       });
-      
-    // Function to load footer members
-    function loadFooterMembers() {
-      const members = [
-        { name: 'Robin Mattern', email: 'robin.mattern@gmail.com' },
-        { name: 'Bruce Troutman', email: 'bruce.troutman@gmail.com' },
-        { name: 'Richard Schinner', email: 'richard.schinner@gmail.com' },
-        { name: 'Alan McConnell', email: 'alan.mcconnell@gmail.com' },
-        { name: 'Ken Fussell', email: 'ken.fussell@gmail.com' },
-        { name: 'Ladi Goc', email: 'ladi.goc@gmail.com' },
-        { name: 'Joe Benin', email: 'joe.benin@gmail.com' }
-      ];
-      
-      const footerMembers = document.getElementById('footer-members');
-      const memberLinks = members.map(member => 
-        `<a href="./group-member-profile.html?email=${member.email}" target="_blank" class="footer-group-member">${member.name}</a>`
-      ).join(' • ');
-      footerMembers.innerHTML = `Team: ${memberLinks}`;
-    }
     
     // Function to check authentication status and show appropriate content
     function checkAuthAndDevice() {
@@ -368,20 +347,7 @@
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-links">
-        <a href="./privacy-policy.html">Privacy Policy</a>
-        <a href="./terms-of-service.html">Terms of Service</a>
-        <a href="./contact.html">Contact</a>
-      </div>
-      <div class="copyright">
-        <p>&copy; 2025 <a href="./group.html" class="footer-link" id="footer-group-link">AI Private Search Group</a>. All rights reserved.</p>
-        <p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" class="footer-link">Creative Commons Attribution-NonCommercial (CC BY-NC-ND)</a>.</p>
-        <div id="footer-members" style="margin-top: 0.5rem; font-size: 0.8rem;"></div>
-      </div>
-    </div>
-  </footer>
+  <div id="footer-placeholder"></div>
 
 
 </body>
