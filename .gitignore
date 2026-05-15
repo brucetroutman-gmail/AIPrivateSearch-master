@@ -1,6 +1,7 @@
 /dist
 /electron-app
 .env
+.env-aips
 node_modules
 .DS_Store
 yarn.lock
