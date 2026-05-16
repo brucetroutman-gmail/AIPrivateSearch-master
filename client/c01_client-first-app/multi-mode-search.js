@@ -10,10 +10,6 @@ import { DOMSanitizer } from './shared/utils/domSanitizer.js';
 
 // Multi-mode search functionality
 
-// Detect page mode: 'exact' hides AI group, 'ai' hides Non-AI group, 'all' shows both
-const pageFile = window.location.pathname.split('/').pop();
-const PAGE_MODE = pageFile === 'exact-search.html' ? 'exact' : pageFile === 'ai-search.html' ? 'ai' : 'all';
-
 // DOM elements
 const searchQueryEl = document.getElementById('searchQuery');
 const userPromptsEl = document.getElementById('userPrompts');
@@ -486,25 +482,6 @@ function updateGroupSelectAllStates() {
 document.addEventListener('DOMContentLoaded', async () => {
     // Load search types first
     await loadSearchTypes();
-    
-    // Hide irrelevant method groups based on page mode
-    if (PAGE_MODE === 'exact') {
-        const aiGroup = document.querySelector('#aiCheckboxes')?.closest('.method-group');
-        if (aiGroup) aiGroup.style.display = 'none';
-        // Also hide AI result columns
-        ['smart-search-results', 'hybrid-search-results', 'ai-direct-results', 'ai-document-chat-results'].forEach(id => {
-            const col = document.getElementById(id);
-            if (col) col.style.display = 'none';
-        });
-    } else if (PAGE_MODE === 'ai') {
-        const nonAIGroup = document.querySelector('#nonAICheckboxes')?.closest('.method-group');
-        if (nonAIGroup) nonAIGroup.style.display = 'none';
-        // Also hide Non-AI result columns
-        ['document-index-results', 'line-search-results', 'document-search-results'].forEach(id => {
-            const col = document.getElementById(id);
-            if (col) col.style.display = 'none';
-        });
-    }
     
     // Restore selected methods
     restoreSelectedMethods();

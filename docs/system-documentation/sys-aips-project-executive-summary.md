@@ -2,7 +2,7 @@
 
 **Project**: AIPrivateSearch (AIPS)
 **Repos**: aiprivatesearch v20.22 | aiprivatesearchcustmgr v2.06 | aiprivatesearchweb v1.60
-**License**: CC BY-NC-ND | **Website**: AIPrivateSearch
+**License**: CC BY-NC-ND | **Website**: AIPrivateSearch.com
 
 ---
 
@@ -130,4 +130,4 @@ All tiers include a **60-day free trial** — users can search their own documen
 | Payments | Stripe |
 | Database | MySQL |
 | Prompt Enhancement | Fabric (optional) |
-| Platform | macOS (tested on macOS 12+) |
+| Platform | macOS (tested on macOS 14+) |
