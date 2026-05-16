@@ -12,17 +12,6 @@ import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { QueryProcessor } from '../utils/queryProcessor.mjs';
 import { NLPAnalytics } from '../nlp/NLPAnalytics.mjs';
 
-let systemPrompts = null;
-
-async function loadSystemPrompts() {
-  if (!systemPrompts) {
-    const promptsPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/system-prompts.json');
-    const data = JSON.parse(fs.readFileSync(promptsPath, 'utf8'));
-    systemPrompts = data.system_prompts;
-  }
-  return systemPrompts;
-}
-
 export class DocumentIndex {
   constructor() {
     this.name = 'Document Index Search';
@@ -86,24 +75,31 @@ export class DocumentIndex {
         };
       }
       
-      // Search in document index table
-      const searchQuery = `
-        SELECT docid, filename, content
-        FROM document_index 
-        WHERE content LIKE ? 
-           OR filename LIKE ?
-        LIMIT 50
-      `;
-      
+      // Search metadata fields with weighted scoring
+      // title=3x, keywords=2x, key_phrases=2x, topics=2x, summary=1x, content=0.5x
       const searchTerm = `%${processedQuery}%`;
-      console.log(`[DocumentIndexSearch] Executing search with term: "${searchTerm}"`);
-      
-      const results = db.exec(searchQuery, [searchTerm, searchTerm]);
-      console.log(`[DocumentIndexSearch] Raw search results:`, results);
-      
+      console.log(`[DocumentIndexSearch] Executing weighted search for: "${searchTerm}"`);
+
+      const allResults = db.exec(
+        `SELECT docid, filename, title, summary, topics, keywords, key_phrases, content,
+                (CASE WHEN title LIKE ? THEN 3 ELSE 0 END +
+                 CASE WHEN keywords LIKE ? THEN 2 ELSE 0 END +
+                 CASE WHEN key_phrases LIKE ? THEN 2 ELSE 0 END +
+                 CASE WHEN topics LIKE ? THEN 2 ELSE 0 END +
+                 CASE WHEN summary LIKE ? THEN 1 ELSE 0 END +
+                 CASE WHEN content LIKE ? THEN 0.5 ELSE 0 END) AS score
+         FROM document_index
+         WHERE title LIKE ? OR keywords LIKE ? OR key_phrases LIKE ?
+            OR topics LIKE ? OR summary LIKE ? OR content LIKE ?
+         ORDER BY score DESC
+         LIMIT 50`,
+        [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm,
+         searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]
+      );
+
       db.close();
-      
-      if (!results || results.length === 0 || !results[0].values || results[0].values.length === 0) {
+
+      if (!allResults || allResults.length === 0 || !allResults[0].values || allResults[0].values.length === 0) {
         console.log(`[DocumentIndexSearch] No results found`);
         return {
           results: [],
@@ -112,24 +108,37 @@ export class DocumentIndex {
           message: `No documents found matching "${processedQuery}" in ${collection}`
         };
       }
-      
-      const formattedResults = results[0].values.map(row => ({
+
+      const formattedResults = allResults[0].values.map(row => ({
         docid: row[0],
         filename: row[1],
-        content: row[2],
-        score: 1.0
+        title: row[2],
+        summary: row[3],
+        topics: row[4],
+        keywords: row[5],
+        key_phrases: row[6],
+        content: row[7],
+        score: row[8]
       }));
-      
-      console.log(`[DocumentIndexSearch] Formatted results:`, formattedResults);
-      
+
+      console.log(`[DocumentIndexSearch] Found ${formattedResults.length} results`);
+
       return {
-        results: formattedResults.map(doc => ({
-          id: doc.docid,
-          title: doc.filename.replace('.md', '').replace('.json', ''),
-          excerpt: ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, processedQuery),
-          score: doc.score,
-          source: doc.filename
-        })),
+        results: formattedResults.map(doc => {
+          // Build excerpt from best matching metadata field
+          const bestExcerpt = doc.summary || doc.topics || doc.keywords || doc.key_phrases
+            ? `${doc.summary ? doc.summary + ' ' : ''}${doc.topics ? '| Topics: ' + doc.topics : ''}`
+            : ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, processedQuery);
+          return {
+            id: doc.docid,
+            title: doc.title || doc.filename.replace('.md', '').replace('.json', ''),
+            excerpt: bestExcerpt.trim(),
+            score: doc.score,
+            source: doc.filename,
+            collection,
+            documentPath: `/api/documents/${collection}/${encodeURIComponent(doc.filename)}/view?search=${encodeURIComponent(query)}`
+          };
+        }),
         method: 'document-index',
         total: formattedResults.length
       };
@@ -164,7 +173,14 @@ export class DocumentIndex {
         console.error('[DocumentIndex] Failed to initialize NLP Analytics:', nlpError.message);
         console.log('[DocumentIndex] Continuing without NLP analytics');
       }
-      const modelName = 'llama3.2:3b'; // From models-list.json document-index category
+      // Get document-index model from config
+      const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');
+      const modelList = JSON.parse(fs.readFileSync(modelListPath, 'utf8'));
+      const docIndexModels = modelList.models.filter(m => m.category === 'document-index');
+      if (docIndexModels.length === 0) {
+        throw new Error('No document-index model found in models-list.json configuration');
+      }
+      const modelName = docIndexModels[0].modelName;
       
       // Create new database with all 39 fields (clear existing if present)
       const SQL = await initSqlJs();
@@ -299,13 +315,8 @@ export class DocumentIndex {
           console.log(`Updated ${filename} with DocID: ${docId}`);
         }
         
-        // Load system prompts and get doc index prompt
-        const prompts = await loadSystemPrompts();
-        const docIndexPrompt = prompts.find(p => p.id === '6')?.prompt || 'Analyze this document.';
-        const analysisPrompt = `${docIndexPrompt}
-
-Document: ${filename}
-Content: ${content.substring(0, 3000)}`;
+        // Unified prompt — same as indexSingleDocument for consistent index cards
+        const analysisPrompt = `Analyze this document briefly:\n\nTitle: ${filename}\nContent: ${content.substring(0, 1000)}\n\nProvide:\n1. Author:\n2. Type:\n3. Summary (1 sentence):\n4. Topics:\n5. Key phrases:`;
         
         const aiResponse = await ollamaService.generateText(analysisPrompt, modelName);
         
@@ -367,55 +378,35 @@ Content: ${content.substring(0, 3000)}`;
           };
         }
         
-        // Parse numbered AI response
+        // Parse numbered AI response — unified with indexSingleDocument
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
-          if (line.startsWith('1.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.author = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
+          if (line.startsWith('1.') && line.includes('Author:')) {
+            const val = line.split(':').slice(1).join(':').trim();
+            if (val && val.length > 2 && !val.toLowerCase().includes('unknown')) analysis.author = val.substring(0, 100);
           }
-          if (line.startsWith('2.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.document_type = content && !content.includes('Not specified') && !content.includes('None') ? content.toLowerCase() : 'other';
+          if (line.startsWith('2.') && line.includes('Type:')) {
+            const val = line.split(':').slice(1).join(':').trim();
+            if (val && val.length > 2) analysis.document_type = val.toLowerCase().substring(0, 50);
           }
-          if (line.startsWith('3.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.entities = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
+          if (line.startsWith('3.') && line.includes('Summary:')) {
+            const val = line.split(':').slice(1).join(':').trim();
+            if (val && val.length > 10) analysis.summary = val.substring(0, 300);
           }
-          if (line.startsWith('4.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.dates_mentioned = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
+          if (line.startsWith('4.') && line.includes('Topics:')) {
+            const val = line.split(':').slice(1).join(':').trim();
+            if (val && val.length > 3) analysis.topics = val.substring(0, 200);
           }
-          if (line.startsWith('5.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.amounts_mentioned = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 100) : '';
-          }
-          if (line.startsWith('6.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.key_phrases = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
-          }
-          if (line.startsWith('7.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.action_items = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
-          }
-          if (line.startsWith('8.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.summary = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 300) : '';
-          }
-          if (line.startsWith('9.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.topics = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 200) : '';
-          }
-          if (line.startsWith('10.')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            analysis.importance_level = content && !content.includes('Not specified') && !content.includes('None') ? content.substring(0, 1) : '4';
+          if (line.startsWith('5.') && line.includes('Key phrases:')) {
+            const val = line.split(':').slice(1).join(':').trim();
+            if (val && val.length > 5) analysis.key_phrases = val.substring(0, 200);
           }
         });
         
-        // Merge AI analysis with NLP analytics (NLP takes precedence for factual data)
+        // Merge NLP analytics
         if (nlpResults.entities && nlpResults.entities.people) analysis.entities = nlpResults.entities.people;
         if (nlpResults.dates) analysis.dates_mentioned = nlpResults.dates;
-        if (nlpResults.keyPhrases) analysis.key_phrases = nlpResults.keyPhrases;
+        if (nlpResults.keyPhrases) analysis.key_phrases = analysis.key_phrases || nlpResults.keyPhrases;
         
         // Use NLP text statistics
         const { wordCount, sentenceCount, paragraphCount, uniqueWordCount, averageSentenceLength, readingTime } = nlpResults;

@@ -58,7 +58,7 @@ export class DocumentSearch {
           score: result.score,
           source: doc.filename,
           collection: doc.collection,
-          documentPath: `http://localhost:56306/api/documents/${doc.collection}/${encodeURIComponent(doc.filename)}/view?line=${matchData.lineNumber}`
+          documentPath: `/api/documents/${doc.collection}/${encodeURIComponent(doc.filename)}/view?line=${matchData.lineNumber}&search=${encodeURIComponent(query)}`
         };
       });
       
