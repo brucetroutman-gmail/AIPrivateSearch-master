@@ -36,7 +36,7 @@ curl http://localhost:11434/api/tags
 | Redirected to login on every page | Session expired or invalid | Log in again |
 | Login succeeds but menu doesn't appear | tierAccessManager failed | Hard refresh (Cmd+Shift+R), check console for errors |
 | "Authentication required" API errors | sessionId missing from localStorage | Clear localStorage, log in again |
-| Menu shows wrong items | Stale tier-access.json on remote Mac | Run `update-aips.sh`, restart app |
+| Menu shows wrong items | Stale tier-access.json on remote Mac | Restart app via `aiprivatesearch.app`, hard refresh |
 
 ### Clear session manually
 Open browser DevTools → Application → Local Storage → delete `sessionId`, `userEmail`, `userUserRole`.
@@ -117,10 +117,10 @@ Open browser DevTools → Application → Local Storage → delete `sessionId`, 
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Changes not appearing after push | `update-aips.sh` not run | Run `update-aips.sh` on remote Mac, restart app |
-| Config changes not taking effect | Config not synced | `update-aips.sh` copies config from repo to `/Users/Shared/AIPrivateSearch/config/` |
+| Changes not appearing after push | App not restarted after push | Restart app via `aiprivatesearch.app` — it pulls latest from GitHub automatically |
+| Config changes not taking effect | Config not synced | `Start App` syncs config from repo to `/Users/Shared/AIPrivateSearch/config/` automatically |
 | App running old version | Browser cache | Hard refresh (Cmd+Shift+R) |
-| `update-aips.sh` fails | Git auth issue | Check GitHub access token or SSH key |
+| `git pull` fails on Start App | Git auth issue | Check GitHub access token or SSH key |
 
 ---
 

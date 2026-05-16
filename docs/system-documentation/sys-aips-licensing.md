@@ -172,7 +172,7 @@ Professional tier: unlimited computers and users
 | Problem | Cause | Fix |
 |---------|-------|-----|
 | Stuck on activation page | Device not registered | Complete device activation with valid email |
-| Wrong tier features showing | Stale tier-access.json | Run `update-aips.sh`, hard refresh |
+| Wrong tier features showing | Stale tier-access.json | Restart app via `aiprivatesearch.app`, hard refresh |
 | "License expired" after offline | Grace period exceeded | Connect to internet, app will refresh automatically |
 | User can't access feature | Wrong role or tier | Check user role in User Management |
 | Menu items missing | CSS class mismatch | Check browser console for `TIER CSS SHOW` logs |

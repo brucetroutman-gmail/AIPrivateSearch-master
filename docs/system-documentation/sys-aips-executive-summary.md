@@ -101,7 +101,7 @@ Most AI search tools send your documents to cloud servers for processing. For me
 ✅ MySQL result storage
 ✅ Focused search pages (Exact Search, AI Search)
 ✅ Fabric prompt enhancement pipeline (tested)
-✅ Remote Mac deployment via update-aips.sh
+✅ Remote Mac deployment via `aiprivatesearch.app` Start App
 
 ---
 

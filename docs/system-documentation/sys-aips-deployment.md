@@ -50,17 +50,12 @@ Double-click `load-aiss.command` in `/Users/Shared/`. This will:
 9. Start frontend (port 56305) and backend (port 56306)
 
 ### Updating remote Mac
-After pushing changes to GitHub, run on the remote Mac:
-```bash
-/Users/Shared/repos/AIPrivateSearch/repo/aiprivatesearch/update-aips.sh
-```
+After pushing changes to GitHub, simply restart the app via `aiprivatesearch.app` → Start App.
 
-What `update-aips.sh` does:
-1. Deletes existing repo at `/Users/Shared/repos/AIPrivateSearch/repo/aiprivatesearch`
-2. Git clones from GitHub
-3. Copies `client/c01_client-first-app/config/` → `/Users/Shared/AIPrivateSearch/config/`
-
-After running, restart the app via `aiprivatesearch.app`.
+What `Start App` does automatically:
+1. `git pull` latest from GitHub
+2. Syncs `client/c01_client-first-app/config/` → `/Users/Shared/AIPrivateSearch/config/`
+3. Starts Ollama, backend, and frontend servers
 
 ---
 

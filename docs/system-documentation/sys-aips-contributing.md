@@ -158,7 +158,7 @@ If the hook blocks your commit, fix the ESLint errors before committing. Do not 
 
 1. Add to `app.json` in `/Users/Shared/AIPrivateSearch/config/` (parent — this is what the app reads)
 2. The release process will sync parent config → repo
-3. Add to `update-aips.sh` sync if it needs to reach remote Macs
+3. Add to `Start App` config sync if it needs to reach remote Macs
 4. Document in `sys-aips-architecture.md`
 
 ---

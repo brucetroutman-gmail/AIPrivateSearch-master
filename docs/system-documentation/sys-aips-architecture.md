@@ -109,7 +109,7 @@ The server reads config from `/Users/Shared/AIPrivateSearch/config/` — NOT fro
 
 - Repo `client/c01_client-first-app/config/` is the template
 - Release process syncs: parent config → repo
-- `update-aips.sh` syncs: repo → remote Mac parent config
+- `Start App` (via `aiprivatesearch.app`) syncs: repo → remote Mac parent config
 
 ---
 
