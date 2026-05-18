@@ -291,7 +291,7 @@ async function setUserRole(role) {
   try {
     const sessionId = localStorage.getItem('sessionId');
     const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/subscription-tier`, {
-      method: 'POST',
+      method: `POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${sessionId}`
@@ -527,7 +527,7 @@ function showLicensedContent() {
 // Common score model loading function
 async function loadScoreModels(selectElementId) {
   try {
-    const response = await fetch('config/models-list.json');
+    const response = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
     const data = await response.json();
     const scoreSelect = document.getElementById(selectElementId);
     

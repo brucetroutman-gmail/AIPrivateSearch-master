@@ -362,7 +362,7 @@ async function loadModels() {
 // Load user prompts
 async function loadUserPrompts() {
     try {
-        const response = await fetch('config/user-prompts.json');
+        const response = await fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`);
         const data = await response.json();
         
         filterUserPrompts(data);
@@ -415,7 +415,7 @@ function setupParameterPersistence() {
 // Load search types and generate checkboxes
 async function loadSearchTypes() {
     try {
-        const response = await fetch('config/search-types.json');
+        const response = await fetch(`${window.API_BASE_URL}/api/config/search-types.json`);
         const data = await response.json();
         
         const nonAIContainer = document.getElementById('nonAICheckboxes');

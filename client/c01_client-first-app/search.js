@@ -105,7 +105,7 @@ async function loadCollections() {
 // Load source types from JSON file
 async function loadSourceTypes() {
   try {
-    const response = await fetch('./config/source-types.json');
+    const response = await fetch(`${window.API_BASE_URL}/api/config/source-types.json`);
     const data = await response.json();
     
     while (sourceTypeEl.firstChild) {
@@ -290,7 +290,7 @@ async function loadSearchTypes() {
 // Load system prompts from JSON file
 async function loadSystemPrompts() {
   try {
-    const response = await fetch('./config/system-prompts.json');
+    const response = await fetch(`${window.API_BASE_URL}/api/config/system-prompts.json`);
     const data = await response.json();
     systemPrompts = data.system_prompts;
     
@@ -344,7 +344,7 @@ function filterAssistantTypes() {
 // Load user prompts from JSON file
 async function loadUserPrompts() {
   try {
-    const response = await fetch('./config/user-prompts.json');
+    const response = await fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`);
     const data = await response.json();
     
     filterUserPrompts(data);
@@ -458,7 +458,7 @@ searchTypeEl.addEventListener('change', () => {
 // Load visibility configuration from JSON
 async function loadVisibilityConfig() {
   try {
-    const response = await fetch('./config/show-hide.json');
+    const response = await fetch(`${window.API_BASE_URL}/api/config/show-hide.json`);
     const data = await response.json();
     visibilityConfig = data.visibilityRules;
     logger.log('Visibility configuration loaded successfully');

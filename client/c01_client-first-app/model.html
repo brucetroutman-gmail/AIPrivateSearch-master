@@ -199,7 +199,7 @@
         // Load models from models-list.json
         async function loadModels() {
             try {
-                const configResponse = await fetch('config/models-list.json');
+                const configResponse = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
                 const configData = await configResponse.json();
                 const modelConfig = {};
                 
@@ -351,7 +351,7 @@
                         
                         // Save updated config
                         const saveResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
-                            method: 'PUT',
+                            method: `PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
                         });
@@ -456,7 +456,7 @@
                 const installedModels = ollamaData.models.map(m => m.name.replace(':latest', ''));
                 
                 // Get models from models-list.json
-                const configResponse = await fetch('config/models-list.json');
+                const configResponse = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
                 const configData = await configResponse.json();
                 const configuredModels = [...new Set(configData.models.map(m => m.modelName))];
                 
@@ -576,7 +576,7 @@
                         
                         // Save updated config
                         await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
-                            method: 'PUT',
+                            method: `PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
                         });

@@ -7,7 +7,7 @@ class ParameterManager {
   // Load configuration from JSON files
   async loadConfig(configFile) {
     try {
-      const response = await fetch(`./config/${configFile}`);
+      const response = await fetch(`${window.API_BASE_URL}/api/config/${configFile}`);
       return await response.json();
     } catch (error) {
       console.error(`Failed to load ${configFile}:`, error);

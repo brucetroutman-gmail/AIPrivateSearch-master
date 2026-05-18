@@ -8,7 +8,7 @@ class SearchManager {
   // Load models from config
   async loadModels(category = 'search') {
     try {
-      const response = await fetch('config/models-list.json');
+      const response = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
       const data = await response.json();
       this.models = data.models.filter(m => m.category === category).map(m => m.modelName).sort();
       return this.models;

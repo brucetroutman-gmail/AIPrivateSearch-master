@@ -2,6 +2,7 @@
 
 echo "🚀 Starting AIPrivateSearch..."
 
+
 # Read ports from app.json config - ONLY use config file values
 if [ ! -f "client/c01_client-first-app/config/app.json" ]; then
     echo "❌ Config file not found: client/c01_client-first-app/config/app.json"

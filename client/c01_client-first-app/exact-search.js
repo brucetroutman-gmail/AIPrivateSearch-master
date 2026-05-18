@@ -219,7 +219,7 @@ async function loadCollections() {
 
 async function loadUserPrompts() {
     try {
-        const response = await fetch('config/user-prompts.json');
+        const response = await fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`);
         const data = await response.json();
         userPromptsEl.innerHTML = '<option value="">Select a prompt...</option>';
         const collection = document.getElementById('collectionSelect').value;

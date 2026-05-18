@@ -128,7 +128,7 @@
 
         async function loadModelTests() {
             try {
-                const response = await fetch('./config/model-tests.json');
+                const response = await fetch(`${window.API_BASE_URL}/api/config/model-tests.json`);
                 const data = await response.json();
                 modelTests = data['model-tests'];
                 renderTests();
@@ -283,12 +283,12 @@
             
             // Load configuration data
             const [sourceTypes, systemPrompts, userPrompts, temperatureOptions, contextOptions, tokensOptions] = await Promise.all([
-                fetch('./config/source-types.json').then(r => r.json()),
-                fetch('./config/system-prompts.json').then(r => r.json()),
-                fetch('./config/user-prompts.json').then(r => r.json()),
-                fetch('./config/temperature.json').then(r => r.json()),
-                fetch('./config/context.json').then(r => r.json()),
-                fetch('./config/tokens.json').then(r => r.json())
+                fetch(`${window.API_BASE_URL}/api/config/source-types.json`).then(r => r.json()),
+                fetch(`${window.API_BASE_URL}/api/config/system-prompts.json`).then(r => r.json()),
+                fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`).then(r => r.json()),
+                fetch(`${window.API_BASE_URL}/api/config/temperature.json`).then(r => r.json()),
+                fetch(`${window.API_BASE_URL}/api/config/context.json`).then(r => r.json()),
+                fetch(`${window.API_BASE_URL}/api/config/tokens.json`).then(r => r.json())
             ]);
             
             let completedTests = 0;
@@ -646,7 +646,7 @@
         // Load models from models-list.json (search category only)
         async function loadModels() {
             try {
-                const response = await fetch('config/models-list.json');
+                const response = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
                 const data = await response.json();
                 const modelList = document.getElementById('modelList');
                 modelList.innerHTML = '';
