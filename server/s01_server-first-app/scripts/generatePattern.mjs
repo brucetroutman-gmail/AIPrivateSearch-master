@@ -11,11 +11,6 @@ const STOP_WORDS = new Set(['the','a','an','and','or','but','in','on','at','to',
 
 // Generate a Fabric pattern from the collection's document files
 export async function generatePattern(collection) {
-  if (!FABRIC_URL || !FABRIC_API_KEY) {
-    console.log('[generatePattern] Fabric not configured — skipping');
-    return { skipped: true, reason: 'Fabric not configured' };
-  }
-
   const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
   if (!fs.existsSync(collectionPath)) {
     return { skipped: true, reason: 'Collection not found' };
