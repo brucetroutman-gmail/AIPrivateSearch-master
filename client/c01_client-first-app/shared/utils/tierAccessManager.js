@@ -146,10 +146,10 @@ class TierAccessManager {
           tierName = tierNames[tier] || 'standard';
           console.log('🔐 TIER ACCESS DEBUG: Got tier from license system:', { tier, tierName });
         } else {
-          console.log('🔐 TIER ACCESS DEBUG: License not valid, using default tier 1');
+          console.error('🔐 TIER ACCESS ERROR: License not valid — defaulting to standard tier. Status:', licenseStatus);
         }
       } else {
-        console.log('🔐 TIER ACCESS DEBUG: No license checker available');
+        console.error('🔐 TIER ACCESS ERROR: No license checker available — license-checker.js not loaded on this page');
       }
     } catch (error) {
       console.warn('🔐 TIER ACCESS DEBUG: Could not get tier from license system:', error);
