@@ -69,7 +69,37 @@ Options:
 
 Currently returns both matches and non-matches.
 
-### 2-049 — One-time: Clean up any enhance_ patterns on Fabric server
+### 2-050 — Collection Manifest System
+Replace folder-scan approach with a `collection.json` manifest per collection.
+
+**Manifest structure** (`sources/local-documents/[collection]/collection.json`):
+- `name` — collection name
+- `created` — creation date
+- `documents[]` — list of documents with:
+  - `id` — unique doc id
+  - `name` — display name
+  - `sourcePath` — full path to source file (anywhere on Mac)
+  - `sourceExt` — original file extension
+  - `convertedFile` — filename of converted .md in collection folder (if converted)
+  - `addedAt` — date added
+
+**Rules:**
+- Creating a collection creates `sources/local-documents/[collection]/` folder + empty `collection.json`
+- Adding a document adds entry to manifest (source stays where it is)
+- Removing a document removes manifest entry only — source file never deleted
+- Converting writes `.md` to collection folder, updates `convertedFile` in manifest
+- Document list reads from manifest, not folder scan
+- Embedding/indexing unchanged — still uses `.md` in collection folder
+- Collections without manifest fall back to folder scan (migration handled later)
+
+- [ ] Create manifest on collection create
+- [ ] Add document — adds to manifest with sourcePath
+- [ ] Remove document — removes from manifest only
+- [ ] Document list — reads from manifest
+- [ ] Convert — reads sourcePath, writes .md to collection folder, updates manifest
+- [ ] Migration plan for existing collections (later)
+
+
 New approach stores patterns locally in `sources/local-documents/[collection]/fabric-pattern.md`.
 - [ ] Run: `curl https://fabric.formr.net/patterns/names | grep enhance_`
 - [ ] Delete any found with: `curl -X DELETE https://fabric.formr.net/patterns/enhance_[name] -H "Authorization: Bearer [key]"`

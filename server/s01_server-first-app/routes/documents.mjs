@@ -54,8 +54,9 @@ router.post('/collections/create', async (req, res) => {
       // Collection doesn't exist, continue with creation
     }
     
-    // Create collection directory
+    // Create collection directory and manifest
     await secureFs.mkdir(collectionPath, { recursive: true });
+    await CollectionsUtil.createManifest(name);
     
     res.json({ success: true, message: `Collection '${name}' created successfully` });
   } catch (error) {
@@ -84,6 +85,9 @@ router.post('/collections/:collection/upload', upload.single('file'), async (req
     
     // Write file to disk
     await secureFs.writeFile(filePath, req.file.buffer);
+
+    // Add to manifest
+    await CollectionsUtil.addToManifest(collection, filePath, filename);
     
     res.json({ success: true, message: `File '${filename}' uploaded successfully` });
   } catch (error) {
@@ -125,6 +129,12 @@ router.post('/convert-selected', async (req, res) => {
         
         // Write markdown file
         await secureFs.writeFile(targetPath, markdownContent, 'utf8');
+
+        // Update manifest convertedFile
+        const baseName = filename.substring(0, filename.lastIndexOf('.')) || filename;
+        const convertedFilename = baseName + '.md';
+        await CollectionsUtil.updateConvertedFile(collection, baseName, convertedFilename);
+
         converted++;
       } catch (error) {
         errors.push(`${filename}: ${error.message}`);
@@ -146,11 +156,26 @@ router.get('/collections/:collection/files', async (req, res) => {
   try {
     const { collection } = req.params;
     const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
-    
+
+    // Try manifest first
+    const manifest = await CollectionsUtil.readManifest(collection);
+    if (manifest) {
+      // Return manifest documents with metadata
+      const files = manifest.documents.map(doc => ({
+        name: doc.name,
+        sourcePath: doc.sourcePath,
+        sourceExt: doc.sourceExt,
+        convertedFile: doc.convertedFile,
+        addedAt: doc.addedAt,
+        id: doc.id
+      }));
+      return res.json({ files, manifest: true });
+    }
+
+    // Legacy fallback — folder scan
     const files = await secureFs.readdir(collectionPath);
-    const fileList = files.filter(file => !file.startsWith('.'));
-    
-    res.json({ files: fileList });
+    const fileList = files.filter(file => !file.startsWith('.') && file !== 'collection.json');
+    res.json({ files: fileList, manifest: false });
   } catch (error) {
     if (error.code === 'ENOENT') {
       return res.status(404).json({ error: 'Collection not found' });
@@ -251,14 +276,27 @@ router.post('/collections/:collection/search', async (req, res) => {
   }
 });
 
-// Delete individual file
+// Delete individual file — removes from manifest only, source file stays on disk
 router.delete('/collections/:collection/files/:filename', async (req, res) => {
   try {
     const { collection, filename } = req.params;
-    
+
+    const manifest = await CollectionsUtil.readManifest(collection);
+    if (manifest) {
+      // Remove from manifest — do NOT delete source file
+      await CollectionsUtil.removeFromManifest(collection, filename);
+
+      // Delete converted .md file from collection folder if it exists
+      const baseName = filename.substring(0, filename.lastIndexOf('.')) || filename;
+      const mdPath = path.join(CollectionsUtil.getCollectionsPath(), collection, `${baseName}.md`);
+      try { await secureFs.unlink(mdPath); } catch { /* md may not exist */ }
+
+      return res.json({ success: true });
+    }
+
+    // Legacy fallback — delete file from disk
     const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
     await secureFs.unlink(filePath);
-    
     res.json({ success: true });
   } catch (error) {
     if (error.message.includes('Path traversal')) {

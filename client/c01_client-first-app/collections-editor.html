@@ -387,7 +387,16 @@
         const indexedData = await indexedResponse.json();
         const documentIndexData = await documentIndexResponse.json();
         
-        documents = filesData.files || [];
+        // Support both manifest and legacy folder-scan responses
+        if (filesData.manifest) {
+          // Manifest mode — rich document objects
+          documents = filesData.files || [];
+          window._collectionHasManifest = true;
+        } else {
+          // Legacy mode — plain filename strings
+          documents = filesData.files || [];
+          window._collectionHasManifest = false;
+        }
         indexedDocuments = indexedData.documents || [];
         metadataDocuments = documentIndexData.documents || [];
         renderDocuments();
@@ -408,13 +417,28 @@
       const docGroups = new Map();
       
       documents.forEach(doc => {
-        const fileName = typeof doc === 'string' ? doc : doc.name;
-        
-        // Skip database files
-        if (fileName === 'index-cards.db' || fileName === 'embeddings.db') {
+        // Support both manifest objects and legacy filename strings
+        const isManifestDoc = typeof doc === 'object' && doc.sourceExt !== undefined;
+        const fileName = isManifestDoc ? (doc.convertedFile || `${doc.name}.${doc.sourceExt}`) : (typeof doc === 'string' ? doc : doc.name);
+        const sourceFileName = isManifestDoc ? `${doc.name}.${doc.sourceExt}` : null;
+        const sourceExt = isManifestDoc ? doc.sourceExt : null;
+
+        // Skip database and system files (legacy mode)
+        if (!isManifestDoc && (fileName === 'index-cards.db' || fileName === 'embeddings.db' || fileName === 'fabric-pattern.md' || fileName === 'collection.json')) {
           return;
         }
-        
+        // Manifest mode — use rich metadata directly
+        if (isManifestDoc) {
+          const baseName = doc.name;
+          if (!docGroups.has(baseName)) {
+            docGroups.set(baseName, { baseName, sourceFiles: [], mdFile: null, metaFile: null });
+          }
+          const group = docGroups.get(baseName);
+          if (doc.convertedFile) group.mdFile = doc.convertedFile;
+          group.sourceFiles.push({ fileName: sourceFileName, ext: sourceExt, size: 0 });
+          return;
+        }
+
         const ext = fileName.split('.').pop().toLowerCase();
         
         // Handle META_ files - associate them with their base document
@@ -449,7 +473,7 @@
         
         const group = docGroups.get(baseName);
         
-        if (ext === 'md' || ext === 'json') {
+        if (ext === 'md') {
           group.mdFile = fileName;
         } else {
           group.sourceFiles.push({ fileName, ext, size: typeof doc === 'string' ? 0 : doc.size });
