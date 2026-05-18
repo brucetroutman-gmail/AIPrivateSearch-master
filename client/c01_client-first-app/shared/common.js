@@ -498,6 +498,11 @@ async function handleLogout() {
   } else {
     AuthUtils.logout();
   }
+  localStorage.removeItem('sessionId');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userUserRole');
+  localStorage.removeItem('userRole');
+  window.location.href = './user-management.html';
 }
 
 function setupLoginIcon() {
