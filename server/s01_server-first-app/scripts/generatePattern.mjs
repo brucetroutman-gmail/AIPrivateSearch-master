@@ -1,121 +1,89 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import fs from 'fs';
 import path from 'path';
-import initSqlJs from 'sql.js';
 import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
 
-const FABRIC_URL = process.env.FABRIC_URL;
-const FABRIC_API_KEY = process.env.FABRIC_API_KEY;
+// Common stop words to filter out of keyword extraction
+const STOP_WORDS = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by',
+  'is','are','was','were','be','been','have','has','had','do','does','did','will','would','could','should',
+  'this','that','these','those','it','its','from','as','not','no','so','if','then','than','when','where',
+  'who','what','which','how','all','any','each','more','also','into','about','up','out','over','after']);
 
-// Aggregate index cards for a collection and build a sanitized domain pattern
+// Generate a Fabric pattern from the collection's document files
 export async function generatePattern(collection) {
   if (!FABRIC_URL || !FABRIC_API_KEY) {
-    console.log('[generatePattern] Fabric not configured — skipping pattern generation');
+    console.log('[generatePattern] Fabric not configured — skipping');
     return { skipped: true, reason: 'Fabric not configured' };
   }
 
-  const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'index-cards.db');
-  if (!fs.existsSync(dbPath)) {
-    console.log(`[generatePattern] No index cards found for collection: ${collection}`);
-    return { skipped: true, reason: 'No index cards' };
+  const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
+  if (!fs.existsSync(collectionPath)) {
+    return { skipped: true, reason: 'Collection not found' };
   }
 
   try {
-    // Read all index cards
-    const dbBuffer = fs.readFileSync(dbPath);
-    const SQL = await initSqlJs();
-    const db = new SQL.Database(dbBuffer);
+    // Read all .md and .txt files in the collection
+    const files = fs.readdirSync(collectionPath)
+      .filter(f => (f.endsWith('.md') || f.endsWith('.txt')) && !f.startsWith('META_'));
 
-    const results = db.exec('SELECT document_type, topics, keywords FROM document_index');
-    db.close();
-
-    if (!results || results.length === 0 || !results[0].values.length) {
-      return { skipped: true, reason: 'Empty index' };
+    if (files.length === 0) {
+      return { skipped: true, reason: 'No documents found' };
     }
 
-    // Aggregate across all cards — no PII, no filenames, no summaries
-    const typeCounts = {};
-    const topicSet = new Set();
-    const keywordSet = new Set();
+    // Extract words from all documents — aggregate frequency
+    const wordFreq = {};
+    let totalWords = 0;
 
-    results[0].values.forEach(row => {
-      const [docType, topics, keywords] = row;
+    files.forEach(filename => {
+      const filePath = path.join(collectionPath, filename);
+      const content = fs.readFileSync(filePath, 'utf8');
 
-      // Count document types
-      if (docType) {
-        const t = docType.toLowerCase().trim();
-        typeCounts[t] = (typeCounts[t] || 0) + 1;
-      }
+      // Extract words, filter stop words, min length 4
+      const words = content.toLowerCase()
+        .replace(/[^a-z\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length >= 4 && !STOP_WORDS.has(w));
 
-      // Collect unique topics (split by comma)
-      if (topics) {
-        topics.split(',').forEach(t => {
-          const clean = t.trim().toLowerCase();
-          if (clean.length > 2) topicSet.add(clean);
-        });
-      }
-
-      // Collect unique keywords (split by comma)
-      if (keywords) {
-        keywords.split(',').forEach(k => {
-          const clean = k.trim().toLowerCase();
-          if (clean.length > 2) keywordSet.add(clean);
-        });
-      }
+      words.forEach(w => {
+        wordFreq[w] = (wordFreq[w] || 0) + 1;
+        totalWords++;
+      });
     });
 
-    // Dominant document type
-    const dominantType = Object.entries(typeCounts)
+    // Top keywords by frequency (exclude very common single-doc words)
+    const topKeywords = Object.entries(wordFreq)
+      .filter(([, count]) => count >= 2) // appears in multiple places
       .sort((a, b) => b[1] - a[1])
-      .map(([type]) => type)
-      .slice(0, 3)
+      .slice(0, 25)
+      .map(([word]) => word)
       .join(', ');
 
-    const topTopics = [...topicSet].slice(0, 15).join(', ');
-    const topKeywords = [...keywordSet].slice(0, 20).join(', ');
-    const docCount = results[0].values.length;
+    const docCount = files.length;
 
     // Build sanitized Fabric system prompt
     const patternName = `enhance_${collection}`;
     const systemPrompt = `You are an expert query enhancer for a private document collection called "${collection}".
 
-This collection contains ${docCount} documents of type: ${dominantType || 'general'}.
+This collection contains ${docCount} documents.
 
-Key topics covered: ${topTopics || 'general content'}.
-
-Domain vocabulary: ${topKeywords || 'general terms'}.
+Key domain vocabulary from this collection: ${topKeywords || 'general terms'}.
 
 Your task: Transform the user's search query into a precise, well-structured prompt that will produce the best possible answer from a local AI model searching this collection.
 
 Guidelines:
 - Preserve the user's original intent exactly
-- Add relevant domain context from the collection's topics
+- Add relevant domain context using the vocabulary above
 - Structure the query to request organized, specific answers
 - Ask for document references where appropriate
 - Keep the enhanced prompt focused and actionable
-- Do not add information not implied by the original query`;
+- Do not add information not implied by the original query
+- Do not include any personal names, patient data, or confidential information`;
 
-    // Upload pattern to Fabric
-    const response = await fetch(`${FABRIC_URL}/patterns/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${FABRIC_API_KEY}`
-      },
-      body: JSON.stringify({
-        name: patternName,
-        pattern: { system: systemPrompt }
-      }),
-      signal: AbortSignal.timeout(10000)
-    });
+    // Save pattern locally in collection folder
+    const patternPath = path.join(collectionPath, 'fabric-pattern.md');
+    fs.writeFileSync(patternPath, systemPrompt, 'utf8');
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error(`[generatePattern] Fabric upload failed for ${collection}: ${response.status} ${text}`);
-      return { success: false, error: `Fabric upload failed: ${response.status}` };
-    }
-
-    console.log(`[generatePattern] Pattern uploaded: ${patternName} (${docCount} docs, types: ${dominantType})`);
+    console.log(`[generatePattern] Pattern saved locally: ${patternPath} (${docCount} docs, ${totalWords} words)`);
     return { success: true, patternName, docCount };
 
   } catch (error) {

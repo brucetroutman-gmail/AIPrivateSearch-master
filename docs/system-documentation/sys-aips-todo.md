@@ -69,6 +69,12 @@ Options:
 
 Currently returns both matches and non-matches.
 
+### 2-049 — One-time: Clean up any enhance_ patterns on Fabric server
+New approach stores patterns locally in `sources/local-documents/[collection]/fabric-pattern.md`.
+- [ ] Run: `curl https://fabric.formr.net/patterns/names | grep enhance_`
+- [ ] Delete any found with: `curl -X DELETE https://fabric.formr.net/patterns/enhance_[name] -H "Authorization: Bearer [key]"`
+- **Status**: Checked May 2025 — no enhance_ patterns found, nothing to clean up ✅
+
 ### 2-007 — Consistent View Document across all search types
 Make Response matches and View Document consistent. Add View Index Card to Doc Index Cards response.
 

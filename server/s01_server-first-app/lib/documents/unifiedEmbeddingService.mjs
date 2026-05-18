@@ -170,19 +170,25 @@ export class UnifiedEmbeddingService {
     
     for (const paragraph of paragraphs) {
       const trimmedParagraph = paragraph.trim();
-      
-      if (currentChunk.length > 0 && (currentChunk.length + trimmedParagraph.length) > chunkSize) {
-        chunks.push({
-          content: currentChunk.trim(),
-          startChar,
-          endChar: startChar + currentChunk.length,
-          type: 'semantic'
-        });
-        
-        startChar += currentChunk.length;
-        currentChunk = trimmedParagraph + '\n\n';
-      } else {
-        currentChunk += trimmedParagraph + '\n\n';
+
+      // If a single paragraph exceeds chunkSize, split it by sentences or fixed size
+      const subParagraphs = trimmedParagraph.length > chunkSize
+        ? this.splitLargeParagraph(trimmedParagraph, chunkSize)
+        : [trimmedParagraph];
+
+      for (const sub of subParagraphs) {
+        if (currentChunk.length > 0 && (currentChunk.length + sub.length) > chunkSize) {
+          chunks.push({
+            content: currentChunk.trim(),
+            startChar,
+            endChar: startChar + currentChunk.length,
+            type: 'semantic'
+          });
+          startChar += currentChunk.length;
+          currentChunk = sub + '\n\n';
+        } else {
+          currentChunk += sub + '\n\n';
+        }
       }
     }
     
@@ -196,6 +202,34 @@ export class UnifiedEmbeddingService {
     }
     
     return chunks;
+  }
+
+  // Split a large paragraph by sentences, falling back to fixed-size slices
+  splitLargeParagraph(text, chunkSize) {
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    const parts = [];
+    let current = '';
+    for (const sentence of sentences) {
+      if (current.length + sentence.length > chunkSize && current.length > 0) {
+        parts.push(current.trim());
+        current = sentence + ' ';
+      } else {
+        current += sentence + ' ';
+      }
+    }
+    if (current.trim().length > 0) parts.push(current.trim());
+    // If still too large (no sentence breaks), slice by fixed size
+    const result = [];
+    for (const part of parts) {
+      if (part.length > chunkSize) {
+        for (let i = 0; i < part.length; i += chunkSize) {
+          result.push(part.slice(i, i + chunkSize));
+        }
+      } else {
+        result.push(part);
+      }
+    }
+    return result;
   }
 
   async findSimilarChunks(query, collection, topK = 5, options = {}) {

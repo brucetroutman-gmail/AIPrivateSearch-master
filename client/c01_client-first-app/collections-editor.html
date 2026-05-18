@@ -280,6 +280,7 @@
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
           <button class="btn btn-info" onclick="viewFabricPattern()">✨ View/Edit Fabric Pattern</button>
+          <button class="btn btn-success" onclick="generateFabricPatternOnly()">✨ Generate Fabric Pattern</button>
         </div>
       </div>
       
@@ -718,13 +719,15 @@
           }
         }
 
-        // Step 2b: Generate Fabric pattern (fire-and-forget)
+        // Step 2b: Generate Fabric pattern from all collection documents (fire-and-forget)
         fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
           body: JSON.stringify({ collection: currentCollection })
-        }).then(() => showLog(`✨ Fabric pattern generation started for ${currentCollection}`, 'success'))
-          .catch(() => showLog(`⚠️ Fabric pattern generation skipped (Fabric not configured)`, 'warning'));
+        }).then(r => r.json()).then(data => {
+          if (data.success) showLog(`✨ Fabric pattern generated for ${currentCollection} (${data.docCount} docs)`, 'success');
+          else showLog(`⚠️ Fabric pattern skipped: ${data.error || data.reason || 'unknown'}`, 'warning');
+        }).catch(() => showLog(`⚠️ Fabric pattern generation skipped (Fabric not configured)`, 'warning'));
 
         // Step 3: Embed Converted Files
         showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
@@ -1511,6 +1514,22 @@
   </div>
 
   <script>
+    async function generateFabricPatternOnly() {
+      showLog(`\n--- GENERATING FABRIC PATTERN ---`, 'processing');
+      try {
+        const response = await fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
+          body: JSON.stringify({ collection: currentCollection })
+        });
+        const data = await response.json();
+        if (data.success) showLog(`✨ Fabric pattern generated for ${currentCollection} (${data.docCount} docs)`, 'success');
+        else showLog(`⚠️ Fabric pattern skipped: ${data.error || data.reason || 'unknown'}`, 'warning');
+      } catch (err) {
+        showLog(`✗ Fabric pattern generation failed: ${err.message}`, 'error');
+      }
+    }
+
     async function viewFabricPattern() {
       const patternName = `enhance_${currentCollection}`;
       document.getElementById('fabricPatternName').textContent = patternName;
@@ -1525,7 +1544,7 @@
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to load pattern');
         document.getElementById('fabricPatternText').value = data.pattern || '';
-        document.getElementById('fabricPatternStatus').textContent = data.exists ? 'Pattern loaded from Fabric server.' : 'No pattern exists yet — generate one first or write your own.';
+        document.getElementById('fabricPatternStatus').textContent = data.exists ? 'Pattern loaded from local collection folder.' : 'No pattern exists yet — click Generate Fabric Pattern to create one.';
       } catch (err) {
         document.getElementById('fabricPatternText').value = '';
         document.getElementById('fabricPatternStatus').textContent = `⚠️ ${err.message}`;
@@ -1545,7 +1564,7 @@
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Save failed');
-        document.getElementById('fabricPatternStatus').textContent = '✅ Pattern saved to Fabric server.';
+        document.getElementById('fabricPatternStatus').textContent = '✅ Pattern saved to collection folder.';
       } catch (err) {
         document.getElementById('fabricPatternStatus').textContent = `✗ ${err.message}`;
       }
