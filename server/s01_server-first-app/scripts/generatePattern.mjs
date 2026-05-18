@@ -19,7 +19,7 @@ export async function generatePattern(collection) {
   try {
     // Read all .md and .txt files in the collection
     const files = fs.readdirSync(collectionPath)
-      .filter(f => (f.endsWith('.md') || f.endsWith('.txt')) && !f.startsWith('META_'));
+      .filter(f => (f.endsWith('.md') || f.endsWith('.txt') || f.endsWith('.json')) && !f.startsWith('META_') && f !== 'fabric-pattern.md');
 
     if (files.length === 0) {
       return { skipped: true, reason: 'No documents found' };

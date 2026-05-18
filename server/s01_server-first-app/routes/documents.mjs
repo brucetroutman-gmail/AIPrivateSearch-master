@@ -110,8 +110,8 @@ router.post('/convert-selected', async (req, res) => {
       try {
         const ext = filename.split('.').pop().toLowerCase();
         
-        // Skip files that are already markdown or json (treat json like md)
-        if (ext === 'md' || ext === 'json') {
+        // Skip files that are already markdown
+        if (ext === 'md') {
           continue;
         }
         

@@ -663,8 +663,22 @@ export class DocumentProcessor {
       
       if (ext === '.json') {
         const jsonData = JSON.parse(content);
-        const formatted = JSON.stringify(jsonData, null, 2);
-        return `# ${filename}\n\n\`\`\`json\n${formatted}\n\`\`\``;
+        // Convert JSON to readable markdown — flatten keys/values for better searchability
+        const lines = [`# ${filename}`, ''];
+        const flatten = (obj, prefix = '') => {
+          for (const [key, val] of Object.entries(obj)) {
+            const label = prefix ? `${prefix} / ${key}` : key;
+            if (val && typeof val === 'object' && !Array.isArray(val)) {
+              flatten(val, label);
+            } else if (Array.isArray(val)) {
+              lines.push(`**${label}**: ${val.join(', ')}`);
+            } else {
+              lines.push(`**${label}**: ${val}`);
+            }
+          }
+        };
+        flatten(jsonData);
+        return lines.join('\n');
       } else if (ext === '.yaml' || ext === '.yml') {
         return `# ${filename}\n\n\`\`\`yaml\n${content.trim()}\n\`\`\``;
       } else if (ext === '.xml') {
