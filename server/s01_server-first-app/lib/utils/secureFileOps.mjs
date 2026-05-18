@@ -54,7 +54,17 @@ export const secureFs = {
         const safePath = validatePath(dirPath);
         return fs.mkdir(safePath, options);
     },
-    
+
+    async unlink(filePath) {
+        const safePath = validatePath(filePath);
+        return fs.unlink(safePath);
+    },
+
+    async rmdir(dirPath, options) {
+        const safePath = validatePath(dirPath);
+        return fs.rm(safePath, { recursive: true, force: true, ...options });
+    },
+
     createReadStream(filePath, options) {
         const safePath = validatePath(filePath);
         return fs.createReadStream(safePath, options);
