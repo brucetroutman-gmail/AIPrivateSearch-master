@@ -105,7 +105,7 @@ export class UnifiedEmbeddingService {
         VALUES (?, ?, ?, ?, ?)
       `);
       
-      const docEmbedding = await this.createEmbedding(content.substring(0, 8000), useTransformers, model);
+      const docEmbedding = await this.createEmbedding(content.substring(0, 1500), useTransformers, model);
       console.log(`[UnifiedEmbeddingService] Document embedding created, length: ${docEmbedding.length}`);
       
       const docResult = await docStmt.run(documentId, filename, contentHash, content, JSON.stringify(docEmbedding));
@@ -161,7 +161,7 @@ export class UnifiedEmbeddingService {
     return { success: true, chunks: chunkCount.count, reused: !!existingDoc };
   }
 
-  semanticChunking(text, chunkSize = 1200) {
+  semanticChunking(text, chunkSize = 800) {
     const chunks = [];
     const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     
