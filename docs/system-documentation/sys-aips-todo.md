@@ -33,6 +33,12 @@
 - [ ] Implement graceful degradation — fallback to `addMetaPrompt` with toast if Fabric unreachable
 - [ ] Test: USA-History query, sensitive collection, offline mode, malformed collection name
 
+**Phase 1b — Auto Pattern Generation on Process Source Files**
+- [ ] Create `generatePattern.mjs` in `server/scripts/` — aggregates all index cards for collection, builds sanitized domain pattern, uploads to Fabric (fire-and-forget)
+- [ ] Trigger at end of Step 2 (Create Doc Index Cards) in `processSourceFiles()` in `collections-editor.html`
+- [ ] Pattern content: aggregate document_type, topics, keywords across all cards — no PII, no filenames, no summaries
+- [ ] Test: Run Process Source Files on USA-History, confirm `enhance_USA-History` appears on Fabric server
+
 **Phase 2 — Pattern Management**
 - [ ] Create `safeDomainContext.json` in config — sanitized domain templates per collection type
 - [ ] Create `generatePattern.mjs` in scripts — uses `safeDomainContext.json`, no PII
@@ -50,7 +56,17 @@
 - [ ] Add auto-enhance toggle per collection (with warning for sensitive collections)
 - [ ] Test: Disable Fabric, confirm fallback toast shown and search completes normally
 
-### 2-006 — Fix Smart Search to return only matches
+### 2-048 — Embedding fails when document exceeds model context length
+Error: `Ollama embedding error: 500 - {"error":"the input length exceeds the context length"}`
+Occurs during embedding of large documents:
+- `patient_appointments_calendar.md` (Family-Documents collection)
+- `gospel-john.md` (My-Literature collection)
+Options:
+- [ ] Detect oversized documents before embedding and split into smaller chunks
+- [ ] Show a clear user-facing error message instead of silent failure
+- [ ] Log which files failed so user knows what to re-try
+
+
 Currently returns both matches and non-matches.
 
 ### 2-007 — Consistent View Document across all search types

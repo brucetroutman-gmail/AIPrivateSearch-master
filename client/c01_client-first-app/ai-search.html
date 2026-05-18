@@ -94,6 +94,19 @@
         .sort-arrow { margin-left: 5px; opacity: 0.3; }
         .sortable.asc .sort-arrow::after { content: '▲'; opacity: 1; }
         .sortable.desc .sort-arrow::after { content: '▼'; opacity: 1; }
+        .btn-enhance {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .btn-enhance:hover { opacity: 0.85; }
+        .btn-enhance:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
     <script src="./shared/utils/apiConfig.js"></script>
     <script src="shared/license-checker.js"></script>
@@ -145,6 +158,7 @@
             </div>
             <div class="search-input-container">
                 <input type="text" id="searchQuery" placeholder="Enter your search query..." class="search-input">
+                <button id="enhanceBtn" class="btn-enhance" style="display:none;" onclick="enhancePrompt()">✨ Enhance Prompt</button>
             </div>
             <div class="controls-container">
                 <select id="modelSelect" class="model-select" required>
@@ -230,6 +244,81 @@
     </main>
 
     <div id="footer-placeholder"></div>
+
+    <!-- Enhance Prompt Modal -->
+    <div id="enhanceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+      <div style="background:var(--card-bg); border-radius:8px; padding:2rem; max-width:700px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-lg);">
+        <h3 style="margin-bottom:1rem; color:var(--text-color)">✨ Enhanced Prompt Preview</h3>
+        <div style="margin-bottom:1rem;">
+          <label style="font-weight:600; color:var(--text-muted); font-size:0.85rem;">ORIGINAL</label>
+          <div id="originalPromptPreview" style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:4px; padding:0.75rem; margin-top:0.25rem; color:var(--text-color); font-size:0.9rem;"></div>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="font-weight:600; color:var(--primary); font-size:0.85rem;">ENHANCED</label>
+          <div id="enhancedPromptPreview" style="background:var(--input-bg); border:1px solid var(--primary); border-radius:4px; padding:0.75rem; margin-top:0.25rem; color:var(--text-color); font-size:0.9rem; white-space:pre-wrap;"></div>
+        </div>
+        <div style="display:flex; gap:1rem; justify-content:flex-end;">
+          <button onclick="cancelEnhance()" style="padding:0.6rem 1.2rem; border:1px solid var(--border-color); border-radius:4px; background:transparent; color:var(--text-color); cursor:pointer;">Cancel</button>
+          <button onclick="useEnhanced()" style="padding:0.6rem 1.2rem; border:none; border-radius:4px; background:var(--primary); color:white; cursor:pointer; font-weight:600;">Use Enhanced</button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="ai-search.js"></script>
+    <script>
+      // Show/hide enhance button based on collection selection
+      document.addEventListener('DOMContentLoaded', () => {
+        const collectionSelect = document.getElementById('collectionSelect');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        if (collectionSelect && enhanceBtn) {
+          collectionSelect.addEventListener('change', () => {
+            enhanceBtn.style.display = collectionSelect.value ? 'inline-block' : 'none';
+          });
+        }
+      });
+
+      let pendingEnhanced = '';
+
+      async function enhancePrompt() {
+        const query = document.getElementById('searchQuery').value.trim();
+        const collection = document.getElementById('collectionSelect').value;
+        if (!query) { window.showUserMessage('Please enter a query first', 'error'); return; }
+        if (!collection) { window.showUserMessage('Please select a collection first', 'error'); return; }
+
+        const btn = document.getElementById('enhanceBtn');
+        btn.textContent = 'Enhancing...';
+        btn.disabled = true;
+
+        try {
+          const response = await fetch(`${window.API_BASE_URL}/api/fabric/enhance`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
+            body: JSON.stringify({ query, collection })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.enhanced) throw new Error(data.error || 'Enhancement failed');
+
+          pendingEnhanced = data.enhanced;
+          document.getElementById('originalPromptPreview').textContent = query;
+          document.getElementById('enhancedPromptPreview').textContent = data.enhanced;
+          const modal = document.getElementById('enhanceModal');
+          modal.style.display = 'flex';
+        } catch (err) {
+          window.showUserMessage('Prompt enhancement unavailable — using original query', 'warning');
+        } finally {
+          btn.textContent = '\u2728 Enhance Prompt';
+          btn.disabled = false;
+        }
+      }
+
+      function useEnhanced() {
+        document.getElementById('searchQuery').value = pendingEnhanced;
+        document.getElementById('enhanceModal').style.display = 'none';
+      }
+
+      function cancelEnhance() {
+        document.getElementById('enhanceModal').style.display = 'none';
+      }
+    </script>
 </body>
 </html>

@@ -277,6 +277,7 @@
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
+          <button class="btn btn-info" onclick="viewFabricPattern()">✨ View/Edit Fabric Pattern</button>
         </div>
       </div>
       
@@ -714,7 +715,15 @@
             showLog(`${progress} ✗ Index error: ${fileName} - ${error.message} (${fileElapsed}s)`, 'error');
           }
         }
-        
+
+        // Step 2b: Generate Fabric pattern (fire-and-forget)
+        fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
+          body: JSON.stringify({ collection: currentCollection })
+        }).then(() => showLog(`✨ Fabric pattern generation started for ${currentCollection}`, 'success'))
+          .catch(() => showLog(`⚠️ Fabric pattern generation skipped (Fabric not configured)`, 'warning'));
+
         // Step 3: Embed Converted Files
         showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
         for (let i = 0; i < convertedFiles.length; i++) {
@@ -1481,6 +1490,62 @@
           document.removeEventListener('keydown', window.currentEscHandler);
           window.currentEscHandler = null;
         }
+      }
+    }
+  </script>
+
+  <!-- Fabric Pattern Modal -->
+  <div id="fabricPatternModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:var(--card-bg); border-radius:8px; padding:2rem; max-width:750px; width:90%; max-height:85vh; overflow-y:auto; box-shadow:var(--shadow-lg);">
+      <h3 style="margin-bottom:0.5rem; color:var(--text-color)">✨ Fabric Pattern: <span id="fabricPatternName" style="color:var(--primary);"></span></h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">This pattern is used to enhance prompts for this collection. Edit and save to update on the Fabric server.</p>
+      <textarea id="fabricPatternText" style="width:100%; height:300px; padding:0.75rem; background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:4px; font-size:0.85rem; font-family:monospace; resize:vertical;"></textarea>
+      <div id="fabricPatternStatus" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; min-height:1.2rem;"></div>
+      <div style="display:flex; gap:1rem; justify-content:flex-end; margin-top:1rem;">
+        <button onclick="document.getElementById('fabricPatternModal').style.display='none'" style="padding:0.6rem 1.2rem; border:1px solid var(--border-color); border-radius:4px; background:transparent; color:var(--text-color); cursor:pointer;">Close</button>
+        <button onclick="saveFabricPattern()" style="padding:0.6rem 1.2rem; border:none; border-radius:4px; background:var(--primary); color:white; cursor:pointer; font-weight:600;">Save to Fabric</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function viewFabricPattern() {
+      const patternName = `enhance_${currentCollection}`;
+      document.getElementById('fabricPatternName').textContent = patternName;
+      document.getElementById('fabricPatternText').value = 'Loading...';
+      document.getElementById('fabricPatternStatus').textContent = '';
+      document.getElementById('fabricPatternModal').style.display = 'flex';
+
+      try {
+        const response = await fetch(`${window.API_BASE_URL}/api/fabric/pattern/${encodeURIComponent(currentCollection)}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to load pattern');
+        document.getElementById('fabricPatternText').value = data.pattern || '';
+        document.getElementById('fabricPatternStatus').textContent = data.exists ? 'Pattern loaded from Fabric server.' : 'No pattern exists yet — generate one first or write your own.';
+      } catch (err) {
+        document.getElementById('fabricPatternText').value = '';
+        document.getElementById('fabricPatternStatus').textContent = `⚠️ ${err.message}`;
+      }
+    }
+
+    async function saveFabricPattern() {
+      const pattern = document.getElementById('fabricPatternText').value.trim();
+      if (!pattern) return;
+      document.getElementById('fabricPatternStatus').textContent = 'Saving...';
+
+      try {
+        const response = await fetch(`${window.API_BASE_URL}/api/fabric/pattern/${encodeURIComponent(currentCollection)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
+          body: JSON.stringify({ pattern })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Save failed');
+        document.getElementById('fabricPatternStatus').textContent = '✅ Pattern saved to Fabric server.';
+      } catch (err) {
+        document.getElementById('fabricPatternStatus').textContent = `✗ ${err.message}`;
       }
     }
   </script>

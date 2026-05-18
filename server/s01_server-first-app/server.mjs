@@ -30,6 +30,7 @@ import tierAccessRouter from './routes/tierAccess.mjs';
 import searchLogsRouter from './routes/searchLogs.mjs';
 import licensingRouter from './routes/device-licensing.mjs';
 import membersRouter from './routes/members.mjs';
+import fabricRouter from './routes/fabric.mjs';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import { generateCSRFToken, validateCSRFToken } from './middleware/csrf.mjs';
@@ -166,6 +167,7 @@ app.use('/api/tier-access', validateOrigin, tierAccessRouter);
 app.use('/api/search-logs', searchLogsRouter);
 app.use('/api/licensing', licensingRouter);
 app.use('/api/device-licensing', licensingRouter);
+app.use('/api/fabric', validateOrigin, fabricRouter);
 app.use('/api', membersRouter);
 app.use('/api', testResultsRouter);
 
