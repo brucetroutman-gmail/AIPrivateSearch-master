@@ -291,7 +291,7 @@ async function setUserRole(role) {
   try {
     const sessionId = localStorage.getItem('sessionId');
     const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/subscription-tier`, {
-      method: `POST',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${sessionId}`
