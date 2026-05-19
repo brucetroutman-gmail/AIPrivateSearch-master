@@ -662,23 +662,30 @@ export class DocumentProcessor {
       const content = await secureFs.readFile(filePath, 'utf8');
       
       if (ext === '.json') {
-        const jsonData = JSON.parse(content);
-        // Convert JSON to readable markdown — flatten keys/values for better searchability
-        const lines = [`# ${filename}`, ''];
-        const flatten = (obj, prefix = '') => {
-          for (const [key, val] of Object.entries(obj)) {
-            const label = prefix ? `${prefix} / ${key}` : key;
-            if (val && typeof val === 'object' && !Array.isArray(val)) {
-              flatten(val, label);
-            } else if (Array.isArray(val)) {
-              lines.push(`**${label}**: ${val.join(', ')}`);
-            } else {
-              lines.push(`**${label}**: ${val}`);
+        // Strip DocID header if present before parsing
+        const cleanContent = content.replace(/^DocID:\s*[^\n]+\n?/, '').trim();
+        try {
+          const jsonData = JSON.parse(cleanContent);
+          // Convert JSON to readable markdown — flatten keys/values for better searchability
+          const lines = [`# ${filename}`, ''];
+          const flatten = (obj, prefix = '') => {
+            for (const [key, val] of Object.entries(obj)) {
+              const label = prefix ? `${prefix} / ${key}` : key;
+              if (val && typeof val === 'object' && !Array.isArray(val)) {
+                flatten(val, label);
+              } else if (Array.isArray(val)) {
+                lines.push(`**${label}**: ${val.join(', ')}`);
+              } else {
+                lines.push(`**${label}**: ${val}`);
+              }
             }
-          }
-        };
-        flatten(jsonData);
-        return lines.join('\n');
+          };
+          flatten(jsonData);
+          return lines.join('\n');
+        } catch {
+          // Not valid JSON — treat as plain text
+          return `# ${filename}\n\n${cleanContent}`;
+        }
       } else if (ext === '.yaml' || ext === '.yml') {
         return `# ${filename}\n\n\`\`\`yaml\n${content.trim()}\n\`\`\``;
       } else if (ext === '.xml') {
