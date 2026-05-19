@@ -71,7 +71,12 @@ router.get('/:filename', async (req, res) => {
     }
     
     const content = await secureFs.readFile(filePath, 'utf8');
-    res.json({ content });
+    // Return parsed JSON directly so clients can use data.property directly
+    try {
+      res.json(JSON.parse(content));
+    } catch {
+      res.json({ content }); // fallback for non-JSON files
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

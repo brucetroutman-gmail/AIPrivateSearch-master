@@ -17,7 +17,7 @@ class TierAccessManager {
         throw new Error(`HTTP ${response.status}`);
       }
       const data = await response.json();
-      this.config = JSON.parse(data.content);
+      this.config = data.content ? JSON.parse(data.content) : data;
       return this.config;
     } catch (error) {
       console.error('Failed to load tier-access.json:', error);

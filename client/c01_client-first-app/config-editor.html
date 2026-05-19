@@ -204,13 +204,15 @@
         
         const data = await response.json();
         console.log('Data received:', data);
-        
-        originalContent = data.content;
-        document.getElementById('jsonEditor').value = data.content;
+
+        // Handle both old { content: string } and new parsed JSON response
+        const rawContent = data.content !== undefined ? data.content : JSON.stringify(data, null, 2);
+        originalContent = rawContent;
+        document.getElementById('jsonEditor').value = rawContent;
         
         // Try to format if it's valid JSON
         try {
-          const parsed = JSON.parse(data.content);
+          const parsed = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
           document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
           console.log('JSON formatted successfully');
         } catch (e) {
