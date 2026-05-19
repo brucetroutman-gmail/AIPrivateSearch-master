@@ -179,7 +179,7 @@ router.get('/collections/:collection/files', async (req, res) => {
     const docFiles = legacyFiles.filter(f => !f.startsWith('.') && !f.startsWith('META_') && !systemFiles.has(f));
 
     // Build manifest from existing files
-    const manifest = { name: collection, created: new Date().toISOString(), documents: [] };
+    const newManifest = { name: collection, created: new Date().toISOString(), documents: [] };
     const crypto = await import('crypto');
     const seen = new Set();
     for (const file of docFiles) {
@@ -189,7 +189,7 @@ router.get('/collections/:collection/files', async (req, res) => {
       seen.add(baseName);
       const filePath = path.join(collectionPath, file);
       const mdFile = docFiles.find(f => f === `${baseName}.md`);
-      manifest.documents.push({
+      newManifest.documents.push({
         id: crypto.default.randomBytes(6).toString('hex'),
         name: baseName,
         sourcePath: filePath,
@@ -198,11 +198,11 @@ router.get('/collections/:collection/files', async (req, res) => {
         addedAt: new Date().toISOString()
       });
     }
-    await CollectionsUtil.writeManifest(collection, manifest);
-    console.log(`[documents] Auto-created manifest for legacy collection: ${collection} (${manifest.documents.length} docs)`);
+    await CollectionsUtil.writeManifest(collection, newManifest);
+    console.log(`[documents] Auto-created manifest for legacy collection: ${collection} (${newManifest.documents.length} docs)`);
 
     // Re-read and return as manifest
-    return res.json({ files: manifest.documents.map(doc => ({
+    return res.json({ files: newManifest.documents.map(doc => ({
       name: doc.name, sourcePath: doc.sourcePath, sourceExt: doc.sourceExt,
       convertedFile: doc.convertedFile, addedAt: doc.addedAt, id: doc.id
     })), manifest: true });
