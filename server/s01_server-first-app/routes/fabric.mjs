@@ -49,24 +49,25 @@ router.post('/enhance', requireAuth, async (req, res) => {
   const sanitizedQuery = query.trim().substring(0, 1000);
   const patternPath = patternFilePath(collection);
 
-  // Read local pattern — fall back to improve_prompt if not found
-  let systemPrompt = null;
-  if (fs.existsSync(patternPath)) {
-    systemPrompt = fs.readFileSync(patternPath, 'utf8').trim();
-  }
-
   try {
-    const body = systemPrompt
-      ? {
-          prompts: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: sanitizedQuery }
-          ]
-        }
-      : {
-          prompts: [{ role: 'user', content: sanitizedQuery }],
-          patternName: 'improve_prompt'
-        };
+    // Read local pattern for context
+    let contextPrefix = '';
+    if (fs.existsSync(patternPath)) {
+      const patternText = fs.readFileSync(patternPath, 'utf8').trim();
+      // Inject pattern context into the user message
+      contextPrefix = `Context for this collection:\n${patternText}\n\nQuery to enhance: `;
+    }
+
+    const userContent = contextPrefix + sanitizedQuery;
+
+    const body = {
+      prompts: [{
+        userInput: userContent,
+        patternName: 'improve_prompt',
+        model: 'claude-haiku-4-5',
+        vendor: 'Anthropic'
+      }]
+    };
 
     const response = await fetch(`${FABRIC_URL}/chat`, {
       method: 'POST',
@@ -84,7 +85,7 @@ router.post('/enhance', requireAuth, async (req, res) => {
     }
 
     const enhanced = await collectSSE(response);
-    res.json({ enhanced, fallback: !systemPrompt });
+    res.json({ enhanced, fallback: !fs.existsSync(patternPath) });
 
   } catch (error) {
     console.error('[fabric/enhance] Error:', error.message);
