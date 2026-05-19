@@ -268,7 +268,7 @@
         
         <div class="action-buttons">
           <button class="btn btn-success" onclick="processSourceFiles()">Process Source Files</button>
-          <button class="btn btn-danger" onclick="deleteDocuments()">Delete Documents</button>
+          <button class="btn btn-danger" onclick="deleteDocuments()">Remove from Collection</button>
         </div>
         
         <div class="action-buttons doc-index-edit-only">
@@ -1149,12 +1149,12 @@
         return;
       }
       
-      if (!await secureConfirm(`Are you sure you want to delete ${selected.length} selected documents? This action cannot be undone.`)) {
+      if (!await secureConfirm(`Remove ${selected.length} selected document(s) from this collection?\n\nThe source files will NOT be deleted from your computer.`)) {
         return;
       }
       
       clearLog();
-      showLog(`Deleting ${selected.length} selected documents...`);
+      showLog(`Removing ${selected.length} selected documents from collection...`);
       
       for (let i = 0; i < selected.length; i++) {
         const filename = selected[i];
@@ -1180,9 +1180,9 @@
           const result = await deleteResponse.json();
           
           if (result.success) {
-            showLog(`${progress} ✓ Deleted: ${filename}`);
+            showLog(`${progress} ✓ Removed from collection: ${filename}`);
           } else {
-            showLog(`${progress} ✗ Failed to delete: ${filename} - ${result.error}`);
+            showLog(`${progress} ✗ Failed to remove: ${filename} - ${result.error}`);
           }
         } catch (error) {
           showLog(`${progress} ✗ Error deleting: ${filename} - ${error.message}`);
@@ -1190,7 +1190,7 @@
         showLog(''); // Add blank line after each file
       }
       
-      showLog(`✓ Deletion complete: ${selected.length} documents processed`);
+      showLog(`✓ Removal complete: ${selected.length} documents removed from collection`);
       loadDocuments(); // Refresh the document list
     }
     
