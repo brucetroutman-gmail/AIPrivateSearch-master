@@ -72,7 +72,7 @@ router.post('/enhance', requireAuth, async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${FABRIC_API_KEY}`
+        'X-API-Key': FABRIC_API_KEY
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(15000)
