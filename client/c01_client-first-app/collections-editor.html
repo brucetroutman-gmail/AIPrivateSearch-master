@@ -702,10 +702,11 @@
         await loadDocuments();
         
         // Get converted files for next steps
+        // Build expected .md filenames from selected source files
         const convertedFiles = selected.map(file => {
           const baseName = file.substring(0, file.lastIndexOf('.')) || file;
           return baseName + '.md';
-        }).filter(file => documents.some(doc => (typeof doc === 'string' ? doc : doc.name) === file));
+        });
         
         if (convertedFiles.length === 0) {
           showLog(`✗ No converted files found to process further`, 'error');
