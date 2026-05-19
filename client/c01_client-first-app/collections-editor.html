@@ -534,7 +534,7 @@
         // Determine which files to include in selection (exclude META files since they're in database)
         const selectableFiles = [];
         if (hasSource) selectableFiles.push(...group.sourceFiles.map(f => f.fileName));
-        if (hasMd) selectableFiles.push(group.mdFile);
+        else if (hasMd) selectableFiles.push(group.mdFile); // legacy: no source, use md
         
         const isSelected = savedSelections.includes(selectableFiles.join(','));
         row.innerHTML = `
