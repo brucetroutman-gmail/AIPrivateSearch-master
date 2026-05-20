@@ -485,68 +485,14 @@
 
 
   </div>
-  
   <div id="footer-placeholder"></div>
 
+  <script src="shared/utils/enhancePrompt.js"></script>
   <script type="module" src="./search.js"></script>
   <script>
-    // Show/hide enhance button when collection is selected
     document.addEventListener('DOMContentLoaded', () => {
-      const collectionSelect = document.getElementById('collection');
-      const enhanceBtn = document.getElementById('enhanceBtn');
-      const updateEnhanceBtn = () => {
-        if (enhanceBtn) enhanceBtn.style.display = collectionSelect && collectionSelect.value ? 'inline-block' : 'none';
-      };
-      if (collectionSelect && enhanceBtn) {
-        collectionSelect.addEventListener('change', updateEnhanceBtn);
-        // Re-check when collection section visibility changes
-        const observer = new MutationObserver(updateEnhanceBtn);
-        const collectionSection = document.getElementById('collectionSection');
-        if (collectionSection) observer.observe(collectionSection, { attributes: true });
-      }
+      window.initEnhancePrompt('query', 'collection');
     });
-
-    let pendingEnhanced = '';
-
-    async function enhancePrompt() {
-      const query = document.getElementById('query').value.trim();
-      const collection = document.getElementById('collection').value;
-      if (!query) { window.showUserMessage('Please enter a query first', 'error'); return; }
-      if (!collection) { window.showUserMessage('Please select a collection first', 'error'); return; }
-
-      const btn = document.getElementById('enhanceBtn');
-      btn.textContent = 'Enhancing...';
-      btn.disabled = true;
-
-      try {
-        const response = await fetch(`${window.API_BASE_URL}/api/fabric/enhance`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
-          body: JSON.stringify({ query, collection })
-        });
-        const data = await response.json();
-        if (!response.ok || !data.enhanced) throw new Error(data.error || 'Enhancement failed');
-
-        pendingEnhanced = data.enhanced;
-        document.getElementById('originalPromptPreview').textContent = query;
-        document.getElementById('enhancedPromptPreview').textContent = data.enhanced;
-        document.getElementById('enhancePreview').style.display = 'block';
-      } catch (err) {
-        window.showUserMessage('Prompt enhancement unavailable — using original query', 'warning');
-      } finally {
-        btn.textContent = '✨ Enhance Prompt';
-        btn.disabled = false;
-      }
-    }
-
-    function useEnhanced() {
-      document.getElementById('query').value = pendingEnhanced;
-      document.getElementById('enhancePreview').style.display = 'none';
-    }
-
-    function cancelEnhance() {
-      document.getElementById('enhancePreview').style.display = 'none';
-    }
   </script>
 </body>
 </html>
