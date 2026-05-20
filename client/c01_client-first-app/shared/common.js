@@ -825,6 +825,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userRole');
       localStorage.removeItem('userUserRole');
+      sessionStorage.setItem('loginReturnUrl', window.location.href);
       window.location.href = './user-management.html';
       return;
     }
