@@ -6,6 +6,26 @@
 
 ## IMMEDIATE PRIORITY
 
+### 2-006 — Verify Breadcrumb Logging & Post-Login Redirect
+
+**Breadcrumbs**
+- [ ] Open browser DevTools → Application → Session Storage — confirm `aips_breadcrumbs` key exists after any page load
+- [ ] Go to AI Search, run a search — confirm `search_submitted` entry appears in sessionStorage with method, collection, model
+- [ ] Go to Exact Search, run a search — confirm `search_submitted` entry appears with method and collection
+- [ ] Trigger a JS error (e.g. open console and run `throw new Error('test')`) — confirm `js_error` crumb added and a POST to `/api/breadcrumbs/report` fires (check Network tab)
+- [ ] Check `/Users/Shared/AIPrivateSearch/logs/breadcrumbs.log` exists and contains the error report
+- [ ] Hit `http://localhost:3001/api/breadcrumbs/download` — confirm file downloads with readable JSON lines
+- [ ] Log out — confirm `logout` crumb appears in sessionStorage
+
+**Post-Login Redirect**
+- [ ] Go to AI Search page, wait for session timeout (or clear `sessionId` from localStorage manually)
+- [ ] Click anywhere on the page — confirm login page appears
+- [ ] Log in — confirm browser returns to AI Search page (not index.html)
+- [ ] Repeat from Exact Search page — confirm same behaviour
+- [ ] Log in normally from scratch (no prior page) — confirm redirects to index.html as fallback
+
+---
+
 ### 2-005 — Test multi prompts and ASCII/Unicode characters (Remote Mac)
 - [ ] Verify user prompts load on Exact Search — select "Local Model Only", confirm 5 prompts appear (KNOWLEDGE, REASON, CREATE, CODE, INSTRUCT)
 - [ ] Test prompt selection fills query field

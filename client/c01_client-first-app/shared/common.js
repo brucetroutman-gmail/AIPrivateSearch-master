@@ -4,6 +4,7 @@ import DebugUtils from './utils/debugUtils.js';
 import './utils/apiConfig.js';
 import './utils/appTokenManager.js';
 import './utils/secureUserManager.js';
+import { logger } from './utils/logger.js';
 
 // Simple rate limiting
 let messageCallCount = 0;
@@ -493,6 +494,7 @@ async function showUserInfo() {
 }
 
 async function handleLogout() {
+  logger.crumb('logout', { user: localStorage.getItem('userEmail') || 'unknown' });
   if (window.SecureUser) {
     await window.SecureUser.logout();
   } else {
@@ -826,6 +828,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       localStorage.removeItem('userRole');
       localStorage.removeItem('userUserRole');
       sessionStorage.setItem('loginReturnUrl', window.location.href);
+      logger.crumb('session_timeout', { page: window.location.pathname.split('/').pop() });
       window.location.href = './user-management.html';
       return;
     }

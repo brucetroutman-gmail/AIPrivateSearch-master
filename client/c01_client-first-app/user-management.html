@@ -298,6 +298,7 @@
                         }
                         
                         this.currentUser = data.user;
+                        if (window.logger) window.logger.crumb('login_success', { user: data.user.email });
                         const returnUrl = sessionStorage.getItem('loginReturnUrl');
                         sessionStorage.removeItem('loginReturnUrl');
                         window.location.href = returnUrl || 'index.html';
