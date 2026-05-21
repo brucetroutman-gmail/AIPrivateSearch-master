@@ -29,6 +29,23 @@ function addCrumb(action, details = {}) {
   });
   if (crumbs.length > MAX_CRUMBS) crumbs.splice(0, crumbs.length - MAX_CRUMBS);
   saveCrumbs(crumbs);
+  sendCrumb(crumbs[crumbs.length - 1]);
+}
+
+async function sendCrumb(crumb) {
+  if (localStorage.getItem('breadcrumbsEnabled') !== 'true') return;
+  try {
+    const apiBase = window.API_BASE_URL || '';
+    await fetch(`${apiBase}/api/breadcrumbs/crumb`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        user: localStorage.getItem('userEmail') || 'unknown',
+        crumb
+      })
+    });
+  } catch { /* never throw from logger */ }
 }
 
 async function reportToServer(errorMsg, errorStack = '') {

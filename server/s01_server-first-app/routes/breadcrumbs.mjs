@@ -19,7 +19,18 @@ async function appendLog(entry) {
   }
 }
 
-// POST /api/breadcrumbs/report
+// POST /api/breadcrumbs/crumb — single crumb from addCrumb
+router.post('/crumb', async (req, res) => {
+  try {
+    const { user, crumb } = req.body;
+    await appendLog({ receivedAt: crumb.t, user: user || 'unknown', action: crumb.action, page: crumb.page, details: crumb });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// POST /api/breadcrumbs/report — full trail on JS error
 router.post('/report', async (req, res) => {
   try {
     const { user, error, stack, crumbs } = req.body;
