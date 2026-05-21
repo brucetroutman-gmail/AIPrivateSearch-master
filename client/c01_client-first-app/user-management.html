@@ -49,7 +49,7 @@
                 <h2>Welcome, <span id="currentUserEmail"></span></h2>
                 <p>Role: <span id="currentUserRole"></span></p>
                 <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.location.href='index.html'" style="background: #28a745;">Go to Application</button>
+                    <button onclick="window.location.href='exact-search.html'" style="background: #28a745;">Go to Application</button>
                     <button id="logoutBtn">Logout</button>
                 </div>
             </div>
@@ -301,7 +301,7 @@
                         if (window.logger) window.logger.crumb('login_success', { user: data.user.email });
                         const returnUrl = sessionStorage.getItem('loginReturnUrl');
                         sessionStorage.removeItem('loginReturnUrl');
-                        window.location.href = returnUrl || 'index.html';
+                        window.location.href = returnUrl || 'exact-search.html';
                     } else {
                         showMessage(data.error || 'Login failed');
                     }
