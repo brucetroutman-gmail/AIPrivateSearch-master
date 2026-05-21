@@ -32,6 +32,7 @@ function addCrumb(action, details = {}) {
 }
 
 async function reportToServer(errorMsg, errorStack = '') {
+  if (localStorage.getItem('breadcrumbsEnabled') !== 'true') return;
   try {
     const apiBase = window.API_BASE_URL || '';
     await fetch(`${apiBase}/api/breadcrumbs/report`, {

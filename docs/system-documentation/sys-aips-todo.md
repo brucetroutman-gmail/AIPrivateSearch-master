@@ -6,23 +6,23 @@
 
 ## IMMEDIATE PRIORITY
 
-### 2-006 — Verify Breadcrumb Logging & Post-Login Redirect
+### 2-006 — Verify Breadcrumb Logging & Post-Login Redirect ✅ v20.35
 
 **Breadcrumbs**
-- [ ] Open browser DevTools → Application → Session Storage — confirm `aips_breadcrumbs` key exists after any page load
-- [ ] Go to AI Search, run a search — confirm `search_submitted` entry appears in sessionStorage with method, collection, model
-- [ ] Go to Exact Search, run a search — confirm `search_submitted` entry appears with method and collection
+- [x] Open browser DevTools → Application → Session Storage — confirm `aips_breadcrumbs` key exists after any page load
+- [x] Go to AI Search, run a search — confirm `search_submitted` entry appears in sessionStorage with method, collection, model
+- [x] Go to Exact Search, run a search — confirm `search_submitted` entry appears with method and collection
 - [ ] Trigger a JS error (e.g. open console and run `throw new Error('test')`) — confirm `js_error` crumb added and a POST to `/api/breadcrumbs/report` fires (check Network tab)
 - [ ] Check `/Users/Shared/AIPrivateSearch/logs/breadcrumbs.log` exists and contains the error report
 - [ ] Hit `http://localhost:3001/api/breadcrumbs/download` — confirm file downloads with readable JSON lines
 - [ ] Log out — confirm `logout` crumb appears in sessionStorage
 
 **Post-Login Redirect**
-- [ ] Go to AI Search page, wait for session timeout (or clear `sessionId` from localStorage manually)
-- [ ] Click anywhere on the page — confirm login page appears
-- [ ] Log in — confirm browser returns to AI Search page (not index.html)
-- [ ] Repeat from Exact Search page — confirm same behaviour
-- [ ] Log in normally from scratch (no prior page) — confirm redirects to index.html as fallback
+- [x] Go to AI Search page, wait for session timeout (or clear `sessionId` from localStorage manually)
+- [x] Click anywhere on the page — confirm login page appears
+- [x] Log in — confirm browser returns to AI Search page (not index.html)
+- [x] Repeat from Exact Search page — confirm same behaviour
+- [x] Log in normally from scratch (no prior page) — confirm redirects to exact-search.html as fallback
 
 ---
 
@@ -194,6 +194,15 @@ Many documents are only 2 chunks. Analyze chunk size for small and large documen
 ---
 
 ## RECENTLY COMPLETED
+
+### v20.35
+- Breadcrumb logging — enhanced `logger.js` with sessionStorage trail, auto page_load/error capture, server reporting
+- New `breadcrumbs.mjs` route — POST /report (appends to breadcrumbs.log), GET /download for support team
+- Manual crumbs wired into `ai-search.js` and `exact-search.js` (search_submitted, search_error)
+- Login/logout/session_timeout crumbs in `common.js` and `user-management.html`
+- Post-login redirect — returns to page user was on before timeout, falls back to exact-search.html
+- Fixed "Go to Application" button — now goes to exact-search.html instead of blank index.html
+- Collections editor — Back to Collections button style changed to light blue, Generate Fabric Pattern moved before View/Edit
 
 ### v20.22
 - Unified footer — index.html now uses shared footer.html, removed Team members section

@@ -39,14 +39,35 @@
                 </div>
             </div>
 
-            <div class="option-section">
-                <h2>Privacy & Logging</h2>
+            <div class="option-section support-log-section">
+                <h2>Support Team Log</h2>
+
                 <div class="option-item">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="logSearchToggle" />
-                        Log Search Results
+                        <input type="checkbox" id="breadcrumbsToggle" />
+                        Enable Activity Logging
                     </label>
-                    <p class="option-description">Enable logging of search activities for analytics and performance monitoring.</p>
+                    <p class="option-description">Logs page navigation, searches, errors, and login events to help the support team diagnose issues.</p>
+                </div>
+
+                <div class="option-item">
+                    <div class="log-filters">
+                        <input type="text" id="filterUser" placeholder="Filter by user" />
+                        <input type="text" id="filterAction" placeholder="Filter by action" />
+                        <input type="date" id="filterFrom" />
+                        <input type="date" id="filterTo" />
+                        <button class="btn btn-primary" onclick="loadLog()">Filter</button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                    </div>
+                </div>
+
+                <div id="logViewer" class="log-viewer">
+                    <p class="log-empty">Click Filter to load log entries.</p>
+                </div>
+
+                <div class="log-actions">
+                    <button class="btn btn-info" onclick="downloadLog()">&#11123; Download Log</button>
+                    <button class="btn btn-danger" onclick="deleteLog()">&#128465; Delete Log</button>
                 </div>
             </div>
         </div>
@@ -106,7 +127,76 @@
             padding-left: 2rem;
         }
 
-        @media (max-width: 768px) {
+        .support-log-section {
+            grid-column: 1 / -1;
+        }
+
+        .log-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .log-filters input {
+            flex: 1;
+            min-width: 140px;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .log-viewer {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+        }
+
+        .log-entry {
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.6rem 0;
+        }
+
+        .log-entry:last-child { border-bottom: none; }
+
+        .log-entry-header {
+            display: flex;
+            gap: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.3rem;
+        }
+
+        .log-crumbs {
+            padding-left: 1rem;
+            color: var(--text-muted);
+        }
+
+        .log-crumb { margin: 0.15rem 0; }
+
+        .log-error { color: #e74c3c; font-weight: 600; }
+
+        .log-empty { color: var(--text-muted); font-style: italic; }
+
+        .log-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn { padding: 0.4rem 1rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; color: white; }
+        .btn-primary  { background: #3498db; }
+        .btn-secondary { background: #6c757d; }
+        .btn-info     { background: #17a2b8; }
+        .btn-danger   { background: #e74c3c; }
             .options-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
@@ -123,36 +213,80 @@
     </style>
 
     <script>
-        // Initialize options on page load
         document.addEventListener('DOMContentLoaded', () => {
             const darkModeToggle = document.getElementById('darkModeToggle');
-            const logSearchToggle = document.getElementById('logSearchToggle');
+            const breadcrumbsToggle = document.getElementById('breadcrumbsToggle');
 
-            // Set initial dark mode state
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            darkModeToggle.checked = currentTheme === 'dark';
+            // Dark mode
+            darkModeToggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+            darkModeToggle.addEventListener('change', () => { if (window.toggleDarkMode) window.toggleDarkMode(); });
 
-            // Set initial log search state
-            const logSearchEnabled = localStorage.getItem('logSearchResults');
-            logSearchToggle.checked = logSearchEnabled === 'true';
-
-            // Dark mode toggle handler
-            darkModeToggle.addEventListener('change', () => {
-                if (window.toggleDarkMode) {
-                    window.toggleDarkMode();
-                }
-            });
-
-            // Log search toggle handler
-            logSearchToggle.addEventListener('change', () => {
-                localStorage.setItem('logSearchResults', logSearchToggle.checked);
-                if (window.showUserMessage) {
-                    const message = logSearchToggle.checked ? 
-                        'Search logging enabled' : 'Search logging disabled';
-                    window.showUserMessage(message, 'success');
-                }
+            // Breadcrumbs toggle — default OFF
+            breadcrumbsToggle.checked = localStorage.getItem('breadcrumbsEnabled') === 'true';
+            breadcrumbsToggle.addEventListener('change', () => {
+                localStorage.setItem('breadcrumbsEnabled', breadcrumbsToggle.checked);
+                if (window.showUserMessage)
+                    window.showUserMessage(breadcrumbsToggle.checked ? 'Activity logging enabled' : 'Activity logging disabled', 'success');
             });
         });
+
+        async function loadLog() {
+            const params = new URLSearchParams();
+            const user   = document.getElementById('filterUser').value.trim();
+            const action = document.getElementById('filterAction').value.trim();
+            const from   = document.getElementById('filterFrom').value;
+            const to     = document.getElementById('filterTo').value;
+            if (user)   params.set('user', user);
+            if (action) params.set('action', action);
+            if (from)   params.set('from', from);
+            if (to)     params.set('to', to);
+
+            const viewer = document.getElementById('logViewer');
+            viewer.innerHTML = '<p class="log-empty">Loading...</p>';
+
+            try {
+                const res = await fetch(`${window.API_BASE_URL}/api/breadcrumbs?${params}`);
+                const data = await res.json();
+                if (!data.entries.length) { viewer.innerHTML = '<p class="log-empty">No entries found.</p>'; return; }
+
+                viewer.innerHTML = data.entries.map(e => {
+                    const crumbsHtml = (e.crumbs || []).map(c =>
+                        `<div class="log-crumb">${c.t?.slice(11,19) || ''} &nbsp; <strong>${c.action}</strong> &nbsp; ${Object.entries(c).filter(([k]) => !['t','action','page'].includes(k)).map(([k,v]) => `${k}=${v}`).join(' &nbsp; ')}</div>`
+                    ).join('');
+                    const errorHtml = e.error ? `<div class="log-error">&#9888; ${e.error}</div>` : '';
+                    return `<div class="log-entry">
+                        <div class="log-entry-header">
+                            <span>${e.receivedAt?.slice(0,19).replace('T',' ')}</span>
+                            <span>${e.user}</span>
+                        </div>
+                        ${errorHtml}
+                        <div class="log-crumbs">${crumbsHtml}</div>
+                    </div>`;
+                }).join('');
+            } catch {
+                viewer.innerHTML = '<p class="log-empty">Failed to load log.</p>';
+            }
+        }
+
+        function clearFilters() {
+            ['filterUser','filterAction','filterFrom','filterTo'].forEach(id => document.getElementById(id).value = '');
+            loadLog();
+        }
+
+        function downloadLog() {
+            window.location.href = `${window.API_BASE_URL}/api/breadcrumbs/download`;
+        }
+
+        async function deleteLog() {
+            if (!confirm('Delete all support log entries? This cannot be undone.')) return;
+            try {
+                await fetch(`${window.API_BASE_URL}/api/breadcrumbs`, { method: 'DELETE' });
+                document.getElementById('logViewer').innerHTML = '<p class="log-empty">Log cleared.</p>';
+                if (window.showUserMessage) window.showUserMessage('Log deleted', 'success');
+            } catch {
+                if (window.showUserMessage) window.showUserMessage('Failed to delete log', 'error');
+            }
+        }
     </script>
 </body>
 </html>
