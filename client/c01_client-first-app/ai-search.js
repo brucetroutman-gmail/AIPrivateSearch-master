@@ -1,6 +1,5 @@
 
 import { DOMSanitizer } from './shared/utils/domSanitizer.js';
-import { logger } from './shared/utils/logger.js';
 
 // AI search methods only
 const AI_METHODS = ['smart-search', 'hybrid-search', 'ai-direct', 'ai-document-chat'];
@@ -100,7 +99,7 @@ async function performAllSearches() {
     if (!model) { window.showUserMessage('Please select a model', 'error'); return; }
 
     window._lastSearchQuery = query;
-    logger.crumb('search_submitted', { methods: getSelectedMethods().join(','), collection, model, temperature, contextSize });
+    if (window.logger) window.logger.crumb('search_submitted', { methods: getSelectedMethods().join(','), collection, model, temperature, contextSize });
 
     searchAllBtn.textContent = 'Searching...';
     searchAllBtn.disabled = true;
@@ -150,7 +149,7 @@ async function performAllSearches() {
         });
         updatePerformanceTable(perfData);
     } catch (err) {
-        logger.crumb('search_error', { error: err?.message || 'unknown' });
+        if (window.logger) window.logger.crumb('search_error', { error: err?.message || 'unknown' });
         window.showUserMessage('Search failed. Please try again.', 'error');
     } finally {
         searchAllBtn.textContent = 'Search Selected Methods';
