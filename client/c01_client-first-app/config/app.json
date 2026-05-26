@@ -3,7 +3,7 @@
   "sources-location": "/Users/Shared/AIPrivateSearch/sources",
   "config-location": "/Users/Shared/AIPrivateSearch/config",
   "bearer-token-timeout": 3600,
-  "subscription-tier": 1,
+  "subscription-tier": 3,
   "ports": {
     "frontend": 56305,
     "backend": 56306
@@ -11,5 +11,6 @@
   "custmgr": {
     "host": "custmgr.aiprivatesearch.com",
     "protocol": "https"
-  }
+  },
+  "customerEmail": "bonnie.troutman@gmail.com"
 }

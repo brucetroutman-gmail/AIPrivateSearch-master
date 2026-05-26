@@ -1,0 +1,54 @@
+{
+  "name": "Medical-Practice",
+  "created": "2026-05-26T18:35:51.950Z",
+  "documents": [
+    {
+      "id": "d33b00d3343d",
+      "name": "medications_available",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/medications_available.json",
+      "sourceExt": "json",
+      "convertedFile": "medications_available.md",
+      "addedAt": "2026-05-26T18:35:51.951Z"
+    },
+    {
+      "id": "084bed2b27aa",
+      "name": "patient_appointments_calendar",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/patient_appointments_calendar.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_appointments_calendar.md",
+      "addedAt": "2026-05-26T18:36:06.412Z"
+    },
+    {
+      "id": "db98ebd33b38",
+      "name": "patient_medical_histories",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/patient_medical_histories.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_medical_histories.md",
+      "addedAt": "2026-05-26T18:36:18.978Z"
+    },
+    {
+      "id": "aad3951c8d5a",
+      "name": "patient_treatment_plans",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/patient_treatment_plans.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_treatment_plans.md",
+      "addedAt": "2026-05-26T18:36:33.817Z"
+    },
+    {
+      "id": "d74b81d507b6",
+      "name": "practice-overview",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/practice-overview.docx",
+      "sourceExt": "docx",
+      "convertedFile": "practice-overview.md",
+      "addedAt": "2026-05-26T18:36:55.734Z"
+    },
+    {
+      "id": "874efc4d8bf2",
+      "name": "patient_info",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/patient_info.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_info.md",
+      "addedAt": "2026-05-26T18:37:27.221Z"
+    }
+  ]
+}

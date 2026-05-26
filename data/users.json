@@ -38,5 +38,15 @@
     "createdAt": "2025-11-02T17:02:05.945Z",
     "lastLogin": "2025-11-04T14:43:47.711Z",
     "active": true
+  },
+  {
+    "id": "bc2ca495-5258-40cf-9e85-d144f31d47d9",
+    "email": "adm-std@a.com",
+    "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "subscriptionTier": "professional",
+    "userRole": "admin",
+    "createdAt": "2026-05-26T18:31:46.114Z",
+    "lastLogin": null,
+    "active": true
   }
 ]

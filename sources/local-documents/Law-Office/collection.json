@@ -1,0 +1,126 @@
+{
+  "name": "Law-Office",
+  "created": "2026-05-26T18:44:49.592Z",
+  "documents": [
+    {
+      "id": "2d446be675d2",
+      "name": "appointments",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/appointments.json",
+      "sourceExt": "json",
+      "convertedFile": "appointments.md",
+      "addedAt": "2026-05-26T18:44:49.593Z"
+    },
+    {
+      "id": "e04e0099bcc5",
+      "name": "clients",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/clients.json",
+      "sourceExt": "json",
+      "convertedFile": "clients.md",
+      "addedAt": "2026-05-26T18:44:49.746Z"
+    },
+    {
+      "id": "fc72051c2586",
+      "name": "Durable Power of Attorney of Emma Johnson",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Durable Power of Attorney of Emma Johnson.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Durable Power of Attorney of Emma Johnson.md",
+      "addedAt": "2026-05-26T18:44:49.769Z"
+    },
+    {
+      "id": "ce0181a47fde",
+      "name": "Durable Power of Attorney of Thomas Hall",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Durable Power of Attorney of Thomas Hall.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Durable Power of Attorney of Thomas Hall.md",
+      "addedAt": "2026-05-26T18:44:49.776Z"
+    },
+    {
+      "id": "9d3f0c454519",
+      "name": "Durable Power of Attorney of William Brown",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Durable Power of Attorney of William Brown.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Durable Power of Attorney of William Brown.md",
+      "addedAt": "2026-05-26T18:44:49.787Z"
+    },
+    {
+      "id": "0d2dcb44a58f",
+      "name": "Last Will and Testament of Ava Lee",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Last Will and Testament of Ava Lee.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Last Will and Testament of Ava Lee.md",
+      "addedAt": "2026-05-26T18:44:49.795Z"
+    },
+    {
+      "id": "462f57e9874b",
+      "name": "Last Will and Testament of Harper Baker",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Last Will and Testament of Harper Baker.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Last Will and Testament of Harper Baker.md",
+      "addedAt": "2026-05-26T18:44:49.804Z"
+    },
+    {
+      "id": "75946f234f55",
+      "name": "Last Will and Testament of John Smith",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Last Will and Testament of John Smith.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Last Will and Testament of John Smith.md",
+      "addedAt": "2026-05-26T18:44:49.810Z"
+    },
+    {
+      "id": "9772a5adf80e",
+      "name": "Living Will of Emma Johnson",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Living Will of Emma Johnson.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Living Will of Emma Johnson.md",
+      "addedAt": "2026-05-26T18:44:49.821Z"
+    },
+    {
+      "id": "ca1c5173cd4c",
+      "name": "Living Will of Thomas Hall",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Living Will of Thomas Hall.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Living Will of Thomas Hall.md",
+      "addedAt": "2026-05-26T18:44:49.827Z"
+    },
+    {
+      "id": "3448758d733f",
+      "name": "Living Will of William Brown",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Living Will of William Brown.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Living Will of William Brown.md",
+      "addedAt": "2026-05-26T18:44:49.838Z"
+    },
+    {
+      "id": "34d9819510d3",
+      "name": "Revocable Living Trust of James Wilson",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Revocable Living Trust of James Wilson.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Revocable Living Trust of James Wilson.md",
+      "addedAt": "2026-05-26T18:44:49.845Z"
+    },
+    {
+      "id": "76086bf3ccf7",
+      "name": "Revocable Living Trust of Mia Walker",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Revocable Living Trust of Mia Walker.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Revocable Living Trust of Mia Walker.md",
+      "addedAt": "2026-05-26T18:44:49.856Z"
+    },
+    {
+      "id": "2878afb442af",
+      "name": "Revocable Living Trust of Michael Chen",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Revocable Living Trust of Michael Chen.pdf",
+      "sourceExt": "pdf",
+      "convertedFile": "Revocable Living Trust of Michael Chen.md",
+      "addedAt": "2026-05-26T18:44:49.953Z"
+    },
+    {
+      "id": "d1fd44a3ee00",
+      "name": "staff",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/staff.json",
+      "sourceExt": "json",
+      "convertedFile": "staff.md",
+      "addedAt": "2026-05-26T18:44:49.959Z"
+    }
+  ]
+}
