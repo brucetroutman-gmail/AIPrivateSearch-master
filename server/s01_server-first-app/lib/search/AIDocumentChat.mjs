@@ -2,6 +2,10 @@
  
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
+import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { secureFs } from '../utils/secureFileOps.mjs';
+import { modelConfig } from '../utils/modelConfig.mjs';
+import path from 'path';
 
 export class AIDocumentChat {
   constructor() {
@@ -18,19 +22,21 @@ export class AIDocumentChat {
       console.log(`[AIDocumentChat] Collection parameter: "${collection}"`);
       console.log(`[AIDocumentChat] Collection type: ${typeof collection}`);
       
-      // Check if embeddings exist - no auto-embedding
+      // Fetch wider candidate set for reranking
+      const candidateChunks = await this.findSimilarChunks(query, collection, topK * 3);
+      console.log(`[AIDocumentChat] Found ${candidateChunks.length} candidate chunks`);
       
-      const relevantChunks = await this.findSimilarChunks(query, collection, topK);
-      console.log(`[AIDocumentChat] Found ${relevantChunks.length} relevant chunks`);
-      
-      if (relevantChunks.length === 0) {
+      if (candidateChunks.length === 0) {
         return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
       }
+
+      // Rerank candidates down to topK using rerank model
+      const relevantChunks = await this.rerankChunks(query, candidateChunks, topK);
+      console.log(`[AIDocumentChat] Reranked to ${relevantChunks.length} chunks`);
       
       let aiResponse;
       try {
-        aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit);
-        // Add source document links to AI response
+        aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit, collection);
         aiResponse += this.addSourceLinks(relevantChunks);
       } catch (error) {
         console.log('AI generation failed, using chunks directly:', error.message);
@@ -105,11 +111,47 @@ export class AIDocumentChat {
 
 
 
+  async rerankChunks(query, chunks, topK) {
+    try {
+      const rerankModel = await modelConfig.getRerankModel();
+      if (!rerankModel) {
+        console.log('[AIDocumentChat] No rerank model configured, using cosine similarity order');
+        return chunks.slice(0, topK);
+      }
+
+      console.log(`[AIDocumentChat] Reranking ${chunks.length} chunks with model: ${rerankModel}`);
+
+      const scored = await Promise.all(chunks.map(async (chunk) => {
+        try {
+          const prompt = `Passage: ${chunk.content.substring(0, 400)}\nQuestion: ${query}\nRelevance score 1-10 (reply with number only):`;
+          const response = await fetch('http://localhost:11434/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: rerankModel, prompt, stream: false, options: { temperature: 0, num_predict: 3 } })
+          });
+          if (!response.ok) return { ...chunk, rerankScore: chunk.similarity };
+          const result = await response.json();
+          const score = parseFloat(result.response?.trim()) || 0;
+          return { ...chunk, rerankScore: isNaN(score) ? chunk.similarity : score / 10 };
+        } catch {
+          return { ...chunk, rerankScore: chunk.similarity };
+        }
+      }));
+
+      return scored
+        .sort((a, b) => b.rerankScore - a.rerankScore)
+        .slice(0, topK);
+    } catch (error) {
+      console.log('[AIDocumentChat] Reranking failed, falling back to cosine order:', error.message);
+      return chunks.slice(0, topK);
+    }
+  }
+
   async findSimilarChunks(query, collection, topK) {
     return await this.embeddingService.findSimilarChunks(query, collection, topK);
   }
 
-  async generateAIResponse(query, chunks, model, temperature = 0.3, contextSize = 1024, tokenLimit = null) {
+  async generateAIResponse(query, chunks, model, temperature = 0.3, contextSize = 1024, tokenLimit = null, collection = null) {
     const context = chunks.map((chunk, index) => 
       `**Source ${index + 1}: ${chunk.filename}**\n${chunk.content.substring(0, 800)}`
     ).join('\n\n');
@@ -122,8 +164,18 @@ export class AIDocumentChat {
     if (tokenLimit && tokenLimit !== 'No Limit') {
       options.num_predict = parseInt(tokenLimit);
     }
+
+    // Load collection-specific Fabric pattern as domain context if available
+    let domainContext = '';
+    if (collection) {
+      try {
+        const patternPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'fabric-pattern.md');
+        const pattern = await secureFs.readFile(patternPath, 'utf8');
+        if (pattern.trim()) domainContext = `Domain context for this collection:\n${pattern.trim()}\n\n`;
+      } catch { /* no pattern file — proceed without it */ }
+    }
     
-    const enhancedPrompt = `You have access to multiple document excerpts. Use ALL relevant information to provide a comprehensive answer.
+    const enhancedPrompt = `${domainContext}You have access to multiple document excerpts. Use ALL relevant information to provide a comprehensive answer.
 
 ${context}
 

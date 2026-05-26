@@ -6,6 +6,33 @@
 
 ## IMMEDIATE PRIORITY
 
+### 2-009 — Re-embed All Collections for Chunk Overlap
+Chunk overlap (150 chars) added to `semanticChunking` in v20.36. Existing embeddings were built without overlap and won't benefit automatically.
+- [ ] For each collection: Collections Editor → Remove Embeds → Embed Converted Files
+- [ ] Priority collections to re-embed first: My-Literature, Federalist-Papers, Family-Documents
+- [ ] Verify chunk counts increase slightly after re-embedding (expected due to overlap)
+
+---
+
+### 2-008 — Architectural Rule: Ollama Model Calls Must Go Through SearchOrchestrator
+- All AI model interactions must go through `SearchOrchestrator` → search method classes (e.g. `AIDocumentChat.mjs`, `AIDirectSearch.mjs`)
+- No page or route should call `http://localhost:11434/api/generate` directly except through the orchestrator
+- Both Search and AI Search pages already comply — both route through `/api/search` or `/api/multi-search` → `searchOrchestrator`
+- [ ] Audit all routes and client files for any direct Ollama calls that bypass the orchestrator
+- [ ] Add a code comment to `SearchOrchestrator.mjs` documenting this rule
+- [ ] Add to contributing guide (`sys-aips-contributing.md`)
+
+---
+
+### 2-007 — Improve Support Team Log Breadcrumbs
+- [ ] Breadcrumbs not capturing all user steps — search_submitted not appearing in log after fix
+- [ ] Investigate whether window.logger is available when search pages call it (timing issue)
+- [ ] Consider sending crumbs via a simple fetch in search files without depending on window.logger
+- [ ] Verify page_load crumbs appear for each page visited
+- [ ] Test login, search, exact search, logout full trail end-to-end
+
+---
+
 ### 2-006 — Verify Breadcrumb Logging & Post-Login Redirect ✅ v20.35
 
 **Breadcrumbs**

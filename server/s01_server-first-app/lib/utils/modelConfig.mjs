@@ -26,6 +26,12 @@ class ModelConfig {
     return embedModel.modelName;
   }
 
+  async getRerankModel() {
+    const modelsData = await this.loadModels();
+    const rerankModel = modelsData.models.find(model => model.category === 'rerank');
+    return rerankModel ? rerankModel.modelName : null;
+  }
+
   async getModelsByCategory(category) {
     const modelsData = await this.loadModels();
     return modelsData.models.filter(model => model.category === category);

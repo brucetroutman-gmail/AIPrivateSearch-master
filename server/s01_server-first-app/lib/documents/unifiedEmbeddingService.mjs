@@ -161,7 +161,7 @@ export class UnifiedEmbeddingService {
     return { success: true, chunks: chunkCount.count, reused: !!existingDoc };
   }
 
-  semanticChunking(text, chunkSize = 800) {
+  semanticChunking(text, chunkSize = 800, overlap = 150) {
     const chunks = [];
     const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     
@@ -184,8 +184,10 @@ export class UnifiedEmbeddingService {
             endChar: startChar + currentChunk.length,
             type: 'semantic'
           });
-          startChar += currentChunk.length;
-          currentChunk = sub + '\n\n';
+          // Carry forward last `overlap` chars of current chunk into next
+          const overlapText = currentChunk.slice(-overlap).trim();
+          startChar += currentChunk.length - overlapText.length;
+          currentChunk = overlapText + '\n\n' + sub + '\n\n';
         } else {
           currentChunk += sub + '\n\n';
         }

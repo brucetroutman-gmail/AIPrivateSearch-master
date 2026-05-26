@@ -32,6 +32,19 @@ window.responseDisplayCommon = {
             container.appendChild(formattedElement);
             return;
         }
+
+        // AI Document Chat — render as a full answer, not a result card
+        if (searchResult.method === 'ai-document-chat') {
+            const firstResult = searchResult.results[0];
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'ai-chat-answer';
+            const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(firstResult.excerpt);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(sanitizedHTML, 'text/html');
+            while (doc.body.firstChild) answerDiv.appendChild(doc.body.firstChild);
+            container.appendChild(answerDiv);
+            return;
+        }
         
         // Use common formatter for search types that need document links
         if (searchResult.method === 'ai-direct' || searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
@@ -73,7 +86,7 @@ window.responseDisplayCommon = {
             excerpt.className = 'result-excerpt';
             
             // Handle markdown conversion for AI-based searches
-            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search' || searchResult.method === 'ai-document-chat') {
+            if (searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
                 const sanitizedHTML = window.lineSearchFormatter.convertMarkdownToHTML(result.excerpt);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(sanitizedHTML, 'text/html');
