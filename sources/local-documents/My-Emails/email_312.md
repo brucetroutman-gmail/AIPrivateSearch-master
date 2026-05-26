@@ -1,0 +1,25 @@
+# email_312
+DocID: My-_1779831348121_yhkq72t3c
+
+## Email Details
+
+**From:** supplier@b.com
+**To:** autoshop@a.com
+**Subject:** Order Confirmation - ORD-30169
+**Date:** Wed, 30 Apr 2025 11:56:58 
+
+## Message Content
+
+Dear Auto Shop,
+
+Your order has been confirmed:
+
+Order ID: ORD-30169
+Part: Muffler
+Quantity: 3
+Total: $1092
+Estimated Delivery: 2025-11-16
+
+Thank you for your business!
+
+Supplier Team

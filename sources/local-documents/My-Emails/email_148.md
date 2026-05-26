@@ -1,0 +1,30 @@
+# email_148
+DocID: My-_1779830219394_8foqq72qm
+
+## Email Details
+
+**From:** autoshop@a.com
+**To:** john.smith@email.com
+**Subject:** Service Update - 2019 Honda Civic - JOB-7672
+**Date:** Sat, 13 Sep 2025 11:56:58 
+
+## Message Content
+
+Dear John Smith,
+
+This is an update on your 2019 Honda Civic service:
+
+Job ID: JOB-7672
+Current Status: Ready For Pickup
+Estimated Completion: 2025-11-10
+
+Work performed:
+- Engine diagnostic
+- Fluid top-off
+
+Current charges: $240
+
+Please call if you have any questions.
+
+Best regards,
+Auto Shop Service Team

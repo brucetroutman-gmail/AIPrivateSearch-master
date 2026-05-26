@@ -1,0 +1,30 @@
+# email_230
+DocID: My-_1779830794222_5p7r9m6i6
+
+## Email Details
+
+**From:** autoshop@a.com
+**To:** tom.brown@email.com
+**Subject:** Service Update - 2017 Chevrolet Silverado - JOB-8165
+**Date:** Mon, 12 May 2025 11:56:58 
+
+## Message Content
+
+Dear Tom Brown,
+
+This is an update on your 2017 Chevrolet Silverado service:
+
+Job ID: JOB-8165
+Current Status: In Progress
+Estimated Completion: 2025-11-09
+
+Work performed:
+- Brake inspection
+- Belt inspection
+
+Current charges: $789
+
+Please call if you have any questions.
+
+Best regards,
+Auto Shop Service Team

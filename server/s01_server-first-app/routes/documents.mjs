@@ -88,6 +88,13 @@ router.post('/collections/:collection/upload', upload.single('file'), async (req
 
     // Add to manifest
     await CollectionsUtil.addToManifest(collection, filePath, filename);
+
+    // If source is already .md, set convertedFile immediately
+    const ext = path.extname(filename).toLowerCase();
+    if (ext === '.md') {
+      const baseName = path.basename(filename, ext);
+      await CollectionsUtil.updateConvertedFile(collection, baseName, filename);
+    }
     
     res.json({ success: true, message: `File '${filename}' uploaded successfully` });
   } catch (error) {

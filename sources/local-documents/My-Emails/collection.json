@@ -1,0 +1,4006 @@
+{
+  "name": "My-Emails",
+  "created": "2026-05-26T20:58:47.535Z",
+  "documents": [
+    {
+      "id": "fa2e3d130b24",
+      "name": "email_001",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_001.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_001.md",
+      "addedAt": "2026-05-26T20:58:47.535Z"
+    },
+    {
+      "id": "acfac670077d",
+      "name": "email_002",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_002.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_002.md",
+      "addedAt": "2026-05-26T20:58:47.600Z"
+    },
+    {
+      "id": "ec38d83d96e0",
+      "name": "email_003",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_003.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_003.md",
+      "addedAt": "2026-05-26T20:58:47.663Z"
+    },
+    {
+      "id": "f9ca4d867a55",
+      "name": "email_004",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_004.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_004.md",
+      "addedAt": "2026-05-26T20:58:47.673Z"
+    },
+    {
+      "id": "2d9365ed060f",
+      "name": "email_005",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_005.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_005.md",
+      "addedAt": "2026-05-26T20:58:47.693Z"
+    },
+    {
+      "id": "cacd2ae0e765",
+      "name": "email_006",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_006.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_006.md",
+      "addedAt": "2026-05-26T20:58:47.704Z"
+    },
+    {
+      "id": "562d88e3cd33",
+      "name": "email_007",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_007.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_007.md",
+      "addedAt": "2026-05-26T20:58:47.710Z"
+    },
+    {
+      "id": "9c75f73b2083",
+      "name": "email_008",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_008.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_008.md",
+      "addedAt": "2026-05-26T20:58:47.719Z"
+    },
+    {
+      "id": "bd6e5505186d",
+      "name": "email_009",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_009.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_009.md",
+      "addedAt": "2026-05-26T20:58:47.724Z"
+    },
+    {
+      "id": "1cec1848b556",
+      "name": "email_010",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_010.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_010.md",
+      "addedAt": "2026-05-26T20:58:47.731Z"
+    },
+    {
+      "id": "3c555f8ff046",
+      "name": "email_011",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_011.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_011.md",
+      "addedAt": "2026-05-26T20:58:47.738Z"
+    },
+    {
+      "id": "ce58217cd585",
+      "name": "email_012",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_012.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_012.md",
+      "addedAt": "2026-05-26T20:58:47.743Z"
+    },
+    {
+      "id": "e612e0bfc869",
+      "name": "email_013",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_013.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_013.md",
+      "addedAt": "2026-05-26T20:58:47.754Z"
+    },
+    {
+      "id": "f4f43808ad30",
+      "name": "email_014",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_014.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_014.md",
+      "addedAt": "2026-05-26T20:58:47.759Z"
+    },
+    {
+      "id": "8c2cadb4ccea",
+      "name": "email_015",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_015.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_015.md",
+      "addedAt": "2026-05-26T20:58:47.770Z"
+    },
+    {
+      "id": "28f1d0415d28",
+      "name": "email_016",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_016.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_016.md",
+      "addedAt": "2026-05-26T20:58:47.776Z"
+    },
+    {
+      "id": "cebc36e5082f",
+      "name": "email_017",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_017.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_017.md",
+      "addedAt": "2026-05-26T20:58:47.781Z"
+    },
+    {
+      "id": "5d62a5d8e080",
+      "name": "email_018",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_018.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_018.md",
+      "addedAt": "2026-05-26T20:58:47.788Z"
+    },
+    {
+      "id": "34e33ba9a9fa",
+      "name": "email_019",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_019.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_019.md",
+      "addedAt": "2026-05-26T20:58:47.795Z"
+    },
+    {
+      "id": "ba52e9a91e06",
+      "name": "email_020",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_020.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_020.md",
+      "addedAt": "2026-05-26T20:58:47.803Z"
+    },
+    {
+      "id": "9d2914965096",
+      "name": "email_021",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_021.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_021.md",
+      "addedAt": "2026-05-26T20:58:47.809Z"
+    },
+    {
+      "id": "57ef85a7aa6e",
+      "name": "email_022",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_022.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_022.md",
+      "addedAt": "2026-05-26T20:58:47.815Z"
+    },
+    {
+      "id": "f2af640c8e25",
+      "name": "email_023",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_023.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_023.md",
+      "addedAt": "2026-05-26T20:58:47.822Z"
+    },
+    {
+      "id": "145f4bc1f32a",
+      "name": "email_024",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_024.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_024.md",
+      "addedAt": "2026-05-26T20:58:47.828Z"
+    },
+    {
+      "id": "f570bc1870f8",
+      "name": "email_025",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_025.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_025.md",
+      "addedAt": "2026-05-26T20:58:47.838Z"
+    },
+    {
+      "id": "02e88d027342",
+      "name": "email_026",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_026.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_026.md",
+      "addedAt": "2026-05-26T20:58:47.843Z"
+    },
+    {
+      "id": "7f51e1b7a027",
+      "name": "email_027",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_027.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_027.md",
+      "addedAt": "2026-05-26T20:58:47.850Z"
+    },
+    {
+      "id": "6f9e4da1b0b7",
+      "name": "email_028",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_028.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_028.md",
+      "addedAt": "2026-05-26T20:58:47.856Z"
+    },
+    {
+      "id": "000ea6f2d6ec",
+      "name": "email_029",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_029.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_029.md",
+      "addedAt": "2026-05-26T20:58:47.862Z"
+    },
+    {
+      "id": "41fad50e19a4",
+      "name": "email_030",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_030.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_030.md",
+      "addedAt": "2026-05-26T20:58:47.869Z"
+    },
+    {
+      "id": "7b5aed962744",
+      "name": "email_031",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_031.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_031.md",
+      "addedAt": "2026-05-26T20:58:47.875Z"
+    },
+    {
+      "id": "3578f41173ec",
+      "name": "email_032",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_032.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_032.md",
+      "addedAt": "2026-05-26T20:58:47.881Z"
+    },
+    {
+      "id": "bd041bda5b55",
+      "name": "email_033",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_033.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_033.md",
+      "addedAt": "2026-05-26T20:58:47.888Z"
+    },
+    {
+      "id": "7b7097975bd4",
+      "name": "email_034",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_034.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_034.md",
+      "addedAt": "2026-05-26T20:58:47.895Z"
+    },
+    {
+      "id": "547762da64ee",
+      "name": "email_035",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_035.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_035.md",
+      "addedAt": "2026-05-26T20:58:47.901Z"
+    },
+    {
+      "id": "98ff827eefcc",
+      "name": "email_036",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_036.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_036.md",
+      "addedAt": "2026-05-26T20:58:47.907Z"
+    },
+    {
+      "id": "4edf4b883ee5",
+      "name": "email_037",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_037.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_037.md",
+      "addedAt": "2026-05-26T20:58:47.915Z"
+    },
+    {
+      "id": "cb65eaa607f0",
+      "name": "email_038",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_038.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_038.md",
+      "addedAt": "2026-05-26T20:58:47.922Z"
+    },
+    {
+      "id": "087af3107dfd",
+      "name": "email_039",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_039.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_039.md",
+      "addedAt": "2026-05-26T20:58:47.929Z"
+    },
+    {
+      "id": "3873b2bf91a4",
+      "name": "email_040",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_040.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_040.md",
+      "addedAt": "2026-05-26T20:58:47.935Z"
+    },
+    {
+      "id": "337bda91d854",
+      "name": "email_041",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_041.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_041.md",
+      "addedAt": "2026-05-26T20:58:47.942Z"
+    },
+    {
+      "id": "bbc47ee257bb",
+      "name": "email_042",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_042.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_042.md",
+      "addedAt": "2026-05-26T20:58:47.948Z"
+    },
+    {
+      "id": "dcce06ee11a9",
+      "name": "email_043",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_043.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_043.md",
+      "addedAt": "2026-05-26T20:58:47.955Z"
+    },
+    {
+      "id": "438e91f4c998",
+      "name": "email_044",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_044.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_044.md",
+      "addedAt": "2026-05-26T20:58:47.961Z"
+    },
+    {
+      "id": "47044b5a5600",
+      "name": "email_045",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_045.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_045.md",
+      "addedAt": "2026-05-26T20:58:47.967Z"
+    },
+    {
+      "id": "30fbdc714195",
+      "name": "email_046",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_046.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_046.md",
+      "addedAt": "2026-05-26T20:58:47.973Z"
+    },
+    {
+      "id": "f6f24c8ca613",
+      "name": "email_047",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_047.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_047.md",
+      "addedAt": "2026-05-26T20:58:47.979Z"
+    },
+    {
+      "id": "90d07633784d",
+      "name": "email_048",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_048.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_048.md",
+      "addedAt": "2026-05-26T20:58:47.985Z"
+    },
+    {
+      "id": "b0f86f82da86",
+      "name": "email_049",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_049.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_049.md",
+      "addedAt": "2026-05-26T20:58:47.992Z"
+    },
+    {
+      "id": "87b4b3d15d84",
+      "name": "email_050",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_050.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_050.md",
+      "addedAt": "2026-05-26T20:58:48.001Z"
+    },
+    {
+      "id": "7a9c22099e04",
+      "name": "email_051",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_051.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_051.md",
+      "addedAt": "2026-05-26T20:58:48.007Z"
+    },
+    {
+      "id": "244a4422cd74",
+      "name": "email_052",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_052.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_052.md",
+      "addedAt": "2026-05-26T20:58:48.013Z"
+    },
+    {
+      "id": "5317e2e232dc",
+      "name": "email_053",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_053.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_053.md",
+      "addedAt": "2026-05-26T20:58:48.019Z"
+    },
+    {
+      "id": "0442132df1fb",
+      "name": "email_054",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_054.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_054.md",
+      "addedAt": "2026-05-26T20:58:48.026Z"
+    },
+    {
+      "id": "51012b085161",
+      "name": "email_055",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_055.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_055.md",
+      "addedAt": "2026-05-26T20:58:48.033Z"
+    },
+    {
+      "id": "1c0bf8093906",
+      "name": "email_056",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_056.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_056.md",
+      "addedAt": "2026-05-26T20:58:48.039Z"
+    },
+    {
+      "id": "e28205d207dd",
+      "name": "email_057",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_057.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_057.md",
+      "addedAt": "2026-05-26T20:58:48.045Z"
+    },
+    {
+      "id": "0c0f3d617c71",
+      "name": "email_058",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_058.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_058.md",
+      "addedAt": "2026-05-26T20:58:48.052Z"
+    },
+    {
+      "id": "422e0c23f827",
+      "name": "email_059",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_059.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_059.md",
+      "addedAt": "2026-05-26T20:58:48.058Z"
+    },
+    {
+      "id": "2c63b38469ec",
+      "name": "email_060",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_060.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_060.md",
+      "addedAt": "2026-05-26T20:58:48.065Z"
+    },
+    {
+      "id": "b034178937c9",
+      "name": "email_061",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_061.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_061.md",
+      "addedAt": "2026-05-26T20:58:48.071Z"
+    },
+    {
+      "id": "0c7814ba29af",
+      "name": "email_062",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_062.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_062.md",
+      "addedAt": "2026-05-26T20:58:48.077Z"
+    },
+    {
+      "id": "7672833e144e",
+      "name": "email_063",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_063.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_063.md",
+      "addedAt": "2026-05-26T20:58:48.084Z"
+    },
+    {
+      "id": "1d0446cf4224",
+      "name": "email_064",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_064.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_064.md",
+      "addedAt": "2026-05-26T20:58:48.091Z"
+    },
+    {
+      "id": "f8e466a8d4e7",
+      "name": "email_065",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_065.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_065.md",
+      "addedAt": "2026-05-26T20:58:48.098Z"
+    },
+    {
+      "id": "aeae994723fe",
+      "name": "email_066",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_066.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_066.md",
+      "addedAt": "2026-05-26T20:58:48.103Z"
+    },
+    {
+      "id": "bb1ab58a7c3a",
+      "name": "email_067",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_067.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_067.md",
+      "addedAt": "2026-05-26T20:58:48.109Z"
+    },
+    {
+      "id": "e68415576a6f",
+      "name": "email_068",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_068.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_068.md",
+      "addedAt": "2026-05-26T20:58:48.116Z"
+    },
+    {
+      "id": "826204d67034",
+      "name": "email_069",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_069.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_069.md",
+      "addedAt": "2026-05-26T20:58:48.121Z"
+    },
+    {
+      "id": "1fada8700bd8",
+      "name": "email_070",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_070.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_070.md",
+      "addedAt": "2026-05-26T20:58:48.127Z"
+    },
+    {
+      "id": "628ed24c82da",
+      "name": "email_071",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_071.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_071.md",
+      "addedAt": "2026-05-26T20:58:48.134Z"
+    },
+    {
+      "id": "d16b34dd8703",
+      "name": "email_072",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_072.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_072.md",
+      "addedAt": "2026-05-26T20:58:48.140Z"
+    },
+    {
+      "id": "2408ac049686",
+      "name": "email_073",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_073.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_073.md",
+      "addedAt": "2026-05-26T20:58:48.147Z"
+    },
+    {
+      "id": "b27f496f2518",
+      "name": "email_074",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_074.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_074.md",
+      "addedAt": "2026-05-26T20:58:48.152Z"
+    },
+    {
+      "id": "6b06b5541580",
+      "name": "email_075",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_075.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_075.md",
+      "addedAt": "2026-05-26T20:58:48.158Z"
+    },
+    {
+      "id": "1560b81a13b1",
+      "name": "email_076",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_076.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_076.md",
+      "addedAt": "2026-05-26T20:58:48.164Z"
+    },
+    {
+      "id": "a61a164ac218",
+      "name": "email_077",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_077.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_077.md",
+      "addedAt": "2026-05-26T20:58:48.170Z"
+    },
+    {
+      "id": "846d86f0b9bf",
+      "name": "email_078",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_078.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_078.md",
+      "addedAt": "2026-05-26T20:58:48.176Z"
+    },
+    {
+      "id": "9cbde47e7b86",
+      "name": "email_079",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_079.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_079.md",
+      "addedAt": "2026-05-26T20:58:48.184Z"
+    },
+    {
+      "id": "fcf390a7b2da",
+      "name": "email_080",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_080.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_080.md",
+      "addedAt": "2026-05-26T20:58:48.190Z"
+    },
+    {
+      "id": "957d5fac2116",
+      "name": "email_081",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_081.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_081.md",
+      "addedAt": "2026-05-26T20:58:48.196Z"
+    },
+    {
+      "id": "0a5ca549590a",
+      "name": "email_082",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_082.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_082.md",
+      "addedAt": "2026-05-26T20:58:48.202Z"
+    },
+    {
+      "id": "09c94f260925",
+      "name": "email_083",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_083.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_083.md",
+      "addedAt": "2026-05-26T20:58:48.208Z"
+    },
+    {
+      "id": "fe977c5a703c",
+      "name": "email_084",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_084.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_084.md",
+      "addedAt": "2026-05-26T20:58:48.214Z"
+    },
+    {
+      "id": "67144643d221",
+      "name": "email_085",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_085.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_085.md",
+      "addedAt": "2026-05-26T20:58:48.220Z"
+    },
+    {
+      "id": "701b76d788a5",
+      "name": "email_086",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_086.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_086.md",
+      "addedAt": "2026-05-26T20:58:48.226Z"
+    },
+    {
+      "id": "01ecef770ece",
+      "name": "email_087",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_087.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_087.md",
+      "addedAt": "2026-05-26T20:58:48.234Z"
+    },
+    {
+      "id": "dbeff5e161fb",
+      "name": "email_088",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_088.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_088.md",
+      "addedAt": "2026-05-26T20:58:48.240Z"
+    },
+    {
+      "id": "465991974882",
+      "name": "email_089",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_089.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_089.md",
+      "addedAt": "2026-05-26T20:58:48.245Z"
+    },
+    {
+      "id": "04ad1ef46d56",
+      "name": "email_090",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_090.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_090.md",
+      "addedAt": "2026-05-26T20:58:48.252Z"
+    },
+    {
+      "id": "c4e2a7231f00",
+      "name": "email_091",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_091.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_091.md",
+      "addedAt": "2026-05-26T20:58:48.258Z"
+    },
+    {
+      "id": "e1793dbdaba1",
+      "name": "email_092",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_092.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_092.md",
+      "addedAt": "2026-05-26T20:58:48.264Z"
+    },
+    {
+      "id": "5dcacf827cb8",
+      "name": "email_093",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_093.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_093.md",
+      "addedAt": "2026-05-26T20:58:48.270Z"
+    },
+    {
+      "id": "a5d0140a7694",
+      "name": "email_094",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_094.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_094.md",
+      "addedAt": "2026-05-26T20:58:48.276Z"
+    },
+    {
+      "id": "fbe38e035380",
+      "name": "email_095",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_095.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_095.md",
+      "addedAt": "2026-05-26T20:58:48.283Z"
+    },
+    {
+      "id": "73c147325296",
+      "name": "email_096",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_096.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_096.md",
+      "addedAt": "2026-05-26T20:58:48.290Z"
+    },
+    {
+      "id": "f2a4e047f558",
+      "name": "email_097",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_097.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_097.md",
+      "addedAt": "2026-05-26T20:58:48.296Z"
+    },
+    {
+      "id": "be50af6a3880",
+      "name": "email_098",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_098.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_098.md",
+      "addedAt": "2026-05-26T20:58:48.302Z"
+    },
+    {
+      "id": "ad80c22aff10",
+      "name": "email_099",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_099.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_099.md",
+      "addedAt": "2026-05-26T20:58:48.308Z"
+    },
+    {
+      "id": "b3a82ad9da66",
+      "name": "email_100",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_100.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_100.md",
+      "addedAt": "2026-05-26T20:58:48.314Z"
+    },
+    {
+      "id": "6a0a23c4cc0b",
+      "name": "email_101",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_101.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_101.md",
+      "addedAt": "2026-05-26T20:58:48.320Z"
+    },
+    {
+      "id": "823bdef0b1e4",
+      "name": "email_102",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_102.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_102.md",
+      "addedAt": "2026-05-26T20:58:48.326Z"
+    },
+    {
+      "id": "1bbe072e2d0b",
+      "name": "email_103",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_103.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_103.md",
+      "addedAt": "2026-05-26T20:58:48.335Z"
+    },
+    {
+      "id": "97899ec13e16",
+      "name": "email_104",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_104.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_104.md",
+      "addedAt": "2026-05-26T20:58:48.341Z"
+    },
+    {
+      "id": "c56d741fda30",
+      "name": "email_105",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_105.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_105.md",
+      "addedAt": "2026-05-26T20:58:48.347Z"
+    },
+    {
+      "id": "f757a4014e79",
+      "name": "email_106",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_106.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_106.md",
+      "addedAt": "2026-05-26T20:58:48.353Z"
+    },
+    {
+      "id": "e3d936700af9",
+      "name": "email_107",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_107.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_107.md",
+      "addedAt": "2026-05-26T20:58:48.359Z"
+    },
+    {
+      "id": "421878175944",
+      "name": "email_108",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_108.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_108.md",
+      "addedAt": "2026-05-26T20:58:48.365Z"
+    },
+    {
+      "id": "ccefda8e4aaa",
+      "name": "email_109",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_109.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_109.md",
+      "addedAt": "2026-05-26T20:58:48.372Z"
+    },
+    {
+      "id": "4b8cfa7232bc",
+      "name": "email_110",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_110.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_110.md",
+      "addedAt": "2026-05-26T20:58:48.378Z"
+    },
+    {
+      "id": "d354e118d276",
+      "name": "email_111",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_111.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_111.md",
+      "addedAt": "2026-05-26T20:58:48.385Z"
+    },
+    {
+      "id": "f8cefc2a9c33",
+      "name": "email_112",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_112.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_112.md",
+      "addedAt": "2026-05-26T20:58:48.391Z"
+    },
+    {
+      "id": "03201464563e",
+      "name": "email_113",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_113.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_113.md",
+      "addedAt": "2026-05-26T20:58:48.399Z"
+    },
+    {
+      "id": "68879cb3b272",
+      "name": "email_114",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_114.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_114.md",
+      "addedAt": "2026-05-26T20:58:48.405Z"
+    },
+    {
+      "id": "72fb1d6a961e",
+      "name": "email_115",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_115.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_115.md",
+      "addedAt": "2026-05-26T20:58:48.411Z"
+    },
+    {
+      "id": "a29af4b0980c",
+      "name": "email_116",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_116.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_116.md",
+      "addedAt": "2026-05-26T20:58:48.417Z"
+    },
+    {
+      "id": "038db55bd4c9",
+      "name": "email_117",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_117.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_117.md",
+      "addedAt": "2026-05-26T20:58:48.423Z"
+    },
+    {
+      "id": "037e2f5576d1",
+      "name": "email_118",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_118.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_118.md",
+      "addedAt": "2026-05-26T20:58:48.434Z"
+    },
+    {
+      "id": "ac15a5888f76",
+      "name": "email_119",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_119.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_119.md",
+      "addedAt": "2026-05-26T20:58:48.444Z"
+    },
+    {
+      "id": "4d784ac344e9",
+      "name": "email_120",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_120.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_120.md",
+      "addedAt": "2026-05-26T20:58:48.459Z"
+    },
+    {
+      "id": "edb30c5a7221",
+      "name": "email_121",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_121.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_121.md",
+      "addedAt": "2026-05-26T20:58:48.468Z"
+    },
+    {
+      "id": "0b3e23e4c07e",
+      "name": "email_122",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_122.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_122.md",
+      "addedAt": "2026-05-26T20:58:48.475Z"
+    },
+    {
+      "id": "8d8d878e784c",
+      "name": "email_123",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_123.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_123.md",
+      "addedAt": "2026-05-26T20:58:48.481Z"
+    },
+    {
+      "id": "24c5b86c908b",
+      "name": "email_124",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_124.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_124.md",
+      "addedAt": "2026-05-26T20:58:48.488Z"
+    },
+    {
+      "id": "f72f16ca138f",
+      "name": "email_125",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_125.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_125.md",
+      "addedAt": "2026-05-26T20:58:48.494Z"
+    },
+    {
+      "id": "144b01822704",
+      "name": "email_126",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_126.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_126.md",
+      "addedAt": "2026-05-26T20:58:48.501Z"
+    },
+    {
+      "id": "527e552b329f",
+      "name": "email_127",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_127.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_127.md",
+      "addedAt": "2026-05-26T20:58:48.507Z"
+    },
+    {
+      "id": "ed25a1f663a1",
+      "name": "email_128",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_128.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_128.md",
+      "addedAt": "2026-05-26T20:58:48.514Z"
+    },
+    {
+      "id": "0b97ca0dae11",
+      "name": "email_129",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_129.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_129.md",
+      "addedAt": "2026-05-26T20:58:48.520Z"
+    },
+    {
+      "id": "31565ae1d730",
+      "name": "email_130",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_130.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_130.md",
+      "addedAt": "2026-05-26T20:58:48.527Z"
+    },
+    {
+      "id": "ad3a0333c9ec",
+      "name": "email_131",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_131.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_131.md",
+      "addedAt": "2026-05-26T20:58:48.540Z"
+    },
+    {
+      "id": "bcad4276a8c8",
+      "name": "email_132",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_132.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_132.md",
+      "addedAt": "2026-05-26T20:58:48.547Z"
+    },
+    {
+      "id": "d52432c93a4d",
+      "name": "email_133",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_133.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_133.md",
+      "addedAt": "2026-05-26T20:58:48.554Z"
+    },
+    {
+      "id": "8ab08e89d401",
+      "name": "email_134",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_134.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_134.md",
+      "addedAt": "2026-05-26T20:58:48.561Z"
+    },
+    {
+      "id": "ec7e338bf7a0",
+      "name": "email_135",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_135.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_135.md",
+      "addedAt": "2026-05-26T20:58:48.569Z"
+    },
+    {
+      "id": "de54e988b465",
+      "name": "email_136",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_136.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_136.md",
+      "addedAt": "2026-05-26T20:58:48.576Z"
+    },
+    {
+      "id": "8e5c2e660a9d",
+      "name": "email_137",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_137.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_137.md",
+      "addedAt": "2026-05-26T20:58:48.584Z"
+    },
+    {
+      "id": "2db8c3ee3559",
+      "name": "email_138",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_138.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_138.md",
+      "addedAt": "2026-05-26T20:58:48.590Z"
+    },
+    {
+      "id": "7b2307a1f61b",
+      "name": "email_139",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_139.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_139.md",
+      "addedAt": "2026-05-26T20:58:48.598Z"
+    },
+    {
+      "id": "85f048f36cda",
+      "name": "email_140",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_140.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_140.md",
+      "addedAt": "2026-05-26T20:58:48.604Z"
+    },
+    {
+      "id": "5aaeb2bca9b8",
+      "name": "email_141",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_141.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_141.md",
+      "addedAt": "2026-05-26T20:58:48.612Z"
+    },
+    {
+      "id": "81a454101ef3",
+      "name": "email_142",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_142.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_142.md",
+      "addedAt": "2026-05-26T20:58:48.619Z"
+    },
+    {
+      "id": "8a2fdcee5e96",
+      "name": "email_143",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_143.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_143.md",
+      "addedAt": "2026-05-26T20:58:48.625Z"
+    },
+    {
+      "id": "0225a0a3e14d",
+      "name": "email_144",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_144.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_144.md",
+      "addedAt": "2026-05-26T20:58:48.632Z"
+    },
+    {
+      "id": "7bd2aaa96c7b",
+      "name": "email_145",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_145.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_145.md",
+      "addedAt": "2026-05-26T20:58:48.639Z"
+    },
+    {
+      "id": "2d2606146947",
+      "name": "email_146",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_146.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_146.md",
+      "addedAt": "2026-05-26T20:58:48.647Z"
+    },
+    {
+      "id": "e2998d067d9c",
+      "name": "email_147",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_147.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_147.md",
+      "addedAt": "2026-05-26T20:58:48.653Z"
+    },
+    {
+      "id": "db4f349f3520",
+      "name": "email_148",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_148.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_148.md",
+      "addedAt": "2026-05-26T20:58:48.660Z"
+    },
+    {
+      "id": "0602dce92f9a",
+      "name": "email_149",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_149.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_149.md",
+      "addedAt": "2026-05-26T20:58:48.668Z"
+    },
+    {
+      "id": "9424f55cc6e3",
+      "name": "email_150",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_150.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_150.md",
+      "addedAt": "2026-05-26T20:58:48.674Z"
+    },
+    {
+      "id": "9fe2e7ae1b0a",
+      "name": "email_151",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_151.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_151.md",
+      "addedAt": "2026-05-26T20:58:48.681Z"
+    },
+    {
+      "id": "8e83290c3fb3",
+      "name": "email_152",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_152.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_152.md",
+      "addedAt": "2026-05-26T20:58:48.687Z"
+    },
+    {
+      "id": "a2c55cc44654",
+      "name": "email_153",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_153.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_153.md",
+      "addedAt": "2026-05-26T20:58:48.694Z"
+    },
+    {
+      "id": "1a48400f91f4",
+      "name": "email_154",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_154.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_154.md",
+      "addedAt": "2026-05-26T20:58:48.701Z"
+    },
+    {
+      "id": "ed9dd889df17",
+      "name": "email_155",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_155.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_155.md",
+      "addedAt": "2026-05-26T20:58:48.708Z"
+    },
+    {
+      "id": "851e45d83e4b",
+      "name": "email_156",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_156.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_156.md",
+      "addedAt": "2026-05-26T20:58:48.715Z"
+    },
+    {
+      "id": "2920fb87c4f8",
+      "name": "email_157",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_157.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_157.md",
+      "addedAt": "2026-05-26T20:58:48.721Z"
+    },
+    {
+      "id": "b5656ff4b509",
+      "name": "email_158",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_158.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_158.md",
+      "addedAt": "2026-05-26T20:58:48.729Z"
+    },
+    {
+      "id": "be8a584a7b54",
+      "name": "email_159",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_159.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_159.md",
+      "addedAt": "2026-05-26T20:58:48.736Z"
+    },
+    {
+      "id": "200ce113e7b6",
+      "name": "email_160",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_160.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_160.md",
+      "addedAt": "2026-05-26T20:58:48.742Z"
+    },
+    {
+      "id": "92f602ecd637",
+      "name": "email_161",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_161.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_161.md",
+      "addedAt": "2026-05-26T20:58:48.749Z"
+    },
+    {
+      "id": "77b1f767a860",
+      "name": "email_162",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_162.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_162.md",
+      "addedAt": "2026-05-26T20:58:48.756Z"
+    },
+    {
+      "id": "8dd1c72a2267",
+      "name": "email_163",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_163.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_163.md",
+      "addedAt": "2026-05-26T20:58:48.762Z"
+    },
+    {
+      "id": "54dc81013dd5",
+      "name": "email_164",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_164.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_164.md",
+      "addedAt": "2026-05-26T20:58:48.769Z"
+    },
+    {
+      "id": "e286ff9b8f58",
+      "name": "email_165",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_165.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_165.md",
+      "addedAt": "2026-05-26T20:58:48.776Z"
+    },
+    {
+      "id": "34439db3118a",
+      "name": "email_166",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_166.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_166.md",
+      "addedAt": "2026-05-26T20:58:48.783Z"
+    },
+    {
+      "id": "60937232e3ad",
+      "name": "email_167",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_167.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_167.md",
+      "addedAt": "2026-05-26T20:58:48.790Z"
+    },
+    {
+      "id": "3fe4cb2f3322",
+      "name": "email_168",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_168.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_168.md",
+      "addedAt": "2026-05-26T20:58:48.796Z"
+    },
+    {
+      "id": "3ee7848b1d0a",
+      "name": "email_169",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_169.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_169.md",
+      "addedAt": "2026-05-26T20:58:48.804Z"
+    },
+    {
+      "id": "11d4ac0422c9",
+      "name": "email_170",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_170.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_170.md",
+      "addedAt": "2026-05-26T20:58:48.810Z"
+    },
+    {
+      "id": "6add73491e73",
+      "name": "email_171",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_171.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_171.md",
+      "addedAt": "2026-05-26T20:58:48.818Z"
+    },
+    {
+      "id": "bf434d688605",
+      "name": "email_172",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_172.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_172.md",
+      "addedAt": "2026-05-26T20:58:48.825Z"
+    },
+    {
+      "id": "0b45f97278e3",
+      "name": "email_173",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_173.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_173.md",
+      "addedAt": "2026-05-26T20:58:48.832Z"
+    },
+    {
+      "id": "10a573bbb9c7",
+      "name": "email_174",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_174.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_174.md",
+      "addedAt": "2026-05-26T20:58:48.838Z"
+    },
+    {
+      "id": "b0e23a2145de",
+      "name": "email_175",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_175.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_175.md",
+      "addedAt": "2026-05-26T20:58:48.845Z"
+    },
+    {
+      "id": "726e3f1185f0",
+      "name": "email_176",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_176.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_176.md",
+      "addedAt": "2026-05-26T20:58:48.852Z"
+    },
+    {
+      "id": "e3ae75bb877b",
+      "name": "email_177",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_177.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_177.md",
+      "addedAt": "2026-05-26T20:58:48.859Z"
+    },
+    {
+      "id": "151f0beb0b58",
+      "name": "email_178",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_178.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_178.md",
+      "addedAt": "2026-05-26T20:58:48.866Z"
+    },
+    {
+      "id": "e1693171cd4f",
+      "name": "email_179",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_179.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_179.md",
+      "addedAt": "2026-05-26T20:58:48.872Z"
+    },
+    {
+      "id": "e8f0c604cf96",
+      "name": "email_180",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_180.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_180.md",
+      "addedAt": "2026-05-26T20:58:48.880Z"
+    },
+    {
+      "id": "bdddc853cad9",
+      "name": "email_181",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_181.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_181.md",
+      "addedAt": "2026-05-26T20:58:48.887Z"
+    },
+    {
+      "id": "1715e10d7446",
+      "name": "email_182",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_182.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_182.md",
+      "addedAt": "2026-05-26T20:58:48.893Z"
+    },
+    {
+      "id": "fbd0f47ec39b",
+      "name": "email_183",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_183.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_183.md",
+      "addedAt": "2026-05-26T20:58:48.901Z"
+    },
+    {
+      "id": "64e1c18fd0c5",
+      "name": "email_184",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_184.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_184.md",
+      "addedAt": "2026-05-26T20:58:48.908Z"
+    },
+    {
+      "id": "a26839000684",
+      "name": "email_185",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_185.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_185.md",
+      "addedAt": "2026-05-26T20:58:48.915Z"
+    },
+    {
+      "id": "7e65d83278bc",
+      "name": "email_186",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_186.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_186.md",
+      "addedAt": "2026-05-26T20:58:48.922Z"
+    },
+    {
+      "id": "e6b6ab32c07a",
+      "name": "email_187",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_187.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_187.md",
+      "addedAt": "2026-05-26T20:58:48.928Z"
+    },
+    {
+      "id": "5086e39abeaf",
+      "name": "email_188",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_188.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_188.md",
+      "addedAt": "2026-05-26T20:58:48.936Z"
+    },
+    {
+      "id": "6f1f2bbd6131",
+      "name": "email_189",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_189.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_189.md",
+      "addedAt": "2026-05-26T20:58:48.943Z"
+    },
+    {
+      "id": "e8097cc42d93",
+      "name": "email_190",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_190.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_190.md",
+      "addedAt": "2026-05-26T20:58:48.951Z"
+    },
+    {
+      "id": "dc6ecaa06476",
+      "name": "email_191",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_191.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_191.md",
+      "addedAt": "2026-05-26T20:58:48.959Z"
+    },
+    {
+      "id": "f0f18ffe9813",
+      "name": "email_192",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_192.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_192.md",
+      "addedAt": "2026-05-26T20:58:48.966Z"
+    },
+    {
+      "id": "7becb0266e0d",
+      "name": "email_193",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_193.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_193.md",
+      "addedAt": "2026-05-26T20:58:48.973Z"
+    },
+    {
+      "id": "3729b7637439",
+      "name": "email_194",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_194.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_194.md",
+      "addedAt": "2026-05-26T20:58:48.980Z"
+    },
+    {
+      "id": "43e2351e8916",
+      "name": "email_195",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_195.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_195.md",
+      "addedAt": "2026-05-26T20:58:48.987Z"
+    },
+    {
+      "id": "546789c6ae00",
+      "name": "email_196",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_196.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_196.md",
+      "addedAt": "2026-05-26T20:58:48.994Z"
+    },
+    {
+      "id": "db139a3ff9d7",
+      "name": "email_197",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_197.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_197.md",
+      "addedAt": "2026-05-26T20:58:49.002Z"
+    },
+    {
+      "id": "cf9b0953cdd2",
+      "name": "email_198",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_198.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_198.md",
+      "addedAt": "2026-05-26T20:58:49.009Z"
+    },
+    {
+      "id": "20ffa0bc6fc3",
+      "name": "email_199",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_199.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_199.md",
+      "addedAt": "2026-05-26T20:58:49.016Z"
+    },
+    {
+      "id": "5782ee1b9f79",
+      "name": "email_200",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_200.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_200.md",
+      "addedAt": "2026-05-26T20:58:49.023Z"
+    },
+    {
+      "id": "bbfc8ae33d4b",
+      "name": "email_201",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_201.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_201.md",
+      "addedAt": "2026-05-26T20:58:49.031Z"
+    },
+    {
+      "id": "aa15f29c9e29",
+      "name": "email_202",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_202.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_202.md",
+      "addedAt": "2026-05-26T20:58:49.038Z"
+    },
+    {
+      "id": "9a7950e839a1",
+      "name": "email_203",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_203.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_203.md",
+      "addedAt": "2026-05-26T20:58:49.045Z"
+    },
+    {
+      "id": "2240682921cb",
+      "name": "email_204",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_204.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_204.md",
+      "addedAt": "2026-05-26T20:58:49.052Z"
+    },
+    {
+      "id": "f437bff1b1f0",
+      "name": "email_205",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_205.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_205.md",
+      "addedAt": "2026-05-26T20:58:49.059Z"
+    },
+    {
+      "id": "c5a4dd77bf1d",
+      "name": "email_206",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_206.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_206.md",
+      "addedAt": "2026-05-26T20:58:49.068Z"
+    },
+    {
+      "id": "411569360f68",
+      "name": "email_207",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_207.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_207.md",
+      "addedAt": "2026-05-26T20:58:49.075Z"
+    },
+    {
+      "id": "64ec8694b686",
+      "name": "email_208",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_208.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_208.md",
+      "addedAt": "2026-05-26T20:58:49.082Z"
+    },
+    {
+      "id": "8e4de776fb22",
+      "name": "email_209",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_209.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_209.md",
+      "addedAt": "2026-05-26T20:58:49.089Z"
+    },
+    {
+      "id": "86e608e8b720",
+      "name": "email_210",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_210.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_210.md",
+      "addedAt": "2026-05-26T20:58:49.096Z"
+    },
+    {
+      "id": "f12b773267de",
+      "name": "email_211",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_211.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_211.md",
+      "addedAt": "2026-05-26T20:58:49.103Z"
+    },
+    {
+      "id": "0a4e614d0f25",
+      "name": "email_212",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_212.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_212.md",
+      "addedAt": "2026-05-26T20:58:49.110Z"
+    },
+    {
+      "id": "f119de4375f8",
+      "name": "email_213",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_213.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_213.md",
+      "addedAt": "2026-05-26T20:58:49.119Z"
+    },
+    {
+      "id": "b73383da5cf6",
+      "name": "email_214",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_214.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_214.md",
+      "addedAt": "2026-05-26T20:58:49.126Z"
+    },
+    {
+      "id": "32953b64f660",
+      "name": "email_215",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_215.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_215.md",
+      "addedAt": "2026-05-26T20:58:49.135Z"
+    },
+    {
+      "id": "e17ef3aa7bde",
+      "name": "email_216",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_216.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_216.md",
+      "addedAt": "2026-05-26T20:58:49.142Z"
+    },
+    {
+      "id": "61e30b81fd6f",
+      "name": "email_217",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_217.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_217.md",
+      "addedAt": "2026-05-26T20:58:49.150Z"
+    },
+    {
+      "id": "27507e9a3ac5",
+      "name": "email_218",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_218.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_218.md",
+      "addedAt": "2026-05-26T20:58:49.157Z"
+    },
+    {
+      "id": "887e64d9b056",
+      "name": "email_219",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_219.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_219.md",
+      "addedAt": "2026-05-26T20:58:49.165Z"
+    },
+    {
+      "id": "af793af93368",
+      "name": "email_220",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_220.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_220.md",
+      "addedAt": "2026-05-26T20:58:49.172Z"
+    },
+    {
+      "id": "2b714abaaca4",
+      "name": "email_221",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_221.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_221.md",
+      "addedAt": "2026-05-26T20:58:49.179Z"
+    },
+    {
+      "id": "d362e6746aad",
+      "name": "email_222",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_222.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_222.md",
+      "addedAt": "2026-05-26T20:58:49.187Z"
+    },
+    {
+      "id": "51a6c070bf65",
+      "name": "email_223",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_223.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_223.md",
+      "addedAt": "2026-05-26T20:58:49.194Z"
+    },
+    {
+      "id": "56f731ff9c08",
+      "name": "email_224",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_224.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_224.md",
+      "addedAt": "2026-05-26T20:58:49.202Z"
+    },
+    {
+      "id": "25edf925c295",
+      "name": "email_225",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_225.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_225.md",
+      "addedAt": "2026-05-26T20:58:49.209Z"
+    },
+    {
+      "id": "7817f0b76119",
+      "name": "email_226",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_226.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_226.md",
+      "addedAt": "2026-05-26T20:58:49.216Z"
+    },
+    {
+      "id": "c7f349ad1def",
+      "name": "email_227",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_227.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_227.md",
+      "addedAt": "2026-05-26T20:58:49.224Z"
+    },
+    {
+      "id": "0260655acd1e",
+      "name": "email_228",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_228.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_228.md",
+      "addedAt": "2026-05-26T20:58:49.276Z"
+    },
+    {
+      "id": "a330e946a21f",
+      "name": "email_229",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_229.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_229.md",
+      "addedAt": "2026-05-26T20:58:49.299Z"
+    },
+    {
+      "id": "545e61ed1a84",
+      "name": "email_230",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_230.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_230.md",
+      "addedAt": "2026-05-26T20:58:49.309Z"
+    },
+    {
+      "id": "49b2c81973de",
+      "name": "email_231",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_231.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_231.md",
+      "addedAt": "2026-05-26T20:58:49.317Z"
+    },
+    {
+      "id": "e89644e8324f",
+      "name": "email_232",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_232.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_232.md",
+      "addedAt": "2026-05-26T20:58:49.325Z"
+    },
+    {
+      "id": "bfaa6f469c7d",
+      "name": "email_233",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_233.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_233.md",
+      "addedAt": "2026-05-26T20:58:49.332Z"
+    },
+    {
+      "id": "40f9cf8a5861",
+      "name": "email_234",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_234.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_234.md",
+      "addedAt": "2026-05-26T20:58:49.340Z"
+    },
+    {
+      "id": "d2f0765e8845",
+      "name": "email_235",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_235.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_235.md",
+      "addedAt": "2026-05-26T20:58:49.347Z"
+    },
+    {
+      "id": "3dd635cf97bb",
+      "name": "email_236",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_236.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_236.md",
+      "addedAt": "2026-05-26T20:58:49.355Z"
+    },
+    {
+      "id": "11472b1fbc4b",
+      "name": "email_237",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_237.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_237.md",
+      "addedAt": "2026-05-26T20:58:49.361Z"
+    },
+    {
+      "id": "768aad691188",
+      "name": "email_238",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_238.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_238.md",
+      "addedAt": "2026-05-26T20:58:49.369Z"
+    },
+    {
+      "id": "b39dc860079d",
+      "name": "email_239",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_239.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_239.md",
+      "addedAt": "2026-05-26T20:58:49.376Z"
+    },
+    {
+      "id": "35d20e419b52",
+      "name": "email_240",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_240.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_240.md",
+      "addedAt": "2026-05-26T20:58:49.386Z"
+    },
+    {
+      "id": "e9df7ad29a2a",
+      "name": "email_241",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_241.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_241.md",
+      "addedAt": "2026-05-26T20:58:49.393Z"
+    },
+    {
+      "id": "70eb747ba3b7",
+      "name": "email_242",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_242.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_242.md",
+      "addedAt": "2026-05-26T20:58:49.400Z"
+    },
+    {
+      "id": "08fac92151ab",
+      "name": "email_243",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_243.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_243.md",
+      "addedAt": "2026-05-26T20:58:49.407Z"
+    },
+    {
+      "id": "a721fcb0e181",
+      "name": "email_244",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_244.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_244.md",
+      "addedAt": "2026-05-26T20:58:49.414Z"
+    },
+    {
+      "id": "789bcb1f3019",
+      "name": "email_245",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_245.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_245.md",
+      "addedAt": "2026-05-26T20:58:49.421Z"
+    },
+    {
+      "id": "3b00238ebbd9",
+      "name": "email_246",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_246.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_246.md",
+      "addedAt": "2026-05-26T20:58:49.428Z"
+    },
+    {
+      "id": "66587b86adc3",
+      "name": "email_247",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_247.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_247.md",
+      "addedAt": "2026-05-26T20:58:49.436Z"
+    },
+    {
+      "id": "b55131f188b0",
+      "name": "email_248",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_248.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_248.md",
+      "addedAt": "2026-05-26T20:58:49.443Z"
+    },
+    {
+      "id": "6576cd536938",
+      "name": "email_249",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_249.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_249.md",
+      "addedAt": "2026-05-26T20:58:49.452Z"
+    },
+    {
+      "id": "57291c3d01fe",
+      "name": "email_250",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_250.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_250.md",
+      "addedAt": "2026-05-26T20:58:49.459Z"
+    },
+    {
+      "id": "b2d15f7dc656",
+      "name": "email_251",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_251.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_251.md",
+      "addedAt": "2026-05-26T20:58:49.467Z"
+    },
+    {
+      "id": "598c2fd7c8ab",
+      "name": "email_252",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_252.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_252.md",
+      "addedAt": "2026-05-26T20:58:49.474Z"
+    },
+    {
+      "id": "d951a8ce14f1",
+      "name": "email_253",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_253.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_253.md",
+      "addedAt": "2026-05-26T20:58:49.481Z"
+    },
+    {
+      "id": "0c22c913c011",
+      "name": "email_254",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_254.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_254.md",
+      "addedAt": "2026-05-26T20:58:49.488Z"
+    },
+    {
+      "id": "073ae9d7d189",
+      "name": "email_255",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_255.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_255.md",
+      "addedAt": "2026-05-26T20:58:49.495Z"
+    },
+    {
+      "id": "3d9771011697",
+      "name": "email_256",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_256.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_256.md",
+      "addedAt": "2026-05-26T20:58:49.503Z"
+    },
+    {
+      "id": "5a4eb9653266",
+      "name": "email_257",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_257.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_257.md",
+      "addedAt": "2026-05-26T20:58:49.511Z"
+    },
+    {
+      "id": "2ce44c1db001",
+      "name": "email_258",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_258.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_258.md",
+      "addedAt": "2026-05-26T20:58:49.519Z"
+    },
+    {
+      "id": "1913a196f7b3",
+      "name": "email_259",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_259.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_259.md",
+      "addedAt": "2026-05-26T20:58:49.526Z"
+    },
+    {
+      "id": "5fdf5a1029aa",
+      "name": "email_260",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_260.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_260.md",
+      "addedAt": "2026-05-26T20:58:49.536Z"
+    },
+    {
+      "id": "878891151d0c",
+      "name": "email_261",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_261.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_261.md",
+      "addedAt": "2026-05-26T20:58:49.543Z"
+    },
+    {
+      "id": "69c0e7745a36",
+      "name": "email_262",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_262.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_262.md",
+      "addedAt": "2026-05-26T20:58:49.553Z"
+    },
+    {
+      "id": "04b41a34124d",
+      "name": "email_263",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_263.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_263.md",
+      "addedAt": "2026-05-26T20:58:49.560Z"
+    },
+    {
+      "id": "8d917ac0c989",
+      "name": "email_264",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_264.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_264.md",
+      "addedAt": "2026-05-26T20:58:49.568Z"
+    },
+    {
+      "id": "9c9ebc583559",
+      "name": "email_265",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_265.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_265.md",
+      "addedAt": "2026-05-26T20:58:49.575Z"
+    },
+    {
+      "id": "adee1df084a1",
+      "name": "email_266",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_266.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_266.md",
+      "addedAt": "2026-05-26T20:58:49.582Z"
+    },
+    {
+      "id": "bc2ec89f7148",
+      "name": "email_267",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_267.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_267.md",
+      "addedAt": "2026-05-26T20:58:49.590Z"
+    },
+    {
+      "id": "bb7cbdba2c24",
+      "name": "email_268",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_268.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_268.md",
+      "addedAt": "2026-05-26T20:58:49.597Z"
+    },
+    {
+      "id": "87f0c06e736e",
+      "name": "email_269",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_269.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_269.md",
+      "addedAt": "2026-05-26T20:58:49.605Z"
+    },
+    {
+      "id": "73f2f0512332",
+      "name": "email_270",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_270.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_270.md",
+      "addedAt": "2026-05-26T20:58:49.612Z"
+    },
+    {
+      "id": "2f8d1c510cbb",
+      "name": "email_271",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_271.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_271.md",
+      "addedAt": "2026-05-26T20:58:49.620Z"
+    },
+    {
+      "id": "cbfc3b9f2470",
+      "name": "email_272",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_272.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_272.md",
+      "addedAt": "2026-05-26T20:58:49.627Z"
+    },
+    {
+      "id": "9cea3aa6b944",
+      "name": "email_273",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_273.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_273.md",
+      "addedAt": "2026-05-26T20:58:49.636Z"
+    },
+    {
+      "id": "4e0c07adc169",
+      "name": "email_274",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_274.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_274.md",
+      "addedAt": "2026-05-26T20:58:49.644Z"
+    },
+    {
+      "id": "db720d44580e",
+      "name": "email_275",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_275.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_275.md",
+      "addedAt": "2026-05-26T20:58:49.653Z"
+    },
+    {
+      "id": "4e97c5d43c0c",
+      "name": "email_276",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_276.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_276.md",
+      "addedAt": "2026-05-26T20:58:49.660Z"
+    },
+    {
+      "id": "474bc1da77b4",
+      "name": "email_277",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_277.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_277.md",
+      "addedAt": "2026-05-26T20:58:49.670Z"
+    },
+    {
+      "id": "7aefec793d1e",
+      "name": "email_278",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_278.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_278.md",
+      "addedAt": "2026-05-26T20:58:49.677Z"
+    },
+    {
+      "id": "8ae202f0bfe7",
+      "name": "email_279",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_279.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_279.md",
+      "addedAt": "2026-05-26T20:58:49.686Z"
+    },
+    {
+      "id": "8f605f10a0bf",
+      "name": "email_280",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_280.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_280.md",
+      "addedAt": "2026-05-26T20:58:49.693Z"
+    },
+    {
+      "id": "6f3c4f667296",
+      "name": "email_281",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_281.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_281.md",
+      "addedAt": "2026-05-26T20:58:49.703Z"
+    },
+    {
+      "id": "4b7d3a39a116",
+      "name": "email_282",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_282.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_282.md",
+      "addedAt": "2026-05-26T20:58:49.710Z"
+    },
+    {
+      "id": "2dd01955233a",
+      "name": "email_283",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_283.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_283.md",
+      "addedAt": "2026-05-26T20:58:49.720Z"
+    },
+    {
+      "id": "f9737402a937",
+      "name": "email_284",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_284.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_284.md",
+      "addedAt": "2026-05-26T20:58:49.727Z"
+    },
+    {
+      "id": "f70f0a03b934",
+      "name": "email_285",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_285.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_285.md",
+      "addedAt": "2026-05-26T20:58:49.737Z"
+    },
+    {
+      "id": "d5f2f844230b",
+      "name": "email_286",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_286.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_286.md",
+      "addedAt": "2026-05-26T20:58:49.744Z"
+    },
+    {
+      "id": "e50f0d6e9c0d",
+      "name": "email_287",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_287.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_287.md",
+      "addedAt": "2026-05-26T20:58:49.754Z"
+    },
+    {
+      "id": "08af1c410d73",
+      "name": "email_288",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_288.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_288.md",
+      "addedAt": "2026-05-26T20:58:49.761Z"
+    },
+    {
+      "id": "04a90a0281aa",
+      "name": "email_289",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_289.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_289.md",
+      "addedAt": "2026-05-26T20:58:49.770Z"
+    },
+    {
+      "id": "e2db60743824",
+      "name": "email_290",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_290.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_290.md",
+      "addedAt": "2026-05-26T20:58:49.777Z"
+    },
+    {
+      "id": "0037fa8476d8",
+      "name": "email_291",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_291.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_291.md",
+      "addedAt": "2026-05-26T20:58:49.787Z"
+    },
+    {
+      "id": "da0581245db1",
+      "name": "email_292",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_292.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_292.md",
+      "addedAt": "2026-05-26T20:58:49.794Z"
+    },
+    {
+      "id": "29c0120d3207",
+      "name": "email_293",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_293.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_293.md",
+      "addedAt": "2026-05-26T20:58:49.803Z"
+    },
+    {
+      "id": "e08df19cd74f",
+      "name": "email_294",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_294.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_294.md",
+      "addedAt": "2026-05-26T20:58:49.810Z"
+    },
+    {
+      "id": "b25f4fc95e13",
+      "name": "email_295",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_295.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_295.md",
+      "addedAt": "2026-05-26T20:58:49.820Z"
+    },
+    {
+      "id": "f0874d581e1b",
+      "name": "email_296",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_296.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_296.md",
+      "addedAt": "2026-05-26T20:58:49.827Z"
+    },
+    {
+      "id": "05c132ee70b4",
+      "name": "email_297",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_297.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_297.md",
+      "addedAt": "2026-05-26T20:58:49.837Z"
+    },
+    {
+      "id": "2b9921199c4b",
+      "name": "email_298",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_298.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_298.md",
+      "addedAt": "2026-05-26T20:58:49.844Z"
+    },
+    {
+      "id": "a971ba8f0ebd",
+      "name": "email_299",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_299.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_299.md",
+      "addedAt": "2026-05-26T20:58:49.853Z"
+    },
+    {
+      "id": "85f92d858c38",
+      "name": "email_300",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_300.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_300.md",
+      "addedAt": "2026-05-26T20:58:49.860Z"
+    },
+    {
+      "id": "1715c9f5bde9",
+      "name": "email_301",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_301.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_301.md",
+      "addedAt": "2026-05-26T20:58:49.870Z"
+    },
+    {
+      "id": "b4ad263c23b2",
+      "name": "email_302",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_302.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_302.md",
+      "addedAt": "2026-05-26T20:58:49.877Z"
+    },
+    {
+      "id": "656ffa1d4d3f",
+      "name": "email_303",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_303.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_303.md",
+      "addedAt": "2026-05-26T20:58:49.887Z"
+    },
+    {
+      "id": "66f0d64c65e0",
+      "name": "email_304",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_304.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_304.md",
+      "addedAt": "2026-05-26T20:58:49.895Z"
+    },
+    {
+      "id": "6d3da43ff070",
+      "name": "email_305",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_305.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_305.md",
+      "addedAt": "2026-05-26T20:58:49.904Z"
+    },
+    {
+      "id": "0c88a99c6213",
+      "name": "email_306",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_306.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_306.md",
+      "addedAt": "2026-05-26T20:58:49.912Z"
+    },
+    {
+      "id": "e25abb126244",
+      "name": "email_307",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_307.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_307.md",
+      "addedAt": "2026-05-26T20:58:49.920Z"
+    },
+    {
+      "id": "0d69ddeeff4b",
+      "name": "email_308",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_308.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_308.md",
+      "addedAt": "2026-05-26T20:58:49.928Z"
+    },
+    {
+      "id": "ba9462e71eef",
+      "name": "email_309",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_309.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_309.md",
+      "addedAt": "2026-05-26T20:58:49.937Z"
+    },
+    {
+      "id": "0d01c34db933",
+      "name": "email_310",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_310.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_310.md",
+      "addedAt": "2026-05-26T20:58:49.945Z"
+    },
+    {
+      "id": "b94b8d217556",
+      "name": "email_311",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_311.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_311.md",
+      "addedAt": "2026-05-26T20:58:49.953Z"
+    },
+    {
+      "id": "25714fa59cd0",
+      "name": "email_312",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_312.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_312.md",
+      "addedAt": "2026-05-26T20:58:49.961Z"
+    },
+    {
+      "id": "7fe5fd6a9b8f",
+      "name": "email_313",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_313.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_313.md",
+      "addedAt": "2026-05-26T20:58:49.970Z"
+    },
+    {
+      "id": "af7e1130e74f",
+      "name": "email_314",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_314.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_314.md",
+      "addedAt": "2026-05-26T20:58:49.978Z"
+    },
+    {
+      "id": "4e81f3d750be",
+      "name": "email_315",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_315.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_315.md",
+      "addedAt": "2026-05-26T20:58:49.987Z"
+    },
+    {
+      "id": "e0da56e767a4",
+      "name": "email_316",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_316.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_316.md",
+      "addedAt": "2026-05-26T20:58:49.994Z"
+    },
+    {
+      "id": "055aee42e3c0",
+      "name": "email_317",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_317.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_317.md",
+      "addedAt": "2026-05-26T20:58:50.004Z"
+    },
+    {
+      "id": "b58aad541858",
+      "name": "email_318",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_318.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_318.md",
+      "addedAt": "2026-05-26T20:58:50.011Z"
+    },
+    {
+      "id": "b197919bcb33",
+      "name": "email_319",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_319.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_319.md",
+      "addedAt": "2026-05-26T20:58:50.021Z"
+    },
+    {
+      "id": "50033fb7e2a3",
+      "name": "email_320",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_320.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_320.md",
+      "addedAt": "2026-05-26T20:58:50.028Z"
+    },
+    {
+      "id": "4cf50c47ad15",
+      "name": "email_321",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_321.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_321.md",
+      "addedAt": "2026-05-26T20:58:50.036Z"
+    },
+    {
+      "id": "054563e6c975",
+      "name": "email_322",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_322.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_322.md",
+      "addedAt": "2026-05-26T20:58:50.044Z"
+    },
+    {
+      "id": "b58d54d78631",
+      "name": "email_323",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_323.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_323.md",
+      "addedAt": "2026-05-26T20:58:50.053Z"
+    },
+    {
+      "id": "e125a891b12e",
+      "name": "email_324",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_324.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_324.md",
+      "addedAt": "2026-05-26T20:58:50.061Z"
+    },
+    {
+      "id": "fb62b06f47b4",
+      "name": "email_325",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_325.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_325.md",
+      "addedAt": "2026-05-26T20:58:50.070Z"
+    },
+    {
+      "id": "0ab162cd3da2",
+      "name": "email_326",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_326.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_326.md",
+      "addedAt": "2026-05-26T20:58:50.078Z"
+    },
+    {
+      "id": "7fc9f57d55a7",
+      "name": "email_327",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_327.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_327.md",
+      "addedAt": "2026-05-26T20:58:50.087Z"
+    },
+    {
+      "id": "602b3e3cc7ac",
+      "name": "email_328",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_328.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_328.md",
+      "addedAt": "2026-05-26T20:58:50.094Z"
+    },
+    {
+      "id": "72a8a8dd3bb1",
+      "name": "email_329",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_329.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_329.md",
+      "addedAt": "2026-05-26T20:58:50.104Z"
+    },
+    {
+      "id": "76a6ea00846c",
+      "name": "email_330",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_330.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_330.md",
+      "addedAt": "2026-05-26T20:58:50.111Z"
+    },
+    {
+      "id": "38e3519d3b13",
+      "name": "email_331",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_331.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_331.md",
+      "addedAt": "2026-05-26T20:58:50.120Z"
+    },
+    {
+      "id": "0ed7d28a50c1",
+      "name": "email_332",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_332.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_332.md",
+      "addedAt": "2026-05-26T20:58:50.128Z"
+    },
+    {
+      "id": "36185dde8e9d",
+      "name": "email_333",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_333.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_333.md",
+      "addedAt": "2026-05-26T20:58:50.137Z"
+    },
+    {
+      "id": "992451407869",
+      "name": "email_334",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_334.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_334.md",
+      "addedAt": "2026-05-26T20:58:50.194Z"
+    },
+    {
+      "id": "dcad9be35f32",
+      "name": "email_335",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_335.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_335.md",
+      "addedAt": "2026-05-26T20:58:50.213Z"
+    },
+    {
+      "id": "a37b961f9474",
+      "name": "email_336",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_336.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_336.md",
+      "addedAt": "2026-05-26T20:58:50.225Z"
+    },
+    {
+      "id": "f9913dcbc56e",
+      "name": "email_337",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_337.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_337.md",
+      "addedAt": "2026-05-26T20:58:50.235Z"
+    },
+    {
+      "id": "d4615904ab6f",
+      "name": "email_338",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_338.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_338.md",
+      "addedAt": "2026-05-26T20:58:50.244Z"
+    },
+    {
+      "id": "ce64df31acb4",
+      "name": "email_339",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_339.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_339.md",
+      "addedAt": "2026-05-26T20:58:50.255Z"
+    },
+    {
+      "id": "cf2ef5d1428d",
+      "name": "email_340",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_340.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_340.md",
+      "addedAt": "2026-05-26T20:58:50.264Z"
+    },
+    {
+      "id": "8a59f062469f",
+      "name": "email_341",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_341.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_341.md",
+      "addedAt": "2026-05-26T20:58:50.277Z"
+    },
+    {
+      "id": "5dd82db72db8",
+      "name": "email_342",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_342.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_342.md",
+      "addedAt": "2026-05-26T20:58:50.288Z"
+    },
+    {
+      "id": "4ce7a21d3247",
+      "name": "email_343",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_343.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_343.md",
+      "addedAt": "2026-05-26T20:58:50.296Z"
+    },
+    {
+      "id": "2574992bbc31",
+      "name": "email_344",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_344.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_344.md",
+      "addedAt": "2026-05-26T20:58:50.306Z"
+    },
+    {
+      "id": "a9c315a60531",
+      "name": "email_345",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_345.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_345.md",
+      "addedAt": "2026-05-26T20:58:50.315Z"
+    },
+    {
+      "id": "62465dd3f7f7",
+      "name": "email_346",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_346.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_346.md",
+      "addedAt": "2026-05-26T20:58:50.324Z"
+    },
+    {
+      "id": "13d35e5f56b9",
+      "name": "email_347",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_347.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_347.md",
+      "addedAt": "2026-05-26T20:58:50.335Z"
+    },
+    {
+      "id": "a4b88c3d4631",
+      "name": "email_348",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_348.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_348.md",
+      "addedAt": "2026-05-26T20:58:50.344Z"
+    },
+    {
+      "id": "de799095ca77",
+      "name": "email_349",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_349.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_349.md",
+      "addedAt": "2026-05-26T20:58:50.355Z"
+    },
+    {
+      "id": "77c3698c96b2",
+      "name": "email_350",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_350.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_350.md",
+      "addedAt": "2026-05-26T20:58:50.364Z"
+    },
+    {
+      "id": "779bf294214a",
+      "name": "email_351",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_351.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_351.md",
+      "addedAt": "2026-05-26T20:58:50.373Z"
+    },
+    {
+      "id": "d97ab51c0803",
+      "name": "email_352",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_352.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_352.md",
+      "addedAt": "2026-05-26T20:58:50.382Z"
+    },
+    {
+      "id": "283fc0e96b64",
+      "name": "email_353",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_353.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_353.md",
+      "addedAt": "2026-05-26T20:58:50.391Z"
+    },
+    {
+      "id": "4ee6f767a861",
+      "name": "email_354",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_354.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_354.md",
+      "addedAt": "2026-05-26T20:58:50.399Z"
+    },
+    {
+      "id": "c7bc994ae492",
+      "name": "email_355",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_355.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_355.md",
+      "addedAt": "2026-05-26T20:58:50.407Z"
+    },
+    {
+      "id": "5c2c0a472e0f",
+      "name": "email_356",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_356.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_356.md",
+      "addedAt": "2026-05-26T20:58:50.415Z"
+    },
+    {
+      "id": "117b6b736905",
+      "name": "email_357",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_357.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_357.md",
+      "addedAt": "2026-05-26T20:58:50.423Z"
+    },
+    {
+      "id": "a437fc12f879",
+      "name": "email_358",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_358.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_358.md",
+      "addedAt": "2026-05-26T20:58:50.432Z"
+    },
+    {
+      "id": "ff4eb3db6c77",
+      "name": "email_359",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_359.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_359.md",
+      "addedAt": "2026-05-26T20:58:50.439Z"
+    },
+    {
+      "id": "788f9101100e",
+      "name": "email_360",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_360.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_360.md",
+      "addedAt": "2026-05-26T20:58:50.450Z"
+    },
+    {
+      "id": "d1026bf73fcb",
+      "name": "email_361",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_361.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_361.md",
+      "addedAt": "2026-05-26T20:58:50.458Z"
+    },
+    {
+      "id": "6c3a7acb18f4",
+      "name": "email_362",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_362.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_362.md",
+      "addedAt": "2026-05-26T20:58:50.466Z"
+    },
+    {
+      "id": "d1ed28ccfa7a",
+      "name": "email_363",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_363.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_363.md",
+      "addedAt": "2026-05-26T20:58:50.474Z"
+    },
+    {
+      "id": "799445462b48",
+      "name": "email_364",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_364.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_364.md",
+      "addedAt": "2026-05-26T20:58:50.482Z"
+    },
+    {
+      "id": "8d5218a6bcf3",
+      "name": "email_365",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_365.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_365.md",
+      "addedAt": "2026-05-26T20:58:50.490Z"
+    },
+    {
+      "id": "b5d37ecc126d",
+      "name": "email_366",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_366.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_366.md",
+      "addedAt": "2026-05-26T20:58:50.498Z"
+    },
+    {
+      "id": "9744d18261f0",
+      "name": "email_367",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_367.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_367.md",
+      "addedAt": "2026-05-26T20:58:50.506Z"
+    },
+    {
+      "id": "e6f56ca85ba4",
+      "name": "email_368",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_368.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_368.md",
+      "addedAt": "2026-05-26T20:58:50.515Z"
+    },
+    {
+      "id": "172b095e6d86",
+      "name": "email_369",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_369.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_369.md",
+      "addedAt": "2026-05-26T20:58:50.523Z"
+    },
+    {
+      "id": "9481994dfcb1",
+      "name": "email_370",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_370.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_370.md",
+      "addedAt": "2026-05-26T20:58:50.531Z"
+    },
+    {
+      "id": "89490eda62b5",
+      "name": "email_371",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_371.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_371.md",
+      "addedAt": "2026-05-26T20:58:50.539Z"
+    },
+    {
+      "id": "9b58d2affdcd",
+      "name": "email_372",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_372.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_372.md",
+      "addedAt": "2026-05-26T20:58:50.548Z"
+    },
+    {
+      "id": "b180c01ebf37",
+      "name": "email_373",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_373.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_373.md",
+      "addedAt": "2026-05-26T20:58:50.556Z"
+    },
+    {
+      "id": "ec64ef2708a2",
+      "name": "email_374",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_374.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_374.md",
+      "addedAt": "2026-05-26T20:58:50.565Z"
+    },
+    {
+      "id": "fed20a541efd",
+      "name": "email_375",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_375.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_375.md",
+      "addedAt": "2026-05-26T20:58:50.573Z"
+    },
+    {
+      "id": "3ccd78318037",
+      "name": "email_376",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_376.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_376.md",
+      "addedAt": "2026-05-26T20:58:50.582Z"
+    },
+    {
+      "id": "089378a62e6d",
+      "name": "email_377",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_377.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_377.md",
+      "addedAt": "2026-05-26T20:58:50.590Z"
+    },
+    {
+      "id": "2758ee8a24e6",
+      "name": "email_378",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_378.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_378.md",
+      "addedAt": "2026-05-26T20:58:50.599Z"
+    },
+    {
+      "id": "65aeaa7bf156",
+      "name": "email_379",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_379.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_379.md",
+      "addedAt": "2026-05-26T20:58:50.608Z"
+    },
+    {
+      "id": "105fcd1f78d7",
+      "name": "email_380",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_380.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_380.md",
+      "addedAt": "2026-05-26T20:58:50.616Z"
+    },
+    {
+      "id": "8c17de4e45e8",
+      "name": "email_381",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_381.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_381.md",
+      "addedAt": "2026-05-26T20:58:50.625Z"
+    },
+    {
+      "id": "5ea648e356ad",
+      "name": "email_382",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_382.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_382.md",
+      "addedAt": "2026-05-26T20:58:50.635Z"
+    },
+    {
+      "id": "eb5f3c4f80f0",
+      "name": "email_383",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_383.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_383.md",
+      "addedAt": "2026-05-26T20:58:50.643Z"
+    },
+    {
+      "id": "9a17cb49f0fa",
+      "name": "email_384",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_384.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_384.md",
+      "addedAt": "2026-05-26T20:58:50.653Z"
+    },
+    {
+      "id": "9840577ff7b6",
+      "name": "email_385",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_385.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_385.md",
+      "addedAt": "2026-05-26T20:58:50.661Z"
+    },
+    {
+      "id": "0d359b50991a",
+      "name": "email_386",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_386.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_386.md",
+      "addedAt": "2026-05-26T20:58:50.670Z"
+    },
+    {
+      "id": "8311744d9794",
+      "name": "email_387",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_387.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_387.md",
+      "addedAt": "2026-05-26T20:58:50.684Z"
+    },
+    {
+      "id": "100a7f53143b",
+      "name": "email_388",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_388.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_388.md",
+      "addedAt": "2026-05-26T20:58:50.694Z"
+    },
+    {
+      "id": "8bc1892cfe68",
+      "name": "email_389",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_389.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_389.md",
+      "addedAt": "2026-05-26T20:58:50.707Z"
+    },
+    {
+      "id": "b05f287f592d",
+      "name": "email_390",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_390.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_390.md",
+      "addedAt": "2026-05-26T20:58:50.716Z"
+    },
+    {
+      "id": "59a57c85be36",
+      "name": "email_391",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_391.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_391.md",
+      "addedAt": "2026-05-26T20:58:50.724Z"
+    },
+    {
+      "id": "4ce620831e06",
+      "name": "email_392",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_392.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_392.md",
+      "addedAt": "2026-05-26T20:58:50.732Z"
+    },
+    {
+      "id": "a65509604f33",
+      "name": "email_393",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_393.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_393.md",
+      "addedAt": "2026-05-26T20:58:50.740Z"
+    },
+    {
+      "id": "35a37346c79a",
+      "name": "email_394",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_394.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_394.md",
+      "addedAt": "2026-05-26T20:58:50.748Z"
+    },
+    {
+      "id": "4f7f63dbd5d5",
+      "name": "email_395",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_395.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_395.md",
+      "addedAt": "2026-05-26T20:58:50.756Z"
+    },
+    {
+      "id": "1c36d855d65e",
+      "name": "email_396",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_396.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_396.md",
+      "addedAt": "2026-05-26T20:58:50.765Z"
+    },
+    {
+      "id": "2c6ccf5abb06",
+      "name": "email_397",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_397.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_397.md",
+      "addedAt": "2026-05-26T20:58:50.773Z"
+    },
+    {
+      "id": "639b4f117d1d",
+      "name": "email_398",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_398.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_398.md",
+      "addedAt": "2026-05-26T20:58:50.781Z"
+    },
+    {
+      "id": "dfc2f9b7da6e",
+      "name": "email_399",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_399.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_399.md",
+      "addedAt": "2026-05-26T20:58:50.789Z"
+    },
+    {
+      "id": "7b7774c4b905",
+      "name": "email_400",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_400.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_400.md",
+      "addedAt": "2026-05-26T20:58:50.798Z"
+    },
+    {
+      "id": "5e1270a2d448",
+      "name": "email_401",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_401.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_401.md",
+      "addedAt": "2026-05-26T20:58:50.806Z"
+    },
+    {
+      "id": "e8335e94c6d9",
+      "name": "email_402",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_402.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_402.md",
+      "addedAt": "2026-05-26T20:58:50.815Z"
+    },
+    {
+      "id": "9363762449f3",
+      "name": "email_403",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_403.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_403.md",
+      "addedAt": "2026-05-26T20:58:50.823Z"
+    },
+    {
+      "id": "416a28bd47e8",
+      "name": "email_404",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_404.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_404.md",
+      "addedAt": "2026-05-26T20:58:50.831Z"
+    },
+    {
+      "id": "3ba87c5bc10a",
+      "name": "email_405",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_405.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_405.md",
+      "addedAt": "2026-05-26T20:58:50.840Z"
+    },
+    {
+      "id": "e260362a5d7e",
+      "name": "email_406",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_406.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_406.md",
+      "addedAt": "2026-05-26T20:58:50.849Z"
+    },
+    {
+      "id": "65e90b861136",
+      "name": "email_407",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_407.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_407.md",
+      "addedAt": "2026-05-26T20:58:50.858Z"
+    },
+    {
+      "id": "19eab0bf49d8",
+      "name": "email_408",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_408.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_408.md",
+      "addedAt": "2026-05-26T20:58:50.867Z"
+    },
+    {
+      "id": "f9fc6667c2e6",
+      "name": "email_409",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_409.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_409.md",
+      "addedAt": "2026-05-26T20:58:50.876Z"
+    },
+    {
+      "id": "f23db23a63d1",
+      "name": "email_410",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_410.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_410.md",
+      "addedAt": "2026-05-26T20:58:50.885Z"
+    },
+    {
+      "id": "852d2beb3b79",
+      "name": "email_411",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_411.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_411.md",
+      "addedAt": "2026-05-26T20:58:50.894Z"
+    },
+    {
+      "id": "bcc2b6fa019e",
+      "name": "email_412",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_412.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_412.md",
+      "addedAt": "2026-05-26T20:58:50.904Z"
+    },
+    {
+      "id": "4cd5ec388597",
+      "name": "email_413",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_413.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_413.md",
+      "addedAt": "2026-05-26T20:58:50.913Z"
+    },
+    {
+      "id": "1a9df7ad9919",
+      "name": "email_414",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_414.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_414.md",
+      "addedAt": "2026-05-26T20:58:50.968Z"
+    },
+    {
+      "id": "89591b8eaf5f",
+      "name": "email_415",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_415.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_415.md",
+      "addedAt": "2026-05-26T20:58:50.989Z"
+    },
+    {
+      "id": "c0f07581a5b6",
+      "name": "email_416",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_416.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_416.md",
+      "addedAt": "2026-05-26T20:58:51.002Z"
+    },
+    {
+      "id": "501f7c13e6fe",
+      "name": "email_417",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_417.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_417.md",
+      "addedAt": "2026-05-26T20:58:51.016Z"
+    },
+    {
+      "id": "1f182d73a579",
+      "name": "email_418",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_418.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_418.md",
+      "addedAt": "2026-05-26T20:58:51.026Z"
+    },
+    {
+      "id": "c0ed34689ce5",
+      "name": "email_419",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_419.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_419.md",
+      "addedAt": "2026-05-26T20:58:51.039Z"
+    },
+    {
+      "id": "3cb2ecfdca2c",
+      "name": "email_420",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_420.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_420.md",
+      "addedAt": "2026-05-26T20:58:51.049Z"
+    },
+    {
+      "id": "e8f5f85b06f0",
+      "name": "email_421",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_421.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_421.md",
+      "addedAt": "2026-05-26T20:58:51.059Z"
+    },
+    {
+      "id": "817c3c803688",
+      "name": "email_422",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_422.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_422.md",
+      "addedAt": "2026-05-26T20:58:51.070Z"
+    },
+    {
+      "id": "84aebe1d14f6",
+      "name": "email_423",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_423.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_423.md",
+      "addedAt": "2026-05-26T20:58:51.081Z"
+    },
+    {
+      "id": "4703e8b2ce77",
+      "name": "email_424",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_424.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_424.md",
+      "addedAt": "2026-05-26T20:58:51.091Z"
+    },
+    {
+      "id": "b19a3c63290b",
+      "name": "email_425",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_425.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_425.md",
+      "addedAt": "2026-05-26T20:58:51.102Z"
+    },
+    {
+      "id": "c9e5807d6595",
+      "name": "email_426",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_426.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_426.md",
+      "addedAt": "2026-05-26T20:58:51.112Z"
+    },
+    {
+      "id": "c4ca8f7c39a8",
+      "name": "email_427",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_427.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_427.md",
+      "addedAt": "2026-05-26T20:58:51.122Z"
+    },
+    {
+      "id": "c2f42519dc03",
+      "name": "email_428",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_428.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_428.md",
+      "addedAt": "2026-05-26T20:58:51.132Z"
+    },
+    {
+      "id": "6df1a1150be0",
+      "name": "email_429",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_429.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_429.md",
+      "addedAt": "2026-05-26T20:58:51.142Z"
+    },
+    {
+      "id": "307820403942",
+      "name": "email_430",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_430.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_430.md",
+      "addedAt": "2026-05-26T20:58:51.155Z"
+    },
+    {
+      "id": "d7ffda96a9d6",
+      "name": "email_431",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_431.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_431.md",
+      "addedAt": "2026-05-26T20:58:51.166Z"
+    },
+    {
+      "id": "ee2e6f6a41f3",
+      "name": "email_432",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_432.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_432.md",
+      "addedAt": "2026-05-26T20:58:51.176Z"
+    },
+    {
+      "id": "bc9fdcf98bc5",
+      "name": "email_433",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_433.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_433.md",
+      "addedAt": "2026-05-26T20:58:51.189Z"
+    },
+    {
+      "id": "61646e8796c7",
+      "name": "email_434",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_434.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_434.md",
+      "addedAt": "2026-05-26T20:58:51.200Z"
+    },
+    {
+      "id": "ddbfb1ec7d7c",
+      "name": "email_435",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_435.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_435.md",
+      "addedAt": "2026-05-26T20:58:51.210Z"
+    },
+    {
+      "id": "11501dd1aec7",
+      "name": "email_436",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_436.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_436.md",
+      "addedAt": "2026-05-26T20:58:51.223Z"
+    },
+    {
+      "id": "059968efa5d0",
+      "name": "email_437",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_437.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_437.md",
+      "addedAt": "2026-05-26T20:58:51.233Z"
+    },
+    {
+      "id": "72c43ef4db42",
+      "name": "email_438",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_438.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_438.md",
+      "addedAt": "2026-05-26T20:58:51.243Z"
+    },
+    {
+      "id": "b521ce3a6c02",
+      "name": "email_439",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_439.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_439.md",
+      "addedAt": "2026-05-26T20:58:51.256Z"
+    },
+    {
+      "id": "a5191230adc1",
+      "name": "email_440",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_440.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_440.md",
+      "addedAt": "2026-05-26T20:58:51.266Z"
+    },
+    {
+      "id": "346e26be9fe0",
+      "name": "email_441",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_441.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_441.md",
+      "addedAt": "2026-05-26T20:58:51.275Z"
+    },
+    {
+      "id": "64730f7152ac",
+      "name": "email_442",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_442.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_442.md",
+      "addedAt": "2026-05-26T20:58:51.286Z"
+    },
+    {
+      "id": "2a48ca7fb10e",
+      "name": "email_443",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_443.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_443.md",
+      "addedAt": "2026-05-26T20:58:51.301Z"
+    },
+    {
+      "id": "66602ea4c384",
+      "name": "email_444",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_444.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_444.md",
+      "addedAt": "2026-05-26T20:58:51.309Z"
+    },
+    {
+      "id": "ef87667f59f7",
+      "name": "email_445",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_445.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_445.md",
+      "addedAt": "2026-05-26T20:58:51.320Z"
+    },
+    {
+      "id": "3b9c7a248e8d",
+      "name": "email_446",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_446.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_446.md",
+      "addedAt": "2026-05-26T20:58:51.329Z"
+    },
+    {
+      "id": "eef16f6900bb",
+      "name": "email_447",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_447.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_447.md",
+      "addedAt": "2026-05-26T20:58:51.338Z"
+    },
+    {
+      "id": "e660a20faf83",
+      "name": "email_448",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_448.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_448.md",
+      "addedAt": "2026-05-26T20:58:51.347Z"
+    },
+    {
+      "id": "98867992ce21",
+      "name": "email_449",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_449.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_449.md",
+      "addedAt": "2026-05-26T20:58:51.356Z"
+    },
+    {
+      "id": "020a706f02c5",
+      "name": "email_450",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_450.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_450.md",
+      "addedAt": "2026-05-26T20:58:51.365Z"
+    },
+    {
+      "id": "fc4b53b59f7c",
+      "name": "email_451",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_451.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_451.md",
+      "addedAt": "2026-05-26T20:58:51.374Z"
+    },
+    {
+      "id": "5ff0071fd8ab",
+      "name": "email_452",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_452.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_452.md",
+      "addedAt": "2026-05-26T20:58:51.383Z"
+    },
+    {
+      "id": "b4fc1470d29a",
+      "name": "email_453",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_453.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_453.md",
+      "addedAt": "2026-05-26T20:58:51.392Z"
+    },
+    {
+      "id": "ff9250f15850",
+      "name": "email_454",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_454.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_454.md",
+      "addedAt": "2026-05-26T20:58:51.402Z"
+    },
+    {
+      "id": "259a96e428ad",
+      "name": "email_455",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_455.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_455.md",
+      "addedAt": "2026-05-26T20:58:51.410Z"
+    },
+    {
+      "id": "78fdbfbcdadf",
+      "name": "email_456",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_456.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_456.md",
+      "addedAt": "2026-05-26T20:58:51.422Z"
+    },
+    {
+      "id": "0d8e3638e9a6",
+      "name": "email_457",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_457.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_457.md",
+      "addedAt": "2026-05-26T20:58:51.431Z"
+    },
+    {
+      "id": "06f61521636a",
+      "name": "email_458",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_458.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_458.md",
+      "addedAt": "2026-05-26T20:58:51.441Z"
+    },
+    {
+      "id": "b8c945ae8f6b",
+      "name": "email_459",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_459.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_459.md",
+      "addedAt": "2026-05-26T20:58:51.450Z"
+    },
+    {
+      "id": "293b301728ac",
+      "name": "email_460",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_460.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_460.md",
+      "addedAt": "2026-05-26T20:58:51.460Z"
+    },
+    {
+      "id": "7ae786979716",
+      "name": "email_461",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_461.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_461.md",
+      "addedAt": "2026-05-26T20:58:51.471Z"
+    },
+    {
+      "id": "ee357f7de9a8",
+      "name": "email_462",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_462.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_462.md",
+      "addedAt": "2026-05-26T20:58:51.480Z"
+    },
+    {
+      "id": "938d1cacc10e",
+      "name": "email_463",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_463.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_463.md",
+      "addedAt": "2026-05-26T20:58:51.489Z"
+    },
+    {
+      "id": "35a2e9a1343b",
+      "name": "email_464",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_464.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_464.md",
+      "addedAt": "2026-05-26T20:58:51.498Z"
+    },
+    {
+      "id": "e73c69439ed5",
+      "name": "email_465",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_465.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_465.md",
+      "addedAt": "2026-05-26T20:58:51.507Z"
+    },
+    {
+      "id": "a35eefedcc5c",
+      "name": "email_466",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_466.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_466.md",
+      "addedAt": "2026-05-26T20:58:51.516Z"
+    },
+    {
+      "id": "792a002351c9",
+      "name": "email_467",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_467.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_467.md",
+      "addedAt": "2026-05-26T20:58:51.526Z"
+    },
+    {
+      "id": "9a457fbfe048",
+      "name": "email_468",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_468.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_468.md",
+      "addedAt": "2026-05-26T20:58:51.538Z"
+    },
+    {
+      "id": "c8cf6b64c9a4",
+      "name": "email_469",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_469.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_469.md",
+      "addedAt": "2026-05-26T20:58:51.547Z"
+    },
+    {
+      "id": "df76109ff432",
+      "name": "email_470",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_470.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_470.md",
+      "addedAt": "2026-05-26T20:58:51.556Z"
+    },
+    {
+      "id": "9e81b7550644",
+      "name": "email_471",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_471.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_471.md",
+      "addedAt": "2026-05-26T20:58:51.566Z"
+    },
+    {
+      "id": "506ddd34b985",
+      "name": "email_472",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_472.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_472.md",
+      "addedAt": "2026-05-26T20:58:51.575Z"
+    },
+    {
+      "id": "00ce051aafda",
+      "name": "email_473",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_473.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_473.md",
+      "addedAt": "2026-05-26T20:58:51.585Z"
+    },
+    {
+      "id": "bc045adbfd0c",
+      "name": "email_474",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_474.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_474.md",
+      "addedAt": "2026-05-26T20:58:51.594Z"
+    },
+    {
+      "id": "4cac8c0623a3",
+      "name": "email_475",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_475.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_475.md",
+      "addedAt": "2026-05-26T20:58:51.605Z"
+    },
+    {
+      "id": "12f4ab7bb9e9",
+      "name": "email_476",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_476.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_476.md",
+      "addedAt": "2026-05-26T20:58:51.615Z"
+    },
+    {
+      "id": "53647df84298",
+      "name": "email_477",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_477.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_477.md",
+      "addedAt": "2026-05-26T20:58:51.624Z"
+    },
+    {
+      "id": "9dfc6f4f1292",
+      "name": "email_478",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_478.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_478.md",
+      "addedAt": "2026-05-26T20:58:51.633Z"
+    },
+    {
+      "id": "b995952396d6",
+      "name": "email_479",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_479.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_479.md",
+      "addedAt": "2026-05-26T20:58:51.642Z"
+    },
+    {
+      "id": "ba330fa27d75",
+      "name": "email_480",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_480.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_480.md",
+      "addedAt": "2026-05-26T20:58:51.653Z"
+    },
+    {
+      "id": "78b1a918af98",
+      "name": "email_481",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_481.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_481.md",
+      "addedAt": "2026-05-26T20:58:51.663Z"
+    },
+    {
+      "id": "dbdb4dfe9b8d",
+      "name": "email_482",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_482.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_482.md",
+      "addedAt": "2026-05-26T20:58:51.717Z"
+    },
+    {
+      "id": "2d2fb4537685",
+      "name": "email_483",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_483.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_483.md",
+      "addedAt": "2026-05-26T20:58:51.737Z"
+    },
+    {
+      "id": "72bf39036477",
+      "name": "email_484",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_484.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_484.md",
+      "addedAt": "2026-05-26T20:58:51.750Z"
+    },
+    {
+      "id": "0509200121ff",
+      "name": "email_485",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_485.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_485.md",
+      "addedAt": "2026-05-26T20:58:51.760Z"
+    },
+    {
+      "id": "5c50637adcaf",
+      "name": "email_486",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_486.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_486.md",
+      "addedAt": "2026-05-26T20:58:51.771Z"
+    },
+    {
+      "id": "a5f010198d7b",
+      "name": "email_487",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_487.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_487.md",
+      "addedAt": "2026-05-26T20:58:51.780Z"
+    },
+    {
+      "id": "b6edb3b3f44b",
+      "name": "email_488",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_488.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_488.md",
+      "addedAt": "2026-05-26T20:58:51.789Z"
+    },
+    {
+      "id": "b32248da25ec",
+      "name": "email_489",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_489.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_489.md",
+      "addedAt": "2026-05-26T20:58:51.799Z"
+    },
+    {
+      "id": "6539d5b1d1fb",
+      "name": "email_490",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_490.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_490.md",
+      "addedAt": "2026-05-26T20:58:51.808Z"
+    },
+    {
+      "id": "98b2dac0138a",
+      "name": "email_491",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_491.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_491.md",
+      "addedAt": "2026-05-26T20:58:51.819Z"
+    },
+    {
+      "id": "f4096504155d",
+      "name": "email_492",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_492.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_492.md",
+      "addedAt": "2026-05-26T20:58:51.828Z"
+    },
+    {
+      "id": "37ec59605797",
+      "name": "email_493",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_493.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_493.md",
+      "addedAt": "2026-05-26T20:58:51.838Z"
+    },
+    {
+      "id": "411376b2129e",
+      "name": "email_494",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_494.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_494.md",
+      "addedAt": "2026-05-26T20:58:51.848Z"
+    },
+    {
+      "id": "32d6f2f753d2",
+      "name": "email_495",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_495.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_495.md",
+      "addedAt": "2026-05-26T20:58:51.857Z"
+    },
+    {
+      "id": "aa45b2f89679",
+      "name": "email_496",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_496.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_496.md",
+      "addedAt": "2026-05-26T20:58:51.867Z"
+    },
+    {
+      "id": "54933c56a23b",
+      "name": "email_497",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_497.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_497.md",
+      "addedAt": "2026-05-26T20:58:51.876Z"
+    },
+    {
+      "id": "3e6402b2d850",
+      "name": "email_498",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_498.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_498.md",
+      "addedAt": "2026-05-26T20:58:51.888Z"
+    },
+    {
+      "id": "8c73ed06c730",
+      "name": "email_499",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_499.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_499.md",
+      "addedAt": "2026-05-26T20:58:51.898Z"
+    },
+    {
+      "id": "f78ea08592e9",
+      "name": "email_500",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Emails/email_500.eml",
+      "sourceExt": "eml",
+      "convertedFile": "email_500.md",
+      "addedAt": "2026-05-26T20:58:51.908Z"
+    }
+  ]
+}

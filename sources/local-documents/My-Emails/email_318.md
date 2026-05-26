@@ -1,0 +1,25 @@
+# email_318
+DocID: My-_1779831392843_c8m7eyyjv
+
+## Email Details
+
+**From:** autoshop@a.com
+**To:** supplier@b.com
+**Subject:** Parts Order Request - Oil Filter
+**Date:** Wed, 04 Jun 2025 11:56:58 
+
+## Message Content
+
+Hi Supplier Team,
+
+We need to order the following parts for our shop:
+
+Order ID: ORD-64460
+Part: Oil Filter
+Quantity: 5
+Expected Price: $165
+
+Please confirm availability and delivery timeline.
+
+Best regards,
+Auto Shop Team

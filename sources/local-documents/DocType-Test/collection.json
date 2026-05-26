@@ -1,0 +1,158 @@
+{
+  "name": "DocType-Test",
+  "created": "2026-05-26T20:46:46.099Z",
+  "documents": [
+    {
+      "id": "fe8312440600",
+      "name": "01-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/01-sample.txt",
+      "sourceExt": "txt",
+      "convertedFile": "01-sample.md",
+      "addedAt": "2026-05-26T20:46:46.099Z"
+    },
+    {
+      "id": "eb69aa758985",
+      "name": "03-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/03-sample.json",
+      "sourceExt": "json",
+      "convertedFile": "03-sample.md",
+      "addedAt": "2026-05-26T20:46:46.235Z"
+    },
+    {
+      "id": "9066c14402c0",
+      "name": "04-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/04-sample.yaml",
+      "sourceExt": "yaml",
+      "convertedFile": "04-sample.md",
+      "addedAt": "2026-05-26T20:46:46.258Z"
+    },
+    {
+      "id": "fee5f6502ac2",
+      "name": "05-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/05-sample.xml",
+      "sourceExt": "xml",
+      "convertedFile": "05-sample.md",
+      "addedAt": "2026-05-26T20:46:46.267Z"
+    },
+    {
+      "id": "ed148d88c843",
+      "name": "06-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/06-sample.csv",
+      "sourceExt": "csv",
+      "convertedFile": "06-sample.md",
+      "addedAt": "2026-05-26T20:46:46.272Z"
+    },
+    {
+      "id": "5c518993463b",
+      "name": "07-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/07-sample.tsv",
+      "sourceExt": "tsv",
+      "convertedFile": "07-sample.md",
+      "addedAt": "2026-05-26T20:46:46.283Z"
+    },
+    {
+      "id": "d0c59e9c5b15",
+      "name": "08-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/08-sample.html",
+      "sourceExt": "html",
+      "convertedFile": "08-sample.md",
+      "addedAt": "2026-05-26T20:46:46.289Z"
+    },
+    {
+      "id": "86bf19afbd2b",
+      "name": "09-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/09-sample.py",
+      "sourceExt": "py",
+      "convertedFile": "09-sample.md",
+      "addedAt": "2026-05-26T20:46:46.302Z"
+    },
+    {
+      "id": "d7cfad028a09",
+      "name": "10-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/10-sample.js",
+      "sourceExt": "js",
+      "convertedFile": "10-sample.md",
+      "addedAt": "2026-05-26T20:46:46.309Z"
+    },
+    {
+      "id": "54dcb4f15678",
+      "name": "11-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/11-sample.java",
+      "sourceExt": "java",
+      "convertedFile": "11-sample.md",
+      "addedAt": "2026-05-26T20:46:46.408Z"
+    },
+    {
+      "id": "d990f076c78e",
+      "name": "12-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/12-sample.cpp",
+      "sourceExt": "cpp",
+      "convertedFile": "12-sample.md",
+      "addedAt": "2026-05-26T20:46:46.417Z"
+    },
+    {
+      "id": "c63e0eae881b",
+      "name": "13-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/13-sample.c",
+      "sourceExt": "c",
+      "convertedFile": "13-sample.md",
+      "addedAt": "2026-05-26T20:46:46.423Z"
+    },
+    {
+      "id": "c9f2ee86f036",
+      "name": "14-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/14-sample.h",
+      "sourceExt": "h",
+      "convertedFile": "14-sample.md",
+      "addedAt": "2026-05-26T20:46:46.433Z"
+    },
+    {
+      "id": "1ab83892547a",
+      "name": "15-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/15-sample.css",
+      "sourceExt": "css",
+      "convertedFile": "15-sample.md",
+      "addedAt": "2026-05-26T20:46:46.439Z"
+    },
+    {
+      "id": "6fe3dd82dbc7",
+      "name": "16-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/16-sample.sql",
+      "sourceExt": "sql",
+      "convertedFile": "16-sample.md",
+      "addedAt": "2026-05-26T20:46:46.445Z"
+    },
+    {
+      "id": "47be8d06fb9d",
+      "name": "18-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/18-sample.eml",
+      "sourceExt": "eml",
+      "convertedFile": "18-sample.md",
+      "addedAt": "2026-05-26T20:46:46.451Z"
+    },
+    {
+      "id": "0c68d65f9db4",
+      "name": "19-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/19-sample.tex",
+      "sourceExt": "tex",
+      "convertedFile": "19-sample.md",
+      "addedAt": "2026-05-26T20:46:46.456Z"
+    },
+    {
+      "id": "4d103b34b011",
+      "name": "20-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/20-sample.yml",
+      "sourceExt": "yml",
+      "convertedFile": "20-sample.md",
+      "addedAt": "2026-05-26T20:46:46.465Z"
+    },
+    {
+      "id": "61727e766e4b",
+      "name": "21-sample",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/DocType-Test/21-sample.htm",
+      "sourceExt": "htm",
+      "convertedFile": "21-sample.md",
+      "addedAt": "2026-05-26T20:46:46.471Z"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# email_352
+DocID: My-_1779831609502_2u1fnub95
+
+## Email Details
+
+**From:** autoshop@a.com
+**To:** supplier@b.com
+**Subject:** Parts Order Request - Brake Rotors
+**Date:** Sat, 26 Jul 2025 11:56:58 
+
+## Message Content
+
+Hi Supplier Team,
+
+We need to order the following parts for our shop:
+
+Order ID: ORD-88106
+Part: Brake Rotors
+Quantity: 8
+Expected Price: $232
+
+Please confirm availability and delivery timeline.
+
+Best regards,
+Auto Shop Team

@@ -1,0 +1,22 @@
+# email_446
+DocID: My-_1779832264173_ni5igj86u
+
+## Email Details
+
+**From:** mike.davis@email.com
+**To:** autoshop@a.com
+**Subject:** Question about 2018 Ford F-150 service
+**Date:** Sun, 05 Jan 2025 11:56:58 
+
+## Message Content
+
+Hi Auto Shop,
+
+I have a question about my recent service appointment for my 2018 Ford F-150.
+
+When will my car be ready?
+
+Job reference: JOB-7682
+
+Thanks,
+Mike Davis

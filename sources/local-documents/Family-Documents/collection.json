@@ -1,0 +1,94 @@
+{
+  "name": "Family-Documents",
+  "created": "2026-05-26T20:39:37.236Z",
+  "documents": [
+    {
+      "id": "101031ef0666",
+      "name": "Auto_Insurance_Policy",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Auto_Insurance_Policy.md",
+      "sourceExt": "md",
+      "convertedFile": "Auto_Insurance_Policy.md",
+      "addedAt": "2026-05-26T20:39:37.236Z"
+    },
+    {
+      "id": "68544e03aad8",
+      "name": "Bank_Statements_2025",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Bank_Statements_2025.md",
+      "sourceExt": "md",
+      "convertedFile": "Bank_Statements_2025.md",
+      "addedAt": "2026-05-26T20:39:37.359Z"
+    },
+    {
+      "id": "5d4d55ae02ac",
+      "name": "Financial_Power_of_Attorney",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Financial_Power_of_Attorney.md",
+      "sourceExt": "md",
+      "convertedFile": "Financial_Power_of_Attorney.md",
+      "addedAt": "2026-05-26T20:39:37.377Z"
+    },
+    {
+      "id": "15a641123d53",
+      "name": "Health_Insurance_Policy",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Health_Insurance_Policy.md",
+      "sourceExt": "md",
+      "convertedFile": "Health_Insurance_Policy.md",
+      "addedAt": "2026-05-26T20:39:37.386Z"
+    },
+    {
+      "id": "3870a480ba74",
+      "name": "HOA_Agreement",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/HOA_Agreement.md",
+      "sourceExt": "md",
+      "convertedFile": "HOA_Agreement.md",
+      "addedAt": "2026-05-26T20:39:37.398Z"
+    },
+    {
+      "id": "e97a7839e170",
+      "name": "Investment_Account_Statements",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Investment_Account_Statements.md",
+      "sourceExt": "md",
+      "convertedFile": "Investment_Account_Statements.md",
+      "addedAt": "2026-05-26T20:39:37.405Z"
+    },
+    {
+      "id": "c875df2e0f1b",
+      "name": "Life_Insurance_Policy",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Life_Insurance_Policy.md",
+      "sourceExt": "md",
+      "convertedFile": "Life_Insurance_Policy.md",
+      "addedAt": "2026-05-26T20:39:37.415Z"
+    },
+    {
+      "id": "48f49a6d1513",
+      "name": "Medical_Records_Summary",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Medical_Records_Summary.md",
+      "sourceExt": "md",
+      "convertedFile": "Medical_Records_Summary.md",
+      "addedAt": "2026-05-26T20:39:37.421Z"
+    },
+    {
+      "id": "0ef03254cf10",
+      "name": "Property_Deed",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Property_Deed.md",
+      "sourceExt": "md",
+      "convertedFile": "Property_Deed.md",
+      "addedAt": "2026-05-26T20:39:37.431Z"
+    },
+    {
+      "id": "2ce558ecff98",
+      "name": "Property_Insurance_Policy",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Property_Insurance_Policy.md",
+      "sourceExt": "md",
+      "convertedFile": "Property_Insurance_Policy.md",
+      "addedAt": "2026-05-26T20:39:37.438Z"
+    },
+    {
+      "id": "dcd82cf1591b",
+      "name": "Will_Dubie_Duk",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Family-Documents/Will_Dubie_Duk.md",
+      "sourceExt": "md",
+      "convertedFile": "Will_Dubie_Duk.md",
+      "addedAt": "2026-05-26T20:39:37.448Z"
+    }
+  ]
+}
