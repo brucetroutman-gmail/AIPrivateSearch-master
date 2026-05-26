@@ -1,22 +1,173 @@
 # Disciplinary_Actions_Log
 DocID: Hum_1762472767280_9ycjw8iq3
 
-| Action_ID | Date | Employee_ID | Name | Action_Type | Rule_Violated | Description | Manager | Follow_Up_Date | Status |
-|---|---|---|---|---|---|---|---|---|---|
-| DISC-2025-001 | 2025-01-20 | 033 | Brian Lopez | Verbal Warning | Attendance | Late arrival 3 times in 2 weeks | Mark Thompson | 2025-02-20 | Closed |
-| DISC-2025-002 | 2025-02-15 | 041 | Jacob Carter | Written Warning | Safety | Failed to conduct pre-trip inspection | Daniel White | 2025-03-15 | Closed |
-| DISC-2025-003 | 2025-03-10 | 019 | Joseph Anderson | Verbal Warning | Vehicle Care | Truck returned dirty - interior trash | Steven Taylor | 2025-04-10 | Closed |
-| DISC-2025-004 | 2025-03-28 | 046 | Stephen Phillips | Written Warning | HOS Compliance | Multiple HOS violations in 30 days | Brian Anderson | 2025-04-28 | Closed |
-| DISC-2025-005 | 2025-04-15 | 024 | Anthony Lewis | Verbal Warning | Communication | Failed to respond to dispatch calls | Mark Thompson | 2025-05-15 | Closed |
-| DISC-2025-006 | 2025-05-02 | 037 | Timothy Adams | Written Warning | Safety | Preventable accident - backing | Brian Anderson | 2025-06-02 | Closed |
-| DISC-2025-007 | 2025-05-25 | 029 | Andrew Young | Verbal Warning | Attendance | No-call no-show | Steven Taylor | 2025-06-25 | Closed |
-| DISC-2025-008 | 2025-06-18 | 042 | Gary Mitchell | Written Warning | Vehicle Care | Excessive fuel consumption - route deviation | Mark Thompson | 2025-07-18 | Closed |
-| DISC-2025-009 | 2025-07-08 | 035 | Edward Scott | Suspension | Safety | Second preventable accident in 6 months | Mark Thompson | 2025-08-08 | Closed |
-| DISC-2025-010 | 2025-07-30 | 048 | Justin Parker | Verbal Warning | Communication | Unprofessional conduct with customer | Steven Taylor | 2025-08-30 | Closed |
-| DISC-2025-011 | 2025-08-22 | 031 | Kenneth King | Written Warning | HOS Compliance | Driving over 11-hour limit | Daniel White | 2025-09-22 | Closed |
-| DISC-2025-012 | 2025-09-15 | 044 | Eric Roberts | Verbal Warning | Attendance | Pattern of tardiness | Mark Thompson | 2025-10-15 | Closed |
-| DISC-2025-013 | 2025-10-05 | 039 | Jeffrey Gonzalez | Written Warning | Safety | Failed to secure load properly | Steven Taylor | 2025-11-05 | Closed |
-| DISC-2025-014 | 2025-10-28 | 026 | Donald Walker | Verbal Warning | Vehicle Care | Truck maintenance issues not reported | Brian Anderson | 2025-11-28 | Closed |
-| DISC-2025-015 | 2025-11-12 | 043 | Nicholas Perez | Written Warning | Communication | Inappropriate language on radio | Mark Thompson | 2025-12-12 | Open |
-| DISC-2025-016 | 2025-12-03 | 047 | Larry Campbell | Verbal Warning | Attendance | Excessive personal time requests | Brian Anderson | 2026-01-03 | Open |
-| DISC-2025-017 | 2025-12-18 | 050 | Brandon Edwards | Written Warning | Safety | Speed violation caught on camera | Daniel White | 2026-01-18 | Open |
+**0 / Action_ID**: DISC-2025-001
+**0 / Date**: 2025-01-20
+**0 / Employee_ID**: 033
+**0 / Name**: Brian Lopez
+**0 / Action_Type**: Verbal Warning
+**0 / Rule_Violated**: Attendance
+**0 / Description**: Late arrival 3 times in 2 weeks
+**0 / Manager**: Mark Thompson
+**0 / Follow_Up_Date**: 2025-02-20
+**0 / Status**: Closed
+**1 / Action_ID**: DISC-2025-002
+**1 / Date**: 2025-02-15
+**1 / Employee_ID**: 041
+**1 / Name**: Jacob Carter
+**1 / Action_Type**: Written Warning
+**1 / Rule_Violated**: Safety
+**1 / Description**: Failed to conduct pre-trip inspection
+**1 / Manager**: Daniel White
+**1 / Follow_Up_Date**: 2025-03-15
+**1 / Status**: Closed
+**2 / Action_ID**: DISC-2025-003
+**2 / Date**: 2025-03-10
+**2 / Employee_ID**: 019
+**2 / Name**: Joseph Anderson
+**2 / Action_Type**: Verbal Warning
+**2 / Rule_Violated**: Vehicle Care
+**2 / Description**: Truck returned dirty - interior trash
+**2 / Manager**: Steven Taylor
+**2 / Follow_Up_Date**: 2025-04-10
+**2 / Status**: Closed
+**3 / Action_ID**: DISC-2025-004
+**3 / Date**: 2025-03-28
+**3 / Employee_ID**: 046
+**3 / Name**: Stephen Phillips
+**3 / Action_Type**: Written Warning
+**3 / Rule_Violated**: HOS Compliance
+**3 / Description**: Multiple HOS violations in 30 days
+**3 / Manager**: Brian Anderson
+**3 / Follow_Up_Date**: 2025-04-28
+**3 / Status**: Closed
+**4 / Action_ID**: DISC-2025-005
+**4 / Date**: 2025-04-15
+**4 / Employee_ID**: 024
+**4 / Name**: Anthony Lewis
+**4 / Action_Type**: Verbal Warning
+**4 / Rule_Violated**: Communication
+**4 / Description**: Failed to respond to dispatch calls
+**4 / Manager**: Mark Thompson
+**4 / Follow_Up_Date**: 2025-05-15
+**4 / Status**: Closed
+**5 / Action_ID**: DISC-2025-006
+**5 / Date**: 2025-05-02
+**5 / Employee_ID**: 037
+**5 / Name**: Timothy Adams
+**5 / Action_Type**: Written Warning
+**5 / Rule_Violated**: Safety
+**5 / Description**: Preventable accident - backing
+**5 / Manager**: Brian Anderson
+**5 / Follow_Up_Date**: 2025-06-02
+**5 / Status**: Closed
+**6 / Action_ID**: DISC-2025-007
+**6 / Date**: 2025-05-25
+**6 / Employee_ID**: 029
+**6 / Name**: Andrew Young
+**6 / Action_Type**: Verbal Warning
+**6 / Rule_Violated**: Attendance
+**6 / Description**: No-call no-show
+**6 / Manager**: Steven Taylor
+**6 / Follow_Up_Date**: 2025-06-25
+**6 / Status**: Closed
+**7 / Action_ID**: DISC-2025-008
+**7 / Date**: 2025-06-18
+**7 / Employee_ID**: 042
+**7 / Name**: Gary Mitchell
+**7 / Action_Type**: Written Warning
+**7 / Rule_Violated**: Vehicle Care
+**7 / Description**: Excessive fuel consumption - route deviation
+**7 / Manager**: Mark Thompson
+**7 / Follow_Up_Date**: 2025-07-18
+**7 / Status**: Closed
+**8 / Action_ID**: DISC-2025-009
+**8 / Date**: 2025-07-08
+**8 / Employee_ID**: 035
+**8 / Name**: Edward Scott
+**8 / Action_Type**: Suspension
+**8 / Rule_Violated**: Safety
+**8 / Description**: Second preventable accident in 6 months
+**8 / Manager**: Mark Thompson
+**8 / Follow_Up_Date**: 2025-08-08
+**8 / Status**: Closed
+**9 / Action_ID**: DISC-2025-010
+**9 / Date**: 2025-07-30
+**9 / Employee_ID**: 048
+**9 / Name**: Justin Parker
+**9 / Action_Type**: Verbal Warning
+**9 / Rule_Violated**: Communication
+**9 / Description**: Unprofessional conduct with customer
+**9 / Manager**: Steven Taylor
+**9 / Follow_Up_Date**: 2025-08-30
+**9 / Status**: Closed
+**10 / Action_ID**: DISC-2025-011
+**10 / Date**: 2025-08-22
+**10 / Employee_ID**: 031
+**10 / Name**: Kenneth King
+**10 / Action_Type**: Written Warning
+**10 / Rule_Violated**: HOS Compliance
+**10 / Description**: Driving over 11-hour limit
+**10 / Manager**: Daniel White
+**10 / Follow_Up_Date**: 2025-09-22
+**10 / Status**: Closed
+**11 / Action_ID**: DISC-2025-012
+**11 / Date**: 2025-09-15
+**11 / Employee_ID**: 044
+**11 / Name**: Eric Roberts
+**11 / Action_Type**: Verbal Warning
+**11 / Rule_Violated**: Attendance
+**11 / Description**: Pattern of tardiness
+**11 / Manager**: Mark Thompson
+**11 / Follow_Up_Date**: 2025-10-15
+**11 / Status**: Closed
+**12 / Action_ID**: DISC-2025-013
+**12 / Date**: 2025-10-05
+**12 / Employee_ID**: 039
+**12 / Name**: Jeffrey Gonzalez
+**12 / Action_Type**: Written Warning
+**12 / Rule_Violated**: Safety
+**12 / Description**: Failed to secure load properly
+**12 / Manager**: Steven Taylor
+**12 / Follow_Up_Date**: 2025-11-05
+**12 / Status**: Closed
+**13 / Action_ID**: DISC-2025-014
+**13 / Date**: 2025-10-28
+**13 / Employee_ID**: 026
+**13 / Name**: Donald Walker
+**13 / Action_Type**: Verbal Warning
+**13 / Rule_Violated**: Vehicle Care
+**13 / Description**: Truck maintenance issues not reported
+**13 / Manager**: Brian Anderson
+**13 / Follow_Up_Date**: 2025-11-28
+**13 / Status**: Closed
+**14 / Action_ID**: DISC-2025-015
+**14 / Date**: 2025-11-12
+**14 / Employee_ID**: 043
+**14 / Name**: Nicholas Perez
+**14 / Action_Type**: Written Warning
+**14 / Rule_Violated**: Communication
+**14 / Description**: Inappropriate language on radio
+**14 / Manager**: Mark Thompson
+**14 / Follow_Up_Date**: 2025-12-12
+**14 / Status**: Open
+**15 / Action_ID**: DISC-2025-016
+**15 / Date**: 2025-12-03
+**15 / Employee_ID**: 047
+**15 / Name**: Larry Campbell
+**15 / Action_Type**: Verbal Warning
+**15 / Rule_Violated**: Attendance
+**15 / Description**: Excessive personal time requests
+**15 / Manager**: Brian Anderson
+**15 / Follow_Up_Date**: 2026-01-03
+**15 / Status**: Open
+**16 / Action_ID**: DISC-2025-017
+**16 / Date**: 2025-12-18
+**16 / Employee_ID**: 050
+**16 / Name**: Brandon Edwards
+**16 / Action_Type**: Written Warning
+**16 / Rule_Violated**: Safety
+**16 / Description**: Speed violation caught on camera
+**16 / Manager**: Daniel White
+**16 / Follow_Up_Date**: 2026-01-18
+**16 / Status**: Open

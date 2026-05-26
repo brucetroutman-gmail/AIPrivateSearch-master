@@ -1,8 +1,5 @@
----
-DocID: my-_853081
----
-
 # brothers-karamazov
+DocID: my-_853081
 
 
 Title: The Brothers Karamazov

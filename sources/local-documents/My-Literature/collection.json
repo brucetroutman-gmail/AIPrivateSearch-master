@@ -1,0 +1,38 @@
+{
+  "name": "My-Literature",
+  "created": "2026-05-26T19:30:51.781Z",
+  "documents": [
+    {
+      "id": "e448b4359c9a",
+      "name": "brothers-karamazov",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Literature/brothers-karamazov.txt",
+      "sourceExt": "txt",
+      "convertedFile": "brothers-karamazov.md",
+      "addedAt": "2026-05-26T19:30:51.782Z"
+    },
+    {
+      "id": "17d914a0e309",
+      "name": "gospel-john",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Literature/gospel-john.txt",
+      "sourceExt": "txt",
+      "convertedFile": "gospel-john.md",
+      "addedAt": "2026-05-26T19:30:51.845Z"
+    },
+    {
+      "id": "8e616fe611ab",
+      "name": "marine-poem",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Literature/marine-poem.txt",
+      "sourceExt": "txt",
+      "convertedFile": "marine-poem.md",
+      "addedAt": "2026-05-26T19:30:51.859Z"
+    },
+    {
+      "id": "05751d7c04a7",
+      "name": "ransom-of-red-chief",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/My-Literature/ransom-of-red-chief.txt",
+      "sourceExt": "txt",
+      "convertedFile": "ransom-of-red-chief.md",
+      "addedAt": "2026-05-26T19:30:51.866Z"
+    }
+  ]
+}

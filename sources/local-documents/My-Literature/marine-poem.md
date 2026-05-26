@@ -1,10 +1,7 @@
----
+# marine-poem
 DocID: my-_984333
----
 
-# US marine-poem
-
-# United States Marine's Devotion
+# Marine's Devotion
 
 Two loves he carries through this fragile world:
 His rifle, sleek and deadly in his hands,

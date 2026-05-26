@@ -504,13 +504,16 @@
         const nonMdSources = group.sourceFiles.filter(f => f.ext !== 'md');
         const sourceLinks = nonMdSources.map(f => 
           `<a href="#" onclick="openFile('${f.fileName}')" class="ext-badge">${f.ext}</a>`
-        ).join(' ');
+        ).join(' ') || (sourceIsMd ? `<a href="#" onclick="openFile('${group.sourceFiles[0].fileName}')" class="ext-badge">MD</a>` : '');
         const hasSource = nonMdSources.length > 0;
         const hasMd = !!group.mdFile;
+        const sourceIsMd = group.sourceFiles.length > 0 && group.sourceFiles.every(f => f.ext === 'md');
         
         // Create MD/JSON link or status
         let mdContent;
-        if (hasMd) {
+        if (sourceIsMd) {
+          mdContent = '-'; // Source is already .md, no conversion needed
+        } else if (hasMd) {
           // Check if this is a collection file (xxx-xxx_Collection.md or xxx-xxx_collections.md pattern)
           if (group.mdFile && group.mdFile.match(/.*-.*_[Cc]ollections?\.md$/)) {
             mdContent = '-';
@@ -539,7 +542,8 @@
         // Determine which files to include in selection (exclude META files since they're in database)
         const selectableFiles = [];
         if (hasSource) selectableFiles.push(...group.sourceFiles.map(f => f.fileName));
-        else if (hasMd) selectableFiles.push(group.mdFile); // legacy: no source, use md
+        else if (sourceIsMd) selectableFiles.push(group.sourceFiles[0].fileName);
+        else if (hasMd) selectableFiles.push(group.mdFile);
         
         const isSelected = savedSelections.includes(selectableFiles.join(','));
         row.innerHTML = `

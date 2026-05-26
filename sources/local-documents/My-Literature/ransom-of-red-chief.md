@@ -1,8 +1,5 @@
----
-DocID: My-_1760372219694_zlkfbzsmw
----
-
 # ransom-of-red-chief
+DocID: My-_1760372219694_zlkfbzsmw
 
 THE RANSOM OF RED CHIEF
 
