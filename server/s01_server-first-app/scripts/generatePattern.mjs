@@ -3,13 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
 
-// Common stop words to filter out of keyword extraction
 const STOP_WORDS = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by',
   'is','are','was','were','be','been','have','has','had','do','does','did','will','would','could','should',
   'this','that','these','those','it','its','from','as','not','no','so','if','then','than','when','where',
   'who','what','which','how','all','any','each','more','also','into','about','up','out','over','after']);
 
-// Generate a Fabric pattern from the collection's document files
 export async function generatePattern(collection) {
   const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
   if (!fs.existsSync(collectionPath)) {
@@ -17,23 +15,35 @@ export async function generatePattern(collection) {
   }
 
   try {
-    // Read all .md and .txt files in the collection
-    const files = fs.readdirSync(collectionPath)
-      .filter(f => (f.endsWith('.md') || f.endsWith('.txt') || f.endsWith('.json')) && !f.startsWith('META_') && f !== 'fabric-pattern.md');
+    // Use only converted .md files from manifest — not raw source files
+    const manifest = await CollectionsUtil.readManifest(collection);
+    let mdFiles = [];
 
-    if (files.length === 0) {
-      return { skipped: true, reason: 'No documents found' };
+    if (manifest) {
+      mdFiles = manifest.documents
+        .filter(doc => doc.convertedFile && doc.convertedFile.endsWith('.md'))
+        .map(doc => doc.convertedFile)
+        .filter(f => fs.existsSync(path.join(collectionPath, f)));
+    }
+
+    // Fallback: scan for .md files if no manifest or no converted files
+    if (mdFiles.length === 0) {
+      mdFiles = fs.readdirSync(collectionPath)
+        .filter(f => f.endsWith('.md') && f !== 'fabric-pattern.md' && !f.startsWith('META_'));
+    }
+
+    if (mdFiles.length === 0) {
+      return { skipped: true, reason: 'No converted .md files found' };
     }
 
     // Extract words from all documents — aggregate frequency
     const wordFreq = {};
     let totalWords = 0;
 
-    files.forEach(filename => {
+    mdFiles.forEach(filename => {
       const filePath = path.join(collectionPath, filename);
       const content = fs.readFileSync(filePath, 'utf8');
 
-      // Extract words, filter stop words, min length 4
       const words = content.toLowerCase()
         .replace(/[^a-z\s]/g, ' ')
         .split(/\s+/)
@@ -45,15 +55,14 @@ export async function generatePattern(collection) {
       });
     });
 
-    // Top keywords by frequency (exclude very common single-doc words)
     const topKeywords = Object.entries(wordFreq)
-      .filter(([, count]) => count >= 2) // appears in multiple places
+      .filter(([, count]) => count >= 2)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 25)
       .map(([word]) => word)
       .join(', ');
 
-    const docCount = files.length;
+    const docCount = mdFiles.length;
 
     // Build sanitized Fabric system prompt
     const patternName = `enhance_${collection}`;
