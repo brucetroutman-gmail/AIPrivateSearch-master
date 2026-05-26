@@ -155,57 +155,24 @@ router.post('/convert-selected', async (req, res) => {
 router.get('/collections/:collection/files', async (req, res) => {
   try {
     const { collection } = req.params;
-    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
 
-    // Try manifest first
     const manifest = await CollectionsUtil.readManifest(collection);
-    if (manifest) {
-      // Return manifest documents with metadata
-      const files = manifest.documents.map(doc => ({
-        name: doc.name,
-        sourcePath: doc.sourcePath,
-        sourceExt: doc.sourceExt,
-        convertedFile: doc.convertedFile,
-        addedAt: doc.addedAt,
-        id: doc.id
-      }));
-      return res.json({ files, manifest: true });
-    }
-
-    // Legacy fallback — no manifest, do NOT delete from disk
-    // Instead, auto-create a manifest from existing files
-    const legacyFiles = await secureFs.readdir(collectionPath);
-    const systemFiles = new Set(['index-cards.db', 'embeddings.db', 'fabric-pattern.md', 'collection.json']);
-    const docFiles = legacyFiles.filter(f => !f.startsWith('.') && !f.startsWith('META_') && !systemFiles.has(f));
-
-    // Build manifest from existing files
-    const newManifest = { name: collection, created: new Date().toISOString(), documents: [] };
-    const crypto = await import('crypto');
-    const seen = new Set();
-    for (const file of docFiles) {
-      const ext = file.split('.').pop().toLowerCase();
-      const baseName = file.substring(0, file.lastIndexOf('.')) || file;
-      if (seen.has(baseName)) continue;
-      seen.add(baseName);
-      const filePath = path.join(collectionPath, file);
-      const mdFile = docFiles.find(f => f === `${baseName}.md`);
-      newManifest.documents.push({
-        id: crypto.default.randomBytes(6).toString('hex'),
-        name: baseName,
-        sourcePath: filePath,
-        sourceExt: ext === 'md' && mdFile ? (docFiles.find(f => f.startsWith(baseName + '.') && f !== mdFile)?.split('.').pop() || 'md') : ext,
-        convertedFile: mdFile || (ext === 'md' ? file : null),
-        addedAt: new Date().toISOString()
+    if (!manifest) {
+      return res.status(409).json({ 
+        error: 'Collection has no manifest (collection.json). Please delete and recreate this collection.',
+        legacy: true
       });
     }
-    await CollectionsUtil.writeManifest(collection, newManifest);
-    console.log(`[documents] Auto-created manifest for legacy collection: ${collection} (${newManifest.documents.length} docs)`);
 
-    // Re-read and return as manifest
-    return res.json({ files: newManifest.documents.map(doc => ({
-      name: doc.name, sourcePath: doc.sourcePath, sourceExt: doc.sourceExt,
-      convertedFile: doc.convertedFile, addedAt: doc.addedAt, id: doc.id
-    })), manifest: true });
+    const files = manifest.documents.map(doc => ({
+      name: doc.name,
+      sourcePath: doc.sourcePath,
+      sourceExt: doc.sourceExt,
+      convertedFile: doc.convertedFile,
+      addedAt: doc.addedAt,
+      id: doc.id
+    }));
+    return res.json({ files, manifest: true });
   } catch (error) {
     if (error.code === 'ENOENT') {
       return res.status(404).json({ error: 'Collection not found' });
@@ -238,14 +205,28 @@ router.get('/collections/:collection/indexed', async (req, res) => {
 router.post('/collections/:collection/index/:filename', async (req, res) => {
   try {
     const { collection, filename } = req.params;
-    
-    // Read the document content
-    const filePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
+    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
+
+    // Prefer converted .md over raw source file
+    const ext = path.extname(filename).toLowerCase();
+    const baseName = path.basename(filename, ext);
+    const mdFilename = baseName + '.md';
+    const mdPath = path.join(collectionPath, mdFilename);
+
+    let embedFilename = filename;
+    let filePath = path.join(collectionPath, filename);
+
+    if (ext !== '.md') {
+      try {
+        await secureFs.stat(mdPath);
+        embedFilename = mdFilename;
+        filePath = mdPath;
+        console.log(`[embed] Using converted .md for ${filename} -> ${mdFilename}`);
+      } catch { /* no .md version, embed source file as-is */ }
+    }
+
     const content = await secureFs.readFile(filePath, 'utf8');
-    
-    // Process with embedding service
-    const result = await embeddingService.processDocument(filename, content, collection);
-    
+    const result = await embeddingService.processDocument(embedFilename, content, collection);
     res.json(result);
   } catch (error) {
     if (error.message.includes('Path traversal')) {
@@ -312,21 +293,18 @@ router.delete('/collections/:collection/files/:filename', async (req, res) => {
     const { collection, filename } = req.params;
 
     const manifest = await CollectionsUtil.readManifest(collection);
-    if (manifest) {
-      // Remove from manifest — do NOT delete source file
-      await CollectionsUtil.removeFromManifest(collection, filename);
-
-      // Delete converted .md file from collection folder if it exists
-      const baseName = filename.substring(0, filename.lastIndexOf('.')) || filename;
-      const mdPath = path.join(CollectionsUtil.getCollectionsPath(), collection, `${baseName}.md`);
-      try { await secureFs.unlink(mdPath); } catch { /* md may not exist */ }
-
-      return res.json({ success: true });
+    if (!manifest) {
+      return res.status(409).json({ success: false, error: 'Collection has no manifest. Please delete and recreate this collection.', legacy: true });
     }
 
-    // No manifest found — should not happen after auto-migration, but handle gracefully
-    console.error(`[documents] No manifest found for collection: ${collection} after auto-migration attempt`);
-    res.status(500).json({ success: false, error: 'Collection manifest not found' });
+    await CollectionsUtil.removeFromManifest(collection, filename);
+
+    // Delete converted .md file from collection folder if it exists
+    const baseName = filename.substring(0, filename.lastIndexOf('.')) || filename;
+    const mdPath = path.join(CollectionsUtil.getCollectionsPath(), collection, `${baseName}.md`);
+    try { await secureFs.unlink(mdPath); } catch { /* md may not exist */ }
+
+    return res.json({ success: true });
   } catch (error) {
     if (error.message.includes('Path traversal')) {
       return res.status(403).json({ success: false, error: 'Access denied' });

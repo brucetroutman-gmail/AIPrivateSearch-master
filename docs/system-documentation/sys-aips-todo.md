@@ -6,6 +6,18 @@
 
 ## IMMEDIATE PRIORITY
 
+### 2-010 — Fix Embed Converted Files — Only Embedding 1 Chunk Per File
+Medical-Practice collection shows every document has exactly 1 chunk in embeddings.db. Root causes:
+- Files were embedded before chunk overlap was added (v20.37)
+- Large JSON files may be treated as a single paragraph (no blank lines) and not splitting correctly
+- Need to verify `splitLargeParagraph` is triggering for JSON-converted markdown files
+- [ ] Re-embed Medical-Practice collection after fix (Remove Embeds → Embed Converted Files)
+- [ ] Verify chunk counts increase to expected levels (5-20 chunks per file)
+- [ ] Check if 0.3 similarity threshold is too aggressive for single-chunk documents — may need to lower to 0.2 or make dynamic
+- [ ] Test AI Document Chat diabetes query after re-embedding
+
+---
+
 ### 2-009 — Re-embed All Collections for Chunk Overlap
 Chunk overlap (150 chars) added to `semanticChunking` in v20.36. Existing embeddings were built without overlap and won't benefit automatically.
 - [ ] For each collection: Collections Editor → Remove Embeds → Embed Converted Files

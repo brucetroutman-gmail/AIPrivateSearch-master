@@ -386,16 +386,21 @@
         const filesData = await filesResponse.json();
         const indexedData = await indexedResponse.json();
         const documentIndexData = await documentIndexResponse.json();
-        
-        // Support both manifest and legacy folder-scan responses
+
+        // Block legacy collections — require collection.json
+        if (filesData.legacy) {
+          document.getElementById('documentList').innerHTML = `
+            <div style="padding:2rem; background:#fff3cd; border:1px solid #ffc107; border-radius:6px; color:#856404;">
+              <strong>&#9888; Legacy Collection</strong><br><br>
+              This collection has no <code>collection.json</code> manifest and cannot be used.<br><br>
+              <strong>To fix:</strong> Delete this collection and recreate it, then re-upload your documents.
+            </div>`;
+          return;
+        }
+
         if (filesData.manifest) {
-          // Manifest mode — rich document objects
           documents = filesData.files || [];
           window._collectionHasManifest = true;
-        } else {
-          // Legacy mode — plain filename strings
-          documents = filesData.files || [];
-          window._collectionHasManifest = false;
         }
         indexedDocuments = indexedData.documents || [];
         metadataDocuments = documentIndexData.documents || [];
