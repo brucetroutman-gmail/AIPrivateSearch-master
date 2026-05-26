@@ -22,9 +22,10 @@ export class AIDocumentChat {
       console.log(`[AIDocumentChat] Collection parameter: "${collection}"`);
       console.log(`[AIDocumentChat] Collection type: ${typeof collection}`);
       
-      // Fetch wider candidate set for reranking
-      const candidateChunks = await this.findSimilarChunks(query, collection, topK * 3);
-      console.log(`[AIDocumentChat] Found ${candidateChunks.length} candidate chunks`);
+      // Fetch wider candidate set for reranking, filter low-similarity noise
+      const candidateChunks = (await this.findSimilarChunks(query, collection, topK * 3))
+        .filter(c => (c.similarity || 0) >= 0.3);
+      console.log(`[AIDocumentChat] Found ${candidateChunks.length} candidate chunks above similarity threshold`);
       
       if (candidateChunks.length === 0) {
         return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
@@ -114,8 +115,8 @@ export class AIDocumentChat {
   async rerankChunks(query, chunks, topK) {
     try {
       const rerankModel = await modelConfig.getRerankModel();
-      if (!rerankModel) {
-        console.log('[AIDocumentChat] No rerank model configured, using cosine similarity order');
+      if (!rerankModel || chunks.length <= topK) {
+        console.log('[AIDocumentChat] Skipping rerank — no model or candidates <= topK');
         return chunks.slice(0, topK);
       }
 
@@ -123,7 +124,7 @@ export class AIDocumentChat {
 
       const scored = await Promise.all(chunks.map(async (chunk) => {
         try {
-          const prompt = `Passage: ${chunk.content.substring(0, 400)}\nQuestion: ${query}\nRelevance score 1-10 (reply with number only):`;
+          const prompt = `Question: ${query}\nPassage: ${chunk.content.substring(0, 400)}\nIs this passage useful for answering the question, even partially? Score 1-10 (1=not useful, 10=very useful). Reply with a single number only:`;
           const response = await fetch('http://localhost:11434/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -131,8 +132,12 @@ export class AIDocumentChat {
           });
           if (!response.ok) return { ...chunk, rerankScore: chunk.similarity };
           const result = await response.json();
-          const score = parseFloat(result.response?.trim()) || 0;
-          return { ...chunk, rerankScore: isNaN(score) ? chunk.similarity : score / 10 };
+          const parsed = parseFloat(result.response?.trim());
+          // Fall back to cosine similarity if model returns non-numeric
+          const rerankScore = (!isNaN(parsed) && parsed >= 1 && parsed <= 10)
+            ? parsed / 10
+            : chunk.similarity;
+          return { ...chunk, rerankScore };
         } catch {
           return { ...chunk, rerankScore: chunk.similarity };
         }
@@ -175,15 +180,19 @@ export class AIDocumentChat {
       } catch { /* no pattern file — proceed without it */ }
     }
     
-    const enhancedPrompt = `${domainContext}You have access to multiple document excerpts. Use ALL relevant information to provide a comprehensive answer.
+    const enhancedPrompt = `${domainContext}You are analyzing multiple document excerpts to answer a question. Follow these steps:
+1. Identify which documents contain information relevant to the question
+2. Extract the specific facts from each relevant document
+3. Connect facts across documents where they relate to the same entity (e.g. same patient, same topic)
+4. Synthesize a complete answer - if the answer spans multiple documents, combine them
+5. If the information is not present in any document, say so clearly and describe what IS present
 
+Document excerpts:
 ${context}
 
 Question: ${query}
 
-Instructions: Review ALL the document excerpts above and synthesize the information. If multiple documents are relevant, mention information from each one. Provide a complete answer that covers all relevant details found in the documents.
-
-Answer:`;
+Answer (be specific, reference document names, connect related information across documents):`;
     
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
