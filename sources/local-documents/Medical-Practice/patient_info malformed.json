@@ -1,4 +1,5 @@
 [
+DocID: Med_1760491376659_g5sqe5vdb
   {
     "patient_id": "P001",
     "name": "John A. Smith",
@@ -342,7 +343,7 @@
         "purpose": "Pain relief"
       }
     ]
-  },
+  }
   {
     "patient_id": "P007",
     "name": "Michael J. Chen",

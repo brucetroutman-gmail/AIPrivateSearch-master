@@ -23,17 +23,27 @@ export class AIDocumentChat {
       console.log(`[AIDocumentChat] Collection type: ${typeof collection}`);
       
       // Fetch wider candidate set for reranking, filter low-similarity noise
-      const candidateChunks = (await this.findSimilarChunks(query, collection, topK * 3))
-        .filter(c => (c.similarity || 0) >= 0.3);
+      const candidateChunks = (await this.findSimilarChunks(query, collection, topK * 5))
+        .filter(c => (c.similarity || 0) >= 0.1);
       console.log(`[AIDocumentChat] Found ${candidateChunks.length} candidate chunks above similarity threshold`);
       
       if (candidateChunks.length === 0) {
         return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
       }
 
-      // Rerank candidates down to topK using rerank model
-      const relevantChunks = await this.rerankChunks(query, candidateChunks, topK);
-      console.log(`[AIDocumentChat] Reranked to ${relevantChunks.length} chunks`);
+      // Use cosine similarity order directly — no reranking
+      // Ensure document diversity: max 2 chunks per document
+      const seen = new Map();
+      const relevantChunks = [];
+      for (const chunk of candidateChunks) {
+        const count = seen.get(chunk.filename) || 0;
+        if (count < 3) {
+          relevantChunks.push(chunk);
+          seen.set(chunk.filename, count + 1);
+        }
+        if (relevantChunks.length >= topK) break;
+      }
+      console.log(`[AIDocumentChat] Diverse chunks for model: ${relevantChunks.map(c => `${c.filename}(${c.similarity?.toFixed(2)})`).join(', ')}`);
       
       let aiResponse;
       try {
@@ -93,16 +103,16 @@ export class AIDocumentChat {
     if (!chunks || chunks.length === 0) return '';
     
     const uniqueFiles = new Map();
-    chunks.forEach(chunk => {
+    chunks.forEach((chunk, index) => {
       if (!uniqueFiles.has(chunk.filename)) {
-        uniqueFiles.set(chunk.filename, chunk);
+        uniqueFiles.set(chunk.filename, { chunk, sourceNum: index + 1 });
       }
     });
     
     let sourceSection = '\n\n---\n\n**Source Documents:**\n\n';
-    Array.from(uniqueFiles.values()).forEach((chunk, index) => {
+    Array.from(uniqueFiles.values()).forEach(({ chunk, sourceNum }) => {
       const docLink = `[${chunk.filename}](http://localhost:56306/api/documents/${chunk.collection}/${encodeURIComponent(chunk.filename)}/view)`;
-      sourceSection += `${index + 1}. ${docLink}\n`;
+      sourceSection += `${sourceNum}. ${docLink}\n`;
     });
     
     return sourceSection;
@@ -171,12 +181,14 @@ export class AIDocumentChat {
     }
 
     // Load collection-specific Fabric pattern as domain context if available
+    // Note: only use the keyword vocabulary, not the full enhancer instructions
     let domainContext = '';
     if (collection) {
       try {
         const patternPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'fabric-pattern.md');
         const pattern = await secureFs.readFile(patternPath, 'utf8');
-        if (pattern.trim()) domainContext = `Domain context for this collection:\n${pattern.trim()}\n\n`;
+        const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
+        if (vocabMatch) domainContext = `Domain vocabulary for this collection: ${vocabMatch[1].trim()}\n\n`;
       } catch { /* no pattern file — proceed without it */ }
     }
     

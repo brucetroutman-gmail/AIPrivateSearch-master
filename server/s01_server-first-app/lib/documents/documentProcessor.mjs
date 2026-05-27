@@ -662,11 +662,15 @@ export class DocumentProcessor {
       const content = await secureFs.readFile(filePath, 'utf8');
       
       if (ext === '.json') {
-        // Strip DocID header if present before parsing
-        const cleanContent = content.replace(/^DocID:\s*[^\n]+\n?/, '').trim();
+        // Strip DocID header if present before parsing — handles both formats:
+        // "DocID: xxx\n" at start, or "[\nDocID: xxx\n" inside array
+        const cleanContent = content
+          .replace(/^\[\s*\nDocID:\s*[^\n]+\n/, '[\n')
+          .replace(/^DocID:\s*[^\n]+\n?/, '')
+          .trim();
         try {
           const jsonData = JSON.parse(cleanContent);
-          // Convert JSON to readable markdown — flatten keys/values for better searchability
+          // Convert JSON to readable markdown
           const lines = [`# ${filename}`, ''];
           const flatten = (obj, prefix = '') => {
             for (const [key, val] of Object.entries(obj)) {
@@ -674,13 +678,61 @@ export class DocumentProcessor {
               if (val && typeof val === 'object' && !Array.isArray(val)) {
                 flatten(val, label);
               } else if (Array.isArray(val)) {
-                lines.push(`**${label}**: ${val.join(', ')}`);
+                if (val.length > 0 && typeof val[0] === 'object') {
+                  // Array of objects — flatten each item
+                  val.forEach((item, i) => flatten(item, label));
+                } else {
+                  lines.push(`**${label}**: ${val.join(', ')}`);
+                }
               } else {
                 lines.push(`**${label}**: ${val}`);
               }
             }
           };
-          flatten(jsonData);
+          // Array of objects — group by first key if it looks like an ID field, else one paragraph per item
+          if (Array.isArray(jsonData)) {
+            const firstItem = jsonData[0];
+            const idKey = firstItem && Object.keys(firstItem).find(k => k.toLowerCase().includes('id') || k.toLowerCase().includes('name'));
+            if (idKey) {
+              // Group by ID key
+              const groups = {};
+              jsonData.forEach(item => {
+                const groupKey = item[idKey] || 'unknown';
+                if (!groups[groupKey]) groups[groupKey] = [];
+                groups[groupKey].push(item);
+              });
+              Object.entries(groups).forEach(([groupKey, items]) => {
+                lines.push(`## ${idKey}: ${groupKey}`);
+                items.forEach(item => {
+                  Object.entries(item).forEach(([k, v]) => {
+                    if (k === idKey) return; // already in heading
+                    if (Array.isArray(v) && v.length > 0 && typeof v[0] === 'object') {
+                      v.forEach(subItem => {
+                        Object.entries(subItem).forEach(([sk, sv]) => {
+                          lines.push(`**${k} / ${sk}**: ${sv}`);
+                        });
+                      });
+                    } else if (Array.isArray(v)) {
+                      lines.push(`**${k}**: ${v.join(', ')}`);
+                    } else if (v && typeof v === 'object') {
+                      Object.entries(v).forEach(([sk, sv]) => lines.push(`**${k} / ${sk}**: ${sv}`));
+                    } else {
+                      lines.push(`**${k}**: ${v}`);
+                    }
+                  });
+                });
+                lines.push('');
+              });
+            } else {
+              jsonData.forEach((item, i) => {
+                lines.push(`## Record ${i + 1}`);
+                flatten(item);
+                lines.push('');
+              });
+            }
+          } else {
+            flatten(jsonData);
+          }
           return lines.join('\n');
         } catch {
           // Not valid JSON — treat as plain text

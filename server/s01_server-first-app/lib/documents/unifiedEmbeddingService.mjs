@@ -92,15 +92,28 @@ export class UnifiedEmbeddingService {
     
     console.log(`[UnifiedEmbeddingService] Document ID: ${documentId}, Content hash: ${contentHash}`);
     
-    // Check if document already exists
-    const existingDoc = db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
-    console.log(`[UnifiedEmbeddingService] Existing document found:`, !!existingDoc);
-    
-    if (!existingDoc) {
-      console.log(`[UnifiedEmbeddingService] Creating new document with embeddings...`);
-      
-      // Document doesn't exist, create it with embeddings
-      const docStmt = db.prepare(`
+    // Always remove existing document before re-embedding to ensure fresh content
+    // Delete by filename AND by content_hash to handle all stale records
+    const existingByName = db.prepare('SELECT id FROM documents WHERE filename = ?').get(filename);
+    if (existingByName) {
+      db.prepare('DELETE FROM chunks WHERE document_id = ?').run(existingByName.id);
+      db.prepare('DELETE FROM collection_documents WHERE document_id = ?').run(existingByName.id);
+      db.prepare('DELETE FROM documents WHERE id = ?').run(existingByName.id);
+    }
+    const existingByHash = db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
+    if (existingByHash) {
+      db.prepare('DELETE FROM chunks WHERE document_id = ?').run(existingByHash.id);
+      db.prepare('DELETE FROM collection_documents WHERE document_id = ?').run(existingByHash.id);
+      db.prepare('DELETE FROM documents WHERE id = ?').run(existingByHash.id);
+    }
+    // Also clean up any orphaned chunks with matching document_id pattern
+    db.prepare("DELETE FROM chunks WHERE document_id = ?").run(documentId);
+    db.prepare("DELETE FROM collection_documents WHERE document_id = ?").run(documentId);
+    db.prepare("DELETE FROM documents WHERE id = ?").run(documentId);
+    console.log(`[UnifiedEmbeddingService] Cleared existing embeddings for: ${filename}`);
+
+    // Create document with embeddings
+    const docStmt = db.prepare(`
         INSERT INTO documents (id, filename, content_hash, full_content, document_embedding)
         VALUES (?, ?, ?, ?, ?)
       `);
@@ -138,7 +151,6 @@ export class UnifiedEmbeddingService {
         );
         console.log(`[UnifiedEmbeddingService] Chunk ${i} inserted, changes: ${chunkResult.changes}`);
       }
-    }
     
     // Link document to collection (if not already linked)
     const linkStmt = db.prepare(`
@@ -158,7 +170,7 @@ export class UnifiedEmbeddingService {
     const collectionDocs = db.prepare('SELECT COUNT(*) as count FROM collection_documents').get();
     console.log(`[UnifiedEmbeddingService] Database totals - Documents: ${docCount.count}, Chunks: ${totalChunks.count}, Collection docs: ${collectionDocs.count}`);
     
-    return { success: true, chunks: chunkCount.count, reused: !!existingDoc };
+    return { success: true, chunks: chunkCount.count, reused: false };
   }
 
   semanticChunking(text, chunkSize = 800, overlap = 150) {
@@ -287,6 +299,9 @@ export class UnifiedEmbeddingService {
       
       const results = similarities
         .sort((a, b) => b.similarity - a.similarity)
+        .filter((chunk, index, arr) => 
+          arr.findIndex(c => c.filename === chunk.filename && c.chunk_index === chunk.chunk_index) === index
+        )
         .slice(0, topK)
         .map(chunk => ({ ...chunk, collection }));
         

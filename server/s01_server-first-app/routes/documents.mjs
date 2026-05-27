@@ -13,6 +13,38 @@ const router = express.Router();
 const embeddingService = new UnifiedEmbeddingService();
 const documentProcessor = new DocumentProcessor();
 
+// Validate file content before accepting upload
+async function validateFile(filename, buffer) {
+  const ext = path.extname(filename).toLowerCase();
+  const content = buffer.toString('utf8');
+
+  if (ext === '.json') {
+    // Strip DocID header in both formats before parsing
+    const clean = content
+      .replace(/^\[\s*\nDocID:\s*[^\n]+\n/, '[\n')
+      .replace(/^DocID:\s*[^\n]+\n?/, '')
+      .trim();
+    try { JSON.parse(clean); } catch (e) {
+      return `Invalid JSON: ${e.message}. Please fix the file and re-upload.`;
+    }
+  }
+
+  if (ext === '.csv' || ext === '.tsv') {
+    const lines = content.split('\n').filter(l => l.trim());
+    if (lines.length === 0) return 'File is empty.';
+    const sep = ext === '.tsv' ? '\t' : ',';
+    const colCount = lines[0].split(sep).length;
+    const badLine = lines.slice(1).findIndex(l => l.split(sep).length !== colCount);
+    if (badLine >= 0) return `Inconsistent column count at line ${badLine + 2}. Please check the file.`;
+  }
+
+  if (ext === '.md' || ext === '.txt') {
+    if (content.trim().length === 0) return 'File is empty.';
+  }
+
+  return null; // valid
+}
+
 // Get all collections
 router.get('/collections', async (req, res) => {
   try {
@@ -80,6 +112,16 @@ router.post('/collections/:collection/upload', upload.single('file'), async (req
     const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
     const filePath = path.join(collectionPath, filename);
     
+    // Validate file content before accepting
+    const ext = path.extname(filename).toLowerCase();
+    const textExts = ['.json', '.csv', '.tsv', '.md', '.txt'];
+    if (textExts.includes(ext)) {
+      const validationError = await validateFile(filename, req.file.buffer);
+      if (validationError) {
+        return res.status(400).json({ success: false, error: `Validation failed for '${filename}': ${validationError}` });
+      }
+    }
+
     // Ensure collection directory exists
     await secureFs.mkdir(collectionPath, { recursive: true });
     
@@ -90,7 +132,6 @@ router.post('/collections/:collection/upload', upload.single('file'), async (req
     await CollectionsUtil.addToManifest(collection, filePath, filename);
 
     // If source is already .md, set convertedFile immediately
-    const ext = path.extname(filename).toLowerCase();
     if (ext === '.md') {
       const baseName = path.basename(filename, ext);
       await CollectionsUtil.updateConvertedFile(collection, baseName, filename);
@@ -127,11 +168,17 @@ router.post('/convert-selected', async (req, res) => {
         }
         
         const sourcePath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename);
+
+        // Validate file before converting
+        const fileBuffer = await secureFs.readFile(sourcePath);
+        const validationError = await validateFile(filename, fileBuffer);
+        if (validationError) {
+          errors.push(`ERROR: Badly formed file '${filename}' — ${validationError} Please fix and re-upload.`);
+          continue;
+        }
         
         // Convert all files to Markdown using DocumentProcessor
         const targetPath = path.join(CollectionsUtil.getCollectionsPath(), collection, filename.replace(/\.[^.]+$/, '.md'));
-        
-        // Use DocumentProcessor for proper conversion
         const markdownContent = await documentProcessor.convertToMarkdown(sourcePath);
         
         // Write markdown file

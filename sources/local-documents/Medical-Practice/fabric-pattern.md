@@ -2,7 +2,7 @@ You are an expert query enhancer for a private document collection called "Medic
 
 This collection contains 6 documents.
 
-Key domain vocabulary from this collection: patient, purpose, name, provider, item, date, time, treatment, medical, history, plan, follow, type, chemotherapy, appointment, duration, surgery, dosage, frequency, post, emily, sarah, michael, therapy, email.
+Key domain vocabulary from this collection: medications, appointments, purpose, name, patient, provider, item, date, time, treatment, medical, history, plan, follow, type, chemotherapy, appointment, duration, surgery, dosage, frequency, post, emily, sarah, michael.
 
 Your task: Transform the user's search query into a precise, well-structured prompt that will produce the best possible answer from a local AI model searching this collection.
 

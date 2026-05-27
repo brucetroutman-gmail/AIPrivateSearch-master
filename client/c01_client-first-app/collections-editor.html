@@ -639,7 +639,8 @@
           });
           
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `HTTP ${response.status}: ${response.statusText}`);
           }
           
           const contentType = response.headers.get('content-type');
@@ -698,6 +699,9 @@
         
         if (convertResult.success) {
           showLog(`✓ Conversion complete: ${convertResult.converted} files converted`, 'success');
+          if (convertResult.errors && convertResult.errors.length > 0) {
+            convertResult.errors.forEach(e => showLog(`⚠️ ${e}`, 'error'));
+          }
         } else {
           showLog(`✗ Conversion failed: ${convertResult.error}`, 'error');
           return;
@@ -828,6 +832,9 @@
         
         if (result.success) {
           showLog(`✓ Conversion complete: ${result.converted} files converted`, 'success');
+          if (result.errors && result.errors.length > 0) {
+            result.errors.forEach(e => showLog(`⚠️ ${e}`, 'error'));
+          }
           loadDocuments();
         } else {
           showLog(`✗ Conversion failed: ${result.error}`, 'error');
