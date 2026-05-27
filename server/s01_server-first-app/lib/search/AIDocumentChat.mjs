@@ -32,12 +32,21 @@ export class AIDocumentChat {
         return SetupGuidance.createEmbeddingsRequiredResult(collection, 'ai-document-chat', 'ai-document-chat');
       }
 
+      // Keyword pre-filter: extract meaningful words from query (4+ chars, skip stop words)
+      const stopWords = new Set(['find','show','list','what','with','have','that','from','this','which','where','about','does','their','patients']);
+      const queryKeywords = query.toLowerCase().split(/\W+/).filter(w => w.length >= 4 && !stopWords.has(w));
+      const keywordFiltered = queryKeywords.length > 0
+        ? candidateChunks.filter(c => queryKeywords.some(kw => c.content.toLowerCase().includes(kw)))
+        : [];
+      const poolToRank = keywordFiltered.length > 0 ? keywordFiltered : candidateChunks;
+      console.log(`[AIDocumentChat] Keywords: [${queryKeywords.join(', ')}] → keyword-matched: ${keywordFiltered.length}/${candidateChunks.length} chunks`);
+
       // Diversity cap: max 3 chunks per doc, unless only 1 doc in collection
       const uniqueDocs = new Set(candidateChunks.map(c => c.filename)).size;
       const perDocLimit = uniqueDocs === 1 ? topK : 3;
       const seen = new Map();
       const relevantChunks = [];
-      for (const chunk of candidateChunks) {
+      for (const chunk of poolToRank) {
         const count = seen.get(chunk.filename) || 0;
         if (count < perDocLimit) {
           relevantChunks.push(chunk);

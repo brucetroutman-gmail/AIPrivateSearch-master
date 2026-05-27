@@ -773,15 +773,15 @@ function generateTestCode() {
   
   // Position 3: Collection Name (0-9)
   const collectionMap = {
-    'A-Poem': '1',
-    'DocType-Test': '2',
-    'Family-Documents': '3',
-    'Federalist-Papers': '4',
-    'Human-Resources': '5',
-    'Law-Office': '6',
-    'Medical-Practice': '7',
-    'My-Emails': '8',
-    'My-Literature': '9'
+    'Sample_A-Poem': '1',
+    'Sample_DocType-Test': '2',
+    'Sample_Family-Documents': '3',
+    'Sample_Federalist-Papers': '4',
+    'Sample_Human-Resources': '5',
+    'Sample_Law-Office': '6',
+    'Sample_Medical-Practice': '7',
+    'Sample_My-Emails': '8',
+    'Sample_My-Literature': '9'
   };
   const collectionCode = sourceTypeEl.value === 'Local Model Only' ? '0' : (collectionMap[collectionEl.value] || '0');
   testCode += collectionCode;
