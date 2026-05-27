@@ -255,6 +255,18 @@ router.get('/collections/:collection/indexed', async (req, res) => {
   }
 });
 
+// Clear embeddings for a collection — deletes embeddings.db so it's recreated fresh
+router.delete('/collections/:collection/embeddings', async (req, res) => {
+  try {
+    const { collection } = req.params;
+    const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'embeddings.db');
+    try { await secureFs.unlink(dbPath); } catch { /* already gone */ }
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Index/embed a document
 router.post('/collections/:collection/index/:filename', async (req, res) => {
   try {
@@ -353,9 +365,13 @@ router.delete('/collections/:collection/files/:filename', async (req, res) => {
 
     await CollectionsUtil.removeFromManifest(collection, filename);
 
-    // Delete converted .md file from collection folder if it exists
+    // Remove embeddings for this file
     const baseName = filename.substring(0, filename.lastIndexOf('.')) || filename;
-    const mdPath = path.join(CollectionsUtil.getCollectionsPath(), collection, `${baseName}.md`);
+    const mdFilename = baseName + '.md';
+    await embeddingService.removeDocument(collection, mdFilename);
+
+    // Delete converted .md file from collection folder if it exists
+    const mdPath = path.join(CollectionsUtil.getCollectionsPath(), collection, mdFilename);
     try { await secureFs.unlink(mdPath); } catch { /* md may not exist */ }
 
     return res.json({ success: true });

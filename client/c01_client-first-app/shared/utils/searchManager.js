@@ -116,7 +116,7 @@ class SearchManager {
         options: { 
           collection: options.collection, 
           model: options.model, 
-          topK: 3, 
+          topK: 10, 
           temperature: options.temperature, 
           contextSize: options.contextSize, 
           tokenLimit: options.tokenLimit 

@@ -765,6 +765,12 @@
 
         // Step 3: Embed Converted Files
         showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
+
+        // Wipe embeddings.db before batch embed — ensures no stale data
+        await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/embeddings`, {
+          method: 'DELETE'
+        });
+        showLog(`✓ Cleared existing embeddings for fresh rebuild`, 'success');
         for (let i = 0; i < convertedFiles.length; i++) {
           const fileName = convertedFiles[i];
           const progress = `${i + 1}/${convertedFiles.length}`;

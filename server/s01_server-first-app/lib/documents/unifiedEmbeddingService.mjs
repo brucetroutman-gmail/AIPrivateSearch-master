@@ -79,6 +79,13 @@ export class UnifiedEmbeddingService {
     return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
   }
 
+  async clearCollection(collection) {
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
+    db.exec('DELETE FROM chunks; DELETE FROM documents; DELETE FROM collection_documents;');
+    console.log(`[UnifiedEmbeddingService] Cleared all embeddings for collection: ${collection}`);
+  }
+
   async processDocument(filename, content, collection, options = {}) {
     console.log(`[UnifiedEmbeddingService] Processing document: ${filename} in collection: ${collection}`);
     
@@ -92,25 +99,16 @@ export class UnifiedEmbeddingService {
     
     console.log(`[UnifiedEmbeddingService] Document ID: ${documentId}, Content hash: ${contentHash}`);
     
-    // Always remove existing document before re-embedding to ensure fresh content
-    // Delete by filename AND by content_hash to handle all stale records
+    // Delete existing record for this filename before re-inserting
     const existingByName = db.prepare('SELECT id FROM documents WHERE filename = ?').get(filename);
     if (existingByName) {
       db.prepare('DELETE FROM chunks WHERE document_id = ?').run(existingByName.id);
       db.prepare('DELETE FROM collection_documents WHERE document_id = ?').run(existingByName.id);
       db.prepare('DELETE FROM documents WHERE id = ?').run(existingByName.id);
     }
-    const existingByHash = db.prepare('SELECT id FROM documents WHERE content_hash = ?').get(contentHash);
-    if (existingByHash) {
-      db.prepare('DELETE FROM chunks WHERE document_id = ?').run(existingByHash.id);
-      db.prepare('DELETE FROM collection_documents WHERE document_id = ?').run(existingByHash.id);
-      db.prepare('DELETE FROM documents WHERE id = ?').run(existingByHash.id);
-    }
-    // Also clean up any orphaned chunks with matching document_id pattern
-    db.prepare("DELETE FROM chunks WHERE document_id = ?").run(documentId);
-    db.prepare("DELETE FROM collection_documents WHERE document_id = ?").run(documentId);
-    db.prepare("DELETE FROM documents WHERE id = ?").run(documentId);
-    console.log(`[UnifiedEmbeddingService] Cleared existing embeddings for: ${filename}`);
+    // Also clean up by documentId in case of partial previous run
+    db.prepare('DELETE FROM chunks WHERE document_id = ?').run(documentId);
+    db.prepare('DELETE FROM documents WHERE id = ?').run(documentId);
 
     // Create document with embeddings
     const docStmt = db.prepare(`
@@ -173,8 +171,28 @@ export class UnifiedEmbeddingService {
     return { success: true, chunks: chunkCount.count, reused: false };
   }
 
-  semanticChunking(text, chunkSize = 800, overlap = 150) {
+  semanticChunking(text, chunkSize = 2000, overlap = 150) {
     const chunks = [];
+
+    // Header-aware chunking: split on ## headers first — no overlap needed, headers are clean boundaries
+    const headerSections = text.split(/(?=^## )/m).filter(s => s.trim().length > 0);
+    if (headerSections.length > 1) {
+      let currentChunk = '';
+      let startChar = 0;
+      for (const section of headerSections) {
+        if (currentChunk.length > 0 && (currentChunk.length + section.length) > chunkSize) {
+          chunks.push({ content: currentChunk.trim(), startChar, endChar: startChar + currentChunk.length, type: 'semantic' });
+          startChar += currentChunk.length;
+          currentChunk = section;
+        } else {
+          currentChunk += section;
+        }
+      }
+      if (currentChunk.trim().length > 50) {
+        chunks.push({ content: currentChunk.trim(), startChar, endChar: startChar + currentChunk.length, type: 'semantic' });
+      }
+      return chunks;
+    }
     const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     
     let currentChunk = '';

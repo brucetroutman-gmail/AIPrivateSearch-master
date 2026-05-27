@@ -1,0 +1,113 @@
+[
+DocID: Med_1760491338458_o4fr3r45s
+  {
+    "Medication Name": "Doxorubicin",
+    "Used For": "Chemotherapy for osteosarcoma",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Cisplatin",
+    "Used For": "Chemotherapy for osteosarcoma",
+    "Manufacturer": "Bristol Myers Squibb"
+  },
+  {
+    "Medication Name": "Lisinopril",
+    "Used For": "Hypertension management",
+    "Manufacturer": "AstraZeneca"
+  },
+  {
+    "Medication Name": "Ondansetron",
+    "Used For": "Anti-nausea",
+    "Manufacturer": "GlaxoSmithKline"
+  },
+  {
+    "Medication Name": "Metformin",
+    "Used For": "Diabetes management",
+    "Manufacturer": "Bristol Myers Squibb"
+  },
+  {
+    "Medication Name": "Oxycodone",
+    "Used For": "Post-op pain relief",
+    "Manufacturer": "Purdue Pharma"
+  },
+  {
+    "Medication Name": "Ibuprofen",
+    "Used For": "Anti-inflammatory",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Zoledronic Acid",
+    "Used For": "Bone metastasis treatment",
+    "Manufacturer": "Novartis"
+  },
+  {
+    "Medication Name": "Morphine",
+    "Used For": "Pain relief",
+    "Manufacturer": "Mallinckrodt"
+  },
+  {
+    "Medication Name": "Amlodipine",
+    "Used For": "Hypertension management",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Calcium",
+    "Used For": "Bone health",
+    "Manufacturer": "Generic (Various)"
+  },
+  {
+    "Medication Name": "Methotrexate",
+    "Used For": "Chemotherapy for chondrosarcoma",
+    "Manufacturer": "Anthem"
+  },
+  {
+    "Medication Name": "Atorvastatin",
+    "Used For": "Hyperlipidemia management",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Vincristine",
+    "Used For": "Chemotherapy for Ewing sarcoma",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Cyclophosphamide",
+    "Used For": "Chemotherapy for Ewing sarcoma",
+    "Manufacturer": "Bristol Myers Squibb"
+  },
+  {
+    "Medication Name": "Levothyroxine",
+    "Used For": "Hypothyroidism management",
+    "Manufacturer": "AbbVie"
+  },
+  {
+    "Medication Name": "Gabapentin",
+    "Used For": "Neuropathic pain",
+    "Manufacturer": "Pfizer"
+  },
+  {
+    "Medication Name": "Lenalidomide",
+    "Used For": "Myeloma treatment",
+    "Manufacturer": "Bristol Myers Squibb"
+  },
+  {
+    "Medication Name": "Bortezomib",
+    "Used For": "Myeloma treatment",
+    "Manufacturer": "Millennium/Takeda"
+  },
+  {
+    "Medication Name": "Pamidronate",
+    "Used For": "Bone health",
+    "Manufacturer": "Genentech"
+  },
+  {
+    "Medication Name": "Vitamin D",
+    "Used For": "Bone health",
+    "Manufacturer": "Generic (Various)"
+  },
+  {
+    "Medication Name": "Hyaluronic Acid",
+    "Used For": "Osteoarthritis injections",
+    "Manufacturer": "Sanofi"
+  }
+]
