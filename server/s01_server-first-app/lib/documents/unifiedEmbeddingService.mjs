@@ -174,18 +174,24 @@ export class UnifiedEmbeddingService {
   semanticChunking(text, chunkSize = 2000, overlap = 150) {
     const chunks = [];
 
-    // Header-aware chunking: split on ## headers first — no overlap needed, headers are clean boundaries
+    // Header-aware chunking: split on ## headers first — clean boundaries
     const headerSections = text.split(/(?=^## )/m).filter(s => s.trim().length > 0);
     if (headerSections.length > 1) {
       let currentChunk = '';
       let startChar = 0;
       for (const section of headerSections) {
-        if (currentChunk.length > 0 && (currentChunk.length + section.length) > chunkSize) {
-          chunks.push({ content: currentChunk.trim(), startChar, endChar: startChar + currentChunk.length, type: 'semantic' });
-          startChar += currentChunk.length;
-          currentChunk = section;
-        } else {
-          currentChunk += section;
+        // If section itself exceeds chunkSize, split it further by paragraphs
+        const subSections = section.length > chunkSize
+          ? this.splitLargeParagraph(section, chunkSize)
+          : [section];
+        for (const sub of subSections) {
+          if (currentChunk.length > 0 && (currentChunk.length + sub.length) > chunkSize) {
+            chunks.push({ content: currentChunk.trim(), startChar, endChar: startChar + currentChunk.length, type: 'semantic' });
+            startChar += currentChunk.length;
+            currentChunk = sub;
+          } else {
+            currentChunk += sub;
+          }
         }
       }
       if (currentChunk.trim().length > 50) {
@@ -442,11 +448,13 @@ export class UnifiedEmbeddingService {
     const db = await this.getCollectionDb(collection);
     const totalDocs = db.prepare('SELECT COUNT(*) as count FROM documents').get();
     const totalChunks = db.prepare('SELECT COUNT(*) as count FROM chunks').get();
+    const avgChunkSize = db.prepare('SELECT CAST(AVG(LENGTH(content)) AS INT) as avg FROM chunks').get();
     
     return {
       documents: totalDocs.count,
       chunks: totalChunks.count,
-      collection: collection
+      avgChunkSize: avgChunkSize.avg || 0,
+      collection
     };
   }
 }

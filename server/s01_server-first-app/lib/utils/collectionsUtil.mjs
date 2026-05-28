@@ -83,6 +83,13 @@ export class CollectionsUtil {
     }
   }
 
+  static async updateSearchSettings(collection, settings) {
+    const manifest = await this.readManifest(collection);
+    if (!manifest) return;
+    manifest.searchSettings = settings;
+    await this.writeManifest(collection, manifest);
+  }
+
   static async getAvailableCollections() {
     try {
       const collectionsPath = this.getCollectionsPath();

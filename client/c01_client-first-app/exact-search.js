@@ -2,7 +2,7 @@
 import { DOMSanitizer } from './shared/utils/domSanitizer.js';
 
 // Exact search methods only
-const EXACT_METHODS = ['document-index', 'line-search', 'document-search'];
+const EXACT_METHODS = ['line-search', 'document-search'];
 
 const searchQueryEl = document.getElementById('searchQuery');
 const userPromptsEl = document.getElementById('userPrompts');
@@ -12,7 +12,6 @@ const performanceTableBody = document.getElementById('performanceTableBody');
 const selectAllExactCheckbox = document.getElementById('selectAllExact');
 
 const searchMethods = {
-    'document-index': { name: 'Document Index Cards' },
     'line-search': { name: 'Line Search' },
     'document-search': { name: 'Document Search' }
 };

@@ -254,13 +254,12 @@
                 <th>Filename</th>
                 <th>Source</th>
                 <th>Converted</th>
-                <th>Index</th>
                 <th>Embedded</th>
               </tr>
             </thead>
             <tbody id="documentTableBody">
               <tr>
-                <td colspan="6">Loading documents...</td>
+                <td colspan="5">Loading documents...</td>
               </tr>
             </tbody>
           </table>
@@ -273,8 +272,6 @@
         
         <div class="action-buttons doc-index-edit-only">
           <button class="btn btn-warning" onclick="convertDocuments()">Convert Source Files</button>
-          <button class="btn btn-info" onclick="generateDocumentIndex()">Create Doc Index Cards</button>
-          <button class="btn btn-danger" onclick="removeIndexCards()">Remove Index Cards</button>
           <button class="btn btn-primary" onclick="processDocuments()">Embed Converted Files</button>
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
@@ -294,7 +291,6 @@
     let currentCollection = '';
     let documents = [];
     let indexedDocuments = [];
-    let metadataDocuments = [];
     let isProcessing = false;
     
     // Global processing state management
@@ -373,19 +369,13 @@
     
     async function loadDocuments() {
       try {
-        const [filesResponse, indexedResponse, documentIndexResponse] = await Promise.all([
+        const [filesResponse, indexedResponse] = await Promise.all([
           fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/files?t=${Date.now()}`),
-          fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/indexed`),
-          fetch(`${window.API_BASE_URL}/api/multi-search/document-index-status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ collection: currentCollection })
-          })
+          fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/indexed`)
         ]);
         
         const filesData = await filesResponse.json();
         const indexedData = await indexedResponse.json();
-        const documentIndexData = await documentIndexResponse.json();
 
         // Block legacy collections — require collection.json
         if (filesData.legacy) {
@@ -403,7 +393,6 @@
           window._collectionHasManifest = true;
         }
         indexedDocuments = indexedData.documents || [];
-        metadataDocuments = documentIndexData.documents || [];
         renderDocuments();
       } catch (error) {
         console.error('Error loading documents:', error);
@@ -527,12 +516,6 @@
           mdContent = `<span class="status-badge status-no">○</span>`;
         }
         
-        // Create Index link or status (based on SQLite database)
-        const hasDocumentIndex = group.mdFile && metadataDocuments.some(doc => doc.filename === group.mdFile);
-        const indexContent = hasDocumentIndex ? 
-          `<a href="#" onclick="viewDocumentIndex('${group.mdFile}')" class="ext-badge">Card</a>` :
-          `<span class="status-badge status-no">○</span>`;
-        
         // Check if this is a collection meta file to show dash in Embedded column
         const isCollectionMeta = group.metaFile && group.metaFile.match(/^META_.*-.*_[Cc]ollection\.md$/);
         
@@ -556,9 +539,6 @@
           </td>
           <td>
             ${mdContent}
-          </td>
-          <td>
-            ${indexContent}
           </td>
           <td>
             ${isCollectionMeta ? '-' : `<span class="status-badge ${isEmbedded ? 'status-yes' : 'status-no'}">${isEmbedded ? '✓' : '○'}</span>`}
@@ -677,7 +657,7 @@
         return;
       }
       
-      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Create Doc Index Cards\n3. Embed Converted Files\n\nThis may take several minutes.`)) {
+      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Generate Fabric Pattern\n3. Embed Converted Files\n\nThis may take several minutes.`)) {
         return;
       }
       
@@ -722,38 +702,7 @@
           return;
         }
         
-        // Step 2: Create Doc Index Cards
-        showLog(`\n--- STEP 2: CREATING DOC INDEX CARDS ---`, 'processing');
-        for (let i = 0; i < convertedFiles.length; i++) {
-          const fileName = convertedFiles[i];
-          const progress = `${i + 1}/${convertedFiles.length}`;
-          const fileStartTime = Date.now();
-          
-          try {
-            showLog(`${progress} Creating index: ${fileName}`, 'processing');
-            
-            const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/document-index-create-single`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ collection: currentCollection, filename: fileName })
-            });
-            
-            const result = await response.json();
-            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
-            
-            if (result.success) {
-              const docIdInfo = result.docId ? ` (DocID: ${result.docId})` : '';
-              showLog(`${progress} ✓ Index created: ${fileName}${docIdInfo} (${fileElapsed}s)`, 'success');
-            } else {
-              showLog(`${progress} ✗ Index failed: ${fileName} - ${result.error} (${fileElapsed}s)`, 'error');
-            }
-          } catch (error) {
-            const fileElapsed = ((Date.now() - fileStartTime) / 1000).toFixed(1);
-            showLog(`${progress} ✗ Index error: ${fileName} - ${error.message} (${fileElapsed}s)`, 'error');
-          }
-        }
-
-        // Step 2b: Generate Fabric pattern from all collection documents (fire-and-forget)
+        // Step 2: Generate Fabric pattern from all collection documents (fire-and-forget)
         fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
@@ -805,6 +754,14 @@
         showLog(`\n=== PROCESSING COMPLETE ===`, 'success');
         showLog(`✓ ${selected.length} source files processed in ${formatTime(totalElapsed)}`, 'success');
         showLog(`Files are now ready for search and analysis`, 'info');
+
+        // Calculate and save optimal search settings (fire-and-forget)
+        window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/search-settings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }).then(r => r.json()).then(data => {
+          if (data.success) showLog(`✨ Search settings optimized: topK=${data.settings.topK} temp=${data.settings.temperature} ctx=${data.settings.contextSize} tokens=${data.settings.tokenLimit || 'unlimited'} (${data.settings.totalChunks} chunks)`, 'success');
+        }).catch(() => {});
         
         // Refresh document list to show final status
         await loadDocuments();

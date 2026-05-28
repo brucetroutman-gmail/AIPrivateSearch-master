@@ -107,7 +107,28 @@ class SearchManager {
     return { results: data.results || [] };
   }
 
+  async getCollectionSettings(collection) {
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/api/documents/collections/${collection}/files`);
+      const data = await response.json();
+      const s = data.searchSettings || {};
+      return {
+        topK:        s.topK        || 10,
+        temperature: s.temperature !== undefined ? s.temperature : 0.3,
+        contextSize: s.contextSize || 4096,
+        tokenLimit:  s.tokenLimit  || null
+      };
+    } catch {
+      return { topK: 10, temperature: 0.3, contextSize: 4096, tokenLimit: null };
+    }
+  }
+
   async performAIDocumentChat(query, options) {
+    const collectionSettings = await this.getCollectionSettings(options.collection);
+    const topK        = collectionSettings.topK;
+    const temperature = options.temperature !== undefined ? options.temperature : collectionSettings.temperature;
+    const contextSize = options.contextSize || collectionSettings.contextSize;
+    const tokenLimit  = options.tokenLimit  || collectionSettings.tokenLimit;
     const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/ai-document-chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -116,10 +137,10 @@ class SearchManager {
         options: { 
           collection: options.collection, 
           model: options.model, 
-          topK: 10, 
-          temperature: options.temperature, 
-          contextSize: options.contextSize, 
-          tokenLimit: options.tokenLimit 
+          topK,
+          temperature,
+          contextSize,
+          tokenLimit
         } 
       })
     });

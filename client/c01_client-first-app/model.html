@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Models</title>
-    <link rel="stylesheet" href="default.css">
     <link rel="stylesheet" href="shared/styles.css">
-    <script src="shared/license-checker.js"></script>
     <script src="csrf.js"></script>
+    <script src="shared/utils/apiConfig.js"></script>
+    <script src="shared/license-checker.js"></script>
+    <script src="shared/startup-license-check.js"></script>
     <script type="module" src="shared/common.js"></script>
     <script>
         // Load theme immediately to prevent flash
@@ -139,7 +140,6 @@
                     <label><input type="checkbox" id="categorySearch" value="search"> Search</label><br>
                     <label><input type="checkbox" id="categoryScore" value="score"> Score</label><br>
                     <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label><br>
-                    <label><input type="checkbox" id="categoryDocumentIndex" value="document-index"> Document Index</label><br>
                     <label><input type="checkbox" id="categoryRerank" value="rerank"> Re-Rank</label>
                 </div>
             </div>
@@ -263,7 +263,6 @@
             if (document.getElementById('categorySearch').checked) selectedCategories.push('search');
             if (document.getElementById('categoryScore').checked) selectedCategories.push('score');
             if (document.getElementById('categoryEmbed').checked) selectedCategories.push('embed');
-            if (document.getElementById('categoryDocumentIndex').checked) selectedCategories.push('document-index');
             if (document.getElementById('categoryRerank').checked) selectedCategories.push('rerank');
             
             if (!modelName) {
@@ -353,7 +352,7 @@
                         
                         // Save updated config
                         const saveResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
-                            method: `PUT',
+                            method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
                         });
@@ -578,7 +577,7 @@
                         
                         // Save updated config
                         await window.csrfManager.fetch(`${window.API_BASE_URL}/api/config/models-list.json`, {
-                            method: `PUT',
+                            method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: JSON.stringify(models, null, 2) })
                         });
@@ -815,7 +814,7 @@
         }
         
         // Initialize
-        loadModels();
+        document.addEventListener('DOMContentLoaded', () => loadModels());
     </script>
 </body>
 </html>
