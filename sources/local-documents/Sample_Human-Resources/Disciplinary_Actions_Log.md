@@ -1,5 +1,4 @@
 # Disciplinary_Actions_Log
-DocID: Hum_1762472767280_9ycjw8iq3
 
 ## Action_ID: DISC-2025-001
 **Date**: 2025-01-20

@@ -42,8 +42,8 @@
     },
     {
       "category": "document-index",
-      "modelName": "qwen2.5-coder:1.5b",
-      "size": "986 MB"
+      "modelName": "qwen2:0.5b",
+      "size": "532 MB"
     },
     {
       "category": "rerank",

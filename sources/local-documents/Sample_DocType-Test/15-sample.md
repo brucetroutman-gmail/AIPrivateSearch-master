@@ -1,5 +1,4 @@
 # 15-sample
-DocID: Typ_1762462696572_nhflpvaef
 
 ```css
 /**

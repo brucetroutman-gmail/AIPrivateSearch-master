@@ -1,5 +1,4 @@
 # 20-sample
-DocID: Typ_1762462732686_agmweic5c
 
 ```yaml
 # Sample YML Document (alternative YAML extension)

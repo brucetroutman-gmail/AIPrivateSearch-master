@@ -1,5 +1,4 @@
 # 04-sample
-DocID: Typ_1762462640696_31jcqrc2g
 
 ```yaml
 document_type: sample_yaml

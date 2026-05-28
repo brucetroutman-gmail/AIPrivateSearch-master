@@ -1,5 +1,4 @@
 # marine-poem
-DocID: a-p_382268
 
 # A US Marine's Devotion
 

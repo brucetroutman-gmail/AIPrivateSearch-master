@@ -1,5 +1,4 @@
 # ELD_Malfunction_Log
-DocID: Hum_1762472807379_gln5mc7dd
 
 ## Driver_ID: 022
 **Date**: 2025-01-15

@@ -82,5 +82,15 @@
       "convertedFile": "Employee_Master_List.md",
       "addedAt": "2026-05-28T13:56:31.111Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 8192,
+    "tokenLimit": 1024,
+    "totalChunks": 46,
+    "totalDocs": 10,
+    "avgChunkSize": 1534,
+    "generatedAt": "2026-05-28T20:58:55.397Z"
+  }
 }

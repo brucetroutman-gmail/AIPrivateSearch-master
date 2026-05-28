@@ -1,5 +1,4 @@
 # practice-overview
-DocID: Med_1760555858578_pn8fmtxgu
 
 Overview
 

@@ -1,5 +1,4 @@
 # CDL_Expiration_Report
-DocID: Hum_1762472747218_k9vrt6c92
 
 ## Driver_ID: 012
 **Name**: Michael Johnson

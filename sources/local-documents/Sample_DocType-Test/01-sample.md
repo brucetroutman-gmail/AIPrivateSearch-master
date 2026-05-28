@@ -1,5 +1,4 @@
 # 01-sample
-DocID: Typ_1762462630568_xkd1jpn7p
 
 Sample Text Document
 

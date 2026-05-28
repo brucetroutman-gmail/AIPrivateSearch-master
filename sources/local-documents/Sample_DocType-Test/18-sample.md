@@ -1,5 +1,4 @@
 # 18-sample
-DocID: Typ_1762462718984_krlz349vl
 
 ## Email Details
 

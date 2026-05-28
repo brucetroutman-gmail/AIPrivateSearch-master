@@ -1,5 +1,4 @@
 # patient_appointments_calendar
-DocID: Med_1779820680966_s9carzp96
 
 ## Patient ID: P001
 **Date**: 2025-10-20

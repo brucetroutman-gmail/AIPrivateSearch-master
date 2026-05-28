@@ -1,5 +1,4 @@
 # appointments
-DocID: Law_1779821125071_7ukxkkjie
 
 ## AppointmentID: 1
 **ClientID**: 1

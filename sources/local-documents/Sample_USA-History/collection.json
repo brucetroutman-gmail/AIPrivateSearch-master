@@ -26,5 +26,15 @@
       "convertedFile": "The US Constitution.md",
       "addedAt": "2026-05-26T19:26:59.930Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 8192,
+    "tokenLimit": 1024,
+    "totalChunks": 7,
+    "totalDocs": 3,
+    "avgChunkSize": 1345,
+    "generatedAt": "2026-05-28T19:13:07.684Z"
+  }
 }

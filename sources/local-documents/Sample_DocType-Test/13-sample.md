@@ -1,5 +1,4 @@
 # 13-sample
-DocID: Typ_1762462683029_2c0m6rz3o
 
 ```c
 /**

@@ -1,5 +1,4 @@
 # 11-sample
-DocID: Typ_1762462671647_ecyydkri6
 
 ```java
 /**

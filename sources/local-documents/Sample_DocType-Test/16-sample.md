@@ -1,5 +1,4 @@
 # 16-sample
-DocID: Typ_1762462703391_qbwt6re0t
 
 ```sql
 -- Sample SQL Document

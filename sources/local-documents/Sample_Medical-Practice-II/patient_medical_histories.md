@@ -1,5 +1,4 @@
 # patient_medical_histories
-DocID: Med_1779820687823_chlpa753p
 
 ## patient_id: P001
 **medical_history_item**: Osteosarcoma diagnosed in 2023

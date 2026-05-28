@@ -4002,5 +4002,15 @@
       "convertedFile": "email_500.md",
       "addedAt": "2026-05-26T20:58:51.908Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 25,
+    "temperature": 0.1,
+    "contextSize": 4096,
+    "tokenLimit": 512,
+    "totalChunks": 500,
+    "totalDocs": 500,
+    "avgChunkSize": 430,
+    "generatedAt": "2026-05-28T19:16:14.275Z"
+  }
 }

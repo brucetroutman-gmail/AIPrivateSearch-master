@@ -154,5 +154,15 @@
       "convertedFile": "21-sample.md",
       "addedAt": "2026-05-26T20:46:46.471Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 4096,
+    "tokenLimit": 512,
+    "totalChunks": 19,
+    "totalDocs": 19,
+    "avgChunkSize": 769,
+    "generatedAt": "2026-05-28T20:49:22.999Z"
+  }
 }

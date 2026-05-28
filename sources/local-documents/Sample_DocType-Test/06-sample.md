@@ -1,5 +1,4 @@
 # 06-sample
-DocID: Doc_1779828464769_qqhb0bk23
 
 | Name | Age | Department | Salary | Location |
 |---|---|---|---|---|

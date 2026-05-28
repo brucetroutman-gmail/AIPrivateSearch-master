@@ -1,5 +1,4 @@
 # 09-sample
-DocID: Typ_1762462660823_9iuxf18gg
 
 ```python
 #!/usr/bin/env python3

@@ -657,7 +657,7 @@
         return;
       }
       
-      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Generate Fabric Pattern\n3. Embed Converted Files\n\nThis may take several minutes.`)) {
+      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Generate Fabric Pattern\n3. Embed Converted Files\n4. Calculate Search Settings\n\nThis may take several minutes.`)) {
         return;
       }
       
@@ -702,15 +702,20 @@
           return;
         }
         
-        // Step 2: Generate Fabric pattern from all collection documents (fire-and-forget)
-        fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
-          body: JSON.stringify({ collection: currentCollection })
-        }).then(r => r.json()).then(data => {
-          if (data.success) showLog(`✨ Fabric pattern generated for ${currentCollection} (${data.docCount} docs)`, 'success');
-          else showLog(`⚠️ Fabric pattern skipped: ${data.error || data.reason || 'unknown'}`, 'warning');
-        }).catch(() => showLog(`⚠️ Fabric pattern generation skipped (Fabric not configured)`, 'warning'));
+        // Step 2: Generate Fabric pattern
+        showLog(`\n--- STEP 2: GENERATING FABRIC PATTERN ---`, 'processing');
+        try {
+          const fabricResponse = await fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
+            body: JSON.stringify({ collection: currentCollection })
+          });
+          const fabricData = await fabricResponse.json();
+          if (fabricData.success) showLog(`✨ Fabric pattern generated (${fabricData.docCount} docs)`, 'success');
+          else showLog(`⚠️ Fabric pattern skipped: ${fabricData.error || fabricData.reason || 'unknown'}`, 'warning');
+        } catch (error) {
+          showLog(`⚠️ Fabric pattern error: ${error.message}`, 'warning');
+        }
 
         // Step 3: Embed Converted Files
         showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
@@ -755,13 +760,21 @@
         showLog(`✓ ${selected.length} source files processed in ${formatTime(totalElapsed)}`, 'success');
         showLog(`Files are now ready for search and analysis`, 'info');
 
-        // Calculate and save optimal search settings (fire-and-forget)
-        window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/search-settings`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        }).then(r => r.json()).then(data => {
-          if (data.success) showLog(`✨ Search settings optimized: topK=${data.settings.topK} temp=${data.settings.temperature} ctx=${data.settings.contextSize} tokens=${data.settings.tokenLimit || 'unlimited'} (${data.settings.totalChunks} chunks)`, 'success');
-        }).catch(() => {});
+        // Calculate and save optimal search settings
+        try {
+          const settingsResponse = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/search-settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const settingsData = await settingsResponse.json();
+          if (settingsData.success) {
+            showLog(`✨ Search settings: topK=${settingsData.settings.topK} temp=${settingsData.settings.temperature} ctx=${settingsData.settings.contextSize} tokens=${settingsData.settings.tokenLimit || 'unlimited'}`, 'success');
+          } else {
+            showLog(`⚠️ Search settings failed: ${settingsData.error || 'unknown error'}`, 'warning');
+          }
+        } catch (error) {
+          showLog(`⚠️ Search settings error: ${error.message}`, 'warning');
+        }
         
         // Refresh document list to show final status
         await loadDocuments();

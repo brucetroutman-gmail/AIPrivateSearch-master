@@ -1,5 +1,4 @@
 # 12-sample
-DocID: Typ_1762462676173_v7apsnrzq
 
 ```cpp
 /**

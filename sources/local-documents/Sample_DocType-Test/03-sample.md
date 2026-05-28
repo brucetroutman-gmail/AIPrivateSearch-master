@@ -1,5 +1,4 @@
 # 03-sample
-DocID: Doc_1779828446412_tgfs4ddqt
 
 **document_type**: sample_json
 **title**: Sample JSON Document

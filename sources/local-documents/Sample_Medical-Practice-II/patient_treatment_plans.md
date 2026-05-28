@@ -1,5 +1,4 @@
 # patient_treatment_plans
-DocID: Med_1779820695906_cyahpd3z2
 
 ## patient_id: P001
 **treatment_plan_item**: Chemotherapy: Doxorubicin and Cisplatin

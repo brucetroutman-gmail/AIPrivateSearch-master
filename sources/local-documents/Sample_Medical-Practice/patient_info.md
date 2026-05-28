@@ -1,5 +1,4 @@
 # patient_info
-DocID: Med_1779886916133_ye2zj29k9
 
 ## patient_id: P001
 **name**: John A. Smith

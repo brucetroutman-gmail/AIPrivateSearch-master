@@ -10,5 +10,15 @@
       "convertedFile": "The Federalist Papers.md",
       "addedAt": "2026-05-26T20:17:54.787Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 30,
+    "temperature": 0.3,
+    "contextSize": 16384,
+    "tokenLimit": 2048,
+    "totalChunks": 658,
+    "totalDocs": 1,
+    "avgChunkSize": 1754,
+    "generatedAt": "2026-05-28T20:55:10.666Z"
+  }
 }

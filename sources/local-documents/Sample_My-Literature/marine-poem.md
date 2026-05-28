@@ -1,5 +1,4 @@
 # marine-poem
-DocID: my-_984333
 
 # Marine's Devotion
 

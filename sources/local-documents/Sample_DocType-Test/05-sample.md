@@ -1,5 +1,4 @@
 # 05-sample
-DocID: Typ_1762462645057_8n57mo6go
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

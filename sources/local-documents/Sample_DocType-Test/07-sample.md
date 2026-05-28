@@ -1,5 +1,4 @@
 # 07-sample
-DocID: Typ_1762462649713_769yt6ke6
 
 | Product | Category | Price | Stock | Supplier |
 |---|---|---|---|---|

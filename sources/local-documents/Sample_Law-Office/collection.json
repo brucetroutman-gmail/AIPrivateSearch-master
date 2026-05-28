@@ -122,5 +122,15 @@
       "convertedFile": "staff.md",
       "addedAt": "2026-05-26T18:44:49.959Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 8192,
+    "tokenLimit": 1024,
+    "totalChunks": 21,
+    "totalDocs": 15,
+    "avgChunkSize": 855,
+    "generatedAt": "2026-05-28T20:59:43.582Z"
+  }
 }

@@ -1,5 +1,4 @@
 # Living Will of William Brown
-DocID: Law_1761081184763_t8m845zkz
 
 [Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Law-Office/Living Will of William Brown.pdf" -
 /bin/sh: pdftotext: command not found

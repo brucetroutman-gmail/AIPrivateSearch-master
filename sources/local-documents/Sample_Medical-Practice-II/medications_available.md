@@ -1,5 +1,4 @@
 # medications_available
-DocID: Med_1779820671022_iq9g8u74g
 
 ## Medication Name: Doxorubicin
 **Used For**: Chemotherapy for osteosarcoma

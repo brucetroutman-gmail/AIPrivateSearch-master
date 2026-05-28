@@ -1,5 +1,4 @@
 # 10-sample
-DocID: Typ_1762462665808_3tx330zwa
 
 ```javascript
 /**

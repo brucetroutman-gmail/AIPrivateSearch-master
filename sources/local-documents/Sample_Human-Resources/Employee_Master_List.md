@@ -1,5 +1,4 @@
 # Employee_Master_List
-DocID: Hum_1762472827490_46t9l95ce
 
 ## Employee_ID: 001
 **Name**: John Smith

@@ -1,0 +1,64 @@
+{
+  "name": "Sample_Medical-Practice-II",
+  "created": "2026-05-28T18:50:42.318Z",
+  "documents": [
+    {
+      "id": "6371f2076d38",
+      "name": "patient_medical_histories",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/patient_medical_histories.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_medical_histories.md",
+      "addedAt": "2026-05-28T18:50:42.318Z"
+    },
+    {
+      "id": "44a17e68b38b",
+      "name": "patient_treatment_plans",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/patient_treatment_plans.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_treatment_plans.md",
+      "addedAt": "2026-05-28T18:50:42.392Z"
+    },
+    {
+      "id": "15c276a22f18",
+      "name": "practice-overview",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/practice-overview.docx",
+      "sourceExt": "docx",
+      "convertedFile": "practice-overview.md",
+      "addedAt": "2026-05-28T18:50:42.485Z"
+    },
+    {
+      "id": "a973304d6c52",
+      "name": "medications_available",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/medications_available.json",
+      "sourceExt": "json",
+      "convertedFile": "medications_available.md",
+      "addedAt": "2026-05-28T18:50:57.019Z"
+    },
+    {
+      "id": "2d3ef421ed0a",
+      "name": "patient_appointments_calendar",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/patient_appointments_calendar.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_appointments_calendar.md",
+      "addedAt": "2026-05-28T18:50:57.170Z"
+    },
+    {
+      "id": "c3769871e30e",
+      "name": "patient_info",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice-II/patient_info.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_info.md",
+      "addedAt": "2026-05-28T19:01:32.988Z"
+    }
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 8192,
+    "tokenLimit": 1024,
+    "totalChunks": 21,
+    "totalDocs": 6,
+    "avgChunkSize": 1610,
+    "generatedAt": "2026-05-28T21:00:46.381Z"
+  }
+}

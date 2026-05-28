@@ -617,8 +617,8 @@ router.post('/collections/:collection/search-settings', async (req, res) => {
     const nextPow2 = (n) => Math.pow(2, Math.ceil(Math.log2(n)));
     const contextSize = Math.min(32768, Math.max(4096, nextPow2(tokensNeeded)));
 
-    // Token limit: short structured=512, long prose=2048, structured records=1024
-    const tokenLimit = isShortDocs ? 512 : isLongProse ? 2048 : 1024;
+    // Token limit: short structured=1024, long prose=2048, structured records=1024
+    const tokenLimit = isLongProse ? 2048 : 1024;
 
     const settings = {
       topK,

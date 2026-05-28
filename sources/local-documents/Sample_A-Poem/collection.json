@@ -10,5 +10,15 @@
       "convertedFile": "marine-poem.md",
       "addedAt": "2026-05-26T19:03:20.558Z"
     }
-  ]
+  ],
+  "searchSettings": {
+    "topK": 10,
+    "temperature": 0.1,
+    "contextSize": 4096,
+    "tokenLimit": 512,
+    "totalChunks": 1,
+    "totalDocs": 1,
+    "avgChunkSize": 418,
+    "generatedAt": "2026-05-28T20:48:35.884Z"
+  }
 }
