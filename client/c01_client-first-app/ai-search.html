@@ -191,21 +191,13 @@
                 <select id="modelSelect" class="model-select" required>
                     <option value="" disabled selected>Select Model</option>
                 </select>
-                <select id="temperatureSelect" class="param-select prem-only">
-                    <option value="0.3" selected>Predictable</option>
-                    <option value="0.6">Balanced</option>
-                    <option value="0.9">Creative</option>
+                <select id="temperatureSelect" class="param-select prem-only" title="Temperature">
                 </select>
-                <select id="contextSelect" class="param-select prem-only">
-                    <option value="1024" selected>1024</option>
-                    <option value="2048">2048</option>
-                    <option value="4096">4096</option>
-                    <option value="8192">8192</option>
+                <select id="contextSelect" class="param-select prem-only" title="Context Size">
                 </select>
-                <select id="tokensSelect" class="param-select prem-only">
-                    <option value="No Limit" selected>No Limit</option>
-                    <option value="250">250</option>
-                    <option value="500">500</option>
+                <select id="tokensSelect" class="param-select prem-only" title="Token Limit">
+                </select>
+                <select id="topKSelect" class="param-select prem-only" title="Top K Chunks">
                 </select>
             </div>
         </div>

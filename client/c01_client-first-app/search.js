@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.showUserMessage) {
     showUserMessage = window.showUserMessage;
   }
+  // Load all parameter dropdowns with search.html element IDs
+  window.parameterManager.loadAllDropdowns({
+    temperature: 'temperature',
+    context: 'context',
+    tokens: 'tokens',
+    topk: 'topk'
+  });
 });
 
 const form       = document.getElementById('searchForm');
@@ -22,6 +29,7 @@ const scoreTglEl = document.getElementById('scoreToggle');
 const temperatureEl = document.getElementById('temperature');
 const contextEl  = document.getElementById('context');
 const tokensEl   = document.getElementById('tokens');
+const topkEl     = document.getElementById('topk');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
 
@@ -74,6 +82,7 @@ async function loadCollections() {
     const lastUsed = localStorage.getItem('lastCollection');
     if (lastUsed && collections.includes(lastUsed)) {
       collectionEl.value = lastUsed;
+      window.parameterManager.onCollectionChange(lastUsed);
     }
     
     // Load user prompts after collections are loaded
@@ -445,8 +454,8 @@ sourceTypeEl.addEventListener('change', () => {
 // Save collection selection and update user prompts
 collectionEl.addEventListener('change', () => {
   localStorage.setItem('lastCollection', collectionEl.value);
-  // Reload user prompts when collection changes
   loadUserPrompts();
+  window.parameterManager.onCollectionChange(collectionEl.value);
 });
 
 // Save search type selection and update visibility
@@ -1166,9 +1175,10 @@ form.addEventListener('submit', async (e) => {
     const systemPromptName = selectedPrompt ? selectedPrompt.name : null;
     
     // Get token limit
-    const tokenLimit = tokensEl.value === 'No Limit' ? null : 
-                      tokensEl.value === '250' ? 250 : 
-                      tokensEl.value === '500' ? 500 : null;
+    const tokenLimit = tokensEl.value ? parseInt(tokensEl.value) : 1024;
+
+    // Get topK
+    const topK = parseInt(topkEl?.value || '10');
     
     // Generate TestCode
     const testCode = generateTestCode();
@@ -1343,7 +1353,8 @@ form.addEventListener('submit', async (e) => {
         model: modelEl.value,
         temperature: parseFloat(temperatureEl.value),
         contextSize: parseFloat(contextEl.value),
-        tokenLimit
+        tokenLimit,
+        topK
       });
       const searchEndTime = Date.now();
       

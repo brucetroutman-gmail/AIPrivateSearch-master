@@ -1,11 +1,6 @@
 {
   "search_types": [
     {
-      "value": "document-index",
-      "name": "Document Index Cards",
-      "description": "Structured queries using document index cards"
-    },
-    {
       "value": "line-search",
       "name": "Line Search",
       "description": "Line-by-line search with context and Boolean logic"

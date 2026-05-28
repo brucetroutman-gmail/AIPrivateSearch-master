@@ -90,8 +90,9 @@ async function performAllSearches() {
     const temperatureEl = document.getElementById('temperatureSelect');
     const contextEl = document.getElementById('contextSelect');
     const tokensEl = document.getElementById('tokensSelect');
+    const topK = parseInt(document.getElementById('topKSelect')?.value || '10');
     const temperature = parseFloat(temperatureEl?.value || '0.3');
-    const contextSize = parseInt(contextEl?.value || '1024');
+    const contextSize = parseInt(contextEl?.value || '4096');
     const tokenLimit = DOMSanitizer.sanitizeText(tokensEl?.value || 'No Limit');
 
     if (!query) { window.showUserMessage('Please enter a search query', 'error'); return; }
@@ -136,7 +137,7 @@ async function performAllSearches() {
         const searchPromises = [];
         const methodMap = {};
         selectedMethods.forEach(method => {
-            const options = { collection, model, temperature, contextSize, tokenLimit };
+            const options = { collection, model, temperature, contextSize, tokenLimit, topK };
             searchPromises.push(window.searchManager.executeSearch(method, query, options));
             methodMap[method] = searchPromises.length - 1;
         });
@@ -223,9 +224,16 @@ async function loadCollections() {
     const collectionSelect = document.getElementById('collectionSelect');
     if (collectionSelect && !collectionSelect.hasAttribute('data-prompt-listener')) {
         collectionSelect.addEventListener('change', loadUserPrompts);
+        collectionSelect.addEventListener('change', () => {
+            window.parameterManager.onCollectionChange(collectionSelect.value);
+        });
         collectionSelect.setAttribute('data-prompt-listener', 'true');
     }
     await loadUserPrompts();
+    // Apply collection settings for initially selected collection
+    if (collectionSelect.value) {
+        await window.parameterManager.onCollectionChange(collectionSelect.value);
+    }
 }
 
 async function loadModels() {
@@ -262,11 +270,7 @@ async function loadUserPrompts() {
 }
 
 function setupParameterPersistence() {
-    window.parameterManager.setupPersistence([
-        { elementId: 'temperatureSelect', storageKey: 'aiSearchTemperature' },
-        { elementId: 'contextSelect', storageKey: 'aiSearchContext' },
-        { elementId: 'tokensSelect', storageKey: 'aiSearchTokens' }
-    ]);
+    // Dropdowns are loaded and persisted by parameterManager.loadAllDropdowns()
 }
 
 function buildCheckboxes() {
@@ -299,6 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadCollections();
     loadModels();
+    await window.parameterManager.loadAllDropdowns();
     setupParameterPersistence();
 
     document.querySelectorAll('.sortable').forEach(th => {
