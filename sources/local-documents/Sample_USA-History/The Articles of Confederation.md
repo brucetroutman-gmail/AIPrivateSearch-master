@@ -1,7 +1,7 @@
 # The Articles of Confederation
 DocID: USA_1760216076565_1
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/USA-History/The Articles of Confederation.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_USA-History/The Articles of Confederation.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

@@ -1,56 +1,971 @@
 # Employee_Master_List
 DocID: Hum_1762472827490_46t9l95ce
 
-| Employee_ID | Name | Position | Department | Status | Hire_Date | Term_Date | DOB | CDL_Number | CDL_State | CDL_Exp | Med_Card_Exp | Terminal | Address | Phone | Email | Emergency_Contact | Emergency_Phone |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 001 | John Smith | President | Executive | Active | 2015-01-15 |  | 1970-05-12 |  |  |  |  | Corporate | 123 Main St | Dallas TX 75201 | 555-0101 | john.smith@trucking.com | Mary Smith | 555-0102 |
-| 002 | Sarah Johnson | VP Operations | Executive | Active | 2016-03-20 |  | 1975-08-22 |  |  |  |  | Corporate | 456 Oak Ave | Dallas TX 75202 | 555-0103 | sarah.johnson@trucking.com | Mike Johnson | 555-0104 |
-| 003 | Robert Davis | VP Safety | Executive | Active | 2017-06-10 |  | 1972-11-30 |  |  |  |  | Corporate | 789 Pine St | Dallas TX 75203 | 555-0105 | robert.davis@trucking.com | Linda Davis | 555-0106 |
-| 004 | Jennifer Wilson | Executive Secretary | Administration | Active | 2018-02-14 |  | 1980-03-15 |  |  |  |  | Corporate | 321 Elm St | Dallas TX 75204 | 555-0107 | jennifer.wilson@trucking.com | Tom Wilson | 555-0108 |
-| 005 | Lisa Brown | Operations Secretary | Administration | Active | 2019-04-22 |  | 1985-07-08 |  |  |  |  | Corporate | 654 Maple Ave | Dallas TX 75205 | 555-0109 | lisa.brown@trucking.com | David Brown | 555-0110 |
-| 006 | Michelle Garcia | Safety Secretary | Administration | Active | 2020-01-30 |  | 1982-12-03 |  |  |  |  | Corporate | 987 Cedar St | Dallas TX 75206 | 555-0111 | michelle.garcia@trucking.com | Carlos Garcia | 555-0112 |
-| 007 | Mark Thompson | Dispatcher | Operations | Active | 2018-05-15 |  | 1978-09-25 |  |  |  |  | Dallas | 147 First St | Dallas TX 75207 | 555-0113 | mark.thompson@trucking.com | Susan Thompson | 555-0114 |
-| 008 | Kevin Martinez | Dispatcher | Operations | Active | 2019-08-12 |  | 1983-04-18 |  |  |  |  | Houston | 258 Second Ave | Houston TX 77001 | 555-0115 | kevin.martinez@trucking.com | Maria Martinez | 555-0116 |
-| 009 | Brian Anderson | Dispatcher | Operations | Active | 2020-11-05 |  | 1981-01-22 |  |  |  |  | Atlanta | 369 Third St | Atlanta GA 30301 | 555-0117 | brian.anderson@trucking.com | Amy Anderson | 555-0118 |
-| 010 | Steven Taylor | Dispatcher | Operations | Active | 2021-03-18 |  | 1979-06-14 |  |  |  |  | Phoenix | 741 Fourth Ave | Phoenix AZ 85001 | 555-0119 | steven.taylor@trucking.com | Jennifer Taylor | 555-0120 |
-| 011 | Daniel White | Dispatcher | Operations | Active | 2021-07-25 |  | 1984-10-07 |  |  |  |  | Denver | 852 Fifth St | Denver CO 80201 | 555-0121 | daniel.white@trucking.com | Lisa White | 555-0122 |
-| 012 | Michael Johnson | Driver | Transportation | Active | 2020-01-15 |  | 1975-03-20 | TX123456789 | TX | 2026-03-20 | 2025-12-15 | Dallas | 123 Driver Ln | Dallas TX 75208 | 555-0201 | michael.johnson@trucking.com | Carol Johnson | 555-0202 |
-| 013 | David Miller | Driver | Transportation | Active | 2020-02-20 |  | 1978-07-12 | TX234567890 | TX | 2026-07-12 | 2026-01-20 | Dallas | 234 Trucker St | Dallas TX 75209 | 555-0203 | david.miller@trucking.com | Nancy Miller | 555-0204 |
-| 014 | James Wilson | Driver | Transportation | Active | 2020-03-25 |  | 1980-11-05 | TX345678901 | TX | 2026-11-05 | 2025-11-25 | Houston | 345 Highway Rd | Houston TX 77002 | 555-0205 | james.wilson@trucking.com | Patricia Wilson | 555-0206 |
-| 015 | Robert Brown | Driver | Transportation | Active | 2020-04-30 |  | 1976-02-28 | TX456789012 | TX | 2026-02-28 | 2026-02-10 | Houston | 456 Route Ave | Houston TX 77003 | 555-0207 | robert.brown@trucking.com | Barbara Brown | 555-0208 |
-| 016 | William Davis | Driver | Transportation | Active | 2020-05-10 |  | 1982-06-15 | GA567890123 | GA | 2026-06-15 | 2025-12-30 | Atlanta | 567 Interstate Dr | Atlanta GA 30302 | 555-0209 | william.davis@trucking.com | Sandra Davis | 555-0210 |
-| 017 | Richard Garcia | Driver | Transportation | Active | 2020-06-15 |  | 1977-09-08 | GA678901234 | GA | 2026-09-08 | 2026-03-15 | Atlanta | 678 Freeway Blvd | Atlanta GA 30303 | 555-0211 | richard.garcia@trucking.com | Maria Garcia | 555-0212 |
-| 018 | Charles Martinez | Driver | Transportation | Active | 2020-07-20 |  | 1979-12-22 | AZ789012345 | AZ | 2026-12-22 | 2025-10-20 | Phoenix | 789 Desert Rd | Phoenix AZ 85002 | 555-0213 | charles.martinez@trucking.com | Rosa Martinez | 555-0214 |
-| 019 | Joseph Anderson | Driver | Transportation | Active | 2020-08-25 |  | 1981-04-10 | AZ890123456 | AZ | 2026-04-10 | 2026-01-25 | Phoenix | 890 Cactus Ave | Phoenix AZ 85003 | 555-0215 | joseph.anderson@trucking.com | Helen Anderson | 555-0216 |
-| 020 | Thomas Taylor | Driver | Transportation | Active | 2020-09-30 |  | 1974-08-03 | CO901234567 | CO | 2026-08-03 | 2025-11-30 | Denver | 901 Mountain St | Denver CO 80202 | 555-0217 | thomas.taylor@trucking.com | Dorothy Taylor | 555-0218 |
-| 021 | Christopher White | Driver | Transportation | Active | 2020-10-05 |  | 1983-01-18 | CO012345678 | CO | 2026-01-18 | 2026-02-05 | Denver | 012 Valley Dr | Denver CO 80203 | 555-0219 | christopher.white@trucking.com | Betty White | 555-0220 |
-| 022 | Daniel Harris | Driver | Transportation | Active | 2021-01-10 |  | 1978-05-25 | TX123456790 | TX | 2027-05-25 | 2026-03-10 | Dallas | 123 Oak Tree Ln | Dallas TX 75210 | 555-0221 | daniel.harris@trucking.com | Ruth Harris | 555-0222 |
-| 023 | Matthew Clark | Driver | Transportation | Active | 2021-02-15 |  | 1980-09-12 | TX234567801 | TX | 2027-09-12 | 2025-12-15 | Dallas | 234 Pine Hill St | Dallas TX 75211 | 555-0223 | matthew.clark@trucking.com | Sharon Clark | 555-0224 |
-| 024 | Anthony Lewis | Driver | Transportation | Active | 2021-03-20 |  | 1976-12-30 | TX345678912 | TX | 2027-12-30 | 2026-01-20 | Houston | 345 Cedar Park Ave | Houston TX 77004 | 555-0225 | anthony.lewis@trucking.com | Michelle Lewis | 555-0226 |
-| 025 | Mark Robinson | Driver | Transportation | Active | 2021-04-25 |  | 1982-03-17 | TX456789023 | TX | 2027-03-17 | 2025-11-25 | Houston | 456 Maple Grove Rd | Houston TX 77005 | 555-0227 | mark.robinson@trucking.com | Kimberly Robinson | 555-0228 |
-| 026 | Donald Walker | Driver | Transportation | Active | 2021-05-30 |  | 1979-07-04 | GA567890134 | GA | 2027-07-04 | 2026-02-28 | Atlanta | 567 Elm Street Dr | Atlanta GA 30304 | 555-0229 | donald.walker@trucking.com | Deborah Walker | 555-0230 |
-| 027 | Steven Hall | Driver | Transportation | Active | 2021-06-05 |  | 1981-10-21 | GA678901245 | GA | 2027-10-21 | 2025-12-05 | Atlanta | 678 Birch Lane Blvd | Atlanta GA 30305 | 555-0231 | steven.hall@trucking.com | Lisa Hall | 555-0232 |
-| 028 | Paul Allen | Driver | Transportation | Active | 2021-07-10 |  | 1977-02-14 | AZ789012356 | AZ | 2027-02-14 | 2026-03-10 | Phoenix | 789 Willow Creek Rd | Phoenix AZ 85004 | 555-0233 | paul.allen@trucking.com | Nancy Allen | 555-0234 |
-| 029 | Andrew Young | Driver | Transportation | Active | 2021-08-15 |  | 1983-06-01 | AZ890123467 | AZ | 2027-06-01 | 2025-10-15 | Phoenix | 890 Aspen Way Ave | Phoenix AZ 85005 | 555-0235 | andrew.young@trucking.com | Karen Young | 555-0236 |
-| 030 | Joshua Hernandez | Driver | Transportation | Active | 2021-09-20 |  | 1975-11-28 | CO901234578 | CO | 2027-11-28 | 2026-01-20 | Denver | 901 Spruce Hill St | Denver CO 80204 | 555-0237 | joshua.hernandez@trucking.com | Sandra Hernandez | 555-0238 |
-| 031 | Kenneth King | Driver | Transportation | Active | 2021-10-25 |  | 1980-04-15 | CO012345689 | CO | 2027-04-15 | 2025-12-25 | Denver | 012 Fir Valley Dr | Denver CO 80205 | 555-0239 | kenneth.king@trucking.com | Donna King | 555-0240 |
-| 032 | Kevin Wright | Driver | Transportation | Active | 2022-01-30 |  | 1978-08-08 | TX123456791 | TX | 2028-08-08 | 2026-02-28 | Dallas | 123 Redwood Ct | Dallas TX 75212 | 555-0241 | kevin.wright@trucking.com | Carol Wright | 555-0242 |
-| 033 | Brian Lopez | Driver | Transportation | Active | 2022-02-05 |  | 1982-12-25 | TX234567802 | TX | 2028-12-25 | 2025-11-05 | Dallas | 234 Sequoia Ave | Dallas TX 75213 | 555-0243 | brian.lopez@trucking.com | Patricia Lopez | 555-0244 |
-| 034 | George Hill | Driver | Transportation | Active | 2022-03-10 |  | 1976-05-12 | TX345678913 | TX | 2028-05-12 | 2026-01-10 | Houston | 345 Magnolia St | Houston TX 77006 | 555-0245 | george.hill@trucking.com | Linda Hill | 555-0246 |
-| 035 | Edward Scott | Driver | Transportation | Active | 2022-04-15 |  | 1981-09-29 | TX456789024 | TX | 2028-09-29 | 2025-12-15 | Houston | 456 Dogwood Rd | Houston TX 77007 | 555-0247 | edward.scott@trucking.com | Barbara Scott | 555-0248 |
-| 036 | Ronald Green | Driver | Transportation | Active | 2022-05-20 |  | 1979-01-16 | GA567890135 | GA | 2028-01-16 | 2026-03-20 | Atlanta | 567 Hickory Dr | Atlanta GA 30306 | 555-0249 | ronald.green@trucking.com | Elizabeth Green | 555-0250 |
-| 037 | Timothy Adams | Driver | Transportation | Active | 2022-06-25 |  | 1983-06-03 | GA678901246 | GA | 2028-06-03 | 2025-10-25 | Atlanta | 678 Walnut Ave | Atlanta GA 30307 | 555-0251 | timothy.adams@trucking.com | Jennifer Adams | 555-0252 |
-| 038 | Jason Baker | Driver | Transportation | Active | 2022-07-30 |  | 1977-10-20 | AZ789012357 | AZ | 2028-10-20 | 2026-02-28 | Phoenix | 789 Pecan St | Phoenix AZ 85006 | 555-0253 | jason.baker@trucking.com | Maria Baker | 555-0254 |
-| 039 | Jeffrey Gonzalez | Driver | Transportation | Active | 2022-08-05 |  | 1980-02-07 | AZ890123468 | AZ | 2028-02-07 | 2025-11-05 | Phoenix | 890 Chestnut Blvd | Phoenix AZ 85007 | 555-0255 | jeffrey.gonzalez@trucking.com | Susan Gonzalez | 555-0256 |
-| 040 | Ryan Nelson | Driver | Transportation | Active | 2022-09-10 |  | 1975-07-24 | CO901234579 | CO | 2028-07-24 | 2026-01-10 | Denver | 901 Poplar Rd | Denver CO 80206 | 555-0257 | ryan.nelson@trucking.com | Margaret Nelson | 555-0258 |
-| 041 | Jacob Carter | Driver | Transportation | Active | 2022-10-15 |  | 1982-11-11 | CO012345690 | CO | 2028-11-11 | 2025-12-15 | Denver | 012 Sycamore Dr | Denver CO 80207 | 555-0259 | jacob.carter@trucking.com | Dorothy Carter | 555-0260 |
-| 042 | Gary Mitchell | Driver | Transportation | Active | 2023-01-20 |  | 1978-03-28 | TX123456792 | TX | 2029-03-28 | 2026-03-20 | Dallas | 123 Cottonwood Ave | Dallas TX 75214 | 555-0261 | gary.mitchell@trucking.com | Lisa Mitchell | 555-0262 |
-| 043 | Nicholas Perez | Driver | Transportation | Active | 2023-02-25 |  | 1981-08-15 | TX234567803 | TX | 2029-08-15 | 2025-10-25 | Dallas | 234 Basswood St | Dallas TX 75215 | 555-0263 | nicholas.perez@trucking.com | Nancy Perez | 555-0264 |
-| 044 | Eric Roberts | Driver | Transportation | Active | 2023-03-30 |  | 1976-12-02 | TX345678914 | TX | 2029-12-02 | 2026-02-28 | Houston | 345 Beech Rd | Houston TX 77008 | 555-0265 | eric.roberts@trucking.com | Karen Roberts | 555-0266 |
-| 045 | Jonathan Turner | Driver | Transportation | Active | 2023-04-05 |  | 1983-04-19 | TX456789025 | TX | 2029-04-19 | 2025-11-05 | Houston | 456 Cypress Dr | Houston TX 77009 | 555-0267 | jonathan.turner@trucking.com | Betty Turner | 555-0268 |
-| 046 | Stephen Phillips | Driver | Transportation | Active | 2023-05-10 |  | 1979-09-06 | GA567890136 | GA | 2029-09-06 | 2026-01-10 | Atlanta | 567 Juniper Ave | Atlanta GA 30308 | 555-0269 | stephen.phillips@trucking.com | Helen Phillips | 555-0270 |
-| 047 | Larry Campbell | Driver | Transportation | Active | 2023-06-15 |  | 1980-01-23 | GA678901247 | GA | 2029-01-23 | 2025-12-15 | Atlanta | 678 Laurel St | Atlanta GA 30309 | 555-0271 | larry.campbell@trucking.com | Sandra Campbell | 555-0272 |
-| 048 | Justin Parker | Driver | Transportation | Active | 2023-07-20 |  | 1977-06-10 | AZ789012358 | AZ | 2029-06-10 | 2026-03-20 | Phoenix | 789 Holly Blvd | Phoenix AZ 85008 | 555-0273 | justin.parker@trucking.com | Donna Parker | 555-0274 |
-| 049 | Scott Evans | Driver | Transportation | Active | 2023-08-25 |  | 1982-10-27 | AZ890123469 | AZ | 2029-10-27 | 2025-10-25 | Phoenix | 890 Ivy Rd | Phoenix AZ 85009 | 555-0275 | scott.evans@trucking.com | Carol Evans | 555-0276 |
-| 050 | Brandon Edwards | Driver | Transportation | Active | 2023-09-30 |  | 1975-02-14 | CO901234580 | CO | 2029-02-14 | 2026-02-28 | Denver | 901 Rose Dr | Denver CO 80208 | 555-0277 | brandon.edwards@trucking.com | Patricia Edwards | 555-0278 |
-| 051 | Benjamin Collins | Driver | Transportation | Active | 2023-10-05 |  | 1981-07-01 | CO012345691 | CO | 2029-07-01 | 2025-11-05 | Denver | 012 Violet Ave | Denver CO 80209 | 555-0279 | benjamin.collins@trucking.com | Linda Collins | 555-0280 |
+## Employee_ID: 001
+**Name**: John Smith
+**Position**: President
+**Department**: Executive
+**Status**: Active
+**Hire_Date**: 2015-01-15
+**Term_Date**: 
+**DOB**: 1970-05-12
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 123 Main St
+**Phone**: Dallas TX 75201
+**Email**: 555-0101
+**Emergency_Contact**: john.smith@trucking.com
+**Emergency_Phone**: Mary Smith
+
+## Employee_ID: 002
+**Name**: Sarah Johnson
+**Position**: VP Operations
+**Department**: Executive
+**Status**: Active
+**Hire_Date**: 2016-03-20
+**Term_Date**: 
+**DOB**: 1975-08-22
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 456 Oak Ave
+**Phone**: Dallas TX 75202
+**Email**: 555-0103
+**Emergency_Contact**: sarah.johnson@trucking.com
+**Emergency_Phone**: Mike Johnson
+
+## Employee_ID: 003
+**Name**: Robert Davis
+**Position**: VP Safety
+**Department**: Executive
+**Status**: Active
+**Hire_Date**: 2017-06-10
+**Term_Date**: 
+**DOB**: 1972-11-30
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 789 Pine St
+**Phone**: Dallas TX 75203
+**Email**: 555-0105
+**Emergency_Contact**: robert.davis@trucking.com
+**Emergency_Phone**: Linda Davis
+
+## Employee_ID: 004
+**Name**: Jennifer Wilson
+**Position**: Executive Secretary
+**Department**: Administration
+**Status**: Active
+**Hire_Date**: 2018-02-14
+**Term_Date**: 
+**DOB**: 1980-03-15
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 321 Elm St
+**Phone**: Dallas TX 75204
+**Email**: 555-0107
+**Emergency_Contact**: jennifer.wilson@trucking.com
+**Emergency_Phone**: Tom Wilson
+
+## Employee_ID: 005
+**Name**: Lisa Brown
+**Position**: Operations Secretary
+**Department**: Administration
+**Status**: Active
+**Hire_Date**: 2019-04-22
+**Term_Date**: 
+**DOB**: 1985-07-08
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 654 Maple Ave
+**Phone**: Dallas TX 75205
+**Email**: 555-0109
+**Emergency_Contact**: lisa.brown@trucking.com
+**Emergency_Phone**: David Brown
+
+## Employee_ID: 006
+**Name**: Michelle Garcia
+**Position**: Safety Secretary
+**Department**: Administration
+**Status**: Active
+**Hire_Date**: 2020-01-30
+**Term_Date**: 
+**DOB**: 1982-12-03
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Corporate
+**Address**: 987 Cedar St
+**Phone**: Dallas TX 75206
+**Email**: 555-0111
+**Emergency_Contact**: michelle.garcia@trucking.com
+**Emergency_Phone**: Carlos Garcia
+
+## Employee_ID: 007
+**Name**: Mark Thompson
+**Position**: Dispatcher
+**Department**: Operations
+**Status**: Active
+**Hire_Date**: 2018-05-15
+**Term_Date**: 
+**DOB**: 1978-09-25
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Dallas
+**Address**: 147 First St
+**Phone**: Dallas TX 75207
+**Email**: 555-0113
+**Emergency_Contact**: mark.thompson@trucking.com
+**Emergency_Phone**: Susan Thompson
+
+## Employee_ID: 008
+**Name**: Kevin Martinez
+**Position**: Dispatcher
+**Department**: Operations
+**Status**: Active
+**Hire_Date**: 2019-08-12
+**Term_Date**: 
+**DOB**: 1983-04-18
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Houston
+**Address**: 258 Second Ave
+**Phone**: Houston TX 77001
+**Email**: 555-0115
+**Emergency_Contact**: kevin.martinez@trucking.com
+**Emergency_Phone**: Maria Martinez
+
+## Employee_ID: 009
+**Name**: Brian Anderson
+**Position**: Dispatcher
+**Department**: Operations
+**Status**: Active
+**Hire_Date**: 2020-11-05
+**Term_Date**: 
+**DOB**: 1981-01-22
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Atlanta
+**Address**: 369 Third St
+**Phone**: Atlanta GA 30301
+**Email**: 555-0117
+**Emergency_Contact**: brian.anderson@trucking.com
+**Emergency_Phone**: Amy Anderson
+
+## Employee_ID: 010
+**Name**: Steven Taylor
+**Position**: Dispatcher
+**Department**: Operations
+**Status**: Active
+**Hire_Date**: 2021-03-18
+**Term_Date**: 
+**DOB**: 1979-06-14
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Phoenix
+**Address**: 741 Fourth Ave
+**Phone**: Phoenix AZ 85001
+**Email**: 555-0119
+**Emergency_Contact**: steven.taylor@trucking.com
+**Emergency_Phone**: Jennifer Taylor
+
+## Employee_ID: 011
+**Name**: Daniel White
+**Position**: Dispatcher
+**Department**: Operations
+**Status**: Active
+**Hire_Date**: 2021-07-25
+**Term_Date**: 
+**DOB**: 1984-10-07
+**CDL_Number**: 
+**CDL_State**: 
+**CDL_Exp**: 
+**Med_Card_Exp**: 
+**Terminal**: Denver
+**Address**: 852 Fifth St
+**Phone**: Denver CO 80201
+**Email**: 555-0121
+**Emergency_Contact**: daniel.white@trucking.com
+**Emergency_Phone**: Lisa White
+
+## Employee_ID: 012
+**Name**: Michael Johnson
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-01-15
+**Term_Date**: 
+**DOB**: 1975-03-20
+**CDL_Number**: TX123456789
+**CDL_State**: TX
+**CDL_Exp**: 2026-03-20
+**Med_Card_Exp**: 2025-12-15
+**Terminal**: Dallas
+**Address**: 123 Driver Ln
+**Phone**: Dallas TX 75208
+**Email**: 555-0201
+**Emergency_Contact**: michael.johnson@trucking.com
+**Emergency_Phone**: Carol Johnson
+
+## Employee_ID: 013
+**Name**: David Miller
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-02-20
+**Term_Date**: 
+**DOB**: 1978-07-12
+**CDL_Number**: TX234567890
+**CDL_State**: TX
+**CDL_Exp**: 2026-07-12
+**Med_Card_Exp**: 2026-01-20
+**Terminal**: Dallas
+**Address**: 234 Trucker St
+**Phone**: Dallas TX 75209
+**Email**: 555-0203
+**Emergency_Contact**: david.miller@trucking.com
+**Emergency_Phone**: Nancy Miller
+
+## Employee_ID: 014
+**Name**: James Wilson
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-03-25
+**Term_Date**: 
+**DOB**: 1980-11-05
+**CDL_Number**: TX345678901
+**CDL_State**: TX
+**CDL_Exp**: 2026-11-05
+**Med_Card_Exp**: 2025-11-25
+**Terminal**: Houston
+**Address**: 345 Highway Rd
+**Phone**: Houston TX 77002
+**Email**: 555-0205
+**Emergency_Contact**: james.wilson@trucking.com
+**Emergency_Phone**: Patricia Wilson
+
+## Employee_ID: 015
+**Name**: Robert Brown
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-04-30
+**Term_Date**: 
+**DOB**: 1976-02-28
+**CDL_Number**: TX456789012
+**CDL_State**: TX
+**CDL_Exp**: 2026-02-28
+**Med_Card_Exp**: 2026-02-10
+**Terminal**: Houston
+**Address**: 456 Route Ave
+**Phone**: Houston TX 77003
+**Email**: 555-0207
+**Emergency_Contact**: robert.brown@trucking.com
+**Emergency_Phone**: Barbara Brown
+
+## Employee_ID: 016
+**Name**: William Davis
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-05-10
+**Term_Date**: 
+**DOB**: 1982-06-15
+**CDL_Number**: GA567890123
+**CDL_State**: GA
+**CDL_Exp**: 2026-06-15
+**Med_Card_Exp**: 2025-12-30
+**Terminal**: Atlanta
+**Address**: 567 Interstate Dr
+**Phone**: Atlanta GA 30302
+**Email**: 555-0209
+**Emergency_Contact**: william.davis@trucking.com
+**Emergency_Phone**: Sandra Davis
+
+## Employee_ID: 017
+**Name**: Richard Garcia
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-06-15
+**Term_Date**: 
+**DOB**: 1977-09-08
+**CDL_Number**: GA678901234
+**CDL_State**: GA
+**CDL_Exp**: 2026-09-08
+**Med_Card_Exp**: 2026-03-15
+**Terminal**: Atlanta
+**Address**: 678 Freeway Blvd
+**Phone**: Atlanta GA 30303
+**Email**: 555-0211
+**Emergency_Contact**: richard.garcia@trucking.com
+**Emergency_Phone**: Maria Garcia
+
+## Employee_ID: 018
+**Name**: Charles Martinez
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-07-20
+**Term_Date**: 
+**DOB**: 1979-12-22
+**CDL_Number**: AZ789012345
+**CDL_State**: AZ
+**CDL_Exp**: 2026-12-22
+**Med_Card_Exp**: 2025-10-20
+**Terminal**: Phoenix
+**Address**: 789 Desert Rd
+**Phone**: Phoenix AZ 85002
+**Email**: 555-0213
+**Emergency_Contact**: charles.martinez@trucking.com
+**Emergency_Phone**: Rosa Martinez
+
+## Employee_ID: 019
+**Name**: Joseph Anderson
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-08-25
+**Term_Date**: 
+**DOB**: 1981-04-10
+**CDL_Number**: AZ890123456
+**CDL_State**: AZ
+**CDL_Exp**: 2026-04-10
+**Med_Card_Exp**: 2026-01-25
+**Terminal**: Phoenix
+**Address**: 890 Cactus Ave
+**Phone**: Phoenix AZ 85003
+**Email**: 555-0215
+**Emergency_Contact**: joseph.anderson@trucking.com
+**Emergency_Phone**: Helen Anderson
+
+## Employee_ID: 020
+**Name**: Thomas Taylor
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-09-30
+**Term_Date**: 
+**DOB**: 1974-08-03
+**CDL_Number**: CO901234567
+**CDL_State**: CO
+**CDL_Exp**: 2026-08-03
+**Med_Card_Exp**: 2025-11-30
+**Terminal**: Denver
+**Address**: 901 Mountain St
+**Phone**: Denver CO 80202
+**Email**: 555-0217
+**Emergency_Contact**: thomas.taylor@trucking.com
+**Emergency_Phone**: Dorothy Taylor
+
+## Employee_ID: 021
+**Name**: Christopher White
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2020-10-05
+**Term_Date**: 
+**DOB**: 1983-01-18
+**CDL_Number**: CO012345678
+**CDL_State**: CO
+**CDL_Exp**: 2026-01-18
+**Med_Card_Exp**: 2026-02-05
+**Terminal**: Denver
+**Address**: 012 Valley Dr
+**Phone**: Denver CO 80203
+**Email**: 555-0219
+**Emergency_Contact**: christopher.white@trucking.com
+**Emergency_Phone**: Betty White
+
+## Employee_ID: 022
+**Name**: Daniel Harris
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-01-10
+**Term_Date**: 
+**DOB**: 1978-05-25
+**CDL_Number**: TX123456790
+**CDL_State**: TX
+**CDL_Exp**: 2027-05-25
+**Med_Card_Exp**: 2026-03-10
+**Terminal**: Dallas
+**Address**: 123 Oak Tree Ln
+**Phone**: Dallas TX 75210
+**Email**: 555-0221
+**Emergency_Contact**: daniel.harris@trucking.com
+**Emergency_Phone**: Ruth Harris
+
+## Employee_ID: 023
+**Name**: Matthew Clark
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-02-15
+**Term_Date**: 
+**DOB**: 1980-09-12
+**CDL_Number**: TX234567801
+**CDL_State**: TX
+**CDL_Exp**: 2027-09-12
+**Med_Card_Exp**: 2025-12-15
+**Terminal**: Dallas
+**Address**: 234 Pine Hill St
+**Phone**: Dallas TX 75211
+**Email**: 555-0223
+**Emergency_Contact**: matthew.clark@trucking.com
+**Emergency_Phone**: Sharon Clark
+
+## Employee_ID: 024
+**Name**: Anthony Lewis
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-03-20
+**Term_Date**: 
+**DOB**: 1976-12-30
+**CDL_Number**: TX345678912
+**CDL_State**: TX
+**CDL_Exp**: 2027-12-30
+**Med_Card_Exp**: 2026-01-20
+**Terminal**: Houston
+**Address**: 345 Cedar Park Ave
+**Phone**: Houston TX 77004
+**Email**: 555-0225
+**Emergency_Contact**: anthony.lewis@trucking.com
+**Emergency_Phone**: Michelle Lewis
+
+## Employee_ID: 025
+**Name**: Mark Robinson
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-04-25
+**Term_Date**: 
+**DOB**: 1982-03-17
+**CDL_Number**: TX456789023
+**CDL_State**: TX
+**CDL_Exp**: 2027-03-17
+**Med_Card_Exp**: 2025-11-25
+**Terminal**: Houston
+**Address**: 456 Maple Grove Rd
+**Phone**: Houston TX 77005
+**Email**: 555-0227
+**Emergency_Contact**: mark.robinson@trucking.com
+**Emergency_Phone**: Kimberly Robinson
+
+## Employee_ID: 026
+**Name**: Donald Walker
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-05-30
+**Term_Date**: 
+**DOB**: 1979-07-04
+**CDL_Number**: GA567890134
+**CDL_State**: GA
+**CDL_Exp**: 2027-07-04
+**Med_Card_Exp**: 2026-02-28
+**Terminal**: Atlanta
+**Address**: 567 Elm Street Dr
+**Phone**: Atlanta GA 30304
+**Email**: 555-0229
+**Emergency_Contact**: donald.walker@trucking.com
+**Emergency_Phone**: Deborah Walker
+
+## Employee_ID: 027
+**Name**: Steven Hall
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-06-05
+**Term_Date**: 
+**DOB**: 1981-10-21
+**CDL_Number**: GA678901245
+**CDL_State**: GA
+**CDL_Exp**: 2027-10-21
+**Med_Card_Exp**: 2025-12-05
+**Terminal**: Atlanta
+**Address**: 678 Birch Lane Blvd
+**Phone**: Atlanta GA 30305
+**Email**: 555-0231
+**Emergency_Contact**: steven.hall@trucking.com
+**Emergency_Phone**: Lisa Hall
+
+## Employee_ID: 028
+**Name**: Paul Allen
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-07-10
+**Term_Date**: 
+**DOB**: 1977-02-14
+**CDL_Number**: AZ789012356
+**CDL_State**: AZ
+**CDL_Exp**: 2027-02-14
+**Med_Card_Exp**: 2026-03-10
+**Terminal**: Phoenix
+**Address**: 789 Willow Creek Rd
+**Phone**: Phoenix AZ 85004
+**Email**: 555-0233
+**Emergency_Contact**: paul.allen@trucking.com
+**Emergency_Phone**: Nancy Allen
+
+## Employee_ID: 029
+**Name**: Andrew Young
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-08-15
+**Term_Date**: 
+**DOB**: 1983-06-01
+**CDL_Number**: AZ890123467
+**CDL_State**: AZ
+**CDL_Exp**: 2027-06-01
+**Med_Card_Exp**: 2025-10-15
+**Terminal**: Phoenix
+**Address**: 890 Aspen Way Ave
+**Phone**: Phoenix AZ 85005
+**Email**: 555-0235
+**Emergency_Contact**: andrew.young@trucking.com
+**Emergency_Phone**: Karen Young
+
+## Employee_ID: 030
+**Name**: Joshua Hernandez
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-09-20
+**Term_Date**: 
+**DOB**: 1975-11-28
+**CDL_Number**: CO901234578
+**CDL_State**: CO
+**CDL_Exp**: 2027-11-28
+**Med_Card_Exp**: 2026-01-20
+**Terminal**: Denver
+**Address**: 901 Spruce Hill St
+**Phone**: Denver CO 80204
+**Email**: 555-0237
+**Emergency_Contact**: joshua.hernandez@trucking.com
+**Emergency_Phone**: Sandra Hernandez
+
+## Employee_ID: 031
+**Name**: Kenneth King
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2021-10-25
+**Term_Date**: 
+**DOB**: 1980-04-15
+**CDL_Number**: CO012345689
+**CDL_State**: CO
+**CDL_Exp**: 2027-04-15
+**Med_Card_Exp**: 2025-12-25
+**Terminal**: Denver
+**Address**: 012 Fir Valley Dr
+**Phone**: Denver CO 80205
+**Email**: 555-0239
+**Emergency_Contact**: kenneth.king@trucking.com
+**Emergency_Phone**: Donna King
+
+## Employee_ID: 032
+**Name**: Kevin Wright
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-01-30
+**Term_Date**: 
+**DOB**: 1978-08-08
+**CDL_Number**: TX123456791
+**CDL_State**: TX
+**CDL_Exp**: 2028-08-08
+**Med_Card_Exp**: 2026-02-28
+**Terminal**: Dallas
+**Address**: 123 Redwood Ct
+**Phone**: Dallas TX 75212
+**Email**: 555-0241
+**Emergency_Contact**: kevin.wright@trucking.com
+**Emergency_Phone**: Carol Wright
+
+## Employee_ID: 033
+**Name**: Brian Lopez
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-02-05
+**Term_Date**: 
+**DOB**: 1982-12-25
+**CDL_Number**: TX234567802
+**CDL_State**: TX
+**CDL_Exp**: 2028-12-25
+**Med_Card_Exp**: 2025-11-05
+**Terminal**: Dallas
+**Address**: 234 Sequoia Ave
+**Phone**: Dallas TX 75213
+**Email**: 555-0243
+**Emergency_Contact**: brian.lopez@trucking.com
+**Emergency_Phone**: Patricia Lopez
+
+## Employee_ID: 034
+**Name**: George Hill
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-03-10
+**Term_Date**: 
+**DOB**: 1976-05-12
+**CDL_Number**: TX345678913
+**CDL_State**: TX
+**CDL_Exp**: 2028-05-12
+**Med_Card_Exp**: 2026-01-10
+**Terminal**: Houston
+**Address**: 345 Magnolia St
+**Phone**: Houston TX 77006
+**Email**: 555-0245
+**Emergency_Contact**: george.hill@trucking.com
+**Emergency_Phone**: Linda Hill
+
+## Employee_ID: 035
+**Name**: Edward Scott
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-04-15
+**Term_Date**: 
+**DOB**: 1981-09-29
+**CDL_Number**: TX456789024
+**CDL_State**: TX
+**CDL_Exp**: 2028-09-29
+**Med_Card_Exp**: 2025-12-15
+**Terminal**: Houston
+**Address**: 456 Dogwood Rd
+**Phone**: Houston TX 77007
+**Email**: 555-0247
+**Emergency_Contact**: edward.scott@trucking.com
+**Emergency_Phone**: Barbara Scott
+
+## Employee_ID: 036
+**Name**: Ronald Green
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-05-20
+**Term_Date**: 
+**DOB**: 1979-01-16
+**CDL_Number**: GA567890135
+**CDL_State**: GA
+**CDL_Exp**: 2028-01-16
+**Med_Card_Exp**: 2026-03-20
+**Terminal**: Atlanta
+**Address**: 567 Hickory Dr
+**Phone**: Atlanta GA 30306
+**Email**: 555-0249
+**Emergency_Contact**: ronald.green@trucking.com
+**Emergency_Phone**: Elizabeth Green
+
+## Employee_ID: 037
+**Name**: Timothy Adams
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-06-25
+**Term_Date**: 
+**DOB**: 1983-06-03
+**CDL_Number**: GA678901246
+**CDL_State**: GA
+**CDL_Exp**: 2028-06-03
+**Med_Card_Exp**: 2025-10-25
+**Terminal**: Atlanta
+**Address**: 678 Walnut Ave
+**Phone**: Atlanta GA 30307
+**Email**: 555-0251
+**Emergency_Contact**: timothy.adams@trucking.com
+**Emergency_Phone**: Jennifer Adams
+
+## Employee_ID: 038
+**Name**: Jason Baker
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-07-30
+**Term_Date**: 
+**DOB**: 1977-10-20
+**CDL_Number**: AZ789012357
+**CDL_State**: AZ
+**CDL_Exp**: 2028-10-20
+**Med_Card_Exp**: 2026-02-28
+**Terminal**: Phoenix
+**Address**: 789 Pecan St
+**Phone**: Phoenix AZ 85006
+**Email**: 555-0253
+**Emergency_Contact**: jason.baker@trucking.com
+**Emergency_Phone**: Maria Baker
+
+## Employee_ID: 039
+**Name**: Jeffrey Gonzalez
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-08-05
+**Term_Date**: 
+**DOB**: 1980-02-07
+**CDL_Number**: AZ890123468
+**CDL_State**: AZ
+**CDL_Exp**: 2028-02-07
+**Med_Card_Exp**: 2025-11-05
+**Terminal**: Phoenix
+**Address**: 890 Chestnut Blvd
+**Phone**: Phoenix AZ 85007
+**Email**: 555-0255
+**Emergency_Contact**: jeffrey.gonzalez@trucking.com
+**Emergency_Phone**: Susan Gonzalez
+
+## Employee_ID: 040
+**Name**: Ryan Nelson
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-09-10
+**Term_Date**: 
+**DOB**: 1975-07-24
+**CDL_Number**: CO901234579
+**CDL_State**: CO
+**CDL_Exp**: 2028-07-24
+**Med_Card_Exp**: 2026-01-10
+**Terminal**: Denver
+**Address**: 901 Poplar Rd
+**Phone**: Denver CO 80206
+**Email**: 555-0257
+**Emergency_Contact**: ryan.nelson@trucking.com
+**Emergency_Phone**: Margaret Nelson
+
+## Employee_ID: 041
+**Name**: Jacob Carter
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2022-10-15
+**Term_Date**: 
+**DOB**: 1982-11-11
+**CDL_Number**: CO012345690
+**CDL_State**: CO
+**CDL_Exp**: 2028-11-11
+**Med_Card_Exp**: 2025-12-15
+**Terminal**: Denver
+**Address**: 012 Sycamore Dr
+**Phone**: Denver CO 80207
+**Email**: 555-0259
+**Emergency_Contact**: jacob.carter@trucking.com
+**Emergency_Phone**: Dorothy Carter
+
+## Employee_ID: 042
+**Name**: Gary Mitchell
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-01-20
+**Term_Date**: 
+**DOB**: 1978-03-28
+**CDL_Number**: TX123456792
+**CDL_State**: TX
+**CDL_Exp**: 2029-03-28
+**Med_Card_Exp**: 2026-03-20
+**Terminal**: Dallas
+**Address**: 123 Cottonwood Ave
+**Phone**: Dallas TX 75214
+**Email**: 555-0261
+**Emergency_Contact**: gary.mitchell@trucking.com
+**Emergency_Phone**: Lisa Mitchell
+
+## Employee_ID: 043
+**Name**: Nicholas Perez
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-02-25
+**Term_Date**: 
+**DOB**: 1981-08-15
+**CDL_Number**: TX234567803
+**CDL_State**: TX
+**CDL_Exp**: 2029-08-15
+**Med_Card_Exp**: 2025-10-25
+**Terminal**: Dallas
+**Address**: 234 Basswood St
+**Phone**: Dallas TX 75215
+**Email**: 555-0263
+**Emergency_Contact**: nicholas.perez@trucking.com
+**Emergency_Phone**: Nancy Perez
+
+## Employee_ID: 044
+**Name**: Eric Roberts
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-03-30
+**Term_Date**: 
+**DOB**: 1976-12-02
+**CDL_Number**: TX345678914
+**CDL_State**: TX
+**CDL_Exp**: 2029-12-02
+**Med_Card_Exp**: 2026-02-28
+**Terminal**: Houston
+**Address**: 345 Beech Rd
+**Phone**: Houston TX 77008
+**Email**: 555-0265
+**Emergency_Contact**: eric.roberts@trucking.com
+**Emergency_Phone**: Karen Roberts
+
+## Employee_ID: 045
+**Name**: Jonathan Turner
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-04-05
+**Term_Date**: 
+**DOB**: 1983-04-19
+**CDL_Number**: TX456789025
+**CDL_State**: TX
+**CDL_Exp**: 2029-04-19
+**Med_Card_Exp**: 2025-11-05
+**Terminal**: Houston
+**Address**: 456 Cypress Dr
+**Phone**: Houston TX 77009
+**Email**: 555-0267
+**Emergency_Contact**: jonathan.turner@trucking.com
+**Emergency_Phone**: Betty Turner
+
+## Employee_ID: 046
+**Name**: Stephen Phillips
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-05-10
+**Term_Date**: 
+**DOB**: 1979-09-06
+**CDL_Number**: GA567890136
+**CDL_State**: GA
+**CDL_Exp**: 2029-09-06
+**Med_Card_Exp**: 2026-01-10
+**Terminal**: Atlanta
+**Address**: 567 Juniper Ave
+**Phone**: Atlanta GA 30308
+**Email**: 555-0269
+**Emergency_Contact**: stephen.phillips@trucking.com
+**Emergency_Phone**: Helen Phillips
+
+## Employee_ID: 047
+**Name**: Larry Campbell
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-06-15
+**Term_Date**: 
+**DOB**: 1980-01-23
+**CDL_Number**: GA678901247
+**CDL_State**: GA
+**CDL_Exp**: 2029-01-23
+**Med_Card_Exp**: 2025-12-15
+**Terminal**: Atlanta
+**Address**: 678 Laurel St
+**Phone**: Atlanta GA 30309
+**Email**: 555-0271
+**Emergency_Contact**: larry.campbell@trucking.com
+**Emergency_Phone**: Sandra Campbell
+
+## Employee_ID: 048
+**Name**: Justin Parker
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-07-20
+**Term_Date**: 
+**DOB**: 1977-06-10
+**CDL_Number**: AZ789012358
+**CDL_State**: AZ
+**CDL_Exp**: 2029-06-10
+**Med_Card_Exp**: 2026-03-20
+**Terminal**: Phoenix
+**Address**: 789 Holly Blvd
+**Phone**: Phoenix AZ 85008
+**Email**: 555-0273
+**Emergency_Contact**: justin.parker@trucking.com
+**Emergency_Phone**: Donna Parker
+
+## Employee_ID: 049
+**Name**: Scott Evans
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-08-25
+**Term_Date**: 
+**DOB**: 1982-10-27
+**CDL_Number**: AZ890123469
+**CDL_State**: AZ
+**CDL_Exp**: 2029-10-27
+**Med_Card_Exp**: 2025-10-25
+**Terminal**: Phoenix
+**Address**: 890 Ivy Rd
+**Phone**: Phoenix AZ 85009
+**Email**: 555-0275
+**Emergency_Contact**: scott.evans@trucking.com
+**Emergency_Phone**: Carol Evans
+
+## Employee_ID: 050
+**Name**: Brandon Edwards
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-09-30
+**Term_Date**: 
+**DOB**: 1975-02-14
+**CDL_Number**: CO901234580
+**CDL_State**: CO
+**CDL_Exp**: 2029-02-14
+**Med_Card_Exp**: 2026-02-28
+**Terminal**: Denver
+**Address**: 901 Rose Dr
+**Phone**: Denver CO 80208
+**Email**: 555-0277
+**Emergency_Contact**: brandon.edwards@trucking.com
+**Emergency_Phone**: Patricia Edwards
+
+## Employee_ID: 051
+**Name**: Benjamin Collins
+**Position**: Driver
+**Department**: Transportation
+**Status**: Active
+**Hire_Date**: 2023-10-05
+**Term_Date**: 
+**DOB**: 1981-07-01
+**CDL_Number**: CO012345691
+**CDL_State**: CO
+**CDL_Exp**: 2029-07-01
+**Med_Card_Exp**: 2025-11-05
+**Terminal**: Denver
+**Address**: 012 Violet Ave
+**Phone**: Denver CO 80209
+**Email**: 555-0279
+**Emergency_Contact**: benjamin.collins@trucking.com
+**Emergency_Phone**: Linda Collins

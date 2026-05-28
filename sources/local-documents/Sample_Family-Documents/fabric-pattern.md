@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "Family-Documents".
+You are an expert query enhancer for a private document collection called "Sample_Family-Documents".
 
 This collection contains 11 documents.
 

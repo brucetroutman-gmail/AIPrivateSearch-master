@@ -81,16 +81,16 @@ export class DocumentIndex {
       console.log(`[DocumentIndexSearch] Executing weighted search for: "${searchTerm}"`);
 
       const allResults = db.exec(
-        `SELECT docid, filename, title, summary, topics, keywords, key_phrases, content,
+        `SELECT docid, filename, title, summary, topics, keywords, content,
                 (CASE WHEN title LIKE ? THEN 3 ELSE 0 END +
                  CASE WHEN keywords LIKE ? THEN 2 ELSE 0 END +
-                 CASE WHEN key_phrases LIKE ? THEN 2 ELSE 0 END +
                  CASE WHEN topics LIKE ? THEN 2 ELSE 0 END +
+                 CASE WHEN entities LIKE ? THEN 2 ELSE 0 END +
                  CASE WHEN summary LIKE ? THEN 1 ELSE 0 END +
                  CASE WHEN content LIKE ? THEN 0.5 ELSE 0 END) AS score
          FROM document_index
-         WHERE title LIKE ? OR keywords LIKE ? OR key_phrases LIKE ?
-            OR topics LIKE ? OR summary LIKE ? OR content LIKE ?
+         WHERE title LIKE ? OR keywords LIKE ? OR topics LIKE ?
+            OR entities LIKE ? OR summary LIKE ? OR content LIKE ?
          ORDER BY score DESC
          LIMIT 50`,
         [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm,
@@ -116,9 +116,8 @@ export class DocumentIndex {
         summary: row[3],
         topics: row[4],
         keywords: row[5],
-        key_phrases: row[6],
-        content: row[7],
-        score: row[8]
+        content: row[6],
+        score: row[7]
       }));
 
       console.log(`[DocumentIndexSearch] Found ${formattedResults.length} results`);
@@ -126,7 +125,7 @@ export class DocumentIndex {
       return {
         results: formattedResults.map(doc => {
           // Build excerpt from best matching metadata field
-          const bestExcerpt = doc.summary || doc.topics || doc.keywords || doc.key_phrases
+          const bestExcerpt = doc.summary || doc.topics || doc.keywords
             ? `${doc.summary ? doc.summary + ' ' : ''}${doc.topics ? '| Topics: ' + doc.topics : ''}`
             : ExcerptFormatter.formatExcerptWithLineNumbers(doc.content, processedQuery);
           return {
@@ -200,38 +199,19 @@ export class DocumentIndex {
           content TEXT,
           file_type TEXT,
           file_size INTEGER,
-          file_path TEXT,
           title TEXT,
-          author TEXT,
           document_type TEXT,
-          language TEXT,
-          source TEXT,
-          version TEXT,
-          access_level TEXT,
-          license TEXT,
-          category TEXT,
-          created_date TEXT,
-          last_modified_date TEXT,
-          generated_date TEXT,
-          metadata_version TEXT,
           summary TEXT,
           topics TEXT,
           keywords TEXT,
-          key_phrases TEXT,
-          sentiment TEXT,
           entities TEXT,
           dates_mentioned TEXT,
           amounts_mentioned TEXT,
           action_items TEXT,
-          importance_level TEXT,
-          complexity_score TEXT,
+          sentiment TEXT,
           word_count INTEGER,
-          character_count INTEGER,
           reading_time INTEGER,
-          paragraphs INTEGER,
-          sentences INTEGER,
-          unique_word_count INTEGER,
-          average_sentence_length REAL,
+          generated_date TEXT,
           our_comments TEXT
         )
       `);
@@ -315,33 +295,32 @@ export class DocumentIndex {
           console.log(`Updated ${filename} with DocID: ${docId}`);
         }
         
+        // Load fabric vocabulary for domain context
+        let fabricVocab = '';
+        try {
+          const patternPath = path.join(collectionPath, 'fabric-pattern.md');
+          const pattern = fs.readFileSync(patternPath, 'utf8');
+          const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
+          if (vocabMatch) fabricVocab = `Domain vocabulary: ${vocabMatch[1].trim()}\n\n`;
+        } catch { /* no pattern file */ }
+
         // Unified prompt — same as indexSingleDocument for consistent index cards
-        const analysisPrompt = `Analyze this document briefly:\n\nTitle: ${filename}\nContent: ${content.substring(0, 1000)}\n\nProvide:\n1. Author:\n2. Type:\n3. Summary (1 sentence):\n4. Topics:\n5. Key phrases:`;
+        const analysisPrompt = `${fabricVocab}Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
         
         const aiResponse = await ollamaService.generateText(analysisPrompt, modelName);
         
         // Parse AI response (numbered format)
         let analysis = {
           title: filename.replace('.md', '').replace(/[-_]/g, ' '),
-          author: '',
           document_type: 'other',
-          language: 'en',
-          source: '',
-          version: '',
-          access_level: 'public',
-          license: '',
-          category: 'document',
           summary: 'Document processed successfully',
           topics: '',
           keywords: filename.replace('.md', '').toLowerCase().split(/[-_\s]+/).join(', '),
-          key_phrases: '',
-          sentiment: 'neutral',
           entities: '',
           dates_mentioned: '',
           amounts_mentioned: '',
           action_items: '',
-          importance_level: '4',
-          complexity_score: '6'
+          sentiment: 'neutral'
         };
         
         // Get NLP analytics with error handling
@@ -378,84 +357,39 @@ export class DocumentIndex {
           };
         }
         
-        // Parse numbered AI response — unified with indexSingleDocument
+        // Parse numbered AI response
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
-          if (line.startsWith('1.') && line.includes('Author:')) {
-            const val = line.split(':').slice(1).join(':').trim();
-            if (val && val.length > 2 && !val.toLowerCase().includes('unknown')) analysis.author = val.substring(0, 100);
-          }
-          if (line.startsWith('2.') && line.includes('Type:')) {
-            const val = line.split(':').slice(1).join(':').trim();
-            if (val && val.length > 2) analysis.document_type = val.toLowerCase().substring(0, 50);
-          }
-          if (line.startsWith('3.') && line.includes('Summary:')) {
-            const val = line.split(':').slice(1).join(':').trim();
-            if (val && val.length > 10) analysis.summary = val.substring(0, 300);
-          }
-          if (line.startsWith('4.') && line.includes('Topics:')) {
-            const val = line.split(':').slice(1).join(':').trim();
-            if (val && val.length > 3) analysis.topics = val.substring(0, 200);
-          }
-          if (line.startsWith('5.') && line.includes('Key phrases:')) {
-            const val = line.split(':').slice(1).join(':').trim();
-            if (val && val.length > 5) analysis.key_phrases = val.substring(0, 200);
-          }
+          const val = () => line.split(':').slice(1).join(':').trim();
+          if (line.match(/^1\..*Title:/i))    { const v = val(); if (v.length > 2) analysis.title = v.substring(0, 150); }
+          if (line.match(/^2\..*Type:/i))     { const v = val(); if (v.length > 2) analysis.document_type = v.toLowerCase().substring(0, 50); }
+          if (line.match(/^3\..*Summary:/i))  { const v = val(); if (v.length > 10) analysis.summary = v.substring(0, 400); }
+          if (line.match(/^4\..*Topics:/i))   { const v = val(); if (v.length > 3) analysis.topics = v.substring(0, 200); }
+          if (line.match(/^5\..*Keywords:/i)) { const v = val(); if (v.length > 3) analysis.keywords = v.substring(0, 200); }
+          if (line.match(/^6\..*Entities:/i)) { const v = val(); if (v.length > 3) analysis.entities = v.substring(0, 200); }
+          if (line.match(/^7\..*Dates:/i))    { const v = val(); if (v.length > 3) analysis.dates_mentioned = v.substring(0, 200); }
+          if (line.match(/^8\..*Amounts:/i))  { const v = val(); if (v.length > 3) analysis.amounts_mentioned = v.substring(0, 200); }
+          if (line.match(/^9\..*Actions:/i))  { const v = val(); if (v.length > 3) analysis.action_items = v.substring(0, 200); }
+          if (line.match(/^10\..*Sentiment:/i)){ const v = val(); if (v.length > 2) analysis.sentiment = v.toLowerCase().substring(0, 50); }
         });
+
+        const wordCount = content.split(/\s+/).length;
+        const readingTime = Math.ceil(wordCount / 200);
         
-        // Merge NLP analytics
-        if (nlpResults.entities && nlpResults.entities.people) analysis.entities = nlpResults.entities.people;
-        if (nlpResults.dates) analysis.dates_mentioned = nlpResults.dates;
-        if (nlpResults.keyPhrases) analysis.key_phrases = analysis.key_phrases || nlpResults.keyPhrases;
-        
-        // Use NLP text statistics
-        const { wordCount, sentenceCount, paragraphCount, uniqueWordCount, averageSentenceLength, readingTime } = nlpResults;
-        
-        // Insert with enhanced fields
+        // Insert with slim 12-field schema
         const stmt = db.prepare(`INSERT INTO document_index (
-          docid, collection, filename, content, file_type, file_size, file_path,
-          title, author, document_type, language, source, version, access_level, license, category,
-          created_date, last_modified_date, generated_date, metadata_version,
-          summary, topics, keywords, key_phrases, sentiment, entities,
-          dates_mentioned, amounts_mentioned, action_items, importance_level, complexity_score,
-          word_count, character_count, reading_time, paragraphs, sentences,
-          unique_word_count, average_sentence_length, our_comments
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+          docid, collection, filename, content, file_type, file_size,
+          title, document_type, summary, topics, keywords, entities,
+          dates_mentioned, amounts_mentioned, action_items, sentiment,
+          word_count, reading_time, generated_date, our_comments
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
         
         stmt.run([
-          docId, collection, filename, content, filename.split('.').pop(), content.length, filePath,
-          analysis.title || filename.replace('.md', ''),
-          analysis.author || '',
-          analysis.document_type || 'other',
-          analysis.language || 'en',
-          analysis.source || '',
-          analysis.version || '',
-          analysis.access_level || 'public',
-          analysis.license || '',
-          analysis.category || 'document',
-          new Date().toISOString(),
-          new Date().toISOString(),
-          new Date().toISOString(),
-          '1.0',
-          analysis.summary || '',
-          analysis.topics || '',
-          analysis.keywords || '',
-          analysis.key_phrases || '',
-          analysis.sentiment || 'neutral',
-          analysis.entities || '',
-          analysis.dates_mentioned || '',
-          analysis.amounts_mentioned || '',
-          analysis.action_items || '',
-          analysis.importance_level || '3',
-          analysis.complexity_score || '5',
-          wordCount,
-          content.length,
-          readingTime,
-          paragraphCount,
-          sentenceCount,
-          uniqueWordCount,
-          averageSentenceLength,
-          ''
+          docId, collection, filename, content, filename.split('.').pop(), content.length,
+          analysis.title, analysis.document_type, analysis.summary, analysis.topics,
+          analysis.keywords, analysis.entities, analysis.dates_mentioned,
+          analysis.amounts_mentioned, analysis.action_items, analysis.sentiment,
+          wordCount, readingTime, new Date().toISOString(), ''
         ]);
         stmt.free();
         
@@ -535,40 +469,19 @@ export class DocumentIndex {
           content: data.content || '',
           file_type: data.file_type || filename.split('.').pop(),
           file_size: data.file_size || 0,
-          file_path: data.file_path || '',
           title: data.title || '',
-          author: data.author || '',
-          language: data.language || '',
-          source: data.source || '',
-          version: data.version || '',
-          access_level: data.access_level || '',
-          license: data.license || '',
-          category: data.category || '',
-          created_date: data.created_date || new Date().toISOString(),
-          last_modified_date: data.last_modified_date || new Date().toISOString(),
-          generated_date: data.generated_date || new Date().toISOString(),
-          metadata_version: data.metadata_version || '',
+          document_type: data.document_type || '',
           summary: data.summary || '',
           topics: data.topics || '',
           keywords: data.keywords || '',
-          key_phrases: data.key_phrases || '',
-          sentiment: data.sentiment || '',
           entities: data.entities || '',
-          tags: data.tags || '',
-          document_type: data.document_type || '',
           dates_mentioned: data.dates_mentioned || '',
           amounts_mentioned: data.amounts_mentioned || '',
           action_items: data.action_items || '',
-          importance_level: data.importance_level || '',
-          complexity_score: data.complexity_score || '',
+          sentiment: data.sentiment || '',
           word_count: data.word_count || 0,
-          character_count: data.character_count || 0,
           reading_time: data.reading_time || 0,
-          paragraphs: data.paragraphs || 0,
-          sentences: data.sentences || 0,
-          unique_word_count: data.unique_word_count || 0,
-          average_sentence_length: data.average_sentence_length || 0,
-
+          generated_date: data.generated_date || new Date().toISOString(),
           our_comments: data.our_comments || ''
         };
       } catch (error) {
@@ -648,34 +561,22 @@ export class DocumentIndex {
       };
       
       const stmt = db.prepare(`UPDATE document_index SET
-        title = ?, author = ?, document_type = ?, language = ?, source = ?, version = ?,
-        access_level = ?, license = ?, category = ?, summary = ?, topics = ?, keywords = ?,
-        key_phrases = ?, sentiment = ?, entities = ?, dates_mentioned = ?, amounts_mentioned = ?,
-        action_items = ?, importance_level = ?, complexity_score = ?, our_comments = ?,
-        last_modified_date = ?
+        title = ?, document_type = ?, summary = ?, topics = ?, keywords = ?,
+        entities = ?, dates_mentioned = ?, amounts_mentioned = ?,
+        action_items = ?, sentiment = ?, our_comments = ?, generated_date = ?
         WHERE docid = ?`);
       
       const params = [
         safeString(documentIndex.title),
-        safeString(documentIndex.author),
         safeString(documentIndex.document_type),
-        safeString(documentIndex.language),
-        safeString(documentIndex.source),
-        safeString(documentIndex.version),
-        safeString(documentIndex.access_level),
-        safeString(documentIndex.license),
-        safeString(documentIndex.category),
         safeString(documentIndex.summary),
         safeString(documentIndex.topics),
         safeString(documentIndex.keywords),
-        safeString(documentIndex.key_phrases),
-        safeString(documentIndex.sentiment),
         safeString(documentIndex.entities),
         safeString(documentIndex.dates_mentioned),
         safeString(documentIndex.amounts_mentioned),
         safeString(documentIndex.action_items),
-        safeString(documentIndex.importance_level),
-        safeString(documentIndex.complexity_score),
+        safeString(documentIndex.sentiment),
         safeString(documentIndex.our_comments),
         new Date().toISOString(),
         safeString(documentIndex.id || documentIndex.doc_id)
@@ -774,38 +675,19 @@ export class DocumentIndex {
             content TEXT,
             file_type TEXT,
             file_size INTEGER,
-            file_path TEXT,
             title TEXT,
-            author TEXT,
             document_type TEXT,
-            language TEXT,
-            source TEXT,
-            version TEXT,
-            access_level TEXT,
-            license TEXT,
-            category TEXT,
-            created_date TEXT,
-            last_modified_date TEXT,
-            generated_date TEXT,
-            metadata_version TEXT,
             summary TEXT,
             topics TEXT,
             keywords TEXT,
-            key_phrases TEXT,
-            sentiment TEXT,
             entities TEXT,
             dates_mentioned TEXT,
             amounts_mentioned TEXT,
             action_items TEXT,
-            importance_level TEXT,
-            complexity_score TEXT,
+            sentiment TEXT,
             word_count INTEGER,
-            character_count INTEGER,
             reading_time INTEGER,
-            paragraphs INTEGER,
-            sentences INTEGER,
-            unique_word_count INTEGER,
-            average_sentence_length REAL,
+            generated_date TEXT,
             our_comments TEXT
           )
         `);
@@ -893,30 +775,29 @@ export class DocumentIndex {
       // Fast AI analysis with optimized prompt and timeout
       let analysis = {
         title: filename.replace('.md', '').replace(/[-_]/g, ' '),
-        author: '',
-        document_type: 'document',
-        language: 'en',
-        source: '',
-        version: '',
-        access_level: 'public',
-        license: '',
-        category: 'document',
+        document_type: 'other',
         summary: `Document: ${filename.replace('.md', '')}`,
         topics: '',
         keywords: filename.replace('.md', '').toLowerCase().split(/[-_\s]+/).join(', '),
-        key_phrases: '',
-        sentiment: 'neutral',
         entities: '',
         dates_mentioned: '',
         amounts_mentioned: '',
         action_items: '',
-        importance_level: '3',
-        complexity_score: '5'
+        sentiment: 'neutral'
       };
       
       // Fast AI analysis with timeout and reduced content
       try {
-        const shortPrompt = `Analyze this document briefly:\n\nTitle: ${filename}\nContent: ${content.substring(0, 1000)}\n\nProvide:\n1. Author:\n2. Type:\n3. Summary (1 sentence):\n4. Topics:\n5. Key phrases:`;
+        // Load fabric vocabulary for domain context
+        let fabricVocab = '';
+        try {
+          const patternPath = path.join(collectionPath, 'fabric-pattern.md');
+          const pattern = fs.readFileSync(patternPath, 'utf8');
+          const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
+          if (vocabMatch) fabricVocab = `Domain vocabulary: ${vocabMatch[1].trim()}\n\n`;
+        } catch { /* no pattern file */ }
+
+        const shortPrompt = `${fabricVocab}Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
         
         // Get document-index model from config
         const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');
@@ -930,42 +811,23 @@ export class DocumentIndex {
         // Use timeout to prevent hanging
         const aiResponse = await Promise.race([
           ollamaService.generateText(shortPrompt, docIndexModel),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('AI timeout')), 10000)) // 10s timeout
+          new Promise((_, reject) => setTimeout(() => reject(new Error('AI timeout')), 10000))
         ]);
         
-        // Parse simplified AI response
+        // Parse AI response
         const lines = aiResponse.split('\n').filter(line => line.trim());
         lines.forEach(line => {
-          if (line.startsWith('1.') && line.includes('Author:')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && content.length > 2 && !content.toLowerCase().includes('unknown')) {
-              analysis.author = content.substring(0, 100);
-            }
-          }
-          if (line.startsWith('2.') && line.includes('Type:')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && content.length > 2) {
-              analysis.document_type = content.toLowerCase().substring(0, 50);
-            }
-          }
-          if (line.startsWith('3.') && line.includes('Summary:')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && content.length > 10) {
-              analysis.summary = content.substring(0, 200);
-            }
-          }
-          if (line.startsWith('4.') && line.includes('Topics:')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && content.length > 3) {
-              analysis.topics = content.substring(0, 150);
-            }
-          }
-          if (line.startsWith('5.') && line.includes('Key phrases:')) {
-            const content = line.split(':').slice(1).join(':').trim();
-            if (content && content.length > 5) {
-              analysis.key_phrases = content.substring(0, 150);
-            }
-          }
+          const val = () => line.split(':').slice(1).join(':').trim();
+          if (line.match(/^1\..*Title:/i))    { const v = val(); if (v.length > 2) analysis.title = v.substring(0, 150); }
+          if (line.match(/^2\..*Type:/i))     { const v = val(); if (v.length > 2) analysis.document_type = v.toLowerCase().substring(0, 50); }
+          if (line.match(/^3\..*Summary:/i))  { const v = val(); if (v.length > 10) analysis.summary = v.substring(0, 400); }
+          if (line.match(/^4\..*Topics:/i))   { const v = val(); if (v.length > 3) analysis.topics = v.substring(0, 200); }
+          if (line.match(/^5\..*Keywords:/i)) { const v = val(); if (v.length > 3) analysis.keywords = v.substring(0, 200); }
+          if (line.match(/^6\..*Entities:/i)) { const v = val(); if (v.length > 3) analysis.entities = v.substring(0, 200); }
+          if (line.match(/^7\..*Dates:/i))    { const v = val(); if (v.length > 3) analysis.dates_mentioned = v.substring(0, 200); }
+          if (line.match(/^8\..*Amounts:/i))  { const v = val(); if (v.length > 3) analysis.amounts_mentioned = v.substring(0, 200); }
+          if (line.match(/^9\..*Actions:/i))  { const v = val(); if (v.length > 3) analysis.action_items = v.substring(0, 200); }
+          if (line.match(/^10\..*Sentiment:/i)){ const v = val(); if (v.length > 2) analysis.sentiment = v.toLowerCase().substring(0, 50); }
         });
         
         console.log(`Fast AI analysis completed for ${filename}`);
@@ -975,75 +837,38 @@ export class DocumentIndex {
       
       // Calculate text metrics
       const words = content.split(/\s+/);
-      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
-      const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-      const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(w => w.length > 0));
-      const links = (content.match(/https?:\/\/[^\s]+/g) || []).length;
-      const images = (content.match(/!\[[^\]]*\]\([^)]+\)/g) || []).length;
+      const wordCount = words.length;
+      const readingTime = Math.ceil(wordCount / 200);
       
       // Insert or update document
       if (isUpdate) {
-        // Get existing values to preserve user edits
-        const existingData = db.exec("SELECT * FROM document_index WHERE docid = ?", [docId]);
-        const existing = {};
-        if (existingData?.[0]?.values?.[0]) {
-          const columns = existingData[0].columns;
-          const row = existingData[0].values[0];
-          columns.forEach((col, index) => {
-            existing[col] = row[index] || '';
-          });
-        }
-        
         const stmt = db.prepare(`UPDATE document_index SET
-          content = ?, file_size = ?, title = ?, author = ?, document_type = ?, language = ?, source = ?, version = ?,
-          access_level = ?, license = ?, category = ?, last_modified_date = ?, generated_date = ?,
-          summary = ?, topics = ?, keywords = ?, key_phrases = ?, sentiment = ?, entities = ?,
-          dates_mentioned = ?, amounts_mentioned = ?, action_items = ?, importance_level = ?, complexity_score = ?,
-          word_count = ?, character_count = ?, reading_time = ?, paragraphs = ?, sentences = ?,
-          unique_word_count = ?, average_sentence_length = ?
+          content = ?, file_size = ?, title = ?, document_type = ?,
+          summary = ?, topics = ?, keywords = ?, entities = ?,
+          dates_mentioned = ?, amounts_mentioned = ?, action_items = ?, sentiment = ?,
+          word_count = ?, reading_time = ?, generated_date = ?
           WHERE docid = ?`);
-        
         stmt.run([
-          content, content.length, existing.title || analysis.title || filename.replace('.md', ''),
-          existing.author || analysis.author || '', existing.document_type || analysis.document_type || 'other', 
-          existing.language || analysis.language || 'en', existing.source || analysis.source || '', 
-          existing.version || analysis.version || '', existing.access_level || analysis.access_level || 'public', 
-          existing.license || analysis.license || '', existing.category || analysis.category || 'document',
-          new Date().toISOString(), new Date().toISOString(),
-          existing.summary || analysis.summary || '', existing.topics || analysis.topics || '', 
-          existing.keywords || analysis.keywords || '', existing.key_phrases || analysis.key_phrases || '',
-          existing.sentiment || analysis.sentiment || 'neutral', existing.entities || analysis.entities || '',
-          existing.dates_mentioned || analysis.dates_mentioned || '', existing.amounts_mentioned || analysis.amounts_mentioned || '', 
-          existing.action_items || analysis.action_items || '', existing.importance_level || analysis.importance_level || '3', 
-          existing.complexity_score || analysis.complexity_score || '5',
-          words.length, content.length, Math.ceil(words.length / 200), paragraphs.length, sentences.length,
-          uniqueWords.size, sentences.length > 0 ? parseFloat((words.length / sentences.length).toFixed(1)) : 0,
+          content, content.length, analysis.title, analysis.document_type,
+          analysis.summary, analysis.topics, analysis.keywords, analysis.entities,
+          analysis.dates_mentioned, analysis.amounts_mentioned, analysis.action_items, analysis.sentiment,
+          wordCount, readingTime, new Date().toISOString(),
           docId
         ]);
         stmt.free();
       } else {
         const stmt = db.prepare(`INSERT INTO document_index (
-          docid, collection, filename, content, file_type, file_size, file_path,
-          title, author, document_type, language, source, version, access_level, license, category,
-          created_date, last_modified_date, generated_date, metadata_version,
-          summary, topics, keywords, key_phrases, sentiment, entities,
-          dates_mentioned, amounts_mentioned, action_items, importance_level, complexity_score,
-          word_count, character_count, reading_time, paragraphs, sentences,
-          unique_word_count, average_sentence_length, our_comments
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-        
+          docid, collection, filename, content, file_type, file_size,
+          title, document_type, summary, topics, keywords, entities,
+          dates_mentioned, amounts_mentioned, action_items, sentiment,
+          word_count, reading_time, generated_date, our_comments
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
         stmt.run([
-          docId, collection, filename, content, filename.split('.').pop(), content.length, filePath,
-          analysis.title || filename.replace('.md', ''), analysis.author || '', analysis.document_type || 'other',
-          analysis.language || 'en', analysis.source || '', analysis.version || '', analysis.access_level || 'public',
-          analysis.license || '', analysis.category || 'document',
-          new Date().toISOString(), new Date().toISOString(), new Date().toISOString(), '1.0',
-          analysis.summary || '', analysis.topics || '', analysis.keywords || '', analysis.key_phrases || '',
-          analysis.sentiment || 'neutral', analysis.entities || '',
-          analysis.dates_mentioned || '', analysis.amounts_mentioned || '', analysis.action_items || '',
-          analysis.importance_level || '3', analysis.complexity_score || '5',
-          words.length, content.length, Math.ceil(words.length / 200), paragraphs.length, sentences.length,
-          uniqueWords.size, sentences.length > 0 ? parseFloat((words.length / sentences.length).toFixed(1)) : 0, ''
+          docId, collection, filename, content, filename.split('.').pop(), content.length,
+          analysis.title, analysis.document_type, analysis.summary, analysis.topics,
+          analysis.keywords, analysis.entities, analysis.dates_mentioned,
+          analysis.amounts_mentioned, analysis.action_items, analysis.sentiment,
+          wordCount, readingTime, new Date().toISOString(), ''
         ]);
         stmt.free();
       }

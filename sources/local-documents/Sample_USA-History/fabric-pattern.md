@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "USA-History".
+You are an expert query enhancer for a private document collection called "Sample_USA-History".
 
 This collection contains 3 documents.
 

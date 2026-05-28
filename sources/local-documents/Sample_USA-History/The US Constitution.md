@@ -1,7 +1,7 @@
 # The US Constitution
 DocID: usa_055029
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/USA-History/The US Constitution.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_USA-History/The US Constitution.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

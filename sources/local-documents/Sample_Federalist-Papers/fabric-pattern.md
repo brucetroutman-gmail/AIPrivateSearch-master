@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "Federalist-Papers".
+You are an expert query enhancer for a private document collection called "Sample_Federalist-Papers".
 
 This collection contains 1 documents.
 

@@ -1,7 +1,7 @@
 # Living Will of Emma Johnson
 DocID: Law_1761081097494_43tuyw158
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Living Will of Emma Johnson.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Law-Office/Living Will of Emma Johnson.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

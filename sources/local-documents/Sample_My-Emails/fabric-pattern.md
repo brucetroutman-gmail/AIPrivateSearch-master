@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "My-Emails".
+You are an expert query enhancer for a private document collection called "Sample_My-Emails".
 
 This collection contains 500 documents.
 

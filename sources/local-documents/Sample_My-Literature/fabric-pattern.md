@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "My-Literature".
+You are an expert query enhancer for a private document collection called "Sample_My-Literature".
 
 This collection contains 4 documents.
 

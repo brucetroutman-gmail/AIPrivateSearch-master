@@ -23,7 +23,7 @@ export class AIDocumentChat {
       console.log(`[AIDocumentChat] Collection: ${collection}, Model: ${model}, topK: ${topK}, context: ${contextSize}`);
       console.log('='.repeat(80));
       
-      const candidateChunks = (await this.findSimilarChunks(query, collection, topK * 5))
+      const candidateChunks = (await this.findSimilarChunks(query, collection, 9999))
         .filter(c => (c.similarity || 0) >= 0.1);
 
       console.log(`[AIDocumentChat] Found ${candidateChunks.length} candidate chunks`);

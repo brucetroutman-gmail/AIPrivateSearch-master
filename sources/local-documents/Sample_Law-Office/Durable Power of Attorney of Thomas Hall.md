@@ -1,7 +1,7 @@
 # Durable Power of Attorney of Thomas Hall
 DocID: Law_1761080877128_2ha92wegh
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Durable Power of Attorney of Thomas Hall.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Law-Office/Durable Power of Attorney of Thomas Hall.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

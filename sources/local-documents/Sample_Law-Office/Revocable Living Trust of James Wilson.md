@@ -1,7 +1,7 @@
 # Revocable Living Trust of James Wilson
 DocID: Law_1761081221265_eu9fqyo9r
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Revocable Living Trust of James Wilson.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Law-Office/Revocable Living Trust of James Wilson.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "A-Poem".
+You are an expert query enhancer for a private document collection called "Sample_A-Poem".
 
 This collection contains 1 documents.
 

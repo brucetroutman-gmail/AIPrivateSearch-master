@@ -1,7 +1,7 @@
 # Revocable Living Trust of Mia Walker
 DocID: Law_1761081269902_810bjcqpe
 
-[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Law-Office/Revocable Living Trust of Mia Walker.pdf" -
+[Error extracting PDF content: Command failed: pdftotext "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Law-Office/Revocable Living Trust of Mia Walker.pdf" -
 /bin/sh: pdftotext: command not found
 ]
 

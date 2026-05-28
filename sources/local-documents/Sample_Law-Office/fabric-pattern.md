@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "Law-Office".
+You are an expert query enhancer for a private document collection called "Sample_Law-Office".
 
 This collection contains 15 documents.
 

@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "DocType-Test".
+You are an expert query enhancer for a private document collection called "Sample_DocType-Test".
 
 This collection contains 19 documents.
 

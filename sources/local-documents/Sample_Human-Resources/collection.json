@@ -51,14 +51,6 @@
       "addedAt": "2026-05-26T19:58:46.496Z"
     },
     {
-      "id": "27747e8145bb",
-      "name": "Employee_Master_List",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Employee_Master_List.csv",
-      "sourceExt": "csv",
-      "convertedFile": "Employee_Master_List.md",
-      "addedAt": "2026-05-26T19:58:46.508Z"
-    },
-    {
       "id": "eae859fa9e1e",
       "name": "Hours_of_Service_Violation_Log",
       "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Hours_of_Service_Violation_Log.csv",
@@ -81,6 +73,14 @@
       "sourceExt": "csv",
       "convertedFile": "Safety_Incident_Report_Register.md",
       "addedAt": "2026-05-26T19:58:46.529Z"
+    },
+    {
+      "id": "c03322ace726",
+      "name": "Employee_Master_List",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Employee_Master_List.json",
+      "sourceExt": "json",
+      "convertedFile": "Employee_Master_List.md",
+      "addedAt": "2026-05-28T13:56:31.111Z"
     }
   ]
 }
