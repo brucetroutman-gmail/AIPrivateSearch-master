@@ -1,11 +1,11 @@
 {
-  "name": "Human-Resources",
+  "name": "Sample_Human-Resources",
   "created": "2026-05-26T19:56:24.405Z",
   "documents": [
     {
       "id": "8e49b24c69c1",
       "name": "Annual_DOT_Audit_Prep",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Annual_DOT_Audit_Prep.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Annual_DOT_Audit_Prep.json",
       "sourceExt": "json",
       "convertedFile": "Annual_DOT_Audit_Prep.md",
       "addedAt": "2026-05-26T19:58:46.311Z"
@@ -13,7 +13,7 @@
     {
       "id": "6a05e95d0c5a",
       "name": "Benefits_Enrollment_2026",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Benefits_Enrollment_2026.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Benefits_Enrollment_2026.json",
       "sourceExt": "json",
       "convertedFile": "Benefits_Enrollment_2026.md",
       "addedAt": "2026-05-26T19:58:46.387Z"
@@ -21,7 +21,7 @@
     {
       "id": "52489d02d2c1",
       "name": "CDL_Expiration_Report",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/CDL_Expiration_Report.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/CDL_Expiration_Report.json",
       "sourceExt": "json",
       "convertedFile": "CDL_Expiration_Report.md",
       "addedAt": "2026-05-26T19:58:46.462Z"
@@ -29,7 +29,7 @@
     {
       "id": "6290c6761cc6",
       "name": "Disciplinary_Actions_Log",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Disciplinary_Actions_Log.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Disciplinary_Actions_Log.json",
       "sourceExt": "json",
       "convertedFile": "Disciplinary_Actions_Log.md",
       "addedAt": "2026-05-26T19:58:46.479Z"
@@ -37,7 +37,7 @@
     {
       "id": "764cac5941ea",
       "name": "Drug_Test_Schedule_2026",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Drug_Test_Schedule_2026.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Drug_Test_Schedule_2026.json",
       "sourceExt": "json",
       "convertedFile": "Drug_Test_Schedule_2026.md",
       "addedAt": "2026-05-26T19:58:46.489Z"
@@ -45,7 +45,7 @@
     {
       "id": "62e1142124cf",
       "name": "ELD_Malfunction_Log",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/ELD_Malfunction_Log.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/ELD_Malfunction_Log.json",
       "sourceExt": "json",
       "convertedFile": "ELD_Malfunction_Log.md",
       "addedAt": "2026-05-26T19:58:46.496Z"
@@ -53,7 +53,7 @@
     {
       "id": "eae859fa9e1e",
       "name": "Hours_of_Service_Violation_Log",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Hours_of_Service_Violation_Log.csv",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Hours_of_Service_Violation_Log.csv",
       "sourceExt": "csv",
       "convertedFile": "Hours_of_Service_Violation_Log.md",
       "addedAt": "2026-05-26T19:58:46.514Z"
@@ -61,7 +61,7 @@
     {
       "id": "6b50d6fd92a9",
       "name": "Random_Drug_Alcohol_Testing_Pool_2025",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Random_Drug_Alcohol_Testing_Pool_2025.csv",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Random_Drug_Alcohol_Testing_Pool_2025.csv",
       "sourceExt": "csv",
       "convertedFile": "Random_Drug_Alcohol_Testing_Pool_2025.md",
       "addedAt": "2026-05-26T19:58:46.522Z"
@@ -69,7 +69,7 @@
     {
       "id": "dbe2cb2a6ff8",
       "name": "Safety_Incident_Report_Register",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Human-Resources/Safety_Incident_Report_Register.csv",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Human-Resources/Safety_Incident_Report_Register.csv",
       "sourceExt": "csv",
       "convertedFile": "Safety_Incident_Report_Register.md",
       "addedAt": "2026-05-26T19:58:46.529Z"

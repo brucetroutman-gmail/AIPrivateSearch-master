@@ -1,11 +1,11 @@
 {
-  "name": "Medical-Practice",
+  "name": "Sample_Medical-Practice",
   "created": "2026-05-26T18:35:51.950Z",
   "documents": [
     {
       "id": "d3c167f874bc",
       "name": "patient_info",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Medical-Practice/patient_info.json",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_info.json",
       "sourceExt": "json",
       "convertedFile": "patient_info.md",
       "addedAt": "2026-05-27T01:01:58.359Z"

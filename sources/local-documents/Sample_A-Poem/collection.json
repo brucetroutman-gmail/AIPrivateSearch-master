@@ -1,11 +1,11 @@
 {
-  "name": "A-Poem",
+  "name": "Sample_A-Poem",
   "created": "2026-05-26T19:03:20.557Z",
   "documents": [
     {
       "id": "6bbd0cec20ba",
       "name": "marine-poem",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/A-Poem/marine-poem.txt",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_A-Poem/marine-poem.txt",
       "sourceExt": "txt",
       "convertedFile": "marine-poem.md",
       "addedAt": "2026-05-26T19:03:20.558Z"

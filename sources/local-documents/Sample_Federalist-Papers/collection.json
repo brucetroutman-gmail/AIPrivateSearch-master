@@ -1,11 +1,11 @@
 {
-  "name": "Federalist-Papers",
+  "name": "Sample_Federalist-Papers",
   "created": "2026-05-26T20:03:12.479Z",
   "documents": [
     {
       "id": "d84666cb236a",
       "name": "The Federalist Papers",
-      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Federalist-Papers/The Federalist Papers.md",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Federalist-Papers/The Federalist Papers.md",
       "sourceExt": "md",
       "convertedFile": "The Federalist Papers.md",
       "addedAt": "2026-05-26T20:17:54.787Z"
