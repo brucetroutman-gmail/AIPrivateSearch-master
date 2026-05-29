@@ -61,9 +61,11 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 15px;
-            align-items: center;
+            align-items: flex-end;
         }
-        .controls-container select { flex: 1; min-width: 120px; }
+        .param-group { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 100px; }
+        .param-group label { font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .param-group select { font-size: 0.85rem; }
         .field { margin-bottom: 1rem; }
         .field label {
             display: block;
@@ -191,14 +193,22 @@
                 <select id="modelSelect" class="model-select" required>
                     <option value="" disabled selected>Select Model</option>
                 </select>
-                <select id="temperatureSelect" class="param-select prem-only" title="Temperature">
-                </select>
-                <select id="contextSelect" class="param-select prem-only" title="Context Size">
-                </select>
-                <select id="tokensSelect" class="param-select prem-only" title="Token Limit">
-                </select>
-                <select id="topKSelect" class="param-select prem-only" title="Top K Chunks">
-                </select>
+                <div class="param-group prem-only">
+                    <label for="temperatureSelect">Temperature</label>
+                    <select id="temperatureSelect" class="param-select"></select>
+                </div>
+                <div class="param-group prem-only">
+                    <label for="contextSelect">Context</label>
+                    <select id="contextSelect" class="param-select"></select>
+                </div>
+                <div class="param-group prem-only">
+                    <label for="tokensSelect">Tokens</label>
+                    <select id="tokensSelect" class="param-select"></select>
+                </div>
+                <div class="param-group prem-only">
+                    <label for="topKSelect">Top K</label>
+                    <select id="topKSelect" class="param-select"></select>
+                </div>
             </div>
         </div>
 
