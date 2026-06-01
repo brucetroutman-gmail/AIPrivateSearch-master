@@ -48,19 +48,39 @@ window.responseDisplayCommon = {
             if (searchResult.feedbackToken) {
                 const feedbackDiv = document.createElement('div');
                 feedbackDiv.style.cssText = 'margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-muted);';
-                feedbackDiv.innerHTML = `
-                  <span>Was this helpful?</span>
-                  <button class="feedback-btn" data-token="${searchResult.feedbackToken}" data-rating="1"
-                    style="background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:1rem;" title="Good response">
-                    👍
-                  </button>
-                  <button class="feedback-btn" data-token="${searchResult.feedbackToken}" data-rating="0"
-                    style="background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:1rem;" title="Poor response">
-                    👎
-                  </button>
-                  <span class="feedback-thanks" style="display:none;color:var(--success-color);">Thanks for your feedback!</span>`;
 
-                feedbackDiv.querySelectorAll('.feedback-btn').forEach(btn => {
+                const label = document.createElement('span');
+                label.textContent = 'Was this helpful?';
+
+                const btnStyle = 'background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:1rem;';
+
+                const thumbsUp = document.createElement('button');
+                thumbsUp.className = 'feedback-btn';
+                thumbsUp.dataset.token = searchResult.feedbackToken;
+                thumbsUp.dataset.rating = '1';
+                thumbsUp.style.cssText = btnStyle;
+                thumbsUp.title = 'Good response';
+                thumbsUp.textContent = '\uD83D\uDC4D';
+
+                const thumbsDown = document.createElement('button');
+                thumbsDown.className = 'feedback-btn';
+                thumbsDown.dataset.token = searchResult.feedbackToken;
+                thumbsDown.dataset.rating = '0';
+                thumbsDown.style.cssText = btnStyle;
+                thumbsDown.title = 'Poor response';
+                thumbsDown.textContent = '\uD83D\uDC4E';
+
+                const thanks = document.createElement('span');
+                thanks.className = 'feedback-thanks';
+                thanks.style.cssText = 'display:none;color:var(--success-color);';
+                thanks.textContent = 'Thanks for your feedback!';
+
+                feedbackDiv.appendChild(label);
+                feedbackDiv.appendChild(thumbsUp);
+                feedbackDiv.appendChild(thumbsDown);
+                feedbackDiv.appendChild(thanks);
+
+                [thumbsUp, thumbsDown].forEach(btn => {
                     btn.addEventListener('click', async () => {
                         const rating = parseInt(btn.dataset.rating);
                         const token = btn.dataset.token;
@@ -73,7 +93,7 @@ window.responseDisplayCommon = {
                             });
                         } catch (e) { /* silent — feedback is best-effort */ }
                         feedbackDiv.querySelectorAll('.feedback-btn').forEach(b => b.disabled = true);
-                        feedbackDiv.querySelector('.feedback-thanks').style.display = 'inline';
+                        thanks.style.display = 'inline';
                     });
                 });
                 container.appendChild(feedbackDiv);
