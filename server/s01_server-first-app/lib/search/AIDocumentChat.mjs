@@ -63,9 +63,23 @@ export class AIDocumentChat {
       const poolToRank = keywordFiltered.length > 0 ? keywordFiltered : candidateChunks;
       console.log(`[AIDocumentChat] keyword-matched: ${keywordFiltered.length}/${candidateChunks.length} chunks`);
 
+      // Detect exhaustive queries — "find all", "list", "which", "how many"
+      const exhaustivePattern = /\b(all|every|each|list|find|show|which|how many|any)\b/i;
+      const isExhaustive = exhaustivePattern.test(query);
+
+      // For exhaustive queries, fit as many keyword-matched chunks as context allows
+      // For normal queries, respect topK
+      let chunkLimit = topK;
+      if (isExhaustive && keywordFiltered.length > topK) {
+        const avgSize = keywordFiltered.reduce((s, c) => s + c.content.length, 0) / keywordFiltered.length;
+        const contextBudget = Math.floor((contextSize * 3) / avgSize); // ~3 chars per token
+        chunkLimit = Math.min(keywordFiltered.length, Math.max(topK, contextBudget));
+        console.log(`[AIDocumentChat] Exhaustive query — expanding chunkLimit from ${topK} to ${chunkLimit} (context budget)`);
+      }
+
       // Diversity cap: max 3 chunks per doc, unless only 1 doc in collection
       const uniqueDocs = new Set(candidateChunks.map(c => c.filename)).size;
-      const perDocLimit = uniqueDocs === 1 ? topK : 3;
+      const perDocLimit = uniqueDocs === 1 ? chunkLimit : 3;
       const seen = new Map();
       const relevantChunks = [];
       for (const chunk of poolToRank) {
@@ -74,7 +88,7 @@ export class AIDocumentChat {
           relevantChunks.push(chunk);
           seen.set(chunk.filename, count + 1);
         }
-        if (relevantChunks.length >= topK) break;
+        if (relevantChunks.length >= chunkLimit) break;
       }
 
       console.log(`\n[AIDocumentChat] CANDIDATE CHUNKS (${candidateChunks.length} total, ${uniqueDocs} unique docs):`);
@@ -89,7 +103,13 @@ export class AIDocumentChat {
       });
 
       const aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit, collection);
-      const finalResponse = aiResponse + this.addSourceLinks(relevantChunks);
+
+      // Warn if keyword filter still found more matches than we could send
+      const truncationWarning = keywordFiltered.length > relevantChunks.length
+        ? `\n\n> ⚠️ **Note**: ${keywordFiltered.length} matching chunks were found but only ${relevantChunks.length} fit within the context window. Results may be incomplete. Try increasing Context size in the search settings.`
+        : '';
+
+      const finalResponse = aiResponse + truncationWarning + this.addSourceLinks(relevantChunks);
       
       const result = {
         results: [{
@@ -195,7 +215,8 @@ Answer (be specific, reference source numbers):`;
         prompt: enhancedPrompt,
         stream: false,
         options: options
-      })
+      }),
+      signal: AbortSignal.timeout(300000) // 5 minute timeout for large models
     });
     
     if (!response.ok) {

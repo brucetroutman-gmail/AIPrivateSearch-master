@@ -2,6 +2,7 @@
  
 import { Ollama } from 'ollama';
 import { logger } from '../../../../shared/utils/logger.mjs';
+import { AppConfig } from '../utils/appConfig.mjs';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,7 +13,7 @@ class ScoringService {
   }
 
   loadScoreSettings() {
-    const configPath = path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings');
+    const configPath = path.join(AppConfig.getConfigLocation(), 'score-settings');
      
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     const settings = {};

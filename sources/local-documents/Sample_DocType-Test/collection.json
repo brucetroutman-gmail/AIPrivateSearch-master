@@ -159,10 +159,10 @@
     "topK": 10,
     "temperature": 0.1,
     "contextSize": 4096,
-    "tokenLimit": 512,
+    "tokenLimit": 1024,
     "totalChunks": 19,
     "totalDocs": 19,
     "avgChunkSize": 769,
-    "generatedAt": "2026-05-28T20:49:22.999Z"
+    "generatedAt": "2026-05-29T14:41:11.419Z"
   }
 }

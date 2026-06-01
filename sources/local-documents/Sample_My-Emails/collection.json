@@ -4007,7 +4007,7 @@
     "topK": 25,
     "temperature": 0.1,
     "contextSize": 4096,
-    "tokenLimit": 512,
+    "tokenLimit": 1024,
     "totalChunks": 500,
     "totalDocs": 500,
     "avgChunkSize": 430,
