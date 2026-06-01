@@ -43,6 +43,41 @@ window.responseDisplayCommon = {
             const doc = parser.parseFromString(sanitizedHTML, 'text/html');
             while (doc.body.firstChild) answerDiv.appendChild(doc.body.firstChild);
             container.appendChild(answerDiv);
+
+            // Feedback buttons
+            if (searchResult.feedbackToken) {
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.style.cssText = 'margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-muted);';
+                feedbackDiv.innerHTML = `
+                  <span>Was this helpful?</span>
+                  <button class="feedback-btn" data-token="${searchResult.feedbackToken}" data-rating="1"
+                    style="background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:1rem;" title="Good response">
+                    👍
+                  </button>
+                  <button class="feedback-btn" data-token="${searchResult.feedbackToken}" data-rating="0"
+                    style="background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:1rem;" title="Poor response">
+                    👎
+                  </button>
+                  <span class="feedback-thanks" style="display:none;color:var(--success-color);">Thanks for your feedback!</span>`;
+
+                feedbackDiv.querySelectorAll('.feedback-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const rating = parseInt(btn.dataset.rating);
+                        const token = btn.dataset.token;
+                        const meta = searchResult.feedbackMeta || {};
+                        try {
+                            await window.csrfManager.fetch(`${window.API_BASE_URL}/api/search-feedback`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ feedbackToken: token, rating, ...meta })
+                            });
+                        } catch (e) { /* silent — feedback is best-effort */ }
+                        feedbackDiv.querySelectorAll('.feedback-btn').forEach(b => b.disabled = true);
+                        feedbackDiv.querySelector('.feedback-thanks').style.display = 'inline';
+                    });
+                });
+                container.appendChild(feedbackDiv);
+            }
             return;
         }
         
@@ -130,6 +165,10 @@ window.responseDisplayCommon = {
     convertToMultiModeFormat(result, searchType) {
         if (!result.response) return { results: [], method: searchType };
         
+        // Preserve feedback token if present
+        const feedbackToken = result.feedbackToken || null;
+        const feedbackMeta = result.feedbackMeta || null;
+        
         // Parse markdown-formatted responses into result objects
         if (result.response.includes('**Result ') && result.response.includes('---')) {
             const sections = result.response.split('---').filter(s => s.trim());
@@ -179,7 +218,7 @@ window.responseDisplayCommon = {
                 };
             });
             
-            return { results, method: searchType };
+            return { results, method: searchType, ...(feedbackToken && { feedbackToken, feedbackMeta }) };
         }
         
         // Handle single response
@@ -190,7 +229,8 @@ window.responseDisplayCommon = {
                 score: 1.0,
                 source: 'AI Response'
             }],
-            method: searchType
+            method: searchType,
+            ...(feedbackToken && { feedbackToken, feedbackMeta })
         };
     }
 };

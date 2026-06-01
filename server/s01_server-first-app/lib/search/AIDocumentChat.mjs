@@ -4,6 +4,7 @@ import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mj
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { secureFs } from '../utils/secureFileOps.mjs';
+import crypto from 'crypto';
 import path from 'path';
 
 export class AIDocumentChat {
@@ -111,6 +112,7 @@ export class AIDocumentChat {
 
       const finalResponse = aiResponse + truncationWarning + this.addSourceLinks(relevantChunks);
       
+      const feedbackToken = crypto.randomBytes(8).toString('hex');
       const result = {
         results: [{
           id: `ai_document_chat_${Date.now()}`,
@@ -120,7 +122,9 @@ export class AIDocumentChat {
           source: `${relevantChunks.length} relevant chunks`
         }],
         method: 'ai-document-chat',
-        total: 1
+        total: 1,
+        feedbackToken,
+        feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length }
       };
       
       if (options.showChunks) {

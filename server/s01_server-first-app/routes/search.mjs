@@ -35,6 +35,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let searchResponse;
     let searchMetrics = null;
     let chunks = null;
+    let feedbackToken = null;
+    let feedbackMeta = null;
     
     // Phase 1: Search using SearchOrchestrator
     if (collection && searchType) {
@@ -101,6 +103,11 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         // For AI Document Chat, use the formatted response directly
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
+        // Preserve feedback token for UI
+        if (methodResult.feedbackToken) {
+          feedbackToken = methodResult.feedbackToken;
+          feedbackMeta = methodResult.feedbackMeta;
+        }
       } else {
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
@@ -191,6 +198,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         ...(scoringMetrics && { scoring: scoringMetrics })
       },
       ...(chunks && { chunks }),
+      ...(feedbackToken && { feedbackToken, feedbackMeta }),
       ...systemInfo
     };
     

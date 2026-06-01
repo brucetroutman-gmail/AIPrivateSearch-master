@@ -6,22 +6,22 @@
 
 ## IMMEDIATE PRIORITY
 
-### I-001 — Fix ScoringService Path Bug
+### I-001 — Fix ScoringService Path Bug ✅ v20.51
 `ScoringService.mjs` uses a hardcoded relative path to load `score-settings` config:
 ```
 path.join(process.cwd(), '..', '..', 'client', 'c01_client-first-app', 'config', 'score-settings')
 ```
 This resolves to `/Users/Shared/AIPrivateSearch/client/...` which does not exist.
 Should use `AppConfig.getConfigLocation()` like all other services.
-- [ ] Fix path in `ScoringService.mjs` to use `AppConfig.getConfigLocation()`
-- [ ] Verify server starts cleanly with `node server/s01_server-first-app/server.mjs`
+- [x] Fix path in `ScoringService.mjs` to use `AppConfig.getConfigLocation()`
+- [x] Verify server starts cleanly with `node server/s01_server-first-app/server.mjs`
 
-### I-002 — User Feedback (Thumbs Up/Down)
+### I-002 — User Feedback (Thumbs Up/Down) ✅ v20.52
 Cannot measure 80% good response goal without feedback data.
-- [ ] Add thumbs up/down buttons to AI Document Chat response in UI
-- [ ] Log feedback to `logs/search-evaluations.jsonl` — include query, collection, model, parameters, rating
-- [ ] Add feedback endpoint `POST /api/search-feedback`
-- [ ] Show feedback confirmation to user
+- [x] Add thumbs up/down buttons to AI Document Chat response in UI
+- [x] Log feedback to `logs/search-evaluations.jsonl` — include query, collection, model, parameters, rating
+- [x] Add feedback endpoint `POST /api/search-feedback`
+- [x] Show feedback confirmation to user
 
 ### I-003 — Release Uncommitted Changes
 Current repo has AIDocumentChat exhaustive query fix and fetch timeout fix not yet released.
