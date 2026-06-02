@@ -145,7 +145,10 @@ class SearchManager {
       })
     });
     const data = await response.json();
-    return { results: data.results || [] };
+    return {
+      results: data.results || [],
+      ...(data.feedbackToken && { feedbackToken: data.feedbackToken, feedbackMeta: data.feedbackMeta })
+    };
   }
 }
 
