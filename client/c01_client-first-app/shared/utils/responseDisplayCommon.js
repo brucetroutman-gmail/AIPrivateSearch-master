@@ -47,7 +47,7 @@ window.responseDisplayCommon = {
             // Feedback buttons
             if (searchResult.feedbackToken) {
                 const feedbackDiv = document.createElement('div');
-                feedbackDiv.style.cssText = 'margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-muted);';
+                feedbackDiv.style.cssText = 'margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-color);';
 
                 const label = document.createElement('span');
                 label.textContent = 'Was this helpful?';

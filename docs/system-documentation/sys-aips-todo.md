@@ -23,10 +23,10 @@ Cannot measure 80% good response goal without feedback data.
 - [x] Add feedback endpoint `POST /api/search-feedback`
 - [x] Show feedback confirmation to user
 
-### I-003 — Release Uncommitted Changes
+### I-003 — Release Uncommitted Changes ✅ v20.52
 Current repo has AIDocumentChat exhaustive query fix and fetch timeout fix not yet released.
-- [ ] Sync installed app → repo (release command)
-- [ ] Commit and push v20.51
+- [x] Sync installed app → repo (release command)
+- [x] Commit and push v20.53
 
 ---
 
