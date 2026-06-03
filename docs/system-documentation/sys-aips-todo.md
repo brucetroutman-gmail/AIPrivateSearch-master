@@ -207,6 +207,58 @@ Prerequisite for measuring 80% good response goal.
 - Admin dashboard with usage analytics
 - HIPAA compliance documentation
 - Marketing website / landing page
+- **LanceDB migration** — replace SQLite vector storage with LanceDB for native ANN indexing. Recommended when any collection exceeds ~5,000 chunks or search latency becomes noticeable. Requires re-embedding all collections and rewriting `UnifiedEmbeddingService`. Not a bottleneck at current collection sizes.
+
+---
+
+## LIGHTWEIGHT ENTITY GRAPH
+
+For structured record collections (Medical, HR, Law), build a simple entity index during Process Source Files to enable reliable relationship queries without full GraphRAG complexity.
+
+**Problem it solves**: "Find all patients with cancer" misses patients whose records use `sarcoma`, `tumor` etc. instead of the word "cancer". Standard RAG retrieves by similarity — guaranteed exhaustive retrieval requires traversing entity relationships.
+
+**Approach**: During Process Source Files Step 1 (Convert), extract entities from each converted `.md` file using the already-running LLM. Store as a simple JSON index per collection — no graph database needed.
+
+**Structure** (`entity-index.json` in collection folder):
+```json
+{
+  "entities": [
+    {
+      "chunkId": "chunk_1",
+      "filename": "patient_info.md",
+      "entities": {
+        "patient_id": "P002",
+        "name": "Maria L. Gonzalez",
+        "conditions": ["Type 2 diabetes", "Osteoarthritis"],
+        "medications": ["Metformin", "Oxycodone"],
+        "procedures": ["Hip replacement"]
+      }
+    }
+  ]
+}
+```
+
+**Query use**: When AI Document Chat detects a relationship query ("find all patients with X"), search the entity index first to guarantee all matching chunks are included, regardless of topK or embedding similarity.
+
+**Collections that benefit most**: Medical-Practice, Medical-Practice-II, Human-Resources, Law-Office
+
+**Collections with low benefit**: Federalist-Papers, My-Literature, USA-History (prose — no structured entities)
+
+**Prerequisites before starting**:
+- [ ] Establish baseline measurement from feedback data (I-002)
+- [ ] Complete BM25 + reranking experiment (A-003)
+- [ ] Implement embedding-based query type detection (A-001)
+
+**Tasks**:
+- [ ] Define entity schema per collection profile (medical / legal / HR / general)
+- [ ] Add entity extraction step to Process Source Files (Step 2b — after Fabric, before Embed)
+- [ ] Store `entity-index.json` in collection folder
+- [ ] Add entity index lookup to AIDocumentChat for relationship queries
+- [ ] Fall back to standard PRF expansion when no entity index exists
+- [ ] Test: "Find all patients with cancer" — verify all 11 returned
+- [ ] Test: "Which employees have CDL expiring in 30 days?" on Human-Resources
+- [ ] Test: "Who are the beneficiaries in John Smith's trust?" on Law-Office
+- [ ] Measure improvement vs baseline
 
 ---
 

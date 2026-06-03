@@ -4,6 +4,7 @@ import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mj
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { secureFs } from '../utils/secureFileOps.mjs';
+import { detectQueryType, applyQueryModifiers } from '../utils/queryTypeDetector.mjs';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -15,12 +16,21 @@ export class AIDocumentChat {
   }
 
   async search(query, options = {}) {
-    const { collection = null, model, topK = 10, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
+    let { collection = null, model, topK = 10, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
     try {
       console.log('\n' + '='.repeat(80));
       console.log('[AIDocumentChat] SEARCH START');
       console.log(`[AIDocumentChat] Query: "${query}"`);
+      
+      // Detect query type and apply adaptive parameter modifiers
+      const queryType = detectQueryType(query);
+      const adapted = applyQueryModifiers({ topK, temperature, contextSize, tokenLimit }, queryType);
+      topK = adapted.topK;
+      temperature = adapted.temperature;
+      contextSize = adapted.contextSize;
+      tokenLimit = adapted.tokenLimit;
+
       console.log(`[AIDocumentChat] Collection: ${collection}, Model: ${model}, topK: ${topK}, context: ${contextSize}`);
       console.log('='.repeat(80));
       
