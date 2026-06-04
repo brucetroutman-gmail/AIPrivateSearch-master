@@ -119,11 +119,11 @@ export function applyQueryModifiers(params, queryType) {
     result.topK = Math.min(45, Math.ceil((params.topK || 10) * 1.2 * s));
   } else if (type === 'analysis') {
     result.temperature = Math.min(0.4, (params.temperature || 0.1) * 1.5 * s);
-    result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.25 * s));
+    result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.25)); // always expand, no confidence penalty
     result.tokenLimit = Math.max(params.tokenLimit || 1024, 2048);
   } else if (type === 'creative') {
     result.temperature = Math.min(0.6, (params.temperature || 0.1) * 2.0 * s);
-    result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.4 * s));
+    result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.4)); // always expand, no confidence penalty
     result.tokenLimit = Math.max(params.tokenLimit || 1024, 2048);
   }
 

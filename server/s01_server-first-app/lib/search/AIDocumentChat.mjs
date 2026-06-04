@@ -51,34 +51,51 @@ export class AIDocumentChat {
       }
 
       // Keyword pre-filter with PRF query expansion:
-      // 1. Extract keywords from query
-      // 2. Find top chunks by embedding similarity (already done)
-      // 3. Extract frequent terms from those top chunks as expanded keywords
-      // 4. Filter all candidates using original + expanded keywords
-      const stopWords = new Set(['find','show','list','what','with','have','that','from','this','which','where','about','does','their','patients','also','been','were','will','would','could','should','these','those','then','than','when','they','them','into','over','after','before','other','some','such','only','both','each','more','most','very','just','like','well','even','back','good','much','many','know','need','make','take','give','come','look','want','used','using']);
-      const queryKeywords = query.toLowerCase().split(/\W+/).filter(w => w.length >= 4 && !stopWords.has(w));
+      // For multi-doc collections: use PRF expansion (generic terms help across different docs)
+      // For single-doc collections: use only specific query keywords (PRF adds noise when all chunks share same vocabulary)
+      const stopWords = new Set(['find','show','list','what','with','have','that','from','this','which','where','about','does','their','patients','also','been','were','will','would','could','should','these','those','then','than','when','they','them','into','over','after','before','other','some','such','only','both','each','more','most','very','just','like','well','even','back','good','much','many','know','need','make','take','give','come','look','want','used','using','compare','versus','approach','approaches','the','and','for','are','but','not','you','all','can','her','was','one','our','out','day','get','has','him','his','how','its','may','new','now','old','see','two','who','boy','did','way','let','put','say','she','too','use','yet','via']);
+      const queryKeywords = query.toLowerCase().split(/\W+/).filter(w => w.length >= 3 && !stopWords.has(w));
 
-      // PRF: extract top terms from top-5 similarity chunks
-      const prfChunks = candidateChunks.slice(0, 5);
-      const termFreq = new Map();
-      for (const chunk of prfChunks) {
-        const words = chunk.content.toLowerCase().split(/\W+/).filter(w => w.length >= 5 && !stopWords.has(w));
-        for (const word of words) termFreq.set(word, (termFreq.get(word) || 0) + 1);
+      const uniqueDocs = new Set(candidateChunks.map(c => c.filename)).size;
+      let expandedKeywords = queryKeywords;
+
+      if (uniqueDocs > 1) {
+        // Multi-doc: PRF expand using top-5 chunks
+        const prfChunks = candidateChunks.slice(0, 5);
+        const termFreq = new Map();
+        for (const chunk of prfChunks) {
+          const words = chunk.content.toLowerCase().split(/\W+/).filter(w => w.length >= 5 && !stopWords.has(w));
+          for (const word of words) termFreq.set(word, (termFreq.get(word) || 0) + 1);
+        }
+        const prfTerms = [...termFreq.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([term]) => term);
+        expandedKeywords = [...new Set([...queryKeywords, ...prfTerms])];
+        console.log(`[AIDocumentChat] PRF expanded: [${prfTerms.join(', ')}]`);
+      } else {
+        console.log(`[AIDocumentChat] Single-doc collection — using query keywords only (no PRF)`);
       }
-      // Take top 10 most frequent terms from PRF chunks as expanded keywords
-      const prfTerms = [...termFreq.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([term]) => term);
 
-      const expandedKeywords = [...new Set([...queryKeywords, ...prfTerms])];
       console.log(`[AIDocumentChat] Query keywords: [${queryKeywords.join(', ')}]`);
-      console.log(`[AIDocumentChat] PRF expanded: [${prfTerms.join(', ')}]`);
+
+      // For single-doc collections also apply similarity gap filter:
+      // only include chunks within 20% of the top similarity score
+      let poolAfterSimilarity = candidateChunks;
+      if (uniqueDocs === 1 && candidateChunks.length > 0) {
+        const topSim = candidateChunks[0].similarity;
+        const simThreshold = topSim * 0.80;
+        const simFiltered = candidateChunks.filter(c => c.similarity >= simThreshold);
+        if (simFiltered.length < candidateChunks.length) {
+          poolAfterSimilarity = simFiltered;
+          console.log(`[AIDocumentChat] Similarity gap filter: ${simFiltered.length}/${candidateChunks.length} chunks within 80% of top score (${topSim.toFixed(3)})`);
+        }
+      }
 
       const keywordFiltered = expandedKeywords.length > 0
-        ? candidateChunks.filter(c => expandedKeywords.some(kw => c.content.toLowerCase().includes(kw)))
+        ? poolAfterSimilarity.filter(c => expandedKeywords.some(kw => c.content.toLowerCase().includes(kw)))
         : [];
-      const poolToRank = keywordFiltered.length > 0 ? keywordFiltered : candidateChunks;
+      const poolToRank = keywordFiltered.length > 0 ? keywordFiltered : poolAfterSimilarity;
       console.log(`[AIDocumentChat] keyword-matched: ${keywordFiltered.length}/${candidateChunks.length} chunks`);
 
       // Detect exhaustive queries — "find all", "list", "which", "how many"
@@ -96,7 +113,6 @@ export class AIDocumentChat {
       }
 
       // Diversity cap: max 3 chunks per doc, unless only 1 doc in collection
-      const uniqueDocs = new Set(candidateChunks.map(c => c.filename)).size;
       const perDocLimit = uniqueDocs === 1 ? chunkLimit : 3;
       const seen = new Map();
       const relevantChunks = [];
