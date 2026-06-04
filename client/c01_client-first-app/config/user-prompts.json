@@ -22,7 +22,29 @@
     }
   ],
   "local_documents": {
-    "USA-History": [
+    "Sample_Medical-Practice": [
+      {
+        "name": "MED-Cancer patients",
+        "prompt": "Find all patients with cancer and list their diagnosis and treatment plan"
+      },
+      {
+        "name": "MED-Diabetes patients",
+        "prompt": "Find patients with diabetes and their current medications"
+      },
+      {
+        "name": "MED-Hip vs knee",
+        "prompt": "Compare the treatment approaches for hip replacement vs knee replacement patients"
+      },
+      {
+        "name": "MED-Medications by patient",
+        "prompt": "What medications is patient P013 currently taking and what are they for?"
+      },
+      {
+        "name": "MED-Upcoming appointments",
+        "prompt": "Show all appointments scheduled in November 2025"
+      }
+    ],
+    "Sample_USA-History": [
       {
         "name": "USA-Founding principles",
         "prompt": "What are the key principles outlined in the Declaration of Independence?"
@@ -44,7 +66,7 @@
         "prompt": "How are powers divided between federal and state governments in the Constitution?"
       }
     ],
-    "Human-Resources": [
+    "Sample_Human-Resources": [
       {
         "name": "HR-Employee lookup",
         "prompt": "Find all employees with CDL licenses expiring in the next 30 days"
@@ -66,7 +88,7 @@
         "prompt": "What items need attention for the upcoming DOT audit?"
       }
     ],
-    "Law-Office": [
+    "Sample_Law-Office": [
       {
         "name": "LAW-Estate planning",
         "prompt": "Find all wills and trusts for clients with assets over $1 million"
@@ -88,29 +110,7 @@
         "prompt": "List all trust beneficiaries and their inheritance details"
       }
     ],
-    "Medical-Practice": [
-      {
-        "name": "MED-Patient history",
-        "prompt": "Find patients with diabetes and their current treatment plans"
-      },
-      {
-        "name": "MED-Medication lookup",
-        "prompt": "What medications are available for hypertension treatment?"
-      },
-      {
-        "name": "MED-Appointment schedule",
-        "prompt": "Show all appointments scheduled for next week"
-      },
-      {
-        "name": "MED-Treatment outcomes",
-        "prompt": "What are the treatment outcomes for patients with chronic conditions?"
-      },
-      {
-        "name": "MED-Practice overview",
-        "prompt": "Summarize the practice's services and specialties"
-      }
-    ],
-    "Family-Documents": [
+    "Sample_Family-Documents": [
       {
         "name": "FAM-Insurance policies",
         "prompt": "What insurance policies do we have and when do they renew?"

@@ -9,34 +9,7 @@
 **insurance_provider**: BlueCross BlueShield
 **policy_number**: BC123456789
 **emergency_contact**: Jane Smith, Spouse, (217) 555-0124
-**medical_history**: Osteosarcoma diagnosed in 2023, Right femur fracture (2018), surgically repaired, Hypertension, No known allergies
 **reason_for_visit**: Follow-up for osteosarcoma treatment and hip pain evaluation
-**appointments / date**: 2025-10-20
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-10-22
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy administration
-**appointments / date**: 2025-11-01
-**appointments / time**: 9:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Post-chemotherapy follow-up
-**treatment_plan**: Chemotherapy: Doxorubicin and Cisplatin, 6 cycles, every 3 weeks, starting 2025-10-22, Surgery: Limb-sparing surgery, 2026-01-15, Radiation: 5 sessions, starting 2026-02-01, Physical Therapy: Weekly, starting 2025-11-01
-**medications / name**: Doxorubicin
-**medications / dosage**: 60 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Cisplatin
-**medications / dosage**: 100 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Lisinopril
-**medications / dosage**: 10 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hypertension management
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P002
 **name**: Maria L. Gonzalez
@@ -47,30 +20,7 @@
 **insurance_provider**: Aetna
 **policy_number**: AE987654321
 **emergency_contact**: Luis Gonzalez, Son, (217) 555-0235
-**medical_history**: Osteoarthritis, left hip, Type 2 diabetes, No known allergies
 **reason_for_visit**: Pre-operative consultation for hip replacement
-**appointments / date**: 2025-10-21
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Pre-op assessment
-**appointments / date**: 2025-10-25
-**appointments / time**: 8:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Hip replacement surgery
-**appointments / date**: 2025-11-05
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Michael Lee, NP: Post-op follow-up
-**treatment_plan**: Surgery: Total hip replacement, 2025-10-25, Physical Therapy: Bi-weekly, starting 2025-11-10, Pain Management: Post-op analgesics
-**medications / name**: Metformin
-**medications / dosage**: 500 mg
-**medications / frequency**: Twice daily
-**medications / purpose**: Diabetes management
-**medications / name**: Oxycodone
-**medications / dosage**: 5 mg
-**medications / frequency**: Every 6 hours
-**medications / purpose**: Post-op pain relief
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-inflammatory
 
 ## patient_id: P003
 **name**: James R. Brown
@@ -81,30 +31,7 @@
 **insurance_provider**: Cigna
 **policy_number**: CG456789123
 **emergency_contact**: Mary Brown, Wife, (217) 555-0346
-**medical_history**: Lung cancer with bone metastasis (2024), Hypertension, Allergic to penicillin
 **reason_for_visit**: Management of bone metastasis pain
-**appointments / date**: 2025-10-23
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pain management consultation
-**appointments / date**: 2025-10-27
-**appointments / time**: 3:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-11-03
-**appointments / time**: 10:30 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Follow-up
-**treatment_plan**: Radiation: Palliative radiation, 10 sessions, starting 2025-10-27, Bisphosphonates: Zoledronic acid, monthly, Pain Management: Opioid therapy
-**medications / name**: Zoledronic Acid
-**medications / dosage**: 4 mg
-**medications / frequency**: Monthly IV
-**medications / purpose**: Bone metastasis treatment
-**medications / name**: Morphine
-**medications / dosage**: 15 mg
-**medications / frequency**: Every 4 hours
-**medications / purpose**: Pain relief
-**medications / name**: Amlodipine
-**medications / dosage**: 5 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hypertension management
 
 ## patient_id: P004
 **name**: Emily T. Wilson
@@ -115,26 +42,7 @@
 **insurance_provider**: UnitedHealthcare
 **policy_number**: UH789123456
 **emergency_contact**: Thomas Wilson, Husband, (217) 555-0457
-**medical_history**: Tibial fracture (2025), No chronic conditions, No known allergies
 **reason_for_visit**: Post-fracture follow-up
-**appointments / date**: 2025-10-24
-**appointments / time**: 10:30 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Fracture assessment
-**appointments / date**: 2025-10-28
-**appointments / time**: 1:30 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Cast check
-**appointments / date**: 2025-11-07
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Physical therapy planning
-**treatment_plan**: Immobilization: Cast for 6 weeks, applied 2025-10-10, Physical Therapy: Weekly, starting 2025-11-15, Follow-up Imaging: X-ray on 2025-11-20
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Pain relief
-**medications / name**: Calcium
-**medications / dosage**: 1000 mg
-**medications / frequency**: Daily
-**medications / purpose**: Bone health
 
 ## patient_id: P005
 **name**: David K. Patel
@@ -145,26 +53,7 @@
 **insurance_provider**: Humana
 **policy_number**: HM123789456
 **emergency_contact**: Priya Patel, Wife, (217) 555-0568
-**medical_history**: Chondrosarcoma, left femur (2024), No other conditions, Allergic to sulfa drugs
 **reason_for_visit**: Chemotherapy follow-up
-**appointments / date**: 2025-10-25
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy session
-**appointments / date**: 2025-10-30
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-11-10
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Blood work review
-**treatment_plan**: Chemotherapy: Methotrexate, 4 cycles, every 2 weeks, starting 2025-10-25, Surgery: Wide resection, 2026-01-20, Physical Therapy: Post-op, starting 2026-02-05
-**medications / name**: Methotrexate
-**medications / dosage**: 12 g/m²
-**medications / frequency**: Every 2 weeks
-**medications / purpose**: Chemotherapy for chondrosarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P006
 **name**: Sarah M. Lee
@@ -175,26 +64,7 @@
 **insurance_provider**: Anthem
 **policy_number**: AN456123789
 **emergency_contact**: John Lee, Husband, (217) 555-0679
-**medical_history**: Knee osteoarthritis, Hyperlipidemia, No known allergies
 **reason_for_visit**: Knee pain management
-**appointments / date**: 2025-10-26
-**appointments / time**: 11:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Knee evaluation
-**appointments / date**: 2025-10-31
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Treatment planning
-**appointments / date**: 2025-11-12
-**appointments / time**: 2:30 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Follow-up
-**treatment_plan**: Injections: Hyaluronic acid, 3 sessions, starting 2025-11-01, Physical Therapy: Weekly, starting 2025-11-05, Lifestyle Modifications: Weight management program
-**medications / name**: Atorvastatin
-**medications / dosage**: 20 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hyperlipidemia management
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Pain relief
 
 ## patient_id: P007
 **name**: Michael J. Chen
@@ -205,34 +75,7 @@
 **insurance_provider**: BlueCross BlueShield
 **policy_number**: BC789456123
 **emergency_contact**: Lisa Chen, Sister, (217) 555-0790
-**medical_history**: Ewing sarcoma, diagnosed 2024, No other conditions, No known allergies
 **reason_for_visit**: Chemotherapy and imaging follow-up
-**appointments / date**: 2025-10-27
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-10-29
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy
-**appointments / date**: 2025-11-15
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Post-chemotherapy review
-**treatment_plan**: Chemotherapy: Vincristine, Doxorubicin, Cyclophosphamide, 6 cycles, starting 2025-10-29, Radiation: 10 sessions, starting 2025-12-15, Surgery: Evaluation for resection, 2026-02-01
-**medications / name**: Vincristine
-**medications / dosage**: 1.5 mg/m²
-**medications / frequency**: Weekly
-**medications / purpose**: Chemotherapy for Ewing sarcoma
-**medications / name**: Doxorubicin
-**medications / dosage**: 60 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for Ewing sarcoma
-**medications / name**: Cyclophosphamide
-**medications / dosage**: 1200 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for Ewing sarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P008
 **name**: Linda R. Davis
@@ -243,26 +86,7 @@
 **insurance_provider**: Aetna
 **policy_number**: AE123789456
 **emergency_contact**: Robert Davis, Husband, (217) 555-0891
-**medical_history**: Spinal tumor, diagnosed 2024, Hypothyroidism, No known allergies
 **reason_for_visit**: Spinal tumor management
-**appointments / date**: 2025-10-28
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Pre-radiation planning
-**appointments / date**: 2025-11-01
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-11-20
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Follow-up
-**treatment_plan**: Radiation: Stereotactic radiosurgery, 5 sessions, starting 2025-11-05, Surgery: Decompression surgery, 2026-01-10, Physical Therapy: Post-op, starting 2026-01-20
-**medications / name**: Levothyroxine
-**medications / dosage**: 100 mcg
-**medications / frequency**: Daily
-**medications / purpose**: Hypothyroidism management
-**medications / name**: Gabapentin
-**medications / dosage**: 300 mg
-**medications / frequency**: Three times daily
-**medications / purpose**: Neuropathic pain
 
 ## patient_id: P009
 **name**: Robert E. Kim
@@ -273,22 +97,7 @@
 **insurance_provider**: Cigna
 **policy_number**: CG789123456
 **emergency_contact**: Emily Kim, Wife, (217) 555-0902
-**medical_history**: Recurrent shoulder dislocation, No chronic conditions, No known allergies
 **reason_for_visit**: Surgical consultation for shoulder stabilization
-**appointments / date**: 2025-10-29
-**appointments / time**: 9:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pre-op evaluation
-**appointments / date**: 2025-11-03
-**appointments / time**: 8:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Arthroscopic surgery
-**appointments / date**: 2025-11-15
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Post-op follow-up
-**treatment_plan**: Surgery: Arthroscopic Bankart repair, 2025-11-03, Physical Therapy: Weekly, starting 2025-11-20, Sling Immobilization: 4 weeks post-op
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Post-op pain relief
 
 ## patient_id: P010
 **name**: Anna B. Taylor
@@ -299,30 +108,7 @@
 **insurance_provider**: UnitedHealthcare
 **policy_number**: UH456789123
 **emergency_contact**: Laura Taylor, Mother, (217) 555-1013
-**medical_history**: Osteosarcoma, pelvis, diagnosed 2024, No other conditions, Allergic to latex
 **reason_for_visit**: Chemotherapy planning
-**appointments / date**: 2025-10-30
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-11-01
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy
-**appointments / date**: 2025-11-18
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Follow-up
-**treatment_plan**: Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-01, Surgery: Pelvic resection, 2026-02-15, Radiation: Post-op, starting 2026-03-01
-**medications / name**: Doxorubicin
-**medications / dosage**: 60 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Cisplatin
-**medications / dosage**: 100 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P011
 **name**: Thomas G. White
@@ -333,26 +119,7 @@
 **insurance_provider**: Humana
 **policy_number**: HM789123456
 **emergency_contact**: Susan White, Wife, (217) 555-1124
-**medical_history**: Ankle fracture, 2025, Hypertension, No known allergies
 **reason_for_visit**: Fracture management
-**appointments / date**: 2025-10-31
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Fracture evaluation
-**appointments / date**: 2025-11-05
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Surgical consultation
-**appointments / date**: 2025-11-25
-**appointments / time**: 1:30 PM
-**appointments / provider_purpose**: Michael Lee, NP: Post-op follow-up
-**treatment_plan**: Surgery: Open reduction internal fixation, 2025-11-05, Immobilization: Cast for 6 weeks, Physical Therapy: Starting 2025-12-15
-**medications / name**: Lisinopril
-**medications / dosage**: 10 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hypertension management
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Pain relief
 
 ## patient_id: P012
 **name**: Jessica N. Harris
@@ -363,22 +130,7 @@
 **insurance_provider**: Anthem
 **policy_number**: AN123789456
 **emergency_contact**: Mark Harris, Husband, (217) 555-1235
-**medical_history**: Bone cyst, right humerus, No chronic conditions, No known allergies
 **reason_for_visit**: Cyst evaluation
-**appointments / date**: 2025-11-01
-**appointments / time**: 10:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Imaging review
-**appointments / date**: 2025-11-06
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Surgical planning
-**appointments / date**: 2025-11-20
-**appointments / time**: 9:30 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Follow-up
-**treatment_plan**: Surgery: Curettage and bone grafting, 2025-11-10, Physical Therapy: Post-op, starting 2025-11-25
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Post-op pain relief
 
 ## patient_id: P013
 **name**: William C. Adams
@@ -389,26 +141,7 @@
 **insurance_provider**: BlueCross BlueShield
 **policy_number**: BC456789123
 **emergency_contact**: Diane Adams, Wife, (217) 555-1346
-**medical_history**: Hip fracture, 2025, Type 2 diabetes, No known allergies
 **reason_for_visit**: Post-fracture surgical follow-up
-**appointments / date**: 2025-11-02
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Post-op review
-**appointments / date**: 2025-11-07
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Physical therapy planning
-**appointments / date**: 2025-11-22
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Follow-up
-**treatment_plan**: Surgery: Hip pinning, performed 2025-10-15, Physical Therapy: Bi-weekly, starting 2025-11-07, Follow-up Imaging: X-ray, 2025-12-01
-**medications / name**: Metformin
-**medications / dosage**: 500 mg
-**medications / frequency**: Twice daily
-**medications / purpose**: Diabetes management
-**medications / name**: Oxycodone
-**medications / dosage**: 5 mg
-**medications / frequency**: Every 6 hours
-**medications / purpose**: Post-op pain relief
 
 ## patient_id: P014
 **name**: Karen P. Young
@@ -419,38 +152,7 @@
 **insurance_provider**: Cigna
 **policy_number**: CG789456123
 **emergency_contact**: Paul Young, Husband, (217) 555-1457
-**medical_history**: Multiple myeloma, diagnosed 2023, Osteoporosis, No known allergies
 **reason_for_visit**: Myeloma treatment follow-up
-**appointments / date**: 2025-11-03
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy
-**appointments / date**: 2025-11-08
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-11-25
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Blood work review
-**treatment_plan**: Chemotherapy: Lenalidomide, Bortezomib, 6 cycles, starting 2025-11-03, Bisphosphonates: Pamidronate, monthly, Bone Health: Calcium and vitamin D supplementation
-**medications / name**: Lenalidomide
-**medications / dosage**: 25 mg
-**medications / frequency**: Daily, days 1-21 every 28 days
-**medications / purpose**: Myeloma treatment
-**medications / name**: Bortezomib
-**medications / dosage**: 1.3 mg/m²
-**medications / frequency**: Weekly
-**medications / purpose**: Myeloma treatment
-**medications / name**: Pamidronate
-**medications / dosage**: 90 mg
-**medications / frequency**: Monthly IV
-**medications / purpose**: Bone health
-**medications / name**: Calcium
-**medications / dosage**: 1000 mg
-**medications / frequency**: Daily
-**medications / purpose**: Bone health
-**medications / name**: Vitamin D
-**medications / dosage**: 800 IU
-**medications / frequency**: Daily
-**medications / purpose**: Bone health
 
 ## patient_id: P015
 **name**: Steven L. Moore
@@ -461,22 +163,7 @@
 **insurance_provider**: UnitedHealthcare
 **policy_number**: UH123456789
 **emergency_contact**: Emily Moore, Wife, (217) 555-1568
-**medical_history**: Rotator cuff tear, No chronic conditions, No known allergies
 **reason_for_visit**: Surgical consultation for rotator cuff repair
-**appointments / date**: 2025-11-04
-**appointments / time**: 9:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pre-op evaluation
-**appointments / date**: 2025-11-10
-**appointments / time**: 8:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Arthroscopic surgery
-**appointments / date**: 2025-11-25
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Post-op follow-up
-**treatment_plan**: Surgery: Arthroscopic repair, 2025-11-10, Physical Therapy: Weekly, starting 2025-11-25, Sling Immobilization: 6 weeks post-op
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Post-op pain relief
 
 ## patient_id: P016
 **name**: Rachel F. Clark
@@ -487,30 +174,7 @@
 **insurance_provider**: Humana
 **policy_number**: HM456789123
 **emergency_contact**: David Clark, Husband, (217) 555-1679
-**medical_history**: Osteosarcoma, humerus, diagnosed 2024, No other conditions, Allergic to penicillin
 **reason_for_visit**: Chemotherapy follow-up
-**appointments / date**: 2025-11-05
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-11-07
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy
-**appointments / date**: 2025-11-22
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Follow-up
-**treatment_plan**: Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-07, Surgery: Limb-sparing surgery, 2026-02-20, Radiation: Post-op, starting 2026-03-10
-**medications / name**: Doxorubicin
-**medications / dosage**: 60 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Cisplatin
-**medications / dosage**: 100 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P017
 **name**: Daniel S. Lewis
@@ -521,30 +185,7 @@
 **insurance_provider**: Anthem
 **policy_number**: AN789123456
 **emergency_contact**: Linda Lewis, Wife, (217) 555-1790
-**medical_history**: Knee osteoarthritis, Hypertension, No known allergies
 **reason_for_visit**: Knee replacement consultation
-**appointments / date**: 2025-11-06
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Pre-op evaluation
-**appointments / date**: 2025-11-12
-**appointments / time**: 8:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Knee replacement surgery
-**appointments / date**: 2025-11-27
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Michael Lee, NP: Post-op follow-up
-**treatment_plan**: Surgery: Total knee replacement, 2025-11-12, Physical Therapy: Bi-weekly, starting 2025-11-27, Pain Management: Post-op analgesics
-**medications / name**: Lisinopril
-**medications / dosage**: 10 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hypertension management
-**medications / name**: Oxycodone
-**medications / dosage**: 5 mg
-**medications / frequency**: Every 6 hours
-**medications / purpose**: Post-op pain relief
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-inflammatory
 
 ## patient_id: P018
 **name**: Laura E. Walker
@@ -555,30 +196,7 @@
 **insurance_provider**: BlueCross BlueShield
 **policy_number**: BC123789456
 **emergency_contact**: James Walker, Husband, (217) 555-1891
-**medical_history**: Breast cancer with bone metastasis, diagnosed 2024, Osteoporosis, No known allergies
 **reason_for_visit**: Bone metastasis management
-**appointments / date**: 2025-11-07
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pain management consultation
-**appointments / date**: 2025-11-10
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-11-28
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Follow-up
-**treatment_plan**: Radiation: Palliative radiation, 10 sessions, starting 2025-11-10, Bisphosphonates: Zoledronic acid, monthly, Pain Management: Opioid therapy
-**medications / name**: Zoledronic Acid
-**medications / dosage**: 4 mg
-**medications / frequency**: Monthly IV
-**medications / purpose**: Bone metastasis treatment
-**medications / name**: Morphine
-**medications / dosage**: 15 mg
-**medications / frequency**: Every 4 hours
-**medications / purpose**: Pain relief
-**medications / name**: Calcium
-**medications / dosage**: 1000 mg
-**medications / frequency**: Daily
-**medications / purpose**: Bone health
 
 ## patient_id: P019
 **name**: Paul R. Hall
@@ -589,26 +207,7 @@
 **insurance_provider**: UnitedHealthcare
 **policy_number**: UH789456123
 **emergency_contact**: Sarah Hall, Wife, (217) 555-1902
-**medical_history**: Femoral fracture, 2025, No chronic conditions, No known allergies
 **reason_for_visit**: Post-fracture surgical follow-up
-**appointments / date**: 2025-11-08
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Post-op review
-**appointments / date**: 2025-11-12
-**appointments / time**: 1:30 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Physical therapy planning
-**appointments / date**: 2025-11-30
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Follow-up
-**treatment_plan**: Surgery: Intramedullary nailing, performed 2025-10-20, Physical Therapy: Weekly, starting 2025-11-12, Follow-up Imaging: X-ray, 2025-12-05
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Pain relief
-**medications / name**: Calcium
-**medications / dosage**: 1000 mg
-**medications / frequency**: Daily
-**medications / purpose**: Bone health
 
 ## patient_id: P020
 **name**: Nancy T. King
@@ -619,26 +218,7 @@
 **insurance_provider**: Humana
 **policy_number**: HM123789456
 **emergency_contact**: Robert King, Husband, (217) 555-2013
-**medical_history**: Chondrosarcoma, pelvis, diagnosed 2024, No other conditions, Allergic to sulfa drugs
 **reason_for_visit**: Chemotherapy follow-up
-**appointments / date**: 2025-11-09
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy session
-**appointments / date**: 2025-11-14
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-12-01
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Blood work review
-**treatment_plan**: Chemotherapy: Methotrexate, 4 cycles, every 2 weeks, starting 2025-11-09, Surgery: Wide resection, 2026-02-01, Physical Therapy: Post-op, starting 2026-02-15
-**medications / name**: Methotrexate
-**medications / dosage**: 12 g/m²
-**medications / frequency**: Every 2 weeks
-**medications / purpose**: Chemotherapy for chondrosarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P021
 **name**: George M. Wright
@@ -649,22 +229,7 @@
 **insurance_provider**: Anthem
 **policy_number**: AN456789123
 **emergency_contact**: Linda Wright, Wife, (217) 555-2124
-**medical_history**: Elbow dislocation, No chronic conditions, No known allergies
 **reason_for_visit**: Post-dislocation follow-up
-**appointments / date**: 2025-11-10
-**appointments / time**: 9:30 AM
-**appointments / provider_purpose**: Michael Lee, NP: Elbow evaluation
-**appointments / date**: 2025-11-15
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Follow-up imaging
-**appointments / date**: 2025-12-01
-**appointments / time**: 1:30 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Physical therapy planning
-**treatment_plan**: Immobilization: Sling for 3 weeks, started 2025-10-25, Physical Therapy: Weekly, starting 2025-12-01, Follow-up Imaging: X-ray, 2025-11-15
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Pain relief
 
 ## patient_id: P022
 **name**: Susan B. Scott
@@ -675,30 +240,7 @@
 **insurance_provider**: BlueCross BlueShield
 **policy_number**: BC789123456
 **emergency_contact**: John Scott, Husband, (217) 555-2235
-**medical_history**: Osteosarcoma, tibia, diagnosed 2024, No other conditions, No known allergies
 **reason_for_visit**: Chemotherapy and surgical planning
-**appointments / date**: 2025-11-11
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology consultation
-**appointments / date**: 2025-11-13
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Chemotherapy
-**appointments / date**: 2025-12-01
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pre-surgical evaluation
-**treatment_plan**: Chemotherapy: Doxorubicin, Cisplatin, 6 cycles, starting 2025-11-13, Surgery: Limb-sparing surgery, 2026-02-25, Radiation: Post-op, starting 2026-03-15
-**medications / name**: Doxorubicin
-**medications / dosage**: 60 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Cisplatin
-**medications / dosage**: 100 mg/m²
-**medications / frequency**: Every 3 weeks
-**medications / purpose**: Chemotherapy for osteosarcoma
-**medications / name**: Ondansetron
-**medications / dosage**: 8 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-nausea
 
 ## patient_id: P023
 **name**: Charles D. Green
@@ -709,30 +251,7 @@
 **insurance_provider**: UnitedHealthcare
 **policy_number**: UH123789456
 **emergency_contact**: Mary Green, Wife, (217) 555-2346
-**medical_history**: Hip osteoarthritis, Hypertension, No known allergies
 **reason_for_visit**: Hip replacement consultation
-**appointments / date**: 2025-11-12
-**appointments / time**: 11:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Pre-op evaluation
-**appointments / date**: 2025-11-18
-**appointments / time**: 8:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Hip replacement surgery
-**appointments / date**: 2025-12-03
-**appointments / time**: 1:00 PM
-**appointments / provider_purpose**: Michael Lee, NP: Post-op follow-up
-**treatment_plan**: Surgery: Total hip replacement, 2025-11-18, Physical Therapy: Bi-weekly, starting 2025-12-03, Pain Management: Post-op analgesics
-**medications / name**: Lisinopril
-**medications / dosage**: 10 mg
-**medications / frequency**: Daily
-**medications / purpose**: Hypertension management
-**medications / name**: Oxycodone
-**medications / dosage**: 5 mg
-**medications / frequency**: Every 6 hours
-**medications / purpose**: Post-op pain relief
-**medications / name**: Ibuprofen
-**medications / dosage**: 400 mg
-**medications / frequency**: As needed
-**medications / purpose**: Anti-inflammatory
 
 ## patient_id: P024
 **name**: Patricia A. Hill
@@ -743,26 +262,7 @@
 **insurance_provider**: Humana
 **policy_number**: HM789456123
 **emergency_contact**: David Hill, Husband, (217) 555-2457
-**medical_history**: Bone tumor, spine, diagnosed 2024, Hypothyroidism, No known allergies
 **reason_for_visit**: Tumor management
-**appointments / date**: 2025-11-13
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Pain management consultation
-**appointments / date**: 2025-11-15
-**appointments / time**: 2:00 PM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Oncology review
-**appointments / date**: 2025-12-05
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Sarah Johnson, NP: Follow-up
-**treatment_plan**: Radiation: Stereotactic radiosurgery, 5 sessions, starting 2025-11-20, Surgery: Decompression surgery, 2026-02-10, Physical Therapy: Post-op, starting 2026-02-25
-**medications / name**: Levothyroxine
-**medications / dosage**: 100 mcg
-**medications / frequency**: Daily
-**medications / purpose**: Hypothyroidism management
-**medications / name**: Gabapentin
-**medications / dosage**: 300 mg
-**medications / frequency**: Three times daily
-**medications / purpose**: Neuropathic pain
 
 ## patient_id: P025
 **name**: Edward J. Allen
@@ -773,23 +273,4 @@
 **insurance_provider**: Anthem
 **policy_number**: AN123456789
 **emergency_contact**: Linda Allen, Wife, (217) 555-2568
-**medical_history**: Clavicle fracture, 2025, No chronic conditions, No known allergies
 **reason_for_visit**: Post-fracture follow-up
-**appointments / date**: 2025-11-14
-**appointments / time**: 9:00 AM
-**appointments / provider_purpose**: Dr. Emily Carter, MD: Fracture assessment
-**appointments / date**: 2025-11-18
-**appointments / time**: 1:30 PM
-**appointments / provider_purpose**: Sarah Johnson, NP: Cast check
-**appointments / date**: 2025-12-10
-**appointments / time**: 10:00 AM
-**appointments / provider_purpose**: Michael Lee, NP: Physical therapy planning
-**treatment_plan**: Immobilization: Sling for 6 weeks, applied 2025-10-25, Physical Therapy: Weekly, starting 2025-12-10, Follow-up Imaging: X-ray, 2025-12-15
-**medications / name**: Ibuprofen
-**medications / dosage**: 600 mg
-**medications / frequency**: Every 8 hours
-**medications / purpose**: Pain relief
-**medications / name**: Calcium
-**medications / dosage**: 1000 mg
-**medications / frequency**: Daily
-**medications / purpose**: Bone health

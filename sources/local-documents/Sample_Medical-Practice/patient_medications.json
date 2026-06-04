@@ -1,0 +1,488 @@
+[
+  {
+    "patient_id": "P001",
+    "name": "John A. Smith",
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P002",
+    "name": "Maria L. Gonzalez",
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500 mg",
+        "frequency": "Twice daily",
+        "purpose": "Diabetes management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P003",
+    "name": "James R. Brown",
+    "medications": [
+      {
+        "name": "Zoledronic Acid",
+        "dosage": "4 mg",
+        "frequency": "Monthly IV",
+        "purpose": "Bone metastasis treatment"
+      },
+      {
+        "name": "Morphine",
+        "dosage": "15 mg",
+        "frequency": "Every 4 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Amlodipine",
+        "dosage": "5 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      }
+    ]
+  },
+  {
+    "patient_id": "P004",
+    "name": "Emily T. Wilson",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P005",
+    "name": "David K. Patel",
+    "medications": [
+      {
+        "name": "Methotrexate",
+        "dosage": "12 g/m\u00b2",
+        "frequency": "Every 2 weeks",
+        "purpose": "Chemotherapy for chondrosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P006",
+    "name": "Sarah M. Lee",
+    "medications": [
+      {
+        "name": "Atorvastatin",
+        "dosage": "20 mg",
+        "frequency": "Daily",
+        "purpose": "Hyperlipidemia management"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P007",
+    "name": "Michael J. Chen",
+    "medications": [
+      {
+        "name": "Vincristine",
+        "dosage": "1.5 mg/m\u00b2",
+        "frequency": "Weekly",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Cyclophosphamide",
+        "dosage": "1200 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for Ewing sarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P008",
+    "name": "Linda R. Davis",
+    "medications": [
+      {
+        "name": "Levothyroxine",
+        "dosage": "100 mcg",
+        "frequency": "Daily",
+        "purpose": "Hypothyroidism management"
+      },
+      {
+        "name": "Gabapentin",
+        "dosage": "300 mg",
+        "frequency": "Three times daily",
+        "purpose": "Neuropathic pain"
+      }
+    ]
+  },
+  {
+    "patient_id": "P009",
+    "name": "Robert E. Kim",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P010",
+    "name": "Anna B. Taylor",
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P011",
+    "name": "Thomas G. White",
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P012",
+    "name": "Jessica N. Harris",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P013",
+    "name": "William C. Adams",
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500 mg",
+        "frequency": "Twice daily",
+        "purpose": "Diabetes management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P014",
+    "name": "Dorothy F. Evans",
+    "medications": [
+      {
+        "name": "Lenalidomide",
+        "dosage": "25 mg",
+        "frequency": "Daily for 21 days",
+        "purpose": "Myeloma treatment"
+      },
+      {
+        "name": "Bortezomib",
+        "dosage": "1.3 mg/m\u00b2",
+        "frequency": "Twice weekly",
+        "purpose": "Myeloma treatment"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P015",
+    "name": "Kevin M. Roberts",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P016",
+    "name": "Rachel F. Clark",
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P017",
+    "name": "Daniel S. Lewis",
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P018",
+    "name": "Laura E. Walker",
+    "medications": [
+      {
+        "name": "Zoledronic Acid",
+        "dosage": "4 mg",
+        "frequency": "Monthly IV",
+        "purpose": "Bone metastasis treatment"
+      },
+      {
+        "name": "Morphine",
+        "dosage": "15 mg",
+        "frequency": "Every 4 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  },
+  {
+    "patient_id": "P019",
+    "name": "Henry J. Brooks",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P020",
+    "name": "Nancy T. King",
+    "medications": [
+      {
+        "name": "Methotrexate",
+        "dosage": "12 g/m\u00b2",
+        "frequency": "Every 2 weeks",
+        "purpose": "Chemotherapy for chondrosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P021",
+    "name": "George M. Wright",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Post-op pain relief"
+      }
+    ]
+  },
+  {
+    "patient_id": "P022",
+    "name": "Susan B. Scott",
+    "medications": [
+      {
+        "name": "Doxorubicin",
+        "dosage": "60 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Cisplatin",
+        "dosage": "100 mg/m\u00b2",
+        "frequency": "Every 3 weeks",
+        "purpose": "Chemotherapy for osteosarcoma"
+      },
+      {
+        "name": "Ondansetron",
+        "dosage": "8 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-nausea"
+      }
+    ]
+  },
+  {
+    "patient_id": "P023",
+    "name": "Charles D. Green",
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10 mg",
+        "frequency": "Daily",
+        "purpose": "Hypertension management"
+      },
+      {
+        "name": "Oxycodone",
+        "dosage": "5 mg",
+        "frequency": "Every 6 hours",
+        "purpose": "Post-op pain relief"
+      },
+      {
+        "name": "Ibuprofen",
+        "dosage": "400 mg",
+        "frequency": "As needed",
+        "purpose": "Anti-inflammatory"
+      }
+    ]
+  },
+  {
+    "patient_id": "P024",
+    "name": "Patricia A. Hill",
+    "medications": [
+      {
+        "name": "Levothyroxine",
+        "dosage": "100 mcg",
+        "frequency": "Daily",
+        "purpose": "Hypothyroidism management"
+      },
+      {
+        "name": "Gabapentin",
+        "dosage": "300 mg",
+        "frequency": "Three times daily",
+        "purpose": "Neuropathic pain"
+      }
+    ]
+  },
+  {
+    "patient_id": "P025",
+    "name": "Edward J. Allen",
+    "medications": [
+      {
+        "name": "Ibuprofen",
+        "dosage": "600 mg",
+        "frequency": "Every 8 hours",
+        "purpose": "Pain relief"
+      },
+      {
+        "name": "Calcium",
+        "dosage": "1000 mg",
+        "frequency": "Daily",
+        "purpose": "Bone health"
+      }
+    ]
+  }
+]

@@ -1,14 +1,54 @@
 {
   "name": "Sample_Medical-Practice",
-  "created": "2026-05-26T18:35:51.950Z",
+  "created": "2026-05-28T18:50:42.318Z",
   "documents": [
     {
-      "id": "d3c167f874bc",
+      "id": "6371f2076d38",
+      "name": "patient_medical_histories",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_medical_histories.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_medical_histories.md",
+      "addedAt": "2026-05-28T18:50:42.318Z"
+    },
+    {
+      "id": "44a17e68b38b",
+      "name": "patient_treatment_plans",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_treatment_plans.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_treatment_plans.md",
+      "addedAt": "2026-05-28T18:50:42.392Z"
+    },
+    {
+      "id": "15c276a22f18",
+      "name": "practice-overview",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/practice-overview.docx",
+      "sourceExt": "docx",
+      "convertedFile": "practice-overview.md",
+      "addedAt": "2026-05-28T18:50:42.485Z"
+    },
+    {
+      "id": "2d3ef421ed0a",
+      "name": "patient_appointments_calendar",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_appointments_calendar.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_appointments_calendar.md",
+      "addedAt": "2026-05-28T18:50:57.170Z"
+    },
+    {
+      "id": "c3769871e30e",
       "name": "patient_info",
       "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_info.json",
       "sourceExt": "json",
       "convertedFile": "patient_info.md",
-      "addedAt": "2026-05-27T01:01:58.359Z"
+      "addedAt": "2026-05-28T19:01:32.988Z"
+    },
+    {
+      "id": "056af1174db6",
+      "name": "patient_medications",
+      "sourcePath": "/Users/Shared/AIPrivateSearch/sources/local-documents/Sample_Medical-Practice/patient_medications.json",
+      "sourceExt": "json",
+      "convertedFile": "patient_medications.md",
+      "addedAt": "2026-06-04T16:43:55.706771+00:00"
     }
   ],
   "searchSettings": {
@@ -16,9 +56,9 @@
     "temperature": 0.1,
     "contextSize": 8192,
     "tokenLimit": 1024,
-    "totalChunks": 25,
-    "totalDocs": 1,
-    "avgChunkSize": 1422,
-    "generatedAt": "2026-05-28T21:00:14.060Z"
+    "totalChunks": 27,
+    "totalDocs": 7,
+    "avgChunkSize": 1619,
+    "generatedAt": "2026-06-04T16:51:06.088Z"
   }
 }
