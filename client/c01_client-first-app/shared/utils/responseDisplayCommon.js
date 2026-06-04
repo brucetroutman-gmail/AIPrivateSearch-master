@@ -80,6 +80,54 @@ window.responseDisplayCommon = {
                 feedbackDiv.appendChild(thumbsDown);
                 feedbackDiv.appendChild(thanks);
 
+                // View Log button
+                if (searchResult.searchLog && searchResult.searchLog.length > 0) {
+                    const viewLogBtn = document.createElement('button');
+                    viewLogBtn.style.cssText = 'background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem;color:var(--text-color);margin-left:0.5rem;';
+                    viewLogBtn.textContent = '📋 View Log';
+                    viewLogBtn.addEventListener('click', () => {
+                        const logText = searchResult.searchLog.join('\n');
+                        const modal = document.createElement('div');
+                        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;';
+                        const box = document.createElement('div');
+                        box.style.cssText = 'background:var(--card-bg);padding:1.5rem;border-radius:8px;max-width:900px;width:95%;max-height:85vh;display:flex;flex-direction:column;gap:0.75rem;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+
+                        const header = document.createElement('div');
+                        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+                        const title = document.createElement('h3');
+                        title.style.margin = '0';
+                        title.textContent = 'Search Log';
+                        const closeBtn = document.createElement('button');
+                        closeBtn.className = 'btn btn-secondary';
+                        closeBtn.textContent = 'Close';
+                        closeBtn.addEventListener('click', () => modal.remove());
+                        header.appendChild(title);
+                        header.appendChild(closeBtn);
+
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'btn btn-info';
+                        copyBtn.textContent = '📋 Copy to Clipboard';
+                        copyBtn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(logText).then(() => {
+                                copyBtn.textContent = '✅ Copied!';
+                                setTimeout(() => { copyBtn.textContent = '📋 Copy to Clipboard'; }, 2000);
+                            });
+                        });
+
+                        const pre = document.createElement('pre');
+                        pre.style.cssText = 'background:var(--input-bg);border:1px solid var(--border-color);border-radius:4px;padding:1rem;font-size:0.75rem;overflow:auto;flex:1;white-space:pre-wrap;word-break:break-word;color:var(--text-color);';
+                        pre.textContent = logText;
+
+                        box.appendChild(header);
+                        box.appendChild(copyBtn);
+                        box.appendChild(pre);
+                        modal.appendChild(box);
+                        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+                        document.body.appendChild(modal);
+                    });
+                    feedbackDiv.appendChild(viewLogBtn);
+                }
+
                 [thumbsUp, thumbsDown].forEach(btn => {
                     btn.addEventListener('click', async () => {
                         const rating = parseInt(btn.dataset.rating);
@@ -185,9 +233,10 @@ window.responseDisplayCommon = {
     convertToMultiModeFormat(result, searchType) {
         if (!result.response) return { results: [], method: searchType };
         
-        // Preserve feedback token if present
+        // Preserve feedback token and search log if present
         const feedbackToken = result.feedbackToken || null;
         const feedbackMeta = result.feedbackMeta || null;
+        const searchLog = result.searchLog || null;
         
         // Parse markdown-formatted responses into result objects
         if (result.response.includes('**Result ') && result.response.includes('---')) {
@@ -238,7 +287,7 @@ window.responseDisplayCommon = {
                 };
             });
             
-            return { results, method: searchType, ...(feedbackToken && { feedbackToken, feedbackMeta }) };
+            return { results, method: searchType, ...(feedbackToken && { feedbackToken, feedbackMeta }), ...(searchLog && { searchLog }) };
         }
         
         // Handle single response
@@ -250,7 +299,8 @@ window.responseDisplayCommon = {
                 source: 'AI Response'
             }],
             method: searchType,
-            ...(feedbackToken && { feedbackToken, feedbackMeta })
+            ...(feedbackToken && { feedbackToken, feedbackMeta }),
+            ...(searchLog && { searchLog })
         };
     }
 };

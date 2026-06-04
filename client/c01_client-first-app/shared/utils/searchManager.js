@@ -147,7 +147,8 @@ class SearchManager {
     const data = await response.json();
     return {
       results: data.results || [],
-      ...(data.feedbackToken && { feedbackToken: data.feedbackToken, feedbackMeta: data.feedbackMeta })
+      ...(data.feedbackToken && { feedbackToken: data.feedbackToken, feedbackMeta: data.feedbackMeta }),
+      ...(data.searchLog && { searchLog: data.searchLog })
     };
   }
 }

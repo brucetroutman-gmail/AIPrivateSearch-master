@@ -18,6 +18,13 @@ export class AIDocumentChat {
   async search(query, options = {}) {
     let { collection = null, model, topK = 10, temperature = 0.3, contextSize = 1024, tokenLimit = null } = options;
     
+    // Capture all console output for this search into searchLog
+    const searchLog = [];
+    const origLog = console.log;
+    const origError = console.error;
+    console.log = (...args) => { origLog(...args); searchLog.push(args.join(' ')); };
+    console.error = (...args) => { origError(...args); searchLog.push('ERROR: ' + args.join(' ')); };
+
     try {
       console.log('\n' + '='.repeat(80));
       console.log('[AIDocumentChat] SEARCH START');
@@ -134,7 +141,8 @@ export class AIDocumentChat {
         method: 'ai-document-chat',
         total: 1,
         feedbackToken,
-        feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length }
+        feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length },
+        searchLog
       };
       
       if (options.showChunks) {
@@ -149,6 +157,9 @@ export class AIDocumentChat {
     } catch (error) {
       console.error('AI Document Chat search error:', error);
       throw new Error(`AI Document Chat search failed: ${error.message}`);
+    } finally {
+      console.log = origLog;
+      console.error = origError;
     }
   }
 

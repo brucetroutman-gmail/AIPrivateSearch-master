@@ -199,6 +199,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       },
       ...(chunks && { chunks }),
       ...(feedbackToken && { feedbackToken, feedbackMeta }),
+      ...(methodResult?.searchLog && { searchLog: methodResult.searchLog }),
       ...systemInfo
     };
     
