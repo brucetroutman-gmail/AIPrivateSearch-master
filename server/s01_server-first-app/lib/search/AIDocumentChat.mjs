@@ -60,8 +60,10 @@ export class AIDocumentChat {
       let expandedKeywords = queryKeywords;
 
       if (uniqueDocs > 1) {
-        // Multi-doc: PRF expand using top-5 chunks
-        const prfChunks = candidateChunks.slice(0, 5);
+        // Multi-doc: PRF expand using top-5 chunks from the SAME file as top result
+        // This prevents generic cross-document terms from polluting the filter
+        const topFile = candidateChunks[0].filename;
+        const prfChunks = candidateChunks.filter(c => c.filename === topFile).slice(0, 5);
         const termFreq = new Map();
         for (const chunk of prfChunks) {
           const words = chunk.content.toLowerCase().split(/\W+/).filter(w => w.length >= 5 && !stopWords.has(w));
@@ -72,7 +74,7 @@ export class AIDocumentChat {
           .slice(0, 10)
           .map(([term]) => term);
         expandedKeywords = [...new Set([...queryKeywords, ...prfTerms])];
-        console.log(`[AIDocumentChat] PRF expanded: [${prfTerms.join(', ')}]`);
+        console.log(`[AIDocumentChat] PRF expanded from ${topFile}: [${prfTerms.join(', ')}]`);
       } else {
         console.log(`[AIDocumentChat] Single-doc collection — using query keywords only (no PRF)`);
       }

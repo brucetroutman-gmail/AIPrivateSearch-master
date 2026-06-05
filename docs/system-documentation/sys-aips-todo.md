@@ -32,15 +32,16 @@ Current repo has AIDocumentChat exhaustive query fix and fetch timeout fix not y
 
 ## ACTIVE DEVELOPMENT
 
-### A-001 — Embedding-Based Query Type Detection
-Replace keyword-based exhaustive query detection with embedding similarity against prototype queries.
+### A-001 — Embedding-Based Query Type Detection ✅ v20.56
+Replaced keyword-based exhaustive query detection with TF-IDF + keyword boost classifier using `natural` package.
 Query types: `fact` | `analysis` | `creative` | `general`
 Each type adjusts temperature, topK, contextSize automatically.
-- [ ] Implement prototype embedding cache (4 examples per type)
-- [ ] Detect query type on each AI Document Chat search
-- [ ] Apply modifiers to parameters before search
-- [ ] Test across Medical-Practice, Law-Office, Federalist-Papers, My-Emails
-- [ ] Compare results to baseline
+- [x] Implement TF-IDF + keyword prototype classifier (`queryTypeDetector.mjs`)
+- [x] Detect query type on each AI Document Chat search
+- [x] Apply modifiers to parameters before search
+- [x] Fix context size bug — analysis/creative always expand, no confidence penalty
+- [x] Single-doc collections skip PRF, use query keywords only + similarity gap filter
+- [x] Multi-doc PRF now expands from top-ranked file only, not all files
 
 ### A-002 — Test Query Set + Baseline Measurement
 Required before BM25/reranking experiment.

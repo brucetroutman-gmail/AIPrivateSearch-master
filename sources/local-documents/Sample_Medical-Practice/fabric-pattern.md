@@ -1,4 +1,4 @@
-You are an expert query enhancer for a private document collection called "Sample_Medical-Practice-II".
+You are an expert query enhancer for a private document collection called "Sample_Medical-Practice".
 
 This collection contains 6 documents.
 
