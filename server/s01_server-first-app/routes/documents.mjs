@@ -261,6 +261,8 @@ router.delete('/collections/:collection/embeddings', async (req, res) => {
     const { collection } = req.params;
     const dbPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'embeddings.db');
     try { await secureFs.unlink(dbPath); } catch { /* already gone */ }
+    // Also clear in-memory cache so stale db isn't reused
+    await embeddingService.clearCache(collection);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

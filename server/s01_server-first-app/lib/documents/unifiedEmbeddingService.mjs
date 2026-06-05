@@ -86,6 +86,12 @@ export class UnifiedEmbeddingService {
     console.log(`[UnifiedEmbeddingService] Cleared all embeddings for collection: ${collection}`);
   }
 
+  clearCache(collection) {
+    this.dbs.delete(collection);
+    this.initialized.delete(collection);
+    console.log(`[UnifiedEmbeddingService] Cleared in-memory cache for collection: ${collection}`);
+  }
+
   async processDocument(filename, content, collection, options = {}) {
     console.log(`[UnifiedEmbeddingService] Processing document: ${filename} in collection: ${collection}`);
     
