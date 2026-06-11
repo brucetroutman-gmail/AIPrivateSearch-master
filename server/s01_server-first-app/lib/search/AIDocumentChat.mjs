@@ -26,6 +26,7 @@ export class AIDocumentChat {
     console.error = (...args) => { origError(...args); searchLog.push('ERROR: ' + args.join(' ')); };
 
     try {
+      const searchStartTime = Date.now();
       console.log('\n' + '='.repeat(80));
       console.log('[AIDocumentChat] SEARCH START');
       console.log(`[AIDocumentChat] Query: "${query}"`);
@@ -148,6 +149,7 @@ export class AIDocumentChat {
       const finalResponse = aiResponse + truncationWarning + this.addSourceLinks(relevantChunks);
       
       const feedbackToken = crypto.randomBytes(8).toString('hex');
+      const elapsedMs = Date.now() - searchStartTime;
       const result = {
         results: [{
           id: `ai_document_chat_${Date.now()}`,
@@ -159,7 +161,7 @@ export class AIDocumentChat {
         method: 'ai-document-chat',
         total: 1,
         feedbackToken,
-        feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length },
+        feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length, elapsedMs },
         searchLog
       };
       

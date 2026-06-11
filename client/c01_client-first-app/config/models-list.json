@@ -7,63 +7,23 @@
     },
     {
       "category": "search",
-      "modelName": "llama3.2:3b",
-      "size": "2.0 GB"
+      "modelName": "llama3.1:8b",
+      "size": "unknown"
     },
     {
       "category": "search",
-      "modelName": "gemma2:2b",
-      "size": "1.6 GB"
-    },
-    {
-      "category": "score",
-      "modelName": "gemma2:2b",
-      "size": "1.6 GB"
+      "modelName": "gemma4:12b",
+      "size": "unknown"
     },
     {
       "category": "search",
-      "modelName": "qwen2:0.5b",
-      "size": "532 MB"
+      "modelName": "qwen3.5:9b",
+      "size": "unknown"
     },
     {
       "category": "search",
-      "modelName": "mistral:7b",
-      "size": "4.4 GB"
-    },
-    {
-      "category": "search",
-      "modelName": "qwen2.5:7b",
-      "size": "4.7 GB"
-    },
-    {
-      "category": "search",
-      "modelName": "qwen2.5:3b",
-      "size": "1.9 GB"
-    },
-    {
-      "category": "document-index",
-      "modelName": "qwen2:0.5b",
-      "size": "532 MB"
-    },
-    {
-      "category": "rerank",
-      "modelName": "qwen2:0.5b",
-      "size": "532 MB"
-    },
-    {
-      "category": "search",
-      "modelName": "qwen2.5-coder:1.5b",
-      "size": "986 MB"
-    },
-    {
-      "category": "search",
-      "modelName": "gemma2:9b",
-      "size": "5.4 GB"
-    },
-    {
-      "category": "search",
-      "modelName": "phi3:3.8b",
-      "size": "2.2 GB"
+      "modelName": "mistral-small",
+      "size": "unknown"
     }
   ]
 }
