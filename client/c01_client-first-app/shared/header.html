@@ -10,8 +10,14 @@
       <a href="./search.html" class="menu-search-classic" style="display: none;">Search</a>
       <a href="./exact-search.html" class="menu-search menu-exact-search" style="display: none;">Exact Search</a>
       <a href="./ai-search.html" class="menu-multi-mode menu-ai-search" style="display: none;">AI Search</a>
-      <a href="./test.html" class="pro-only menu-test" style="display: none;">Test</a>
-      <a href="./analyze-tests.html" class="pro-only menu-analyze" style="display: none;">Analyze</a>
+      <div class="dropdown pro-only menu-test" style="display: none;">
+        <a href="#test">Test</a>
+        <div class="dropdown-content">
+          <a href="./test.html">Test — No Documents</a>
+          <a href="./baseline-test.html">Test — Document Collections</a>
+          <a href="./analyze-tests.html" class="menu-analyze">Analyze Tests</a>
+        </div>
+      </div>
       <div class="dropdown menu-manage" style="display: none;">
         <a href="#manage">Manage</a>
         <div class="dropdown-content">

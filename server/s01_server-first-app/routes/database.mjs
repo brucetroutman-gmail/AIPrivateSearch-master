@@ -1,43 +1,17 @@
  
  
 import express from 'express';
-import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
+import pool from '../lib/db.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env-aips from /Users/Shared/AIPrivateSearch/
-const envPath = '/Users/Shared/AIPrivateSearch/.env-aips';
-dotenv.config({ path: envPath, quiet: true, debug: false });
-
 const router = express.Router();
-
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USERNAME || 'aips-readwrite',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_DATABASE || 'aiprivatesearch',
-  connectionLimit: 10,
-  idleTimeout: 300000
-};
-
-
-
-let pool;
-try {
-  pool = mysql.createPool(dbConfig);
-  logger.log('Database pool created successfully');
-} catch (error) {
-  // logger sanitizes all inputs to prevent log injection
-  logger.error('Database pool creation failed:', error.message);
-}
 
 router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
   let connection;
@@ -146,7 +120,7 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
     connection = await pool.getConnection();
     
     const query = `
-      SELECT * FROM \`searches-testresults\` 
+      SELECT * FROM searches 
       ORDER BY CreatedAt DESC
     `;
     
