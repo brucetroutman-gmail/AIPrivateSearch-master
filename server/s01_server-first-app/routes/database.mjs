@@ -112,33 +112,30 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
 // Get all test data for analysis
 router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
   let connection;
-  try {
-    if (!pool) {
-      return res.status(500).json({ success: false, error: 'Database not configured' });
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      if (!pool) {
+        return res.status(500).json({ success: false, error: 'Database not configured' });
+      }
+      connection = await pool.getConnection();
+      const [rows] = await connection.execute(
+        'SELECT * FROM `searches-testresults` ORDER BY CreatedAt DESC'
+      );
+      return res.json({ success: true, tests: rows });
+    } catch (error) {
+      retries--;
+      logger.error('Database query error:', error.message);
+      if (connection) { connection.release(); connection = null; }
+      if (error.code === 'ECONNRESET' && retries > 0) {
+        logger.log('Retrying query, attempts left:', retries);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+      return res.status(500).json({ success: false, error: error.message });
+    } finally {
+      if (connection) connection.release();
     }
-    
-    connection = await pool.getConnection();
-    
-    const query = `
-      SELECT * FROM searches 
-      ORDER BY CreatedAt DESC
-    `;
-    
-    const [rows] = await connection.execute(query);
-    
-    res.json({
-      success: true,
-      tests: rows
-    });
-  } catch (error) {
-    // logger sanitizes all inputs to prevent log injection
-    logger.error('Database query error:', error.message);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  } finally {
-    if (connection) connection.release();
   }
 });
 
