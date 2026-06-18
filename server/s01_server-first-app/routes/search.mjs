@@ -37,6 +37,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let chunks = null;
     let feedbackToken = null;
     let feedbackMeta = null;
+    let methodResult = null;
     
     // Phase 1: Search using SearchOrchestrator
     if (collection && searchType) {
@@ -52,7 +53,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       });
       const endTime = Date.now();
       
-      const methodResult = searchResult.results[searchType];
+      methodResult = searchResult.results[searchType];
       if (!methodResult || !methodResult.results || methodResult.results.length === 0) {
         return res.json({
           response: 'No relevant documents found using the selected search method.',
