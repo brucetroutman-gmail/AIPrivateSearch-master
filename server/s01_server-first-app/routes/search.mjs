@@ -143,6 +143,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
           options: {
             temperature: temperature,
             num_ctx: context,
+            thinking: false,
             ...(tokenLimit && tokenLimit !== 'No Limit' ? { num_predict: parseInt(tokenLimit) } : {})
           }
         })

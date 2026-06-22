@@ -98,7 +98,8 @@ export class AIDirectSearch {
   async performAISearch(documentContent, query, filename, collectionName, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null) {
     const options = {
       temperature: temperature,
-      num_ctx: contextSize
+      num_ctx: contextSize,
+      thinking: false
     };
     
     if (tokenLimit && tokenLimit !== 'No Limit') {

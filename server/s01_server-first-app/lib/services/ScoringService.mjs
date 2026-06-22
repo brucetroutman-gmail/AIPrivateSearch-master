@@ -53,7 +53,8 @@ Respond with only three numbers, one per line.`;
         options: {
           temperature: temperature,
           num_ctx: context,
-          num_predict: 200
+          num_predict: 200,
+          thinking: false
         }
       });
 

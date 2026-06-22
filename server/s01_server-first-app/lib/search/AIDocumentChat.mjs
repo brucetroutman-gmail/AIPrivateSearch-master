@@ -214,7 +214,8 @@ export class AIDocumentChat {
     
     const options = {
       temperature: temperature,
-      num_ctx: contextSize
+      num_ctx: contextSize,
+      thinking: false
     };
     
     if (tokenLimit && tokenLimit !== 'No Limit') {
