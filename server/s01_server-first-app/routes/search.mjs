@@ -133,13 +133,14 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     } else {
       // For non-document searches, use simple model response with metrics
       const startTime = Date.now();
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch('http://localhost:11434/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: model,
-          prompt: `${query}`,
+          messages: [{ role: 'user', content: query }],
           stream: false,
+          think: false,
           options: {
             temperature: temperature,
             num_ctx: context,
@@ -154,7 +155,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       }
       
       const result = await response.json();
-      searchResponse = result.response || result.thinking || 'No response generated';
+      searchResponse = result.message?.content || 'No response generated';
       
       // Capture search metrics
       searchMetrics = {

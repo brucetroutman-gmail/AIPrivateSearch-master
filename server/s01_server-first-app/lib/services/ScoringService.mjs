@@ -46,20 +46,20 @@ Organization (clear structure):
 
 Respond with only three numbers, one per line.`;
 
-      const res = await this.ollama.generate({
+      const res = await this.ollama.chat({
         model: scoreModel,
-        prompt: scoringPrompt,
+        messages: [{ role: 'user', content: scoringPrompt }],
         stream: false,
+        think: false,
         options: {
           temperature: temperature,
           num_ctx: context,
-          num_predict: 200,
-          thinking: false
+          num_predict: 200
         }
       });
 
       logger.log('Scoring model response received, parsing');
-      const scores = this.parseScores(res.response);
+      const scores = this.parseScores(res.message?.content || '');
       logger.log('Scoring completed successfully');
       
       return {

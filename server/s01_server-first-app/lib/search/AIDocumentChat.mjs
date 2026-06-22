@@ -253,13 +253,14 @@ Answer (be specific, reference source numbers):`;
     console.log(enhancedPrompt);
     console.log('-'.repeat(80));
 
-    const response = await fetch('http://localhost:11434/api/generate', {
+    const response = await fetch('http://localhost:11434/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: model,
-        prompt: enhancedPrompt,
+        messages: [{ role: 'user', content: enhancedPrompt }],
         stream: false,
+        think: false,
         options: options
       }),
       signal: AbortSignal.timeout(300000) // 5 minute timeout for large models
@@ -270,8 +271,7 @@ Answer (be specific, reference source numbers):`;
     }
     
     const result = await response.json();
-    // qwen3.5 and gemma4 use thinking mode — response may be in result.thinking if result.response is empty
-    const modelResponse = result.response || result.thinking || 'No response generated';
+    const modelResponse = result.message?.content || 'No response generated';
     console.log('\n[AIDocumentChat] MODEL RESPONSE:');
     console.log('-'.repeat(80));
     console.log(modelResponse);

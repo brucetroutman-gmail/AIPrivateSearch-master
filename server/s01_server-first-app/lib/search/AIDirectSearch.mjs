@@ -116,13 +116,14 @@ Question: Does this text contain information about "${query}"?
 Answer:`;
     
     try {
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch('http://localhost:11434/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: model,
-          prompt: enhancedPrompt,
+          messages: [{ role: 'user', content: enhancedPrompt }],
           stream: false,
+          think: false,
           options: options
         })
       });
@@ -132,7 +133,7 @@ Answer:`;
       }
       
       const result = await response.json();
-      let aiResponse = result.response || result.thinking || 'No response generated';
+      let aiResponse = result.message?.content || 'No response generated';
       
       // Check if document actually contains the query terms
       const queryWords = query.toLowerCase().split(/\s+/);
