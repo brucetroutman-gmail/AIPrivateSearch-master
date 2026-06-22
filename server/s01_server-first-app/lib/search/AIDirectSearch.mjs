@@ -131,7 +131,7 @@ Answer:`;
       }
       
       const result = await response.json();
-      let aiResponse = result.response || 'No response generated';
+      let aiResponse = result.response || result.thinking || 'No response generated';
       
       // Check if document actually contains the query terms
       const queryWords = query.toLowerCase().split(/\s+/);

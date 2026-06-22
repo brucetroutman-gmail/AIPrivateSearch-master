@@ -153,7 +153,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       }
       
       const result = await response.json();
-      searchResponse = result.response || 'No response generated';
+      searchResponse = result.response || result.thinking || 'No response generated';
       
       // Capture search metrics
       searchMetrics = {

@@ -269,7 +269,8 @@ Answer (be specific, reference source numbers):`;
     }
     
     const result = await response.json();
-    const modelResponse = result.response || 'No response generated';
+    // qwen3.5 and gemma4 use thinking mode — response may be in result.thinking if result.response is empty
+    const modelResponse = result.response || result.thinking || 'No response generated';
     console.log('\n[AIDocumentChat] MODEL RESPONSE:');
     console.log('-'.repeat(80));
     console.log(modelResponse);
