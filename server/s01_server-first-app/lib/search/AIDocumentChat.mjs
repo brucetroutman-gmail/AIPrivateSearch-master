@@ -145,7 +145,7 @@ export class AIDocumentChat {
 
       // Warn if keyword filter still found more matches than we could send
       const truncationWarning = keywordFiltered.length > relevantChunks.length
-        ? `\n\n> ⚠️ **Note**: ${keywordFiltered.length} matching chunks were found but only ${relevantChunks.length} fit within the context window. Results may be incomplete. Try increasing Context size in the search settings.`
+        ? `\n\n> ⚠️ **Note**: ${keywordFiltered.length} matching chunks were found but only ${relevantChunks.length} fit within the context window. Results may be incomplete.\n> Query type: **${queryType.type}** | topK: **${chunkLimit}** | perDocLimit: **${perDocLimit}** | contextSize: **${contextSize}** | docs: **${uniqueDocs}** | Increase Context Size or Top K in search settings.`
         : '';
 
       const finalResponse = aiResponse + truncationWarning + this.addSourceLinks(relevantChunks);
