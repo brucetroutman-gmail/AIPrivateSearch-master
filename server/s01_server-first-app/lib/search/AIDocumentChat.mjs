@@ -116,7 +116,9 @@ export class AIDocumentChat {
       }
 
       // Diversity cap: max 3 chunks per doc, unless only 1 doc in collection
-      const perDocLimit = uniqueDocs === 1 ? chunkLimit : 3;
+      // For analysis/creative queries allow more chunks per doc to improve cross-reference quality
+      const isAnalysisQuery = ['analysis', 'creative'].includes(queryType.type);
+      const perDocLimit = uniqueDocs === 1 ? chunkLimit : (isAnalysisQuery ? 5 : 3);
       const seen = new Map();
       const relevantChunks = [];
       for (const chunk of poolToRank) {

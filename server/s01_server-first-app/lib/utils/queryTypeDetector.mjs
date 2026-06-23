@@ -121,12 +121,12 @@ export function applyQueryModifiers(params, queryType) {
     result.temperature = Math.min(0.4, (params.temperature || 0.1) * 1.5 * s);
     result.topK = Math.min(20, Math.ceil((params.topK || 10) * 1.5));
     result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.5)); // always expand, no confidence penalty
-    result.tokenLimit = Math.max(params.tokenLimit || 1024, 2048);
+    result.tokenLimit = Math.max(params.tokenLimit || 2048, 4096);
   } else if (type === 'creative') {
     result.temperature = Math.min(0.6, (params.temperature || 0.1) * 2.0 * s);
     result.topK = Math.min(20, Math.ceil((params.topK || 10) * 1.5));
     result.contextSize = Math.min(32768, Math.floor((params.contextSize || 8192) * 1.5)); // always expand, no confidence penalty
-    result.tokenLimit = Math.max(params.tokenLimit || 1024, 2048);
+    result.tokenLimit = Math.max(params.tokenLimit || 2048, 4096);
   }
 
   console.log(`[QueryTypeDetector] topK:${params.topK}→${result.topK} temp:${(params.temperature||0).toFixed(2)}→${(result.temperature||0).toFixed(2)} ctx:${params.contextSize}→${result.contextSize}`);

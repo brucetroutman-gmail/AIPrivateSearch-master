@@ -66,7 +66,7 @@ class ParameterManager {
     const map = [
       { id: ids.temperature, value: settings.temperature,                    key: 'lastTemperature' },
       { id: ids.context,     value: settings.contextSize,                    key: 'lastContext' },
-      { id: ids.tokens,      value: settings.tokenLimit ?? '1024',          key: 'lastTokens' },
+      { id: ids.tokens,      value: settings.tokenLimit ?? '2048',          key: 'lastTokens' },
       { id: ids.topk,        value: settings.topK,                           key: 'lastTopK' }
     ];
     map.forEach(({ id, value, key }) => {
