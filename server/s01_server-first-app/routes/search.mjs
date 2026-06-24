@@ -31,6 +31,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     logger.log('Scoring enabled:', score);
     logger.log('Search type:', searchType);
     logger.log('Collection:', collection);
+    logger.log('topK received:', topK);
     
     let searchResponse;
     let searchMetrics = null;

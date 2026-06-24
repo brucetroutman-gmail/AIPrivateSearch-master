@@ -39,7 +39,7 @@ export class AIDocumentChat {
       contextSize = adapted.contextSize;
       tokenLimit = adapted.tokenLimit;
 
-      console.log(`[AIDocumentChat] Collection: ${collection}, Model: ${model}, topK: ${topK}, context: ${contextSize}`);
+      console.log(`[AIDocumentChat] Collection: ${collection}, Model: ${model}, topK input: ${options.topK}, topK adapted: ${topK}, context: ${contextSize}`);
       console.log('='.repeat(80));
       
       const candidateChunks = (await this.findSimilarChunks(query, collection, 9999))
