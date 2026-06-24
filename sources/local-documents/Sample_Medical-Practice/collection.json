@@ -52,10 +52,10 @@
     }
   ],
   "searchSettings": {
-    "topK": 10,
+    "topK": 20,
     "temperature": 0.1,
-    "contextSize": 8192,
-    "tokenLimit": 1024,
+    "contextSize": 16384,
+    "tokenLimit": 4096,
     "totalChunks": 27,
     "totalDocs": 7,
     "avgChunkSize": 1619,

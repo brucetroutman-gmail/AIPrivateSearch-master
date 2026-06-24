@@ -125,7 +125,7 @@ class SearchManager {
 
   async performAIDocumentChat(query, options) {
     const collectionSettings = await this.getCollectionSettings(options.collection);
-    const topK        = collectionSettings.topK;
+    const topK        = options.topK        || collectionSettings.topK;
     const temperature = options.temperature !== undefined ? options.temperature : collectionSettings.temperature;
     const contextSize = options.contextSize || collectionSettings.contextSize;
     const tokenLimit  = options.tokenLimit  || collectionSettings.tokenLimit;
