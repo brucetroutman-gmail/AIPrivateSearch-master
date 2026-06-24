@@ -129,7 +129,6 @@ class SearchManager {
     const temperature = options.temperature !== undefined ? options.temperature : collectionSettings.temperature;
     const contextSize = options.contextSize || collectionSettings.contextSize;
     const tokenLimit  = options.tokenLimit  || collectionSettings.tokenLimit;
-    console.log('[searchManager] performAIDocumentChat params — topK:', topK, 'options.topK:', options.topK, 'collection.topK:', collectionSettings.topK);
     const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/ai-document-chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

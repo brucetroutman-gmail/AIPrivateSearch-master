@@ -1378,7 +1378,7 @@ form.addEventListener('submit', async (e) => {
     } else {
       // Default to ai-document-chat for Local Model Only or fallback
       const finalSearchType = sourceTypeEl.value === 'Local Model Only' ? 'ai-document-chat' : searchType;
-      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, finalSearchType);
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, finalSearchType, topK);
     }
 
     
