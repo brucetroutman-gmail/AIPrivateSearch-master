@@ -303,7 +303,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadCollections();
     loadModels();
-    await window.parameterManager.loadAllDropdowns();
+    await window.parameterManager.loadAllDropdowns({
+      temperature: 'temperatureSelect',
+      context: 'contextSelect',
+      tokens: 'tokensSelect',
+      topk: 'topKSelect'
+    });
     setupParameterPersistence();
 
     document.querySelectorAll('.sortable').forEach(th => {
