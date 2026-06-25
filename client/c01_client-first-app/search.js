@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     temperature: 'temperature',
     context: 'context',
     tokens: 'tokens',
-    topk: 'topk'
+    topk: 'topKSelect'
   });
 });
 
@@ -29,7 +29,7 @@ const scoreTglEl = document.getElementById('scoreToggle');
 const temperatureEl = document.getElementById('temperature');
 const contextEl  = document.getElementById('context');
 const tokensEl   = document.getElementById('tokens');
-const topkEl     = document.getElementById('topk');
+const topkEl     = document.getElementById('topKSelect');
 const outputEl   = document.getElementById('output');
 const exportBtn  = document.getElementById('exportBtn');
 
@@ -1178,7 +1178,7 @@ form.addEventListener('submit', async (e) => {
     const tokenLimit = tokensEl.value ? parseInt(tokensEl.value) : 1024;
 
     // Get topK
-    const topK = parseInt(topkEl?.value || '10');
+    const topK = topkEl?.value ? parseInt(topkEl.value, 10) : 10;
     
     // Generate TestCode
     const testCode = generateTestCode();
