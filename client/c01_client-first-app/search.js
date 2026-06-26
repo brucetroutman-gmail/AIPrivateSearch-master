@@ -266,6 +266,7 @@ loadSearchTypes();
 loadTokensOptions();
 loadTemperatureOptions();
 loadContextOptions();
+loadTopKOptions();
 loadScoreModels('scoreModel');
 loadScoringOptions();
 // Load temperature options from JSON file
@@ -279,7 +280,18 @@ async function loadTemperatureOptions() {
 async function loadContextOptions() {
   const data = await loadConfig('context.json', { context: [] });
   populateSelect(contextEl, data.context, 'name', 'name', 'lastContext');
+}
 
+// Load topK options from JSON file
+async function loadTopKOptions() {
+  const data = await loadConfig('topk.json', { topk: [] });
+  populateSelect(topkEl, data.topk, 'value', 'name', 'lastTopK');
+}
+
+// Load tokens options from JSON file
+async function loadTokensOptions() {
+  const data = await loadConfig('tokens.json', { tokens: [] });
+  populateSelect(tokensEl, data.tokens, 'name', 'name', 'lastTokens');
 }
 
 // Load vectorDB options from JSON file
@@ -430,6 +442,16 @@ temperatureEl.addEventListener('change', () => {
 contextEl.addEventListener('change', () => {
   localStorage.setItem('lastContext', contextEl.value);
 
+});
+
+// Save topK selection
+topkEl.addEventListener('change', () => {
+  localStorage.setItem('lastTopK', topkEl.value);
+});
+
+// Save tokens selection
+tokensEl.addEventListener('change', () => {
+  localStorage.setItem('lastTokens', tokensEl.value);
 });
 
 // Save source type selection and handle visibility
@@ -741,14 +763,7 @@ async function loadScoringOptions() {
 
 
 
-// Save tokens selection
-tokensEl.addEventListener('change', () => {
-  localStorage.setItem('lastTokens', tokensEl.value);
 
-});
-
-// Save prompt text
-queryEl.addEventListener('input', (e) => {
   // Don't interfere with normal typing
   const sanitizedValue = DOMSanitizer.sanitizeText(queryEl.value);
   localStorage.setItem('lastPrompt', sanitizedValue);
@@ -760,12 +775,6 @@ queryEl.addEventListener('input', (e) => {
 
 
 
-// Load tokens options from JSON file
-async function loadTokensOptions() {
-  const data = await loadConfig('tokens.json', { tokens: [] });
-  populateSelect(tokensEl, data.tokens, 'name', 'name', 'lastTokens');
-
-}
 
 // Generate TestCode based on current form selections
 function generateTestCode() {
