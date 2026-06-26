@@ -454,6 +454,15 @@ tokensEl.addEventListener('change', () => {
   localStorage.setItem('lastTokens', tokensEl.value);
 });
 
+// Sanitize and save prompt text on input
+queryEl.addEventListener('input', () => {
+  const sanitizedValue = DOMSanitizer.sanitizeText(queryEl.value);
+  localStorage.setItem('lastPrompt', sanitizedValue);
+  if (queryEl.value !== sanitizedValue) {
+    queryEl.value = sanitizedValue;
+  }
+});
+
 // Save source type selection and handle visibility
 sourceTypeEl.addEventListener('change', () => {
   localStorage.setItem('lastSourceType', sourceTypeEl.value);
@@ -762,16 +771,6 @@ async function loadScoringOptions() {
 }
 
 
-
-
-  // Don't interfere with normal typing
-  const sanitizedValue = DOMSanitizer.sanitizeText(queryEl.value);
-  localStorage.setItem('lastPrompt', sanitizedValue);
-  // Only update if sanitization actually changed something
-  if (queryEl.value !== sanitizedValue && sanitizedValue !== queryEl.value) {
-    queryEl.value = sanitizedValue;
-  }
-});
 
 
 
