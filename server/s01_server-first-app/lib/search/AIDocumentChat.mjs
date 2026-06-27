@@ -116,9 +116,13 @@ export class AIDocumentChat {
       }
 
       // Diversity cap: max 3 chunks per doc, unless only 1 doc in collection
-      // For analysis/creative queries allow more chunks per doc to improve cross-reference quality
+      // perDocLimit controls diversity — prevents one document dominating the context.
+      // For fact/general queries: cap at 3 chunks per doc so multiple docs contribute.
+      // For analysis/creative queries: no per-doc cap — the model needs as many chunks
+      // as possible from each doc to compare and synthesize across documents.
+      // chunkLimit (adapted topK) is the only cap for analysis/creative.
       const isAnalysisQuery = ['analysis', 'creative'].includes(queryType.type);
-      const perDocLimit = uniqueDocs === 1 ? chunkLimit : (isAnalysisQuery ? 5 : 3);
+      const perDocLimit = uniqueDocs === 1 || isAnalysisQuery ? chunkLimit : 3;
       const seen = new Map();
       const relevantChunks = [];
       for (const chunk of poolToRank) {
@@ -145,7 +149,7 @@ export class AIDocumentChat {
 
       // Warn if keyword filter still found more matches than we could send
       const truncationWarning = keywordFiltered.length > relevantChunks.length
-        ? `\n\n> ⚠️ **Note**: ${keywordFiltered.length} matching chunks were found but only ${relevantChunks.length} fit within the context window. Results may be incomplete.\n> Query type: **${queryType.type}** | topK: **${chunkLimit}** | perDocLimit: **${perDocLimit}** | contextSize: **${contextSize}** | docs: **${uniqueDocs}** | Increase Context Size or Top K in search settings.`
+        ? `\n\n> ℹ️ **Note**: ${keywordFiltered.length} matching chunks found, ${relevantChunks.length} selected for analysis (query type: **${queryType.type}** | topK: **${chunkLimit}** | context: **${contextSize}**)`
         : '';
 
       const finalResponse = aiResponse + truncationWarning + this.addSourceLinks(relevantChunks);

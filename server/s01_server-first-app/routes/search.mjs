@@ -21,7 +21,6 @@ const scoringService = new ScoringService();
 router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
   try {
     logger.log('Received request with keys:', Object.keys(req.body));
-    logger.log('topK received:', req.body.topK, 'type:', typeof req.body.topK);
     const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, topK, sourceType, testCode, collection, showChunks, scoreModel, searchType } = req.body;
     
     if (!query) {
