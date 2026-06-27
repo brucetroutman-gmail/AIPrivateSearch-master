@@ -1187,7 +1187,6 @@ form.addEventListener('submit', async (e) => {
 
     // Get topK
     const topK = parseInt(document.getElementById('topk')?.value, 10) || 10;
-    console.log('[search.js] topK read:', topK, 'raw value:', document.getElementById('topk')?.value);
     
     // Generate TestCode
     const testCode = generateTestCode();
@@ -1275,7 +1274,7 @@ form.addEventListener('submit', async (e) => {
       };
     } else if (searchType === 'ai-document-chat') {
       // Use main search endpoint for AI Document Chat searches to support scoring
-      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType);
+      result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, topK);
     } else if (searchType === 'document-index') {
       // Use metadata search common utility
       const searchStartTime = Date.now();
