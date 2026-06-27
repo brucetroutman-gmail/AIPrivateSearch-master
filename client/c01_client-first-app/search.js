@@ -1187,6 +1187,7 @@ form.addEventListener('submit', async (e) => {
 
     // Get topK
     const topK = parseInt(document.getElementById('topk')?.value, 10) || 10;
+    console.log('[search.js] topK read:', topK, 'raw value:', document.getElementById('topk')?.value);
     
     // Generate TestCode
     const testCode = generateTestCode();
