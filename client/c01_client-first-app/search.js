@@ -833,23 +833,17 @@ function generateTestCode() {
   }
   testCode += userPromptCode;
   
-  // Position 7: Temperature (1-3)
-  const tempValue = parseFloat(temperatureEl.value);
-  const tempCode = tempValue === 0.3 ? '1' : tempValue === 0.6 ? '2' : '3';
-  testCode += tempCode;
+  // Position 7: Temperature (1-9 = 0.1-0.9)
+  const tempMap = { 0.1:'1', 0.2:'2', 0.3:'3', 0.4:'4', 0.5:'5', 0.6:'6', 0.7:'7', 0.8:'8', 0.9:'9' };
+  testCode += tempMap[parseFloat(temperatureEl.value)] || '3';
   
-  // Position 8: Context (1-4)
-  const contextValue = parseInt(contextEl.value);
-  const contextCode = contextValue === 2048 ? '1' : contextValue === 4096 ? '2' : contextValue === 8192 ? '3' : '4';
-  testCode += contextCode;
+  // Position 8: Context (1-5 = 1024/2048/4096/8192/16384)
+  const contextMap = { 1024:'1', 2048:'2', 4096:'3', 8192:'4', 16384:'5' };
+  testCode += contextMap[parseInt(contextEl.value)] || '3';
   
-  // Position 9: Tokens (1-3)
-  const tokenMap = {
-    'No Limit': '1',
-    '250': '2',
-    '500': '3'
-  };
-  testCode += tokenMap[tokensEl.value] || '1';
+  // Position 9: Tokens (1-5 = 200/512/2048/4096/8192)
+  const tokenMap = { '200':'1', '512':'2', '2048':'3', '4096':'4', '8192':'5' };
+  testCode += tokenMap[String(tokensEl.value)] || '3';
   
   // Position 10: Generate Scores (0-1)
   testCode += (scoreTglEl && scoreTglEl.checked) ? '1' : '0';
