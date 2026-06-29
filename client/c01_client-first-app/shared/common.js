@@ -625,6 +625,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelName-search': result.metrics?.search?.model || null,
     'ModelContextSize-search': result.metrics?.search?.context_size || testParams?.context || null,
     'ModelTemperature-search': result.metrics?.search?.temperature || testParams?.temperature || null,
+    'ModelTopK-search': result.metrics?.search?.topK || result.topK || testParams?.topK || null,
     'ModelTokenLimit-search': result.metrics?.search?.token_limit !== undefined ? 
       (result.metrics?.search?.token_limit === null ? 'No Limit' : result.metrics.search.token_limit) : 
       (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,

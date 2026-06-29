@@ -123,12 +123,13 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       // Create search metrics for document searches
       searchMetrics = {
         model: model,
-        total_duration: (endTime - startTime) * 1000000, // Convert to nanoseconds
-        load_duration: 100000000, // Estimated 100ms load time
-        eval_count: Math.floor(searchResponse.length / 4), // Rough token estimate
-        eval_duration: (endTime - startTime - 100) * 1000000, // Subtract load time
+        total_duration: (endTime - startTime) * 1000000,
+        load_duration: 100000000,
+        eval_count: Math.floor(searchResponse.length / 4),
+        eval_duration: (endTime - startTime - 100) * 1000000,
         context_size: context,
-        temperature: temperature
+        temperature: temperature,
+        topK: topK || null
       };
       
     } else {
@@ -166,7 +167,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         eval_count: result.eval_count || 0,
         eval_duration: result.eval_duration || 0,
         context_size: context,
-        temperature: temperature
+        temperature: temperature,
+        topK: topK || null
       };
     }
     

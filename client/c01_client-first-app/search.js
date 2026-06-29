@@ -1587,6 +1587,7 @@ async function handleExport() {
       'ModelName-search': result.metrics?.search?.model || null,
       'ModelContextSize-search': result.metrics?.search?.context_size || null,
       'ModelTemperature-search': result.metrics?.search?.temperature || null,
+      'ModelTopK-search': result.metrics?.search?.topK || result.topK || null,
       'ModelTokenLimit-search': result.metrics?.search?.token_limit !== undefined ? 
         (result.metrics?.search?.token_limit === null ? 'No Limit' : result.metrics.search.token_limit) : 
         (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
