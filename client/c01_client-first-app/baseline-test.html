@@ -268,6 +268,7 @@
       const tempMap = { 0.1:'1', 0.2:'2', 0.3:'3', 0.4:'4', 0.5:'5', 0.6:'6', 0.7:'7', 0.8:'8', 0.9:'9' };
       const contextMap = { 1024:'1', 2048:'2', 4096:'3', 8192:'4', 16384:'5' };
       const tokenMap = { 200:'1', 512:'2', 2048:'3', 4096:'4', 8192:'5' };
+      const topKMap = { 5:'1', 10:'2', 15:'3', 20:'4', 25:'5', 30:'6' };
       return 't2'
         + (collectionMap[collection] || '0')
         + '7' // ai-document-chat
@@ -276,6 +277,7 @@
         + (tempMap[settings.temperature] || '3')
         + (contextMap[settings.contextSize] || '3')
         + (tokenMap[settings.tokenLimit] || '3')
+        + (topKMap[settings.topK] || '4')
         + '1'; // scoring on
     }
 

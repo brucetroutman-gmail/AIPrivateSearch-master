@@ -845,7 +845,12 @@ function generateTestCode() {
   const tokenMap = { '200':'1', '512':'2', '2048':'3', '4096':'4', '8192':'5' };
   testCode += tokenMap[String(tokensEl.value)] || '3';
   
-  // Position 10: Generate Scores (0-1)
+  // Position 10: TopK (1-6 = 5/10/15/20/25/30)
+  const topKMap = { '5':'1', '10':'2', '15':'3', '20':'4', '25':'5', '30':'6' };
+  const topKEl = document.getElementById('topk');
+  testCode += topKMap[String(topKEl ? parseInt(topKEl.value) : 20)] || '4';
+
+  // Position 11: Generate Scores (0-1)
   testCode += (scoreTglEl && scoreTglEl.checked) ? '1' : '0';
   
   return testCode;
