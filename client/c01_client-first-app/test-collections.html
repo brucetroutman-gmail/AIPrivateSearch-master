@@ -135,7 +135,8 @@
   </div>
 
   <script type="module">
-    import { exportToDatabase } from './shared/common.js';
+    import { exportToDatabase, loadScoreModels } from './shared/common.js';
+    import { search } from './services/api.js';
 
     const TESTS = [
       { id:'M1', testCode:'t27711115451', collection:'Sample_Medical-Practice', type:'fact',     query:'Find patients with diabetes',                                                       promptPos:1, temperature:0.1, contextSize:16384, tokenLimit:4096, topK:20 },
@@ -230,14 +231,7 @@
           document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = this.checked);
         });
 
-        const scoreSel = document.getElementById('scoreModelSelect');
-        scoreSel.innerHTML = '';
-        allModels.forEach(m => {
-          const o = document.createElement('option');
-          o.value = m.modelName;
-          o.textContent = `${m.modelName} (${m.size})`;
-          scoreSel.appendChild(o);
-        });
+        await loadScoreModels('scoreModelSelect');
       } catch(e) { console.error('Failed to load models', e); }
     }
 
@@ -281,7 +275,8 @@
     };
 
     function setUIState(processing) {
-      document.querySelectorAll('input, select, button').forEach(el => el.disabled = processing);
+      document.querySelector('.execute-btn').disabled = processing;
+      document.querySelectorAll('.model-checkbox, .test-checkbox, #selectAll, #selectAllModels, #selectMedical, #selectLaw, #selectFederalist, #selectEmails, #scoreModelSelect').forEach(el => el.disabled = processing);
     }
 
     function updateProgress(i, total, test, model) {
@@ -300,7 +295,6 @@
 
     async function runQuery(test, model, scoreModel) {
       const start = Date.now();
-      const { search } = await import('./services/api.js');
       try {
         const data = await search(
           test.query,
