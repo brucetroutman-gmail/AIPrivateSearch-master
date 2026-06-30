@@ -841,9 +841,9 @@ function generateTestCode() {
   const contextMap = { 1024:'1', 2048:'2', 4096:'3', 8192:'4', 16384:'5' };
   testCode += contextMap[parseInt(contextEl.value)] || '3';
   
-  // Position 9: Tokens (1-5 = 200/512/2048/4096/8192)
-  const tokenMap = { '200':'1', '512':'2', '2048':'3', '4096':'4', '8192':'5' };
-  testCode += tokenMap[String(tokensEl.value)] || '3';
+  // Position 9: Tokens (1-6 = 200/512/1024/2048/4096/8192)
+  const tokenMap = { '200':'1', '512':'2', '1024':'3', '2048':'4', '4096':'5', '8192':'6' };
+  testCode += tokenMap[String(tokensEl.value)] || 'X';
   
   // Position 10: TopK (1-6 = 5/10/15/20/25/30)
   const topKMap = { '5':'1', '10':'2', '15':'3', '20':'4', '25':'5', '30':'6' };
