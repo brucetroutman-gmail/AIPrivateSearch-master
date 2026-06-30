@@ -26,6 +26,7 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       const data = req.body;
       logger.log('Database save request received');
       logger.log('CreatedAt value:', data.CreatedAt);
+      logger.log('[database.mjs] ModelTokenLimit-search received:', data['ModelTokenLimit-search']);
       
       connection = await pool.getConnection();
     

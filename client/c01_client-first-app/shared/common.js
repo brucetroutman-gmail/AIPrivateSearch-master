@@ -628,6 +628,9 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelTopK-search': result.metrics?.search?.topK || result.topK || testParams?.topK || null,
     'ModelTokenLimit-search': (() => {
       const tl = result.metrics?.search?.token_limit ?? result.tokenLimit ?? null;
+      console.log('[exportToDatabase] token_limit from metrics:', result.metrics?.search?.token_limit);
+      console.log('[exportToDatabase] tokenLimit from result:', result.tokenLimit);
+      console.log('[exportToDatabase] final tl:', tl);
       if (tl === null || tl === undefined) throw new Error('ModelTokenLimit-search is missing from search metrics and result');
       return tl;
     })(),
