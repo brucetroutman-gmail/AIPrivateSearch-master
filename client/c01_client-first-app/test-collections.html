@@ -316,7 +316,7 @@
         );
 
         const elapsed = Date.now() - start;
-        const dbSaved = await saveToDB({ ...data, testCode: test.testCode }, test);
+        const dbSaved = await saveToDB({ ...data, testCode: test.testCode, tokenLimit: test.tokenLimit }, test);
 
         return {
           ...test, model, elapsed_ms: elapsed,

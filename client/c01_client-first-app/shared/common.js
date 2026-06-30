@@ -626,9 +626,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelContextSize-search': result.metrics?.search?.context_size || testParams?.context || null,
     'ModelTemperature-search': result.metrics?.search?.temperature || testParams?.temperature || null,
     'ModelTopK-search': result.metrics?.search?.topK || result.topK || testParams?.topK || null,
-    'ModelTokenLimit-search': result.metrics?.search?.token_limit !== undefined ? 
-      (result.metrics?.search?.token_limit === null ? 'No Limit' : result.metrics.search.token_limit) : 
-      (result.tokenLimit === null ? 'No Limit' : result.tokenLimit) || null,
+    'ModelTokenLimit-search': (() => {
+      const tl = result.metrics?.search?.token_limit ?? result.tokenLimit ?? null;
+      if (tl === null || tl === undefined) throw new Error('ModelTokenLimit-search is missing from search metrics and result');
+      return tl;
+    })(),
     'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
     'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
     'EvalTokensPerSecond-ssearch': (() => {
