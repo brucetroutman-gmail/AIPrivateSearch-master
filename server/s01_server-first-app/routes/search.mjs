@@ -129,7 +129,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         eval_duration: (endTime - startTime - 100) * 1000000,
         context_size: context,
         temperature: temperature,
-        topK: topK || null
+        topK: topK || null,
+        token_limit: tokenLimit || null
       };
       
     } else {
@@ -168,7 +169,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         eval_duration: result.eval_duration || 0,
         context_size: context,
         temperature: temperature,
-        topK: topK || null
+        topK: topK || null,
+        token_limit: tokenLimit || null
       };
     }
     
