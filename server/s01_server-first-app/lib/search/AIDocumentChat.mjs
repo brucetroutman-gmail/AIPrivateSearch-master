@@ -178,7 +178,6 @@ export class AIDocumentChat {
         content: chunk.content,
         similarity: chunk.similarity
       }));
-      }
       
       return result;
     } catch (error) {
