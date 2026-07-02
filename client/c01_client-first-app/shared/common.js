@@ -650,9 +650,6 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
           content: c.content
         })))
       : null,
-    'Chunks-Similarity-search': result.chunks?.length
-      ? Math.max(...result.chunks.map(c => c.similarity))
-      : null,
     'ModelName-score': result.metrics?.scoring?.model || null,
     'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
     'ModelTemperature-score': result.metrics?.scoring?.temperature || null,

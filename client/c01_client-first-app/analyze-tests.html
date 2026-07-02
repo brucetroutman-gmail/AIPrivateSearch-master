@@ -276,6 +276,7 @@
           <button class="tab-button" onclick="showTab('parameters')">Parameter Optimization</button>
           <button class="tab-button" onclick="showTab('categories')">Test Categories</button>
           <button class="tab-button" onclick="showTab('consistency')">Consistency</button>
+          <button class="tab-button" onclick="showTab('chunks')">Chunks</button>
         </div>
         
         <div id="leaderboard" class="tab-content active">
@@ -388,6 +389,57 @@
           </div>
         </div>
         
+        <div id="chunks" class="tab-content">
+          <h3>Chunk Analysis</h3>
+          <h4>Chunk Similarity by Model &amp; Collection</h4>
+          <table class="comparison-table" id="chunkSimilarityTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Collection</th>
+                <th>Avg Max Similarity</th>
+                <th>Avg Chunk Count</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
+          </table>
+          <h4 style="margin-top:1.5rem">Chunk Count vs Score</h4>
+          <table class="comparison-table" id="chunkCountScoreTable">
+            <thead>
+              <tr>
+                <th>Chunk Count</th>
+                <th>Avg Score</th>
+                <th>Avg Max Similarity</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+          </table>
+          <h4 style="margin-top:1.5rem">Recent Tests with Chunks</h4>
+          <table class="comparison-table" id="chunkDetailTable">
+            <thead>
+              <tr>
+                <th>TestCode</th>
+                <th>Model</th>
+                <th>Collection</th>
+                <th>Chunks</th>
+                <th>Max Sim</th>
+                <th>Score</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
+          </table>
+          <div id="chunkDrilldown" style="display:none;margin-top:1rem" class="chart-container">
+            <strong id="chunkDrilldownTitle"></strong>
+            <table class="comparison-table" style="margin-top:0.5rem" id="chunkDrilldownTable">
+              <thead><tr><th>#</th><th>File</th><th>Chunk</th><th>Similarity</th><th>Content Preview</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
         <div id="consistency" class="tab-content">
           <h3>Model Reliability & Consistency</h3>
           <table class="comparison-table" id="consistencyTable">
@@ -474,6 +526,7 @@
       updateParameters();
       updateCategories();
       updateConsistency();
+      updateChunks();
     }
     
     function applyFilters() {
@@ -903,6 +956,81 @@
       tbody.innerHTML = rows || '<tr><td colspan="7">No data available (minimum 3 scored tests per model required)</td></tr>';
     }
     
+    function updateChunks() {
+      const withChunks = filteredData.filter(t => t['Chunks-search']);
+
+      // 1. Similarity by model + collection
+      const simMap = {};
+      withChunks.forEach(t => {
+        const key = `${t['ModelName-search']}||${t.CollectionName}`;
+        if (!simMap[key]) simMap[key] = { model: t['ModelName-search'], collection: t.CollectionName, maxSims: [], chunkCounts: [] };
+        try {
+          const chunks = JSON.parse(t['Chunks-search']);
+          simMap[key].maxSims.push(Math.max(...chunks.map(c => c.similarity)));
+          simMap[key].chunkCounts.push(chunks.length);
+        } catch { /* skip */ }
+      });
+      const simRows = Object.values(simMap).sort((a, b) =>
+        (b.maxSims.reduce((s,v)=>s+v,0)/b.maxSims.length) - (a.maxSims.reduce((s,v)=>s+v,0)/a.maxSims.length)
+      ).map(d => {
+        const avgSim = (d.maxSims.reduce((s,v)=>s+v,0)/d.maxSims.length).toFixed(3);
+        const avgCount = (d.chunkCounts.reduce((s,v)=>s+v,0)/d.chunkCounts.length).toFixed(1);
+        const cls = parseFloat(avgSim) >= 0.7 ? 'best-score' : parseFloat(avgSim) < 0.4 ? 'worst-score' : '';
+        return `<tr class="${cls}"><td>${d.model}</td><td>${d.collection}</td><td>${avgSim}</td><td>${avgCount}</td><td>${d.maxSims.length}</td></tr>`;
+      }).join('');
+      document.querySelector('#chunkSimilarityTable tbody').innerHTML = simRows || '<tr><td colspan="5">No chunk data</td></tr>';
+
+      // 2. Chunk count vs score
+      const countMap = {};
+      withChunks.forEach(t => {
+        if (!t['WeightedScore-pct']) return;
+        try {
+          const chunks = JSON.parse(t['Chunks-search']);
+          const count = chunks.length;
+          if (!countMap[count]) countMap[count] = { scores: [], maxSims: [] };
+          countMap[count].scores.push(t['WeightedScore-pct']);
+          countMap[count].maxSims.push(Math.max(...chunks.map(c => c.similarity)));
+        } catch { /* skip */ }
+      });
+      const countRows = Object.entries(countMap).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([count, d]) => {
+        const avgScore = (d.scores.reduce((s,v)=>s+v,0)/d.scores.length).toFixed(1);
+        const avgSim = (d.maxSims.reduce((s,v)=>s+v,0)/d.maxSims.length).toFixed(3);
+        return `<tr><td>${count}</td><td>${avgScore}%</td><td>${avgSim}</td><td>${d.scores.length}</td></tr>`;
+      }).join('');
+      document.querySelector('#chunkCountScoreTable tbody').innerHTML = countRows || '<tr><td colspan="4">No scored chunk data</td></tr>';
+
+      // 3. Recent tests with chunks
+      const recent = withChunks.slice(0, 50);
+      const detailRows = recent.map((t, i) => {
+        let chunkCount = '?', maxSim = '?';
+        try {
+          const chunks = JSON.parse(t['Chunks-search']);
+          chunkCount = chunks.length;
+          maxSim = Math.max(...chunks.map(c => c.similarity)).toFixed(3);
+        } catch { /* skip */ }
+        const score = t['WeightedScore-pct'] ? t['WeightedScore-pct'] + '%' : '-';
+        return `<tr><td>${t.TestCode||'-'}</td><td>${t['ModelName-search']||'-'}</td><td>${t.CollectionName||'-'}</td><td>${chunkCount}</td><td>${maxSim}</td><td>${score}</td><td><button onclick="showChunkDrilldown(${i})" style="padding:0.2rem 0.5rem;cursor:pointer">View</button></td></tr>`;
+      }).join('');
+      document.querySelector('#chunkDetailTable tbody').innerHTML = detailRows || '<tr><td colspan="7">No chunk data</td></tr>';
+
+      // Store for drilldown
+      window._chunkDetailData = recent;
+    }
+
+    function showChunkDrilldown(index) {
+      const t = window._chunkDetailData[index];
+      if (!t) return;
+      let chunks;
+      try { chunks = JSON.parse(t['Chunks-search']); } catch { return; }
+      chunks.sort((a, b) => b.similarity - a.similarity);
+      document.getElementById('chunkDrilldownTitle').textContent = `Chunks for TestCode: ${t.TestCode || '-'} | ${t['ModelName-search'] || '-'} | ${t.CollectionName || '-'}`;
+      const rows = chunks.map((c, i) =>
+        `<tr><td>${i+1}</td><td>${c.filename}</td><td>${c.chunk_index}</td><td>${c.similarity.toFixed(4)}</td><td style="text-align:left;max-width:400px;white-space:pre-wrap">${c.content.substring(0,200).replace(/</g,'&lt;')}…</td></tr>`
+      ).join('');
+      document.querySelector('#chunkDrilldownTable tbody').innerHTML = rows;
+      document.getElementById('chunkDrilldown').style.display = 'block';
+    }
+
     function showTab(tabName) {
       // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
