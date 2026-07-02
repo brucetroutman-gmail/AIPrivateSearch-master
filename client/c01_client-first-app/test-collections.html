@@ -336,9 +336,6 @@
     }
 
     async function saveToDB(data, test) {
-      console.log('[saveToDB] tokenLimit from test:', test.tokenLimit);
-      console.log('[saveToDB] data.tokenLimit:', data.tokenLimit);
-      console.log('[saveToDB] data.metrics?.search?.token_limit:', data.metrics?.search?.token_limit);
       try {
         await exportToDatabase(
           data,

@@ -628,9 +628,6 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     'ModelTopK-search': result.metrics?.search?.topK || result.topK || testParams?.topK || null,
     'ModelTokenLimit-search': (() => {
       const tl = result.metrics?.search?.token_limit ?? result.tokenLimit ?? null;
-      console.log('[exportToDatabase] token_limit from metrics:', result.metrics?.search?.token_limit);
-      console.log('[exportToDatabase] tokenLimit from result:', result.tokenLimit);
-      console.log('[exportToDatabase] final tl:', tl);
       if (tl === null || tl === undefined) throw new Error('ModelTokenLimit-search is missing from search metrics and result');
       return tl;
     })(),
@@ -645,6 +642,17 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       return isFinite(tokensPerSec) ? Math.round(tokensPerSec * 100) / 100 : null;
     })(),
     'Answer-search': result.response || null,
+    'Chunks-search': result.chunks?.length
+      ? JSON.stringify(result.chunks.map(c => ({
+          filename: c.filename,
+          chunk_index: c.chunk_index,
+          similarity: c.similarity,
+          content: c.content
+        })))
+      : null,
+    'Chunks-Similarity-search': result.chunks?.length
+      ? Math.max(...result.chunks.map(c => c.similarity))
+      : null,
     'ModelName-score': result.metrics?.scoring?.model || null,
     'ModelContextSize-score': result.metrics?.scoring?.context_size || null,
     'ModelTemperature-score': result.metrics?.scoring?.temperature || null,

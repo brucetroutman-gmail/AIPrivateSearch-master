@@ -171,12 +171,13 @@ export class AIDocumentChat {
         searchLog
       };
       
-      if (options.showChunks) {
-        result.results[0].chunks = relevantChunks.map(chunk => ({
-          filename: chunk.filename,
-          content: chunk.content,
-          similarity: chunk.similarity
-        }));
+      // Always capture chunks for ai-document-chat (for DB storage)
+      result.results[0].chunks = relevantChunks.map(chunk => ({
+        filename: chunk.filename,
+        chunk_index: chunk.chunk_index,
+        content: chunk.content,
+        similarity: chunk.similarity
+      }));
       }
       
       return result;

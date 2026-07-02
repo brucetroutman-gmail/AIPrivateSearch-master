@@ -26,7 +26,6 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       const data = req.body;
       logger.log('Database save request received');
       logger.log('CreatedAt value:', data.CreatedAt);
-      logger.log('[database.mjs] ModelTokenLimit-search received:', data['ModelTokenLimit-search']);
       
       connection = await pool.getConnection();
     
@@ -34,11 +33,11 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       INSERT INTO searches (
         TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, Prompt,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTopK-search\`, \`ModelTokenLimit-search\`,
-        \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`,
+        \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`, \`Chunks-search\`, \`Chunks-Similarity-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`, \`ModelTokenLimit-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
@@ -65,6 +64,8 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data['Load-search-ms'] || null,
       data['EvalTokensPerSecond-ssearch'] || null,
       data['Answer-search'] || null,
+      data['Chunks-search'] || null,
+      data['Chunks-Similarity-search'] ?? null,
       data['ModelName-score'] || null,
       data['ModelContextSize-score'] || null,
       data['ModelTemperature-score'] || null,
