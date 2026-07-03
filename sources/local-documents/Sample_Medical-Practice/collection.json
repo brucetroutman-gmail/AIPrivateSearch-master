@@ -52,13 +52,13 @@
     }
   ],
   "searchSettings": {
-    "topK": 20,
+    "topK": 10,
     "temperature": 0.1,
-    "contextSize": 16384,
-    "tokenLimit": 4096,
-    "totalChunks": 27,
-    "totalDocs": 7,
-    "avgChunkSize": 1619,
-    "generatedAt": "2026-06-04T17:42:28.086Z"
+    "contextSize": 8192,
+    "tokenLimit": 1024,
+    "totalChunks": 25,
+    "totalDocs": 6,
+    "avgChunkSize": 1661,
+    "generatedAt": "2026-07-03T17:44:41.596Z"
   }
 }
