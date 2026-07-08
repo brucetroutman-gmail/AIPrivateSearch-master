@@ -208,6 +208,10 @@ async function loadSharedComponents() {
         headerEl.appendChild(headerContent);
         // Load app config after header is loaded
         loadAppConfig();
+        // Apply tier access immediately after header is in DOM
+        if (window.tierAccessManager) {
+          window.tierAccessManager.applyAccessControl();
+        }
       }
     }
     
