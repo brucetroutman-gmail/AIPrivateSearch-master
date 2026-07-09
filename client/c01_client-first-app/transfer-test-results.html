@@ -154,9 +154,12 @@
       btn.textContent = 'Transferring...';
 
       try {
-        const res = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/database/transfer-to-testresults`, {
+        const res = await fetch(`${window.API_BASE_URL}/api/database/transfer-to-testresults`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('sessionId')}`
+          },
           body: JSON.stringify({ testCategory, pcCode })
         });
         const data = await res.json();
