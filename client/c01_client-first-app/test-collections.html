@@ -250,6 +250,7 @@
       isProcessing = true;
       setUIState(true);
       allResults = [];
+      const suiteStart = Date.now();
       document.getElementById('liveResults').innerHTML = '';
       document.getElementById('summarySection').classList.add('hidden');
       document.getElementById('progressSection').classList.remove('hidden');
@@ -269,7 +270,7 @@
       }
 
       document.getElementById('progressSection').classList.add('hidden');
-      showSummary(selectedModels);
+      showSummary(selectedModels, Date.now() - suiteStart);
       setUIState(false);
       isProcessing = false;
     };
@@ -373,15 +374,17 @@
       container.appendChild(row);
     }
 
-    function showSummary(models) {
+    function showSummary(models, totalMs) {
       const scored = allResults.filter(r => r.weighted_score_pct != null);
       const avgScore = scored.length ? Math.round(scored.reduce((s, r) => s + r.weighted_score_pct, 0) / scored.length) : null;
       const avgMs = Math.round(allResults.reduce((s, r) => s + (r.elapsed_ms || 0), 0) / allResults.length);
       const dbSaved = allResults.filter(r => r.db_saved).length;
+      const totalSec = totalMs ? (totalMs / 1000).toFixed(0) : null;
+      const totalFormatted = totalSec ? (totalSec >= 60 ? `${Math.floor(totalSec/60)}m ${totalSec%60}s` : `${totalSec}s`) : '';
 
       document.getElementById('finalScore').textContent = avgScore != null ? `${avgScore}%` : '—';
       document.getElementById('finalPct').textContent = avgScore != null ? `average weighted score across ${scored.length} scored queries` : 'scoring unavailable';
-      document.getElementById('finalMeta').textContent = `Models: ${models.join(', ')} · Avg time: ${(avgMs/1000).toFixed(1)}s`;
+      document.getElementById('finalMeta').textContent = `Models: ${models.join(', ')} · Avg time: ${(avgMs/1000).toFixed(1)}s${totalFormatted ? ` · Total elapsed: ${totalFormatted}` : ''}`;
       document.getElementById('dbStatus').textContent = `💾 ${dbSaved}/${allResults.length} results saved to database`;
       document.getElementById('summarySection').classList.remove('hidden');
     }

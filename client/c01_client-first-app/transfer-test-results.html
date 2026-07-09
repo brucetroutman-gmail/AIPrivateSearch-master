@@ -164,7 +164,7 @@
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
-        showResult(`✅ Done — deleted ${data.deleted} rows, inserted ${data.inserted} rows.`, true);
+        showResult(`✅ Done — deleted ${data.deleted} from test results, inserted ${data.inserted}, removed ${data.removed} from searches.`, true);
       } catch (e) {
         showResult('❌ Transfer failed: ' + e.message, false);
       } finally {

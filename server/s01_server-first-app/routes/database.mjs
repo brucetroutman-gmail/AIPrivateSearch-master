@@ -176,9 +176,13 @@ router.post('/transfer-to-testresults', requireAuthWithRateLimit(10, 60000), asy
       'INSERT INTO `searches-testresults` SELECT * FROM `searches` WHERE TestCategory = ? AND PcCode = ?',
       [testCategory, pcCode]
     );
+    const [del2] = await connection.execute(
+      'DELETE FROM `searches` WHERE TestCategory = ? AND PcCode = ?',
+      [testCategory, pcCode]
+    );
     await connection.commit();
-    logger.log(`Transfer: deleted ${del.affectedRows}, inserted ${ins.affectedRows} for ${testCategory} / ${pcCode}`);
-    return res.json({ success: true, deleted: del.affectedRows, inserted: ins.affectedRows });
+    logger.log(`Transfer: deleted ${del.affectedRows} from testresults, inserted ${ins.affectedRows}, removed ${del2.affectedRows} from searches for ${testCategory} / ${pcCode}`);
+    return res.json({ success: true, deleted: del.affectedRows, inserted: ins.affectedRows, removed: del2.affectedRows });
   } catch (error) {
     if (connection) await connection.rollback();
     logger.error('Transfer error:', error.message);
