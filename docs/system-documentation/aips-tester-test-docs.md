@@ -45,7 +45,7 @@ This guide walks you through purchasing a Professional license, downloading, ins
 
 ## Step 5: Run Test Collections
 
-1. Go to **http://localhost:56305/test-collections.html**
+1. Go to **http://localhost:56305n copy the selected rows from the tables searches/test-collections.html**
 2. Select all models using the model checkboxes at the top
 3. Select All tests using the checkbox
 4. Click **Execute Selected Tests**

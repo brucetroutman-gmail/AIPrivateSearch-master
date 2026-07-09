@@ -142,4 +142,50 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
   }
 });
 
+// Get distinct TestCategory + PcCode combos from searches
+router.get('/searches-filter-options', requireAuthWithRateLimit(20, 60000), async (req, res) => {
+  let connection;
+  try {
+    if (!pool) return res.status(500).json({ success: false, error: 'Database not configured' });
+    connection = await pool.getConnection();
+    const [categories] = await connection.execute('SELECT DISTINCT TestCategory FROM `searches` WHERE TestCategory IS NOT NULL ORDER BY TestCategory');
+    const [pcCodes] = await connection.execute('SELECT DISTINCT PcCode FROM `searches` WHERE PcCode IS NOT NULL ORDER BY PcCode');
+    return res.json({ success: true, categories: categories.map(r => r.TestCategory), pcCodes: pcCodes.map(r => r.PcCode) });
+  } catch (error) {
+    logger.error('Filter options error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// Transfer searches → searches-testresults for a given TestCategory + PcCode
+router.post('/transfer-to-testresults', requireAuthWithRateLimit(10, 60000), async (req, res) => {
+  let connection;
+  try {
+    if (!pool) return res.status(500).json({ success: false, error: 'Database not configured' });
+    const { testCategory, pcCode } = req.body;
+    if (!testCategory || !pcCode) return res.status(400).json({ success: false, error: 'testCategory and pcCode are required' });
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    const [del] = await connection.execute(
+      'DELETE FROM `searches-testresults` WHERE TestCategory = ? AND PcCode = ?',
+      [testCategory, pcCode]
+    );
+    const [ins] = await connection.execute(
+      'INSERT INTO `searches-testresults` SELECT * FROM `searches` WHERE TestCategory = ? AND PcCode = ?',
+      [testCategory, pcCode]
+    );
+    await connection.commit();
+    logger.log(`Transfer: deleted ${del.affectedRows}, inserted ${ins.affectedRows} for ${testCategory} / ${pcCode}`);
+    return res.json({ success: true, deleted: del.affectedRows, inserted: ins.affectedRows });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    logger.error('Transfer error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
 export default router;
