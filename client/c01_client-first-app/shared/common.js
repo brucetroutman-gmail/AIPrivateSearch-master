@@ -854,7 +854,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     localStorage.setItem('userUserRole', user.userRole);
     // Store email for compatibility
     localStorage.setItem('userEmail', user.email);
-    window._showLicensedContent = true;
+    // Apply role-based restrictions (but wait for header to load)
+    setTimeout(async () => {
+      if (window.tierAccessManager) {
+        await window.tierAccessManager.applyAccessControl();
+      } else {
+        await applyUserRole(user.subscriptionTier, user.userRole);
+      }
+    }, 100);
+    
+    // Show menu after successful auth (for non-index pages)
+    showLicensedContent();
   } else if (currentPage === 'index.html') {
     // For index page, check license and auth status to show menu
     let showMenu = false;
@@ -879,15 +889,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     if (showMenu) {
-      window._showLicensedContent = true;
+      showLicensedContent();
+      setTimeout(async () => {
+        if (window.tierAccessManager) {
+          await window.tierAccessManager.applyAccessControl();
+        } else {
+          await applyUserRole();
+        }
+      }, 100);
     }
   }
 
+  
   loadSharedComponents().then(async () => {
     setupLoginIcon();
+    // Apply tier access after header is loaded
     if (window.tierAccessManager) {
       await window.tierAccessManager.applyAccessControl();
     }
-    if (window._showLicensedContent) showLicensedContent();
   });
 });
