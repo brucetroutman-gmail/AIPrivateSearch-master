@@ -447,14 +447,14 @@
 
           <h4>Best Model × Query Type</h4>
           <table class="comparison-table" id="ragQueryTypeTable">
-            <thead><tr><th>Query Type</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>Tests</th></tr></thead>
-            <tbody><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
+            <thead><tr><th>Query Type</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>PcCode</th><th>Tests</th></tr></thead>
+            <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
           </table>
 
           <h4 style="margin-top:1.5rem">Best Model × Collection</h4>
           <table class="comparison-table" id="ragCollectionTable">
-            <thead><tr><th>Collection</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>Tests</th></tr></thead>
-            <tbody><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
+            <thead><tr><th>Collection</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>PcCode</th><th>Tests</th></tr></thead>
+            <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
           </table>
 
           <h4 style="margin-top:1.5rem">Model × Query Type Matrix</h4>
@@ -1101,10 +1101,10 @@
 
       function renderBestTable(tableId, rows, keyLabel) {
         const tbody = document.querySelector(`#${tableId} tbody`);
-        if (!rows.length) { tbody.innerHTML = `<tr><td colspan="8">No data (minimum 2 scored tests per combination required)</td></tr>`; return; }
+        if (!rows.length) { tbody.innerHTML = `<tr><td colspan="9">No data (minimum 2 scored tests per combination required)</td></tr>`; return; }
         tbody.innerHTML = rows.map((d,i) => {
           const cls = i===0 ? 'best-score' : '';
-          return `<tr class="${cls}"><td>${d.key}</td><td>${d.model}</td><td>${d.avg}%</td><td>${d.temp??'-'}</td><td>${d.context??'-'}</td><td>${d.topK??'-'}</td><td>${d.tokenLimit??'-'}</td><td>${d.count}</td></tr>`;
+          return `<tr class="${cls}"><td>${d.key}</td><td>${d.model}</td><td>${d.avg}%</td><td>${d.temp??'-'}</td><td>${d.context??'-'}</td><td>${d.topK??'-'}</td><td>${d.tokenLimit??'-'}</td><td>${d.hardware||'-'}</td><td>${d.count}</td></tr>`;
         }).join('');
       }
 
