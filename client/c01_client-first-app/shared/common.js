@@ -854,7 +854,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     localStorage.setItem('userUserRole', user.userRole);
     // Store email for compatibility
     localStorage.setItem('userEmail', user.email);
-    // showLicensedContent() called after header loads in loadSharedComponents().then()
+    window._showLicensedContent = true;
   } else if (currentPage === 'index.html') {
     // For index page, check license and auth status to show menu
     let showMenu = false;
@@ -879,7 +879,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     if (showMenu) {
-      // showLicensedContent() called after header loads in loadSharedComponents().then()
+      window._showLicensedContent = true;
     }
   }
 
@@ -888,6 +888,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.tierAccessManager) {
       await window.tierAccessManager.applyAccessControl();
     }
-    showLicensedContent();
+    if (window._showLicensedContent) showLicensedContent();
   });
 });
