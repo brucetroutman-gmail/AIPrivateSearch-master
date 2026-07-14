@@ -280,20 +280,17 @@ function toggleMenu() {
   }
 }
 
-// Toggle dropdown open/close
-function toggleDropdown(el, event) {
-  event.preventDefault();
-  const isOpen = el.classList.contains('dropdown-open');
-  // Close all dropdowns
-  document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
-  if (!isOpen) el.classList.add('dropdown-open');
-}
-window.toggleDropdown = toggleDropdown;
-
-// Close dropdowns when clicking outside - registered after DOM ready
-function initDropdownClickOutside() {
+// Dropdown event delegation - handles toggle and click-outside
+function initDropdowns() {
   document.addEventListener('click', function(event) {
-    if (!event.target.closest('.dropdown')) {
+    const trigger = event.target.closest('.dropdown > a:first-child');
+    if (trigger) {
+      event.preventDefault();
+      const dropdown = trigger.parentElement;
+      const isOpen = dropdown.classList.contains('dropdown-open');
+      document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
+      if (!isOpen) dropdown.classList.add('dropdown-open');
+    } else if (!event.target.closest('.dropdown')) {
       document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
     }
   });
@@ -922,7 +919,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   loadSharedComponents().then(async () => {
     setupLoginIcon();
-    initDropdownClickOutside();
+    initDropdowns();
     // Apply tier access after header is loaded
     if (window.tierAccessManager) {
       await window.tierAccessManager.applyAccessControl();
