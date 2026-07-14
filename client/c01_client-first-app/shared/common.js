@@ -295,6 +295,7 @@ function initDropdowns() {
     }
   });
 }
+initDropdowns();
 
 // Role-based system
 async function setUserRole(role) {
@@ -919,7 +920,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   loadSharedComponents().then(async () => {
     setupLoginIcon();
-    initDropdowns();
     // Apply tier access after header is loaded
     if (window.tierAccessManager) {
       await window.tierAccessManager.applyAccessControl();
