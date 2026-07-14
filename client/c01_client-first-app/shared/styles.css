@@ -201,7 +201,7 @@ body {
   background-color: #34495e;
 }
 
-.dropdown:hover .dropdown-content {
+.dropdown.dropdown-open .dropdown-content {
   display: block;
 }
 

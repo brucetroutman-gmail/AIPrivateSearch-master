@@ -280,6 +280,22 @@ function toggleMenu() {
   }
 }
 
+// Toggle dropdown open/close
+function toggleDropdown(el, event) {
+  event.preventDefault();
+  const isOpen = el.classList.contains('dropdown-open');
+  // Close all dropdowns
+  document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
+  if (!isOpen) el.classList.add('dropdown-open');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.dropdown')) {
+    document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
+  }
+});
+
 // Role-based system
 async function setUserRole(role) {
   const validRoles = ['standard', 'premium', 'professional'];
@@ -770,6 +786,7 @@ if (typeof window !== 'undefined') {
   window.getUserRole = getUserRole;
   window.getUserUserRole = getUserUserRole;
   window.toggleMenu = toggleMenu;
+  window.toggleDropdown = toggleDropdown;
   window.collectionsUtils = collectionsUtils;
   window.handleLogout = handleLogout;
   window.showLicensedContent = showLicensedContent;
