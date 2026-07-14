@@ -288,13 +288,16 @@ function toggleDropdown(el, event) {
   document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
   if (!isOpen) el.classList.add('dropdown-open');
 }
+window.toggleDropdown = toggleDropdown;
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-  if (!event.target.closest('.dropdown')) {
-    document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
-  }
-});
+// Close dropdowns when clicking outside - registered after DOM ready
+function initDropdownClickOutside() {
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown.dropdown-open').forEach(d => d.classList.remove('dropdown-open'));
+    }
+  });
+}
 
 // Role-based system
 async function setUserRole(role) {
@@ -786,7 +789,6 @@ if (typeof window !== 'undefined') {
   window.getUserRole = getUserRole;
   window.getUserUserRole = getUserUserRole;
   window.toggleMenu = toggleMenu;
-  window.toggleDropdown = toggleDropdown;
   window.collectionsUtils = collectionsUtils;
   window.handleLogout = handleLogout;
   window.showLicensedContent = showLicensedContent;
@@ -920,6 +922,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   loadSharedComponents().then(async () => {
     setupLoginIcon();
+    initDropdownClickOutside();
     // Apply tier access after header is loaded
     if (window.tierAccessManager) {
       await window.tierAccessManager.applyAccessControl();
