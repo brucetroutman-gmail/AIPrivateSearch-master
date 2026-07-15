@@ -246,6 +246,12 @@
             </select>
           </div>
           <div class="filter-group">
+            <label>Test Category:</label>
+            <select id="testCategoryFilter">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+          <div class="filter-group">
             <label>Date Range:</label>
             <select id="dateRangeFilter">
               <option value="">All Dates</option>
@@ -547,6 +553,11 @@
       const collectionFilter = document.getElementById('collectionFilter');
       collectionFilter.innerHTML = '<option value="">All Collections</option>' + 
         collections.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const categories = [...new Set(testData.map(test => test.TestCategory).filter(Boolean))].sort();
+      const testCategoryFilter = document.getElementById('testCategoryFilter');
+      testCategoryFilter.innerHTML = '<option value="">All Categories</option>' + 
+        categories.map(c => `<option value="${c}">${c}</option>`).join('');
     }
     
     function loadAnalysis() {
@@ -565,12 +576,14 @@
         const pcCode = document.getElementById('pcCodeFilter').value;
         const selectedModel = document.getElementById('modelFilter').value;
         const collection = document.getElementById('collectionFilter').value;
+        const testCategory = document.getElementById('testCategoryFilter').value;
         const dateRange = document.getElementById('dateRangeFilter').value;
         const testType = document.getElementById('testTypeFilter').value;
         
         if (pcCode && test.PcCode !== pcCode) return false;
         if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
         if (collection && test.CollectionName !== collection) return false;
+        if (testCategory && test.TestCategory !== testCategory) return false;
         if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
         if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
         
