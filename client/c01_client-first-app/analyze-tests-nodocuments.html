@@ -240,15 +240,6 @@
             </select>
           </div>
           <div class="filter-group">
-            <label>Source Type:</label>
-            <select id="sourceTypeFilter">
-              <option value="">All Source Types</option>
-              <option value="Local Model Only">Local Model Only</option>
-              <option value="Local Documents Only">Local Documents Only</option>
-              <option value="Local Model and Documents">Local Model and Documents</option>
-            </select>
-          </div>
-          <div class="filter-group">
             <label>Date Range:</label>
             <select id="dateRangeFilter">
               <option value="">All Dates</option>
@@ -276,8 +267,7 @@
           <button class="tab-button" onclick="showTab('parameters')">Parameter Optimization</button>
           <button class="tab-button" onclick="showTab('categories')">Test Categories</button>
           <button class="tab-button" onclick="showTab('consistency')">Consistency</button>
-          <button class="tab-button" onclick="showTab('chunks')">Chunks</button>
-          <button class="tab-button" onclick="showTab('rag')">RAG Optimization</button>
+
         </div>
         
         <div id="leaderboard" class="tab-content active">
@@ -390,86 +380,6 @@
           </div>
         </div>
         
-        <div id="chunks" class="tab-content">
-          <h3>Chunk Analysis</h3>
-          <h4>Chunk Similarity by Model &amp; Collection</h4>
-          <table class="comparison-table" id="chunkSimilarityTable">
-            <thead>
-              <tr>
-                <th>Model</th>
-                <th>Collection</th>
-                <th>Avg Max Similarity</th>
-                <th>Avg Chunk Count</th>
-                <th>Tests</th>
-              </tr>
-            </thead>
-            <tbody><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
-          </table>
-          <h4 style="margin-top:1.5rem">Chunk Count vs Score</h4>
-          <table class="comparison-table" id="chunkCountScoreTable">
-            <thead>
-              <tr>
-                <th>Chunk Count</th>
-                <th>Avg Score</th>
-                <th>Avg Max Similarity</th>
-                <th>Tests</th>
-              </tr>
-            </thead>
-            <tbody><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
-          </table>
-          <h4 style="margin-top:1.5rem">Recent Tests with Chunks</h4>
-          <table class="comparison-table" id="chunkDetailTable">
-            <thead>
-              <tr>
-                <th>TestCode</th>
-                <th>Model</th>
-                <th>Collection</th>
-                <th>Chunks</th>
-                <th>Max Sim</th>
-                <th>Score</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
-          </table>
-          <div id="chunkDrilldown" style="display:none;margin-top:1rem" class="chart-container">
-            <strong id="chunkDrilldownTitle"></strong>
-            <table class="comparison-table" style="margin-top:0.5rem" id="chunkDrilldownTable">
-              <thead><tr><th>#</th><th>File</th><th>Chunk</th><th>Similarity</th><th>Content Preview</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="rag" class="tab-content">
-          <h3>RAG Optimization — Best Settings by Collection &amp; Query Type</h3>
-          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Based on <strong>searches-testresults</strong> baseline data. Shows top-scoring model + settings per combination. Minimum 2 scored tests required.</p>
-
-          <h4>Best Model × Query Type</h4>
-          <table class="comparison-table" id="ragQueryTypeTable">
-            <thead><tr><th>Query Type</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>PcCode</th><th>Tests</th></tr></thead>
-            <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
-          </table>
-
-          <h4 style="margin-top:1.5rem">Best Model × Collection</h4>
-          <table class="comparison-table" id="ragCollectionTable">
-            <thead><tr><th>Collection</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>PcCode</th><th>Tests</th></tr></thead>
-            <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
-          </table>
-
-          <h4 style="margin-top:1.5rem">Model × Query Type Matrix</h4>
-          <div id="ragModelQueryMatrix" class="chart-container"><div class="loading">Loading...</div></div>
-
-          <h4 style="margin-top:1.5rem">Model × Collection Matrix</h4>
-          <div id="ragModelCollectionMatrix" class="chart-container"><div class="loading">Loading...</div></div>
-
-          <h4 style="margin-top:1.5rem">Best Settings per Collection × Query Type</h4>
-          <table class="comparison-table" id="ragBestSettingsTable">
-            <thead><tr><th>Collection</th><th>Query Type</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>Hardware</th><th>Tests</th></tr></thead>
-            <tbody><tr><td colspan="10" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-
         <div id="consistency" class="tab-content">
           <h3>Model Reliability & Consistency</h3>
           <table class="comparison-table" id="consistencyTable">
@@ -556,21 +466,18 @@
       updateParameters();
       updateCategories();
       updateConsistency();
-      updateChunks();
-      updateRAGOptimization();
+
     }
     
     function applyFilters() {
       filteredData = testData.filter(test => {
         const pcCode = document.getElementById('pcCodeFilter').value;
         const selectedModel = document.getElementById('modelFilter').value;
-        const sourceType = document.getElementById('sourceTypeFilter').value;
         const dateRange = document.getElementById('dateRangeFilter').value;
         const testType = document.getElementById('testTypeFilter').value;
         
         if (pcCode && test.PcCode !== pcCode) return false;
         if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
-        if (sourceType && test.SourceType !== sourceType) return false;
         if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
         if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
         
@@ -987,187 +894,6 @@
       tbody.innerHTML = rows || '<tr><td colspan="7">No data available (minimum 3 scored tests per model required)</td></tr>';
     }
     
-    function updateChunks() {
-      const withChunks = filteredData.filter(t => t['Chunks-search']);
-
-      // 1. Similarity by model + collection
-      const simMap = {};
-      withChunks.forEach(t => {
-        const key = `${t['ModelName-search']}||${t.CollectionName}`;
-        if (!simMap[key]) simMap[key] = { model: t['ModelName-search'], collection: t.CollectionName, maxSims: [], chunkCounts: [] };
-        try {
-          const chunks = JSON.parse(t['Chunks-search']);
-          simMap[key].maxSims.push(Math.max(...chunks.map(c => c.similarity)));
-          simMap[key].chunkCounts.push(chunks.length);
-        } catch { /* skip */ }
-      });
-      const simRows = Object.values(simMap).sort((a, b) =>
-        (b.maxSims.reduce((s,v)=>s+v,0)/b.maxSims.length) - (a.maxSims.reduce((s,v)=>s+v,0)/a.maxSims.length)
-      ).map(d => {
-        const avgSim = (d.maxSims.reduce((s,v)=>s+v,0)/d.maxSims.length).toFixed(3);
-        const avgCount = (d.chunkCounts.reduce((s,v)=>s+v,0)/d.chunkCounts.length).toFixed(1);
-        const cls = parseFloat(avgSim) >= 0.7 ? 'best-score' : parseFloat(avgSim) < 0.4 ? 'worst-score' : '';
-        return `<tr class="${cls}"><td>${d.model}</td><td>${d.collection}</td><td>${avgSim}</td><td>${avgCount}</td><td>${d.maxSims.length}</td></tr>`;
-      }).join('');
-      document.querySelector('#chunkSimilarityTable tbody').innerHTML = simRows || '<tr><td colspan="5">No chunk data</td></tr>';
-
-      // 2. Chunk count vs score
-      const countMap = {};
-      withChunks.forEach(t => {
-        if (!t['WeightedScore-pct']) return;
-        try {
-          const chunks = JSON.parse(t['Chunks-search']);
-          const count = chunks.length;
-          if (!countMap[count]) countMap[count] = { scores: [], maxSims: [] };
-          countMap[count].scores.push(t['WeightedScore-pct']);
-          countMap[count].maxSims.push(Math.max(...chunks.map(c => c.similarity)));
-        } catch { /* skip */ }
-      });
-      const countRows = Object.entries(countMap).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([count, d]) => {
-        const avgScore = (d.scores.reduce((s,v)=>s+v,0)/d.scores.length).toFixed(1);
-        const avgSim = (d.maxSims.reduce((s,v)=>s+v,0)/d.maxSims.length).toFixed(3);
-        return `<tr><td>${count}</td><td>${avgScore}%</td><td>${avgSim}</td><td>${d.scores.length}</td></tr>`;
-      }).join('');
-      document.querySelector('#chunkCountScoreTable tbody').innerHTML = countRows || '<tr><td colspan="4">No scored chunk data</td></tr>';
-
-      // 3. Recent tests with chunks
-      const recent = withChunks.slice(0, 50);
-      const detailRows = recent.map((t, i) => {
-        let chunkCount = '?', maxSim = '?';
-        try {
-          const chunks = JSON.parse(t['Chunks-search']);
-          chunkCount = chunks.length;
-          maxSim = Math.max(...chunks.map(c => c.similarity)).toFixed(3);
-        } catch { /* skip */ }
-        const score = t['WeightedScore-pct'] ? t['WeightedScore-pct'] + '%' : '-';
-        return `<tr><td>${t.TestCode||'-'}</td><td>${t['ModelName-search']||'-'}</td><td>${t.CollectionName||'-'}</td><td>${chunkCount}</td><td>${maxSim}</td><td>${score}</td><td><button onclick="showChunkDrilldown(${i})" style="padding:0.2rem 0.5rem;cursor:pointer">View</button></td></tr>`;
-      }).join('');
-      document.querySelector('#chunkDetailTable tbody').innerHTML = detailRows || '<tr><td colspan="7">No chunk data</td></tr>';
-
-      // Store for drilldown
-      window._chunkDetailData = recent;
-    }
-
-    function showChunkDrilldown(index) {
-      const t = window._chunkDetailData[index];
-      if (!t) return;
-      let chunks;
-      try { chunks = JSON.parse(t['Chunks-search']); } catch { return; }
-      chunks.sort((a, b) => b.similarity - a.similarity);
-      document.getElementById('chunkDrilldownTitle').textContent = `Chunks for TestCode: ${t.TestCode || '-'} | ${t['ModelName-search'] || '-'} | ${t.CollectionName || '-'}`;
-      const rows = chunks.map((c, i) =>
-        `<tr><td>${i+1}</td><td>${c.filename}</td><td>${c.chunk_index}</td><td>${c.similarity.toFixed(4)}</td><td style="text-align:left;max-width:400px;white-space:pre-wrap">${c.content.substring(0,200).replace(/</g,'&lt;')}…</td></tr>`
-      ).join('');
-      document.querySelector('#chunkDrilldownTable tbody').innerHTML = rows;
-      document.getElementById('chunkDrilldown').style.display = 'block';
-    }
-
-    function updateRAGOptimization() {
-      const scored = filteredData.filter(t => t['WeightedScore-pct'] != null);
-
-      function queryType(t) {
-        const d = (t.TestDescription || t.TestCategory || '').toLowerCase();
-        if (d.includes('fact')) return 'fact';
-        if (d.includes('analysis')) return 'analysis';
-        if (d.includes('creative')) return 'creative';
-        return 'other';
-      }
-
-      function shortCollection(name) {
-        return (name || '').replace('Sample_', '');
-      }
-
-      // Group scored tests by a key, return best model+settings entry
-      function bestByKey(keyFn) {
-        const map = {};
-        scored.forEach(t => {
-          const key = keyFn(t);
-          const model = t['ModelName-search'];
-          const subKey = `${key}||${model}`;
-          if (!map[subKey]) map[subKey] = { key, model, scores: [], temp: t['ModelTemperature-search'], context: t['ModelContextSize-search'], topK: t['ModelTopK-search'], tokenLimit: t['ModelTokenLimit-search'], pcCodes: new Set() };
-          map[subKey].scores.push(t['WeightedScore-pct']);
-          if (t.PcCode) map[subKey].pcCodes.add(t.PcCode);
-        });
-        // For each key, find the model with highest avg score (min 2 tests)
-        const byKey = {};
-        Object.values(map).filter(d => d.scores.length >= 2).forEach(d => {
-          const avg = d.scores.reduce((s,v)=>s+v,0)/d.scores.length;
-          if (!byKey[d.key] || avg > byKey[d.key].avg) {
-            byKey[d.key] = { ...d, avg: avg.toFixed(1), count: d.scores.length, hardware: [...d.pcCodes].join(', ') };
-          }
-        });
-        return Object.values(byKey).sort((a,b) => parseFloat(b.avg)-parseFloat(a.avg));
-      }
-
-      function renderBestTable(tableId, rows, keyLabel) {
-        const tbody = document.querySelector(`#${tableId} tbody`);
-        if (!rows.length) { tbody.innerHTML = `<tr><td colspan="9">No data (minimum 2 scored tests per combination required)</td></tr>`; return; }
-        tbody.innerHTML = rows.map((d,i) => {
-          const cls = i===0 ? 'best-score' : '';
-          return `<tr class="${cls}"><td>${d.key}</td><td>${d.model}</td><td>${d.avg}%</td><td>${d.temp??'-'}</td><td>${d.context??'-'}</td><td>${d.topK??'-'}</td><td>${d.tokenLimit??'-'}</td><td>${d.hardware||'-'}</td><td>${d.count}</td></tr>`;
-        }).join('');
-      }
-
-      // 1. Best model × query type
-      renderBestTable('ragQueryTypeTable', bestByKey(t => queryType(t)), 'Query Type');
-
-      // 2. Best model × collection
-      renderBestTable('ragCollectionTable', bestByKey(t => shortCollection(t.CollectionName)), 'Collection');
-
-      // 3. Model × Query Type matrix
-      const models = [...new Set(scored.map(t => t['ModelName-search']).filter(Boolean))];
-      const queryTypes = [...new Set(scored.map(t => queryType(t)))];
-      function buildMatrix(containerId, rowKeys, colKeys, rowFn, colFn) {
-        if (!rowKeys.length || !colKeys.length) { document.getElementById(containerId).innerHTML = '<div>No data</div>'; return; }
-        const cellData = {};
-        scored.forEach(t => {
-          const r = rowFn(t), c = colFn(t);
-          const k = `${r}||${c}`;
-          if (!cellData[k]) cellData[k] = [];
-          cellData[k].push(t['WeightedScore-pct']);
-        });
-        let html = `<table class="comparison-table"><thead><tr><th></th>${colKeys.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
-        rowKeys.forEach(r => {
-          html += `<tr><td><strong>${r}</strong></td>`;
-          colKeys.forEach(c => {
-            const vals = cellData[`${r}||${c}`] || [];
-            if (vals.length < 1) { html += '<td>-</td>'; return; }
-            const avg = (vals.reduce((s,v)=>s+v,0)/vals.length).toFixed(1);
-            const cls = parseFloat(avg)>=80?'best-score':parseFloat(avg)<50?'worst-score':'';
-            html += `<td class="${cls}"><strong>${avg}%</strong><br><small>(${vals.length})</small></td>`;
-          });
-          html += '</tr>';
-        });
-        html += '</tbody></table><p><small>Values: avg score% (test count)</small></p>';
-        document.getElementById(containerId).innerHTML = html;
-      }
-      buildMatrix('ragModelQueryMatrix', models, queryTypes, t=>t['ModelName-search'], t=>queryType(t));
-
-      // 4. Model × Collection matrix
-      const collections = [...new Set(scored.map(t => shortCollection(t.CollectionName)).filter(Boolean))];
-      buildMatrix('ragModelCollectionMatrix', models, collections, t=>t['ModelName-search'], t=>shortCollection(t.CollectionName));
-
-      // 5. Best settings per collection × query type
-      const tbody5 = document.querySelector('#ragBestSettingsTable tbody');
-      const comboMap = {};
-      scored.forEach(t => {
-        const key = `${shortCollection(t.CollectionName)}||${queryType(t)}||${t['ModelName-search']}`;
-        if (!comboMap[key]) comboMap[key] = { collection: shortCollection(t.CollectionName), qtype: queryType(t), model: t['ModelName-search'], scores: [], temp: t['ModelTemperature-search'], context: t['ModelContextSize-search'], topK: t['ModelTopK-search'], tokenLimit: t['ModelTokenLimit-search'], pcCodes: new Set() };
-        comboMap[key].scores.push(t['WeightedScore-pct']);
-        if (t.PcCode) comboMap[key].pcCodes.add(t.PcCode);
-      });
-      const bestCombos = {};
-      Object.values(comboMap).filter(d=>d.scores.length>=2).forEach(d => {
-        const avg = d.scores.reduce((s,v)=>s+v,0)/d.scores.length;
-        const k = `${d.collection}||${d.qtype}`;
-        if (!bestCombos[k] || avg > bestCombos[k].avg) bestCombos[k] = { ...d, avg: avg.toFixed(1), count: d.scores.length, hardware: [...d.pcCodes].join(', ') };
-      });
-      const comboRows = Object.values(bestCombos).sort((a,b)=>a.collection.localeCompare(b.collection)||a.qtype.localeCompare(b.qtype));
-      tbody5.innerHTML = comboRows.length
-        ? comboRows.map(d=>`<tr><td>${d.collection}</td><td>${d.qtype}</td><td>${d.model}</td><td>${d.avg}%</td><td>${d.temp??'-'}</td><td>${d.context??'-'}</td><td>${d.topK??'-'}</td><td>${d.tokenLimit??'-'}</td><td>${d.hardware||'-'}</td><td>${d.count}</td></tr>`).join('')
-        : '<tr><td colspan="10">No data (minimum 2 scored tests per combination required)</td></tr>';
-    }
-
     function showTab(tabName) {
       // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Model Performance Analysis - AIPrivateSearch</title>
+  <title>Document Collection Analysis - AIPrivateSearch</title>
   <link rel="stylesheet" href="shared/styles.css">
   <script src="./shared/utils/apiConfig.js"></script>
   <script src="shared/license-checker.js"></script>
@@ -221,8 +221,8 @@
 
   <div class="page-content">
     <main class="analyze-container">
-      <h1>Model Performance Analysis</h1>
-      <p>Comprehensive analysis of AI model performance across hardware configurations and test parameters.</p>
+      <h1>Document Collection Analysis</h1>
+      <p>Analysis of AI model performance on document collection searches (Local Documents and Local Model + Documents).</p>
       
       <div class="analyze-section">
         <h2>Filters</h2>
@@ -240,12 +240,9 @@
             </select>
           </div>
           <div class="filter-group">
-            <label>Source Type:</label>
-            <select id="sourceTypeFilter">
-              <option value="">All Source Types</option>
-              <option value="Local Model Only">Local Model Only</option>
-              <option value="Local Documents Only">Local Documents Only</option>
-              <option value="Local Model and Documents">Local Model and Documents</option>
+            <label>Collection:</label>
+            <select id="collectionFilter">
+              <option value="">All Collections</option>
             </select>
           </div>
           <div class="filter-group">
@@ -524,7 +521,7 @@
         const data = await response.json();
         
         if (data.success) {
-          testData = data.tests;
+          testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
           populateFilters();
           loadAnalysis();
         } else {
@@ -536,17 +533,20 @@
     }
     
     function populateFilters() {
-      // Populate PC Code filter
       const pcCodes = [...new Set(testData.map(test => test.PcCode).filter(Boolean))];
       const pcCodeFilter = document.getElementById('pcCodeFilter');
       pcCodeFilter.innerHTML = '<option value="">All PC Codes</option>' + 
         pcCodes.map(code => `<option value="${code}">${code}</option>`).join('');
       
-      // Populate Model filter
       const models = [...new Set(testData.map(test => test['ModelName-search']).filter(Boolean))];
       const modelFilter = document.getElementById('modelFilter');
       modelFilter.innerHTML = '<option value="">All Models</option>' + 
         models.map(model => `<option value="${model}">${model}</option>`).join('');
+
+      const collections = [...new Set(testData.map(test => test.CollectionName).filter(Boolean))];
+      const collectionFilter = document.getElementById('collectionFilter');
+      collectionFilter.innerHTML = '<option value="">All Collections</option>' + 
+        collections.map(c => `<option value="${c}">${c}</option>`).join('');
     }
     
     function loadAnalysis() {
@@ -564,13 +564,13 @@
       filteredData = testData.filter(test => {
         const pcCode = document.getElementById('pcCodeFilter').value;
         const selectedModel = document.getElementById('modelFilter').value;
-        const sourceType = document.getElementById('sourceTypeFilter').value;
+        const collection = document.getElementById('collectionFilter').value;
         const dateRange = document.getElementById('dateRangeFilter').value;
         const testType = document.getElementById('testTypeFilter').value;
         
         if (pcCode && test.PcCode !== pcCode) return false;
         if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
-        if (sourceType && test.SourceType !== sourceType) return false;
+        if (collection && test.CollectionName !== collection) return false;
         if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
         if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
         
