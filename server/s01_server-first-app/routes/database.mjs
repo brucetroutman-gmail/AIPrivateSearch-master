@@ -36,10 +36,18 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`, \`Chunks-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`, \`ModelTokenLimit-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
-        AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`, SimilarityScore
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
+    const similarityScore = (() => {
+      try {
+        const chunks = JSON.parse(data['Chunks-search']);
+        if (!Array.isArray(chunks) || chunks.length === 0) return null;
+        return Math.max(...chunks.map(c => c.similarity ?? 0)) * 100;
+      } catch { return null; }
+    })();
+
     const values = [
       data.TestCode || '',
       data.TestCategory || 'User Selected Test',
@@ -76,7 +84,8 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data.AccurateScore || null,
       data.RelevantScore || null,
       data.OrganizedScore || null,
-      data['WeightedScore-pct'] || null
+      data['WeightedScore-pct'] || null,
+      similarityScore
     ];
     
       logger.log('Executing query with', values.length, 'parameters');
