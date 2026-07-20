@@ -1796,3 +1796,89 @@ mark.search-highlight,
   font-size: 0.9em;
   opacity: 0.8;
 }
+
+/* Analysis table score highlights */
+.best-score {
+  background: #eafaf1 !important;
+  color: #1a5c35 !important;
+}
+
+.worst-score {
+  background: #fde8e8 !important;
+  color: #7b1c1c !important;
+}
+
+[data-theme="dark"] .best-score {
+  background: #1a3d2b !important;
+  color: #6fcf97 !important;
+}
+
+[data-theme="dark"] .worst-score {
+  background: #3d1a1a !important;
+  color: #eb8585 !important;
+}
+
+/* Shared success/error status and message classes */
+.status-success,
+.message-success,
+.result-msg.success,
+.log-item.success {
+  background: #eafaf1;
+  color: #1a5c35;
+  border-color: #a3d9b1;
+}
+
+.status-error,
+.message-error,
+.result-msg.error,
+.log-item.error {
+  background: #fde8e8;
+  color: #7b1c1c;
+  border-color: #f5a5a5;
+}
+
+.status-success,
+.status-error,
+.message-success,
+.message-error {
+  border: 1px solid;
+}
+
+[data-theme="dark"] .status-success,
+[data-theme="dark"] .message-success,
+[data-theme="dark"] .result-msg.success,
+[data-theme="dark"] .log-item.success {
+  background: #1a3d2b;
+  color: #6fcf97;
+  border-color: #2d6a4a;
+}
+
+[data-theme="dark"] .status-error,
+[data-theme="dark"] .message-error,
+[data-theme="dark"] .result-msg.error,
+[data-theme="dark"] .log-item.error {
+  background: #3d1a1a;
+  color: #eb8585;
+  border-color: #6a2d2d;
+}
+
+/* search-logs status badges */
+.status-success-badge {
+  background: #eafaf1;
+  color: #1a5c35;
+}
+
+.status-error-badge {
+  background: #fde8e8;
+  color: #7b1c1c;
+}
+
+[data-theme="dark"] .status-success-badge {
+  background: #1a3d2b;
+  color: #6fcf97;
+}
+
+[data-theme="dark"] .status-error-badge {
+  background: #3d1a1a;
+  color: #eb8585;
+}
