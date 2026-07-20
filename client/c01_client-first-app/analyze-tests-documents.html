@@ -209,6 +209,10 @@
       color: #87ceeb;
     }
     
+    [data-theme="dark"] tr[style*="background:#fff8e1"] {
+      background: #3d3000 !important;
+    }
+
     .loading {
       text-align: center;
       padding: 2rem;
@@ -275,6 +279,7 @@
       <div class="analyze-section">
         <div class="report-tabs">
           <button class="tab-button active" onclick="showTab('leaderboard')">Model Leaderboard</button>
+          <button class="tab-button" onclick="showTab('searchscore')">Search × Score</button>
           <button class="tab-button" onclick="showTab('hardware')">Hardware Impact</button>
           <button class="tab-button" onclick="showTab('parameters')">Parameter Optimization</button>
           <button class="tab-button" onclick="showTab('categories')">Test Categories</button>
@@ -297,17 +302,39 @@
                 <th>Accuracy</th>
                 <th>Relevance</th>
                 <th>Organization</th>
+                <th>Similarity</th>
                 <th>Avg Duration</th>
                 <th>Tokens/sec</th>
                 <th>Tests</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="9" class="loading">Loading leaderboard...</td></tr>
+              <tr><td colspan="10" class="loading">Loading leaderboard...</td></tr>
             </tbody>
           </table>
         </div>
         
+        <div id="searchscore" class="tab-content">
+          <h3>Search × Score Model Combinations</h3>
+          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Each row is a unique (search model, score model) pair. <span style="background:#fff3cd;color:#856404;padding:0.1rem 0.4rem;border-radius:3px">⚠ Same model</span> pairs may inflate scores (self-preference).</p>
+          <table class="comparison-table" id="searchScoreTable">
+            <thead>
+              <tr>
+                <th>Search Model</th>
+                <th>Score Model</th>
+                <th>Avg Score</th>
+                <th>Accuracy</th>
+                <th>Relevance</th>
+                <th>Organization</th>
+                <th>Similarity</th>
+                <th>Avg Duration</th>
+                <th>Tests</th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
+          </table>
+        </div>
+
         <div id="hardware" class="tab-content">
           <h3>Hardware Performance Impact</h3>
           <div class="stats-grid" id="hardwareStats">
@@ -320,13 +347,14 @@
                 <th>CPU</th>
                 <th>RAM</th>
                 <th>Avg Score</th>
+                <th>Similarity</th>
                 <th>Avg Duration</th>
                 <th>Tokens/sec</th>
                 <th>Tests</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="7" class="loading">Loading hardware data...</td></tr>
+              <tr><td colspan="8" class="loading">Loading hardware data...</td></tr>
             </tbody>
           </table>
           <h4>Model vs Hardware Matrix</h4>
@@ -563,6 +591,7 @@
     function loadAnalysis() {
       applyFilters();
       updateLeaderboard();
+      updateSearchScoreMatrix();
       updateHardware();
       updateParameters();
       updateCategories();
@@ -646,6 +675,8 @@
             (scoredModelTests.reduce((sum, test) => sum + (test.RelevantScore || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
           avgOrganization: scoredModelTests.length > 0 ? 
             (scoredModelTests.reduce((sum, test) => sum + (test.OrganizedScore || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
+          avgSimilarity: scoredModelTests.length > 0 ?
+            (scoredModelTests.reduce((sum, test) => sum + (parseFloat(test.SimilarityScore) || 0), 0) / scoredModelTests.length).toFixed(1) : 'N/A',
           avgDuration: (modelTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / modelTests.length).toFixed(1),
           avgTokens: (modelTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / modelTests.length).toFixed(1)
         };
@@ -661,6 +692,7 @@
             <td>${stats.avgAccuracy}</td>
             <td>${stats.avgRelevance}</td>
             <td>${stats.avgOrganization}</td>
+            <td>${stats.avgSimilarity !== 'N/A' ? stats.avgSimilarity + '%' : 'N/A'}</td>
             <td>${stats.avgDuration}s</td>
             <td>${stats.avgTokens}</td>
             <td>${stats.testCount}</td>
@@ -668,7 +700,7 @@
         `;
       }).join('');
       
-      tbody.innerHTML = rows || '<tr><td colspan="9">No data available</td></tr>';
+      tbody.innerHTML = rows || '<tr><td colspan="10">No data available</td></tr>';
     }
     
     function updateHardwareMatrix() {
@@ -707,6 +739,8 @@
           testCount: pcTests.length,
           avgScore: scoredTests.length > 0 ? 
             (scoredTests.reduce((sum, test) => sum + test['WeightedScore-pct'], 0) / scoredTests.length).toFixed(1) : 'N/A',
+          avgSimilarity: scoredTests.length > 0 ?
+            (scoredTests.reduce((sum, test) => sum + (parseFloat(test.SimilarityScore) || 0), 0) / scoredTests.length).toFixed(1) : 'N/A',
           avgDuration: (pcTests.reduce((sum, test) => sum + (test['Duration-search-s'] || 0), 0) / pcTests.length).toFixed(1),
           avgTokens: (pcTests.reduce((sum, test) => sum + (test['EvalTokensPerSecond-ssearch'] || 0), 0) / pcTests.length).toFixed(1)
         };
@@ -720,6 +754,7 @@
             <td>${stats.cpu}</td>
             <td>${stats.ram}</td>
             <td>${stats.avgScore}${stats.avgScore !== 'N/A' ? '%' : ''}</td>
+            <td>${stats.avgSimilarity !== 'N/A' ? stats.avgSimilarity + '%' : 'N/A'}</td>
             <td>${stats.avgDuration}s</td>
             <td>${stats.avgTokens}</td>
             <td>${stats.testCount}</td>
@@ -727,7 +762,7 @@
         `;
       }).join('');
       
-      tbody.innerHTML = rows || '<tr><td colspan="7">No data available</td></tr>';
+      tbody.innerHTML = rows || '<tr><td colspan="8">No data available</td></tr>';
       
       // Model vs Hardware Matrix
       updateHardwareMatrix();
@@ -1179,6 +1214,46 @@
       tbody5.innerHTML = comboRows.length
         ? comboRows.map(d=>`<tr><td>${d.collection}</td><td>${d.qtype}</td><td>${d.model}</td><td>${d.avg}%</td><td>${d.temp??'-'}</td><td>${d.context??'-'}</td><td>${d.topK??'-'}</td><td>${d.tokenLimit??'-'}</td><td>${d.hardware||'-'}</td><td>${d.count}</td></tr>`).join('')
         : '<tr><td colspan="10">No data (minimum 2 scored tests per combination required)</td></tr>';
+    }
+
+    function updateSearchScoreMatrix() {
+      const scored = filteredData.filter(t => t['WeightedScore-pct'] != null);
+      const pairMap = {};
+      scored.forEach(t => {
+        const sm = t['ModelName-search'] || '-';
+        const sc = t['ModelName-score'] || '-';
+        const key = `${sm}||${sc}`;
+        if (!pairMap[key]) pairMap[key] = { sm, sc, scores: [], accurate: [], relevant: [], organized: [], sims: [], durations: [] };
+        pairMap[key].scores.push(t['WeightedScore-pct']);
+        if (t.AccurateScore != null) pairMap[key].accurate.push(t.AccurateScore);
+        if (t.RelevantScore != null) pairMap[key].relevant.push(t.RelevantScore);
+        if (t.OrganizedScore != null) pairMap[key].organized.push(t.OrganizedScore);
+        if (t.SimilarityScore != null) pairMap[key].sims.push(parseFloat(t.SimilarityScore));
+        if (t['Duration-search-s'] != null) pairMap[key].durations.push(t['Duration-search-s']);
+      });
+      const avg = arr => arr.length ? (arr.reduce((s,v)=>s+v,0)/arr.length).toFixed(1) : 'N/A';
+      const rows = Object.values(pairMap)
+        .sort((a,b) => parseFloat(b.scores.reduce((s,v)=>s+v,0)/b.scores.length) - parseFloat(a.scores.reduce((s,v)=>s+v,0)/a.scores.length))
+        .map(d => {
+          const sameModel = d.sm === d.sc;
+          const rowStyle = sameModel ? 'background:#fff8e1' : '';
+          const flag = sameModel ? ' ⚠' : '';
+          const avgScore = avg(d.scores);
+          const avgSim = avg(d.sims);
+          const avgDur = avg(d.durations);
+          return `<tr style="${rowStyle}">
+            <td>${d.sm}</td>
+            <td>${d.sc}${flag}</td>
+            <td>${avgScore !== 'N/A' ? avgScore + '%' : 'N/A'}</td>
+            <td>${avg(d.accurate)}</td>
+            <td>${avg(d.relevant)}</td>
+            <td>${avg(d.organized)}</td>
+            <td>${avgSim !== 'N/A' ? avgSim + '%' : 'N/A'}</td>
+            <td>${avgDur !== 'N/A' ? avgDur + 's' : 'N/A'}</td>
+            <td>${d.scores.length}</td>
+          </tr>`;
+        }).join('');
+      document.querySelector('#searchScoreTable tbody').innerHTML = rows || '<tr><td colspan="9">No scored data available</td></tr>';
     }
 
     function showTab(tabName) {
