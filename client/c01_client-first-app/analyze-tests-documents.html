@@ -123,13 +123,13 @@
     }
     
     .best-score {
-      background: #d4edda !important;
-      color: #155724 !important;
+      background: #eafaf1 !important;
+      color: #1a5c35 !important;
     }
     
     .worst-score {
-      background: #f8d7da !important;
-      color: #721c24 !important;
+      background: #fde8e8 !important;
+      color: #7b1c1c !important;
     }
     
     [data-theme="dark"] .comparison-table th {
@@ -146,13 +146,13 @@
     }
     
     [data-theme="dark"] .best-score {
-      background: #1e4d3a !important;
-      color: #28a745 !important;
+      background: #1a3d2b !important;
+      color: #6fcf97 !important;
     }
     
     [data-theme="dark"] .worst-score {
-      background: #4d1e1e !important;
-      color: #dc3545 !important;
+      background: #3d1a1a !important;
+      color: #eb8585 !important;
     }
     
     .chart-container {
@@ -318,6 +318,16 @@
               <option value="">All Tests</option>
               <option value="scoring">Scoring Only</option>
               <option value="no-scoring">No Scoring Only</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Query Type:</label>
+            <select id="queryTypeFilter">
+              <option value="">All Query Types</option>
+              <option value="fact">Fact</option>
+              <option value="analysis">Analysis</option>
+              <option value="creative">Creative</option>
+              <option value="other">Other</option>
             </select>
           </div>
         </div>
@@ -678,6 +688,14 @@
       updateRAGOptimization();
     }
     
+    function queryType(t) {
+      const d = (t.TestDescription || t.TestCategory || '').toLowerCase();
+      if (d.includes('fact')) return 'fact';
+      if (d.includes('analysis')) return 'analysis';
+      if (d.includes('creative')) return 'creative';
+      return 'other';
+    }
+
     function applyFilters() {
       filteredData = testData.filter(test => {
         const pcCode = document.getElementById('pcCodeFilter').value;
@@ -686,6 +704,7 @@
         const testCategory = document.getElementById('testCategoryFilter').value;
         const dateRange = document.getElementById('dateRangeFilter').value;
         const testType = document.getElementById('testTypeFilter').value;
+        const qType = document.getElementById('queryTypeFilter').value;
         
         if (pcCode && test.PcCode !== pcCode) return false;
         if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
@@ -693,6 +712,7 @@
         if (testCategory && test.TestCategory !== testCategory) return false;
         if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
         if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
+        if (qType && queryType(test) !== qType) return false;
         
         if (dateRange) {
           const testDate = new Date(test.CreatedAt);
@@ -1190,14 +1210,6 @@
 
     function updateRAGOptimization() {
       const scored = filteredData.filter(t => t['WeightedScore-pct'] != null);
-
-      function queryType(t) {
-        const d = (t.TestDescription || t.TestCategory || '').toLowerCase();
-        if (d.includes('fact')) return 'fact';
-        if (d.includes('analysis')) return 'analysis';
-        if (d.includes('creative')) return 'creative';
-        return 'other';
-      }
 
       function shortCollection(name) {
         return (name || '').replace('Sample_', '');

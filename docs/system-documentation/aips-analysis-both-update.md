@@ -46,7 +46,7 @@ Focus only on the high-ROI items that require almost no new data work:
      - Median SimilarityScore ← add this  
    - Optional but cheap: sample size (n) and CV of duration.
 
-2. **Search × Score model combination breakdown table**  
+2. **Searchription × Score model combination breakdown table**  
    - Matrix or grouped table with every observed (`ModelName-search`, `ModelName-score`) pair.  
    - Metrics: median WeightedScore-pct, median SimilarityScore, median total duration, n.  
    - Visually distinguish same-model pairs (circularity risk) from cross-model pairs.  
