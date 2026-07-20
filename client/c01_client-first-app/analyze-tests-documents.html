@@ -213,6 +213,54 @@
       background: #3d3000 !important;
     }
 
+    .compare-selectors {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .compare-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 160px;
+    }
+
+    .compare-group label.group-label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-bottom: 0.2rem;
+    }
+
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      background: var(--card-bg);
+    }
+
+    .checkbox-list label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .compare-metric-label {
+      text-align: left !important;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
     .loading {
       text-align: center;
       padding: 2rem;
@@ -286,6 +334,7 @@
           <button class="tab-button" onclick="showTab('consistency')">Consistency</button>
           <button class="tab-button" onclick="showTab('chunks')">Chunks</button>
           <button class="tab-button" onclick="showTab('rag')">RAG Optimization</button>
+          <button class="tab-button" onclick="showTab('compare')">Compare</button>
         </div>
         
         <div id="leaderboard" class="tab-content active">
@@ -520,6 +569,27 @@
             </tbody>
           </table>
         </div>
+        <div id="compare" class="tab-content">
+          <h3>Comparison Analysis</h3>
+          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Select one or more values in each group. Each unique combination becomes a column. Leave a group unchecked to ignore that dimension.</p>
+          <div class="compare-selectors">
+            <div class="compare-group">
+              <label class="group-label">PC Code</label>
+              <div class="checkbox-list" id="comparePcCodes"></div>
+            </div>
+            <div class="compare-group">
+              <label class="group-label">Model</label>
+              <div class="checkbox-list" id="compareModels"></div>
+            </div>
+            <div class="compare-group">
+              <label class="group-label">Test Category</label>
+              <div class="checkbox-list" id="compareCategories"></div>
+            </div>
+          </div>
+          <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
+          <div id="compareResults" style="margin-top:1.5rem"></div>
+        </div>
+
       </div>
     </main>
   </div>
@@ -586,6 +656,14 @@
       const testCategoryFilter = document.getElementById('testCategoryFilter');
       testCategoryFilter.innerHTML = '<option value="">All Categories</option>' + 
         categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      // Populate compare checkboxes
+      document.getElementById('comparePcCodes').innerHTML = pcCodes.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareModels').innerHTML = models.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareCategories').innerHTML = categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
     }
     
     function loadAnalysis() {
@@ -1254,6 +1332,90 @@
           </tr>`;
         }).join('');
       document.querySelector('#searchScoreTable tbody').innerHTML = rows || '<tr><td colspan="9">No scored data available</td></tr>';
+    }
+
+    function runComparison() {
+      const checked = id => [...document.querySelectorAll(`#${id} input:checked`)].map(el => el.value);
+      const selPc = checked('comparePcCodes');
+      const selModels = checked('compareModels');
+      const selCats = checked('compareCategories');
+
+      if (!selPc.length && !selModels.length && !selCats.length) {
+        document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
+        return;
+      }
+
+      // Build group combinations: cartesian product of selected dimensions
+      function cartesian(...arrays) {
+        return arrays.reduce((acc, arr) =>
+          arr.length ? acc.flatMap(a => arr.map(b => [...a, b])) : acc,
+        [[]]);
+      }
+      const combos = cartesian(
+        selPc.length ? selPc : [null],
+        selModels.length ? selModels : [null],
+        selCats.length ? selCats : [null]
+      );
+
+      // For each combo, filter testData (not filteredData — compare is independent)
+      const avg = arr => arr.length ? (arr.reduce((s,v)=>s+v,0)/arr.length) : null;
+      const fmt = (v, suffix='') => v != null ? v.toFixed(1) + suffix : 'N/A';
+
+      const groups = combos.map(([pc, model, cat]) => {
+        const label = [pc, model, cat].filter(Boolean).join(' / ');
+        const subset = testData.filter(t =>
+          (pc == null || t.PcCode === pc) &&
+          (model == null || t['ModelName-search'] === model) &&
+          (cat == null || t.TestCategory === cat)
+        );
+        const scored = subset.filter(t => t['WeightedScore-pct'] != null);
+        return {
+          label,
+          n: subset.length,
+          avgScore: avg(scored.map(t => t['WeightedScore-pct'])),
+          avgAccuracy: avg(scored.map(t => t.AccurateScore).filter(v => v != null)),
+          avgRelevance: avg(scored.map(t => t.RelevantScore).filter(v => v != null)),
+          avgOrganization: avg(scored.map(t => t.OrganizedScore).filter(v => v != null)),
+          avgSimilarity: avg(scored.map(t => parseFloat(t.SimilarityScore)).filter(v => !isNaN(v))),
+          avgDuration: avg(subset.map(t => t['Duration-search-s']).filter(v => v != null)),
+          avgTokens: avg(subset.map(t => t['EvalTokensPerSecond-ssearch']).filter(v => v != null))
+        };
+      });
+
+      const metrics = [
+        { label: 'Avg Score', key: 'avgScore', suffix: '%', higherBetter: true },
+        { label: 'Accuracy', key: 'avgAccuracy', suffix: '', higherBetter: true },
+        { label: 'Relevance', key: 'avgRelevance', suffix: '', higherBetter: true },
+        { label: 'Organization', key: 'avgOrganization', suffix: '', higherBetter: true },
+        { label: 'Similarity', key: 'avgSimilarity', suffix: '%', higherBetter: true },
+        { label: 'Avg Duration', key: 'avgDuration', suffix: 's', higherBetter: false },
+        { label: 'Tokens/sec', key: 'avgTokens', suffix: '', higherBetter: true },
+        { label: 'Tests (n)', key: 'n', suffix: '', higherBetter: null }
+      ];
+
+      const colHeaders = groups.map(g => `<th>${g.label}</th>`).join('');
+      let html = `<div style="overflow-x:auto"><table class="comparison-table">
+        <thead><tr><th>Metric</th>${colHeaders}</tr></thead><tbody>`;
+
+      metrics.forEach(m => {
+        const vals = groups.map(g => m.key === 'n' ? g.n : g[m.key]);
+        const numericVals = vals.filter(v => v != null);
+        const best = numericVals.length ? (m.higherBetter ? Math.max(...numericVals) : Math.min(...numericVals)) : null;
+        const worst = numericVals.length > 1 ? (m.higherBetter ? Math.min(...numericVals) : Math.max(...numericVals)) : null;
+        const cells = vals.map(v => {
+          const display = m.key === 'n' ? v : fmt(v, m.suffix);
+          let cls = '';
+          if (m.higherBetter !== null && v != null) {
+            if (v === best) cls = 'best-score';
+            else if (v === worst) cls = 'worst-score';
+          }
+          return `<td class="${cls}">${display}</td>`;
+        }).join('');
+        html += `<tr><td class="compare-metric-label">${m.label}</td>${cells}</tr>`;
+      });
+
+      html += '</tbody></table></div>';
+      document.getElementById('compareResults').innerHTML = html;
     }
 
     function showTab(tabName) {
