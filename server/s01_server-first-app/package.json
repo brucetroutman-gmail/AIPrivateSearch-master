@@ -1,6 +1,6 @@
 {
   "name": "ai-search-score-server",
-  "version": "21.14",
+  "version": "21.15",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
