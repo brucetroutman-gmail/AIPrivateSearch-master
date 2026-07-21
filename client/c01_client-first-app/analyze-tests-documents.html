@@ -595,6 +595,10 @@
                 <label><input type="checkbox" value="other"> Other</label>
               </div>
             </div>
+            <div class="compare-group">
+              <label class="group-label">Test</label>
+              <div class="checkbox-list" id="compareTests"></div>
+            </div>
           </div>
           <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
           <div id="compareResults" style="margin-top:1.5rem"></div>
@@ -674,6 +678,9 @@
       document.getElementById('compareModels').innerHTML = models.map(v =>
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
       document.getElementById('compareCategories').innerHTML = categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      const testDescs = [...new Set(testData.map(t => t.TestDescription).filter(Boolean))].sort();
+      document.getElementById('compareTests').innerHTML = testDescs.map(v =>
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
     }
     
@@ -1353,8 +1360,9 @@
       const selModels = checked('compareModels');
       const selCats = checked('compareCategories');
       const selQTypes = checked('compareQueryTypes');
+      const selTests = checked('compareTests');
 
-      if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length) {
+      if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
         document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
         document.getElementById('compareAnswers').innerHTML = '';
         return;
@@ -1369,19 +1377,21 @@
         selPc.length ? selPc : [null],
         selModels.length ? selModels : [null],
         selCats.length ? selCats : [null],
-        selQTypes.length ? selQTypes : [null]
+        selQTypes.length ? selQTypes : [null],
+        selTests.length ? selTests : [null]
       );
 
       const avg = arr => arr.length ? (arr.reduce((s,v)=>s+v,0)/arr.length) : null;
       const fmt = (v, suffix='') => v != null ? v.toFixed(1) + suffix : 'N/A';
 
-      const groups = combos.map(([pc, model, cat, qtype]) => {
-        const label = [pc, model, cat, qtype].filter(Boolean).join(' / ');
+      const groups = combos.map(([pc, model, cat, qtype, test]) => {
+        const label = [pc, model, cat, qtype, test].filter(Boolean).join(' / ');
         const subset = testData.filter(t =>
           (pc == null || t.PcCode === pc) &&
           (model == null || t['ModelName-search'] === model) &&
           (cat == null || t.TestCategory === cat) &&
-          (qtype == null || queryType(t) === qtype)
+          (qtype == null || queryType(t) === qtype) &&
+          (test == null || t.TestDescription === test)
         );
         const scored = subset.filter(t => t['WeightedScore-pct'] != null);
         return {
