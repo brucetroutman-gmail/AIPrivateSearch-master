@@ -1809,13 +1809,13 @@ mark.search-highlight,
 }
 
 [data-theme="dark"] .best-score {
-  background: #eafaf1 !important;
-  color: #1a5c35 !important;
+  background: #1a3d2b !important;
+  color: #ffffff !important;
 }
 
 [data-theme="dark"] .worst-score {
-  background: #fde8e8 !important;
-  color: #7b1c1c !important;
+  background: #3d1a1a !important;
+  color: #ffffff !important;
 }
 
 /* Shared success/error status and message classes */
@@ -1848,18 +1848,18 @@ mark.search-highlight,
 [data-theme="dark"] .message-success,
 [data-theme="dark"] .result-msg.success,
 [data-theme="dark"] .log-item.success {
-  background: #eafaf1;
-  color: #1a5c35;
-  border-color: #a3d9b1;
+  background: #1a3d2b;
+  color: #ffffff;
+  border-color: #2d6a4a;
 }
 
 [data-theme="dark"] .status-error,
 [data-theme="dark"] .message-error,
 [data-theme="dark"] .result-msg.error,
 [data-theme="dark"] .log-item.error {
-  background: #fde8e8;
-  color: #7b1c1c;
-  border-color: #f5a5a5;
+  background: #3d1a1a;
+  color: #ffffff;
+  border-color: #6a2d2d;
 }
 
 /* search-logs status badges */
@@ -1874,11 +1874,11 @@ mark.search-highlight,
 }
 
 [data-theme="dark"] .status-success-badge {
-  background: #eafaf1;
-  color: #1a5c35;
+  background: #1a3d2b;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .status-error-badge {
-  background: #fde8e8;
-  color: #7b1c1c;
+  background: #3d1a1a;
+  color: #ffffff;
 }
