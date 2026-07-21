@@ -586,9 +586,19 @@
               <label class="group-label">Test Category</label>
               <div class="checkbox-list" id="compareCategories"></div>
             </div>
+            <div class="compare-group">
+              <label class="group-label">Query Type</label>
+              <div class="checkbox-list" id="compareQueryTypes">
+                <label><input type="checkbox" value="fact"> Fact</label>
+                <label><input type="checkbox" value="analysis"> Analysis</label>
+                <label><input type="checkbox" value="creative"> Creative</label>
+                <label><input type="checkbox" value="other"> Other</label>
+              </div>
+            </div>
           </div>
           <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
           <div id="compareResults" style="margin-top:1.5rem"></div>
+          <div id="compareAnswers" style="margin-top:1.5rem"></div>
         </div>
 
       </div>
@@ -1342,13 +1352,14 @@
       const selPc = checked('comparePcCodes');
       const selModels = checked('compareModels');
       const selCats = checked('compareCategories');
+      const selQTypes = checked('compareQueryTypes');
 
-      if (!selPc.length && !selModels.length && !selCats.length) {
+      if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length) {
         document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
+        document.getElementById('compareAnswers').innerHTML = '';
         return;
       }
 
-      // Build group combinations: cartesian product of selected dimensions
       function cartesian(...arrays) {
         return arrays.reduce((acc, arr) =>
           arr.length ? acc.flatMap(a => arr.map(b => [...a, b])) : acc,
@@ -1357,24 +1368,26 @@
       const combos = cartesian(
         selPc.length ? selPc : [null],
         selModels.length ? selModels : [null],
-        selCats.length ? selCats : [null]
+        selCats.length ? selCats : [null],
+        selQTypes.length ? selQTypes : [null]
       );
 
-      // For each combo, filter testData (not filteredData — compare is independent)
       const avg = arr => arr.length ? (arr.reduce((s,v)=>s+v,0)/arr.length) : null;
       const fmt = (v, suffix='') => v != null ? v.toFixed(1) + suffix : 'N/A';
 
-      const groups = combos.map(([pc, model, cat]) => {
-        const label = [pc, model, cat].filter(Boolean).join(' / ');
+      const groups = combos.map(([pc, model, cat, qtype]) => {
+        const label = [pc, model, cat, qtype].filter(Boolean).join(' / ');
         const subset = testData.filter(t =>
           (pc == null || t.PcCode === pc) &&
           (model == null || t['ModelName-search'] === model) &&
-          (cat == null || t.TestCategory === cat)
+          (cat == null || t.TestCategory === cat) &&
+          (qtype == null || queryType(t) === qtype)
         );
         const scored = subset.filter(t => t['WeightedScore-pct'] != null);
         return {
           label,
           n: subset.length,
+          subset,
           avgScore: avg(scored.map(t => t['WeightedScore-pct'])),
           avgAccuracy: avg(scored.map(t => t.AccurateScore).filter(v => v != null)),
           avgRelevance: avg(scored.map(t => t.RelevantScore).filter(v => v != null)),
@@ -1419,6 +1432,35 @@
 
       html += '</tbody></table></div>';
       document.getElementById('compareResults').innerHTML = html;
+
+      // Answers section
+      const withAnswers = groups.filter(g => g.subset.some(t => t['Answer-search']));
+      if (!withAnswers.length) {
+        document.getElementById('compareAnswers').innerHTML = '';
+        return;
+      }
+
+      let aHtml = '<h4 style="margin-top:1.5rem">Answer-Search Comparison</h4>';
+      groups.forEach((g, gi) => {
+        const tests = g.subset.filter(t => t['Answer-search']);
+        if (!tests.length) return;
+        aHtml += `<div style="margin-bottom:1.5rem;border:1px solid var(--border-color);border-radius:6px;overflow:hidden">`;
+        aHtml += `<div style="background:var(--bg-color);padding:0.6rem 1rem;font-weight:bold;border-bottom:1px solid var(--border-color)">${g.label} — ${tests.length} answer(s)</div>`;
+        tests.forEach((t, ti) => {
+          const score = t['WeightedScore-pct'] != null ? `${t['WeightedScore-pct']}%` : '-';
+          const uid = `ans_${gi}_${ti}`;
+          aHtml += `
+            <div style="padding:0.6rem 1rem;border-bottom:1px solid var(--border-color)">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
+                <span style="font-size:0.85rem"><strong>${t.TestCode || '-'}</strong> &nbsp;|&nbsp; ${t['ModelName-search'] || '-'} &nbsp;|&nbsp; ${t.TestCategory || '-'} &nbsp;|&nbsp; Score: ${score}</span>
+                <button onclick="document.getElementById('${uid}').style.display=document.getElementById('${uid}').style.display==='none'?'block':'none'" style="padding:0.2rem 0.6rem;white-space:nowrap">View Answer</button>
+              </div>
+              <div id="${uid}" style="display:none;margin-top:0.6rem;padding:0.75rem;background:var(--bg-color);border-radius:4px;white-space:pre-wrap;font-size:0.85rem;line-height:1.5">${(t['Answer-search'] || '').replace(/</g,'&lt;')}</div>
+            </div>`;
+        });
+        aHtml += '</div>';
+      });
+      document.getElementById('compareAnswers').innerHTML = aHtml;
     }
 
     function runCssDebug() {
