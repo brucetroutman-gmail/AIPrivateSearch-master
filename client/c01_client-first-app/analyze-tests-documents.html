@@ -312,6 +312,17 @@
           </div>
         </div>
         <button onclick="loadAnalysis()" class="update-analysis-btn">Update Analysis</button>
+        <div id="cssDebugPanel" style="margin-top:1rem;padding:0.75rem;border:2px dashed orange;border-radius:4px;font-size:0.85rem">
+          <strong>CSS Debug:</strong>
+          <span id="debugBestBg"></span> | <span id="debugWorstBg"></span>
+          <span id="debugStylesheet"></span>
+          <div style="margin-top:0.5rem;display:flex;gap:1rem">
+            <span id="debugBestSwatch" class="best-score" style="padding:0.3rem 0.8rem">best-score sample</span>
+            <span id="debugWorstSwatch" class="worst-score" style="padding:0.3rem 0.8rem">worst-score sample</span>
+          </div>
+          <button onclick="runCssDebug()" style="margin-top:0.5rem;padding:0.2rem 0.6rem">Inspect</button>
+          <button onclick="document.getElementById('cssDebugPanel').style.display='none'" style="margin-top:0.5rem;padding:0.2rem 0.6rem">Hide</button>
+        </div>
       </div>
       
       <div class="analyze-section">
@@ -1408,6 +1419,54 @@
 
       html += '</tbody></table></div>';
       document.getElementById('compareResults').innerHTML = html;
+    }
+
+    function runCssDebug() {
+      const best = document.getElementById('debugBestSwatch');
+      const worst = document.getElementById('debugWorstSwatch');
+      const bestStyle = getComputedStyle(best);
+      const worstStyle = getComputedStyle(worst);
+      document.getElementById('debugBestBg').textContent = `best-score bg: ${bestStyle.backgroundColor}, color: ${bestStyle.color}`;
+      document.getElementById('debugWorstBg').textContent = `worst-score bg: ${worstStyle.backgroundColor}, color: ${worstStyle.color}`;
+
+      // Check which stylesheet is defining these rules
+      const sheets = [...document.styleSheets];
+      const matches = [];
+      sheets.forEach(sheet => {
+        try {
+          const rules = [...sheet.cssRules];
+          rules.forEach(rule => {
+            if (rule.selectorText && (rule.selectorText.includes('best-score') || rule.selectorText.includes('worst-score'))) {
+              matches.push(`[${sheet.href ? sheet.href.split('/').pop() : 'inline'}] ${rule.selectorText}: bg=${rule.style.background || rule.style.backgroundColor}`);
+            }
+          });
+        } catch(e) { /* cross-origin */ }
+      });
+      document.getElementById('debugStylesheet').innerHTML = '<br>' + matches.join('<br>');
+    }
+
+    function runCssDebug() {
+      const best = document.getElementById('debugBestSwatch');
+      const worst = document.getElementById('debugWorstSwatch');
+      const bestStyle = getComputedStyle(best);
+      const worstStyle = getComputedStyle(worst);
+      document.getElementById('debugBestBg').textContent = `best-score bg: ${bestStyle.backgroundColor}, color: ${bestStyle.color}`;
+      document.getElementById('debugWorstBg').textContent = `worst-score bg: ${worstStyle.backgroundColor}, color: ${worstStyle.color}`;
+
+      // Check which stylesheet is defining these rules
+      const sheets = [...document.styleSheets];
+      const matches = [];
+      sheets.forEach(sheet => {
+        try {
+          const rules = [...sheet.cssRules];
+          rules.forEach(rule => {
+            if (rule.selectorText && (rule.selectorText.includes('best-score') || rule.selectorText.includes('worst-score'))) {
+              matches.push(`[${sheet.href ? sheet.href.split('/').pop() : 'inline'}] ${rule.selectorText}: bg=${rule.style.background || rule.style.backgroundColor}`);
+            }
+          });
+        } catch(e) { /* cross-origin */ }
+      });
+      document.getElementById('debugStylesheet').innerHTML = '<br>' + (matches.length ? matches.join('<br>') : 'No matching rules found');
     }
 
     function showTab(tabName) {
