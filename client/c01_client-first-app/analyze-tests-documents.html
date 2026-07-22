@@ -597,7 +597,33 @@
             </div>
             <div class="compare-group">
               <label class="group-label">Test</label>
-              <div class="checkbox-list" id="compareTests"></div>
+              <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
+              <div class="checkbox-list" id="compareTests-email">
+                <label><input type="checkbox" data-test-group="email" value="Find emails about parts orders"> E1</label>
+                <label><input type="checkbox" data-test-group="email" value="What parts were ordered from the supplier?"> E2</label>
+                <label><input type="checkbox" data-test-group="email" value="What is the main business relationship described in these emails?"> E3</label>
+                <label><input type="checkbox" data-test-group="email" value="Find emails about monthly reports"> E4</label>
+              </div>
+              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
+              <div class="checkbox-list" id="compareTests-federalist">
+                <label><input type="checkbox" data-test-group="federalist" value="What arguments does Hamilton make for a strong central government?"> F1</label>
+                <label><input type="checkbox" data-test-group="federalist" value="Compare the arguments for Union vs arguments against it in these papers"> F2</label>
+                <label><input type="checkbox" data-test-group="federalist" value="Summarize the main themes of the Federalist Papers"> F3</label>
+              </div>
+              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
+              <div class="checkbox-list" id="compareTests-legal">
+                <label><input type="checkbox" data-test-group="legal" value="Which clients have durable power of attorney documents?"> L1</label>
+                <label><input type="checkbox" data-test-group="legal" value="Show upcoming appointments"> L2</label>
+                <label><input type="checkbox" data-test-group="legal" value="What are the most common types of estate planning documents in this collection?"> L3</label>
+              </div>
+              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
+              <div class="checkbox-list" id="compareTests-medical">
+                <label><input type="checkbox" data-test-group="medical" value="Find patients with diabetes"> M1</label>
+                <label><input type="checkbox" data-test-group="medical" value="What medications is William Adams taking?"> M2</label>
+                <label><input type="checkbox" data-test-group="medical" value="Find all patients with cancer"> M3</label>
+                <label><input type="checkbox" data-test-group="medical" value="Compare treatment approaches for hip vs knee replacement patients"> M4</label>
+                <label><input type="checkbox" data-test-group="medical" value="Summarize the types of conditions treated at this practice"> M5</label>
+              </div>
             </div>
           </div>
           <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
@@ -679,9 +705,29 @@
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
       document.getElementById('compareCategories').innerHTML = categories.map(v =>
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-      const testDescs = [...new Set(testData.map(t => t.TestDescription).filter(Boolean))].sort();
-      document.getElementById('compareTests').innerHTML = testDescs.map(v =>
-        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      // Query type → test mapping
+      const qTypeTests = {
+        fact: ['Find emails about parts orders','What parts were ordered from the supplier?','Find emails about monthly reports','What arguments does Hamilton make for a strong central government?','Which clients have durable power of attorney documents?','Show upcoming appointments','Find patients with diabetes','What medications is William Adams taking?','Find all patients with cancer'],
+        analysis: ['What is the main business relationship described in these emails?','Compare the arguments for Union vs arguments against it in these papers','What are the most common types of estate planning documents in this collection?','Compare treatment approaches for hip vs knee replacement patients'],
+        creative: ['Summarize the main themes of the Federalist Papers','Summarize the types of conditions treated at this practice']
+      };
+      // When a query type is checked, select matching tests and uncheck all others
+      document.querySelectorAll('#compareQueryTypes input').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const selected = [...document.querySelectorAll('#compareQueryTypes input:checked')].map(el => el.value);
+          const toCheck = new Set(selected.flatMap(qt => qTypeTests[qt] || []));
+          document.querySelectorAll('[data-test-group]').forEach(t => { t.checked = toCheck.has(t.value); });
+        });
+      });
+      // Test group mutual exclusion: checking in one group unchecks all others
+      document.querySelectorAll('[data-test-group]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          if (cb.checked) {
+            document.querySelectorAll(`[data-test-group]:not([data-test-group="${cb.dataset.testGroup}"])`)
+              .forEach(other => { other.checked = false; });
+          }
+        });
+      });
     }
     
     function loadAnalysis() {
@@ -1360,7 +1406,7 @@
       const selModels = checked('compareModels');
       const selCats = checked('compareCategories');
       const selQTypes = checked('compareQueryTypes');
-      const selTests = checked('compareTests');
+      const selTests = [...document.querySelectorAll('[data-test-group]:checked')].map(el => el.value);
 
       if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
         document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
