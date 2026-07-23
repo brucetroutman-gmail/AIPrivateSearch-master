@@ -193,54 +193,6 @@
       background: #3d3000 !important;
     }
 
-    .compare-selectors {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .compare-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      min-width: 160px;
-    }
-
-    .compare-group label.group-label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text-color);
-      margin-bottom: 0.2rem;
-    }
-
-    .checkbox-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.4rem 0.6rem;
-      background: var(--card-bg);
-    }
-
-    .checkbox-list label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      color: var(--text-color);
-    }
-
-    .compare-metric-label {
-      text-align: left !important;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
     .loading {
       text-align: center;
       padding: 2rem;
@@ -312,17 +264,7 @@
           </div>
         </div>
         <button onclick="loadAnalysis()" class="update-analysis-btn">Update Analysis</button>
-        <div id="cssDebugPanel" style="margin-top:1rem;padding:0.75rem;border:2px dashed orange;border-radius:4px;font-size:0.85rem">
-          <strong>CSS Debug:</strong>
-          <span id="debugBestBg"></span> | <span id="debugWorstBg"></span>
-          <span id="debugStylesheet"></span>
-          <div style="margin-top:0.5rem;display:flex;gap:1rem">
-            <span id="debugBestSwatch" class="best-score" style="padding:0.3rem 0.8rem">best-score sample</span>
-            <span id="debugWorstSwatch" class="worst-score" style="padding:0.3rem 0.8rem">worst-score sample</span>
-          </div>
-          <button onclick="runCssDebug()" style="margin-top:0.5rem;padding:0.2rem 0.6rem">Inspect</button>
-          <button onclick="document.getElementById('cssDebugPanel').style.display='none'" style="margin-top:0.5rem;padding:0.2rem 0.6rem">Hide</button>
-        </div>
+
       </div>
       
       <div class="analyze-section">
@@ -335,7 +277,6 @@
           <button class="tab-button" onclick="showTab('consistency')">Consistency</button>
           <button class="tab-button" onclick="showTab('chunks')">Chunks</button>
           <button class="tab-button" onclick="showTab('rag')">RAG Optimization</button>
-          <button class="tab-button" onclick="showTab('compare')">Compare</button>
         </div>
         
         <div id="leaderboard" class="tab-content active">
@@ -570,67 +511,6 @@
             </tbody>
           </table>
         </div>
-        <div id="compare" class="tab-content">
-          <h3>Comparison Analysis</h3>
-          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Select one or more values in each group. Each unique combination becomes a column. Leave a group unchecked to ignore that dimension.</p>
-          <div class="compare-selectors">
-            <div class="compare-group">
-              <label class="group-label">PC Code</label>
-              <div class="checkbox-list" id="comparePcCodes"></div>
-            </div>
-            <div class="compare-group">
-              <label class="group-label">Model</label>
-              <div class="checkbox-list" id="compareModels"></div>
-            </div>
-            <div class="compare-group">
-              <label class="group-label">Test Category</label>
-              <div class="checkbox-list" id="compareCategories"></div>
-            </div>
-            <div class="compare-group">
-              <label class="group-label">Query Type</label>
-              <div class="checkbox-list" id="compareQueryTypes">
-                <label><input type="checkbox" value="fact"> Fact</label>
-                <label><input type="checkbox" value="analysis"> Analysis</label>
-                <label><input type="checkbox" value="creative"> Creative</label>
-                <label><input type="checkbox" value="other"> Other</label>
-              </div>
-            </div>
-            <div class="compare-group">
-              <label class="group-label">Test</label>
-              <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
-              <div class="checkbox-list" id="compareTests-email">
-                <label><input type="checkbox" data-test-group="email" value="Find emails about parts orders"> E1</label>
-                <label><input type="checkbox" data-test-group="email" value="What parts were ordered from the supplier?"> E2</label>
-                <label><input type="checkbox" data-test-group="email" value="What is the main business relationship described in these emails?"> E3</label>
-                <label><input type="checkbox" data-test-group="email" value="Find emails about monthly reports"> E4</label>
-              </div>
-              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
-              <div class="checkbox-list" id="compareTests-federalist">
-                <label><input type="checkbox" data-test-group="federalist" value="What arguments does Hamilton make for a strong central government?"> F1</label>
-                <label><input type="checkbox" data-test-group="federalist" value="Compare the arguments for Union vs arguments against it in these papers"> F2</label>
-                <label><input type="checkbox" data-test-group="federalist" value="Summarize the main themes of the Federalist Papers"> F3</label>
-              </div>
-              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
-              <div class="checkbox-list" id="compareTests-legal">
-                <label><input type="checkbox" data-test-group="legal" value="Which clients have durable power of attorney documents?"> L1</label>
-                <label><input type="checkbox" data-test-group="legal" value="Show upcoming appointments"> L2</label>
-                <label><input type="checkbox" data-test-group="legal" value="What are the most common types of estate planning documents in this collection?"> L3</label>
-              </div>
-              <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
-              <div class="checkbox-list" id="compareTests-medical">
-                <label><input type="checkbox" data-test-group="medical" value="Find patients with diabetes"> M1</label>
-                <label><input type="checkbox" data-test-group="medical" value="What medications is William Adams taking?"> M2</label>
-                <label><input type="checkbox" data-test-group="medical" value="Find all patients with cancer"> M3</label>
-                <label><input type="checkbox" data-test-group="medical" value="Compare treatment approaches for hip vs knee replacement patients"> M4</label>
-                <label><input type="checkbox" data-test-group="medical" value="Summarize the types of conditions treated at this practice"> M5</label>
-              </div>
-            </div>
-          </div>
-          <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
-          <div id="compareResults" style="margin-top:1.5rem"></div>
-          <div id="compareAnswers" style="margin-top:1.5rem"></div>
-        </div>
-
       </div>
     </main>
   </div>
@@ -698,36 +578,6 @@
       testCategoryFilter.innerHTML = '<option value="">All Categories</option>' + 
         categories.map(c => `<option value="${c}">${c}</option>`).join('');
 
-      // Populate compare checkboxes
-      document.getElementById('comparePcCodes').innerHTML = pcCodes.map(v =>
-        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-      document.getElementById('compareModels').innerHTML = models.map(v =>
-        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-      document.getElementById('compareCategories').innerHTML = categories.map(v =>
-        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-      // Query type → test mapping
-      const qTypeTests = {
-        fact: ['Find emails about parts orders','What parts were ordered from the supplier?','Find emails about monthly reports','What arguments does Hamilton make for a strong central government?','Which clients have durable power of attorney documents?','Show upcoming appointments','Find patients with diabetes','What medications is William Adams taking?','Find all patients with cancer'],
-        analysis: ['What is the main business relationship described in these emails?','Compare the arguments for Union vs arguments against it in these papers','What are the most common types of estate planning documents in this collection?','Compare treatment approaches for hip vs knee replacement patients'],
-        creative: ['Summarize the main themes of the Federalist Papers','Summarize the types of conditions treated at this practice']
-      };
-      // When a query type is checked, select matching tests and uncheck all others
-      document.querySelectorAll('#compareQueryTypes input').forEach(cb => {
-        cb.addEventListener('change', () => {
-          const selected = [...document.querySelectorAll('#compareQueryTypes input:checked')].map(el => el.value);
-          const toCheck = new Set(selected.flatMap(qt => qTypeTests[qt] || []));
-          document.querySelectorAll('[data-test-group]').forEach(t => { t.checked = toCheck.has(t.value); });
-        });
-      });
-      // Test group mutual exclusion: checking in one group unchecks all others
-      document.querySelectorAll('[data-test-group]').forEach(cb => {
-        cb.addEventListener('change', () => {
-          if (cb.checked) {
-            document.querySelectorAll(`[data-test-group]:not([data-test-group="${cb.dataset.testGroup}"])`)
-              .forEach(other => { other.checked = false; });
-          }
-        });
-      });
     }
     
     function loadAnalysis() {
@@ -1398,173 +1248,6 @@
           </tr>`;
         }).join('');
       document.querySelector('#searchScoreTable tbody').innerHTML = rows || '<tr><td colspan="9">No scored data available</td></tr>';
-    }
-
-    function runComparison() {
-      const checked = id => [...document.querySelectorAll(`#${id} input:checked`)].map(el => el.value);
-      const selPc = checked('comparePcCodes');
-      const selModels = checked('compareModels');
-      const selCats = checked('compareCategories');
-      const selQTypes = checked('compareQueryTypes');
-      const selTests = [...document.querySelectorAll('[data-test-group]:checked')].map(el => el.value);
-
-      if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
-        document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
-        document.getElementById('compareAnswers').innerHTML = '';
-        return;
-      }
-
-      function cartesian(...arrays) {
-        return arrays.reduce((acc, arr) =>
-          arr.length ? acc.flatMap(a => arr.map(b => [...a, b])) : acc,
-        [[]]);
-      }
-      const combos = cartesian(
-        selPc.length ? selPc : [null],
-        selModels.length ? selModels : [null],
-        selCats.length ? selCats : [null],
-        selQTypes.length ? selQTypes : [null],
-        selTests.length ? selTests : [null]
-      );
-
-      const avg = arr => arr.length ? (arr.reduce((s,v)=>s+v,0)/arr.length) : null;
-      const fmt = (v, suffix='') => v != null ? v.toFixed(1) + suffix : 'N/A';
-
-      const groups = combos.map(([pc, model, cat, qtype, test]) => {
-        const label = [pc, model, cat, qtype, test].filter(Boolean).join(' / ');
-        const subset = testData.filter(t =>
-          (pc == null || t.PcCode === pc) &&
-          (model == null || t['ModelName-search'] === model) &&
-          (cat == null || t.TestCategory === cat) &&
-          (qtype == null || queryType(t) === qtype) &&
-          (test == null || t.TestDescription === test)
-        );
-        const scored = subset.filter(t => t['WeightedScore-pct'] != null);
-        return {
-          label,
-          n: subset.length,
-          subset,
-          avgScore: avg(scored.map(t => t['WeightedScore-pct'])),
-          avgAccuracy: avg(scored.map(t => t.AccurateScore).filter(v => v != null)),
-          avgRelevance: avg(scored.map(t => t.RelevantScore).filter(v => v != null)),
-          avgOrganization: avg(scored.map(t => t.OrganizedScore).filter(v => v != null)),
-          avgSimilarity: avg(scored.map(t => parseFloat(t.SimilarityScore)).filter(v => !isNaN(v))),
-          avgDuration: avg(subset.map(t => t['Duration-search-s']).filter(v => v != null)),
-          avgTokens: avg(subset.map(t => t['EvalTokensPerSecond-ssearch']).filter(v => v != null))
-        };
-      });
-
-      const metrics = [
-        { label: 'Avg Score', key: 'avgScore', suffix: '%', higherBetter: true },
-        { label: 'Accuracy', key: 'avgAccuracy', suffix: '', higherBetter: true },
-        { label: 'Relevance', key: 'avgRelevance', suffix: '', higherBetter: true },
-        { label: 'Organization', key: 'avgOrganization', suffix: '', higherBetter: true },
-        { label: 'Similarity', key: 'avgSimilarity', suffix: '%', higherBetter: true },
-        { label: 'Avg Duration', key: 'avgDuration', suffix: 's', higherBetter: false },
-        { label: 'Tokens/sec', key: 'avgTokens', suffix: '', higherBetter: true },
-        { label: 'Tests (n)', key: 'n', suffix: '', higherBetter: null }
-      ];
-
-      const colHeaders = groups.map(g => `<th>${g.label}</th>`).join('');
-      let html = `<div style="overflow-x:auto"><table class="comparison-table">
-        <thead><tr><th>Metric</th>${colHeaders}</tr></thead><tbody>`;
-
-      metrics.forEach(m => {
-        const vals = groups.map(g => m.key === 'n' ? g.n : g[m.key]);
-        const numericVals = vals.filter(v => v != null);
-        const best = numericVals.length ? (m.higherBetter ? Math.max(...numericVals) : Math.min(...numericVals)) : null;
-        const worst = numericVals.length > 1 ? (m.higherBetter ? Math.min(...numericVals) : Math.max(...numericVals)) : null;
-        const cells = vals.map(v => {
-          const display = m.key === 'n' ? v : fmt(v, m.suffix);
-          let cls = '';
-          if (m.higherBetter !== null && v != null) {
-            if (v === best) cls = 'best-score';
-            else if (v === worst) cls = 'worst-score';
-          }
-          return `<td class="${cls}">${display}</td>`;
-        }).join('');
-        html += `<tr><td class="compare-metric-label">${m.label}</td>${cells}</tr>`;
-      });
-
-      html += '</tbody></table></div>';
-      document.getElementById('compareResults').innerHTML = html;
-
-      // Answers section
-      const withAnswers = groups.filter(g => g.subset.some(t => t['Answer-search']));
-      if (!withAnswers.length) {
-        document.getElementById('compareAnswers').innerHTML = '';
-        return;
-      }
-
-      let aHtml = '<h4 style="margin-top:1.5rem">Answer-Search Comparison</h4>';
-      groups.forEach((g, gi) => {
-        const tests = g.subset.filter(t => t['Answer-search']);
-        if (!tests.length) return;
-        aHtml += `<div style="margin-bottom:1.5rem;border:1px solid var(--border-color);border-radius:6px;overflow:hidden">`;
-        aHtml += `<div style="background:var(--bg-color);padding:0.6rem 1rem;font-weight:bold;border-bottom:1px solid var(--border-color)">${g.label} — ${tests.length} answer(s)</div>`;
-        tests.forEach((t, ti) => {
-          const score = t['WeightedScore-pct'] != null ? `${t['WeightedScore-pct']}%` : '-';
-          const uid = `ans_${gi}_${ti}`;
-          aHtml += `
-            <div style="padding:0.6rem 1rem;border-bottom:1px solid var(--border-color)">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-                <span style="font-size:0.85rem"><strong>${t.TestCode || '-'}</strong> &nbsp;|&nbsp; ${t['ModelName-search'] || '-'} &nbsp;|&nbsp; ${t.TestCategory || '-'} &nbsp;|&nbsp; Score: ${score}</span>
-                <button onclick="document.getElementById('${uid}').style.display=document.getElementById('${uid}').style.display==='none'?'block':'none'" style="padding:0.2rem 0.6rem;white-space:nowrap">View Answer</button>
-              </div>
-              <div id="${uid}" style="display:none;margin-top:0.6rem;padding:0.75rem;background:var(--bg-color);border-radius:4px;white-space:pre-wrap;font-size:0.85rem;line-height:1.5">${(t['Answer-search'] || '').replace(/</g,'&lt;')}</div>
-            </div>`;
-        });
-        aHtml += '</div>';
-      });
-      document.getElementById('compareAnswers').innerHTML = aHtml;
-    }
-
-    function runCssDebug() {
-      const best = document.getElementById('debugBestSwatch');
-      const worst = document.getElementById('debugWorstSwatch');
-      const bestStyle = getComputedStyle(best);
-      const worstStyle = getComputedStyle(worst);
-      document.getElementById('debugBestBg').textContent = `best-score bg: ${bestStyle.backgroundColor}, color: ${bestStyle.color}`;
-      document.getElementById('debugWorstBg').textContent = `worst-score bg: ${worstStyle.backgroundColor}, color: ${worstStyle.color}`;
-
-      // Check which stylesheet is defining these rules
-      const sheets = [...document.styleSheets];
-      const matches = [];
-      sheets.forEach(sheet => {
-        try {
-          const rules = [...sheet.cssRules];
-          rules.forEach(rule => {
-            if (rule.selectorText && (rule.selectorText.includes('best-score') || rule.selectorText.includes('worst-score'))) {
-              matches.push(`[${sheet.href ? sheet.href.split('/').pop() : 'inline'}] ${rule.selectorText}: bg=${rule.style.background || rule.style.backgroundColor}`);
-            }
-          });
-        } catch(e) { /* cross-origin */ }
-      });
-      document.getElementById('debugStylesheet').innerHTML = '<br>' + matches.join('<br>');
-    }
-
-    function runCssDebug() {
-      const best = document.getElementById('debugBestSwatch');
-      const worst = document.getElementById('debugWorstSwatch');
-      const bestStyle = getComputedStyle(best);
-      const worstStyle = getComputedStyle(worst);
-      document.getElementById('debugBestBg').textContent = `best-score bg: ${bestStyle.backgroundColor}, color: ${bestStyle.color}`;
-      document.getElementById('debugWorstBg').textContent = `worst-score bg: ${worstStyle.backgroundColor}, color: ${worstStyle.color}`;
-
-      // Check which stylesheet is defining these rules
-      const sheets = [...document.styleSheets];
-      const matches = [];
-      sheets.forEach(sheet => {
-        try {
-          const rules = [...sheet.cssRules];
-          rules.forEach(rule => {
-            if (rule.selectorText && (rule.selectorText.includes('best-score') || rule.selectorText.includes('worst-score'))) {
-              matches.push(`[${sheet.href ? sheet.href.split('/').pop() : 'inline'}] ${rule.selectorText}: bg=${rule.style.background || rule.style.backgroundColor}`);
-            }
-          });
-        } catch(e) { /* cross-origin */ }
-      });
-      document.getElementById('debugStylesheet').innerHTML = '<br>' + (matches.length ? matches.join('<br>') : 'No matching rules found');
     }
 
     function showTab(tabName) {
