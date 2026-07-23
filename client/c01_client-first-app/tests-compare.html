@@ -31,33 +31,6 @@
       box-shadow: 0 2px 10px var(--shadow);
     }
 
-    .filters {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .filter-group label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-
-    .filter-group select {
-      padding: 0.4rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: var(--card-bg);
-      color: var(--text-color);
-    }
-
     .comparison-table {
       width: 100%;
       border-collapse: collapse;
@@ -154,56 +127,6 @@
       <p>Select dimensions to compare. Each unique combination becomes a column in the results table.</p>
 
       <div class="analyze-section">
-        <h2>Filters</h2>
-        <div class="filters">
-          <div class="filter-group">
-            <label>PC Code:</label>
-            <select id="pcCodeFilter"><option value="">All PC Codes</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Model:</label>
-            <select id="modelFilter"><option value="">All Models</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Collection:</label>
-            <select id="collectionFilter"><option value="">All Collections</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Test Category:</label>
-            <select id="testCategoryFilter"><option value="">All Categories</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Date Range:</label>
-            <select id="dateRangeFilter">
-              <option value="">All Dates</option>
-              <option value="today">Today</option>
-              <option value="week">Last 7 Days</option>
-              <option value="month">Last 30 Days</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Test Type:</label>
-            <select id="testTypeFilter">
-              <option value="">All Tests</option>
-              <option value="scoring">Scoring Only</option>
-              <option value="no-scoring">No Scoring Only</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Query Type:</label>
-            <select id="queryTypeFilter">
-              <option value="">All Query Types</option>
-              <option value="fact">Fact</option>
-              <option value="analysis">Analysis</option>
-              <option value="creative">Creative</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        <button onclick="applyFilters()" class="update-analysis-btn">Update Filters</button>
-      </div>
-
-      <div class="analyze-section">
         <h2>Comparison Analysis</h2>
         <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Select one or more values in each group. Each unique combination becomes a column. Leave a group unchecked to ignore that dimension.</p>
         <div class="compare-selectors">
@@ -270,7 +193,6 @@
 
   <script>
     let testData = [];
-    let filteredData = [];
 
     document.addEventListener('DOMContentLoaded', function() {
       loadTestData();
@@ -288,7 +210,7 @@
         const data = await response.json();
         if (data.success) {
           testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
-          populateFilters();
+          populateCompareSelectors();
         } else {
           showError('Failed to load test data: ' + data.error);
         }
@@ -297,20 +219,10 @@
       }
     }
 
-    function populateFilters() {
+    function populateCompareSelectors() {
       const pcCodes = [...new Set(testData.map(t => t.PcCode).filter(Boolean))];
       const models = [...new Set(testData.map(t => t['ModelName-search']).filter(Boolean))];
-      const collections = [...new Set(testData.map(t => t.CollectionName).filter(Boolean))];
       const categories = [...new Set(testData.map(t => t.TestCategory).filter(Boolean))].sort();
-
-      document.getElementById('pcCodeFilter').innerHTML = '<option value="">All PC Codes</option>' +
-        pcCodes.map(v => `<option value="${v}">${v}</option>`).join('');
-      document.getElementById('modelFilter').innerHTML = '<option value="">All Models</option>' +
-        models.map(v => `<option value="${v}">${v}</option>`).join('');
-      document.getElementById('collectionFilter').innerHTML = '<option value="">All Collections</option>' +
-        collections.map(v => `<option value="${v}">${v}</option>`).join('');
-      document.getElementById('testCategoryFilter').innerHTML = '<option value="">All Categories</option>' +
-        categories.map(v => `<option value="${v}">${v}</option>`).join('');
 
       document.getElementById('comparePcCodes').innerHTML = pcCodes.map(v =>
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
@@ -340,7 +252,6 @@
         });
       });
 
-      applyFilters();
     }
 
     function queryType(t) {
@@ -349,33 +260,6 @@
       if (d.includes('analysis')) return 'analysis';
       if (d.includes('creative')) return 'creative';
       return 'other';
-    }
-
-    function applyFilters() {
-      const pcCode = document.getElementById('pcCodeFilter').value;
-      const selectedModel = document.getElementById('modelFilter').value;
-      const collection = document.getElementById('collectionFilter').value;
-      const testCategory = document.getElementById('testCategoryFilter').value;
-      const dateRange = document.getElementById('dateRangeFilter').value;
-      const testType = document.getElementById('testTypeFilter').value;
-      const qType = document.getElementById('queryTypeFilter').value;
-
-      filteredData = testData.filter(test => {
-        if (pcCode && test.PcCode !== pcCode) return false;
-        if (selectedModel && test['ModelName-search'] !== selectedModel) return false;
-        if (collection && test.CollectionName !== collection) return false;
-        if (testCategory && test.TestCategory !== testCategory) return false;
-        if (testType === 'scoring' && !test['WeightedScore-pct']) return false;
-        if (testType === 'no-scoring' && test['WeightedScore-pct']) return false;
-        if (qType && queryType(test) !== qType) return false;
-        if (dateRange) {
-          const daysDiff = (new Date() - new Date(test.CreatedAt)) / (1000 * 60 * 60 * 24);
-          if (dateRange === 'today' && daysDiff > 1) return false;
-          if (dateRange === 'week' && daysDiff > 7) return false;
-          if (dateRange === 'month' && daysDiff > 30) return false;
-        }
-        return true;
-      });
     }
 
     function runComparison() {
