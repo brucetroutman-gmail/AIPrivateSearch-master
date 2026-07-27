@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compare Tests - AIPrivateSearch</title>
   <link rel="stylesheet" href="shared/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="./shared/utils/apiConfig.js"></script>
   <script src="shared/license-checker.js"></script>
   <script type="module" src="shared/common.js"></script>
@@ -116,6 +117,47 @@
       padding: 2rem;
       color: var(--text-color);
     }
+
+    .result-type-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-type-toggle label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .result-type-toggle select {
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .chart-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+    }
+
+    .chart-card h4 {
+      margin: 0 0 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
   </style>
 </head>
 <body>
@@ -155,32 +197,39 @@
             <label class="group-label">Test</label>
             <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
             <div class="checkbox-list" id="compareTests-email">
-              <label><input type="checkbox" data-test-group="email" value="Find emails about parts orders"> E1</label>
-              <label><input type="checkbox" data-test-group="email" value="What parts were ordered from the supplier?"> E2</label>
-              <label><input type="checkbox" data-test-group="email" value="What is the main business relationship described in these emails?"> E3</label>
-              <label><input type="checkbox" data-test-group="email" value="Find emails about monthly reports"> E4</label>
+              <label><input type="checkbox" data-test-group="email" value="t27811113351"> E1 — Find emails about parts orders</label>
+              <label><input type="checkbox" data-test-group="email" value="t27812113351"> E2 — What parts were ordered from…</label>
+              <label><input type="checkbox" data-test-group="email" value="t27813113351"> E3 — What is the main business rel…</label>
+              <label><input type="checkbox" data-test-group="email" value="t27814113351"> E4 — Find emails about monthly rep…</label>
             </div>
             <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
             <div class="checkbox-list" id="compareTests-federalist">
-              <label><input type="checkbox" data-test-group="federalist" value="What arguments does Hamilton make for a strong central government?"> F1</label>
-              <label><input type="checkbox" data-test-group="federalist" value="Compare the arguments for Union vs arguments against it in these papers"> F2</label>
-              <label><input type="checkbox" data-test-group="federalist" value="Summarize the main themes of the Federalist Papers"> F3</label>
+              <label><input type="checkbox" data-test-group="federalist" value="t27411135461"> F1 — What arguments does Hamilton…</label>
+              <label><input type="checkbox" data-test-group="federalist" value="t27412135461"> F2 — Compare the arguments for Un…</label>
+              <label><input type="checkbox" data-test-group="federalist" value="t27413135461"> F3 — Summarize the main themes of…</label>
             </div>
             <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
             <div class="checkbox-list" id="compareTests-legal">
-              <label><input type="checkbox" data-test-group="legal" value="Which clients have durable power of attorney documents?"> L1</label>
-              <label><input type="checkbox" data-test-group="legal" value="Show upcoming appointments"> L2</label>
-              <label><input type="checkbox" data-test-group="legal" value="What are the most common types of estate planning documents in this collection?"> L3</label>
+              <label><input type="checkbox" data-test-group="legal" value="t27611114321"> L1 — Which clients have durable po…</label>
+              <label><input type="checkbox" data-test-group="legal" value="t27612114321"> L2 — Show upcoming appointments</label>
+              <label><input type="checkbox" data-test-group="legal" value="t27613114321"> L3 — What are the most common type…</label>
             </div>
             <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
             <div class="checkbox-list" id="compareTests-medical">
-              <label><input type="checkbox" data-test-group="medical" value="Find patients with diabetes"> M1</label>
-              <label><input type="checkbox" data-test-group="medical" value="What medications is William Adams taking?"> M2</label>
-              <label><input type="checkbox" data-test-group="medical" value="Find all patients with cancer"> M3</label>
-              <label><input type="checkbox" data-test-group="medical" value="Compare treatment approaches for hip vs knee replacement patients"> M4</label>
-              <label><input type="checkbox" data-test-group="medical" value="Summarize the types of conditions treated at this practice"> M5</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27711115451"> M1 — Find patients with diabetes</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27712115451"> M2 — What medications is William A…</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27713115451"> M3 — Find all patients with cancer</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27714115451"> M4 — Compare treatment approaches…</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27715115451"> M5 — Summarize the types of condi…</label>
             </div>
           </div>
+        </div>
+        <div class="result-type-toggle">
+          <label>Result Type:</label>
+          <select id="resultType">
+            <option value="table">Table</option>
+            <option value="chart">Bar Chart</option>
+          </select>
         </div>
         <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
         <div id="compareResults" style="margin-top:1.5rem"></div>
@@ -232,9 +281,9 @@
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
 
       const qTypeTests = {
-        fact: ['Find emails about parts orders','What parts were ordered from the supplier?','Find emails about monthly reports','What arguments does Hamilton make for a strong central government?','Which clients have durable power of attorney documents?','Show upcoming appointments','Find patients with diabetes','What medications is William Adams taking?','Find all patients with cancer'],
-        analysis: ['What is the main business relationship described in these emails?','Compare the arguments for Union vs arguments against it in these papers','What are the most common types of estate planning documents in this collection?','Compare treatment approaches for hip vs knee replacement patients'],
-        creative: ['Summarize the main themes of the Federalist Papers','Summarize the types of conditions treated at this practice']
+        fact: ['t27811113351','t27812113351','t27814113351','t27411135461','t27611114321','t27612114321','t27711115451','t27712115451','t27713115451'],
+        analysis: ['t27813113351','t27412135461','t27613114321','t27714115451'],
+        creative: ['t27413135461','t27715115451']
       };
       document.querySelectorAll('#compareQueryTypes input').forEach(cb => {
         cb.addEventListener('change', () => {
@@ -298,7 +347,7 @@
           (model == null || t['ModelName-search'] === model) &&
           (cat == null || t.TestCategory === cat) &&
           (qtype == null || queryType(t) === qtype) &&
-          (test == null || t.TestDescription === test)
+          (test == null || t.TestCode === test)
         );
         const scored = subset.filter(t => t['WeightedScore-pct'] != null);
         return {
@@ -346,7 +395,13 @@
       });
 
       html += '</tbody></table></div>';
-      document.getElementById('compareResults').innerHTML = html;
+
+      const resultType = document.getElementById('resultType').value;
+      if (resultType === 'chart') {
+        renderCharts(groups, metrics);
+      } else {
+        document.getElementById('compareResults').innerHTML = html;
+      }
 
       const withAnswers = groups.filter(g => g.subset.some(t => t['Answer-search']));
       if (!withAnswers.length) { document.getElementById('compareAnswers').innerHTML = ''; return; }
@@ -372,6 +427,52 @@
         aHtml += '</div>';
       });
       document.getElementById('compareAnswers').innerHTML = aHtml;
+    }
+
+    const CHART_COLORS = [
+      '#3498db','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'
+    ];
+    let activeCharts = [];
+
+    function renderCharts(groups, metrics) {
+      activeCharts.forEach(c => c.destroy());
+      activeCharts = [];
+
+      const chartMetrics = metrics.filter(m => m.key !== 'n');
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#ecf0f1' : '#2c3e50';
+      const gridColor = isDark ? '#34495e' : '#dce1e7';
+
+      let html = '<div class="chart-grid">';
+      chartMetrics.forEach((m, i) => html += `<div class="chart-card"><h4>${m.label}</h4><canvas id="chart_${i}"></canvas></div>`);
+      html += '</div>';
+      document.getElementById('compareResults').innerHTML = html;
+
+      chartMetrics.forEach((m, i) => {
+        const vals = groups.map(g => g[m.key]);
+        const ctx = document.getElementById(`chart_${i}`).getContext('2d');
+        activeCharts.push(new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: groups.map(g => g.label),
+            datasets: [{
+              label: m.label,
+              data: vals,
+              backgroundColor: groups.map((_, gi) => CHART_COLORS[gi % CHART_COLORS.length] + 'cc'),
+              borderColor: groups.map((_, gi) => CHART_COLORS[gi % CHART_COLORS.length]),
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: textColor, maxRotation: 30 }, grid: { color: gridColor } },
+              y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
+            }
+          }
+        }));
+      });
     }
 
     function showError(message) {
