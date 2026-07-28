@@ -364,9 +364,6 @@
 
       const metrics = [
         { label: 'Avg Score', key: 'avgScore', suffix: '%', higherBetter: true },
-        { label: 'Accuracy', key: 'avgAccuracy', suffix: '', higherBetter: true },
-        { label: 'Relevance', key: 'avgRelevance', suffix: '', higherBetter: true },
-        { label: 'Organization', key: 'avgOrganization', suffix: '', higherBetter: true },
         { label: 'Similarity', key: 'avgSimilarity', suffix: '%', higherBetter: true },
         { label: 'Avg Duration', key: 'avgDuration', suffix: 's', higherBetter: false },
         { label: 'Tokens/sec', key: 'avgTokens', suffix: '', higherBetter: true },
@@ -468,7 +465,16 @@
             plugins: { legend: { display: false } },
             scales: {
               x: { ticks: { color: textColor, maxRotation: 30 }, grid: { color: gridColor } },
-              y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
+              y: {
+                ticks: { color: textColor },
+                grid: { color: gridColor },
+                beginAtZero: false,
+                min: (() => {
+                  const numeric = vals.filter(v => v != null);
+                  if (!numeric.length) return 0;
+                  return Math.floor(Math.min(...numeric) * 0.95);
+                })()
+              }
             }
           }
         }));
