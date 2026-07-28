@@ -228,7 +228,7 @@
           <label>Result Type:</label>
           <select id="resultType">
             <option value="table">Table</option>
-            <option value="chart">Bar Chart</option>
+            <option value="chart" selected>Bar Chart</option>
           </select>
         </div>
         <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
@@ -318,6 +318,10 @@
       const selCats = checked('compareCategories');
       const selQTypes = checked('compareQueryTypes');
       const selTests = [...document.querySelectorAll('[data-test-group]:checked')].map(el => el.value);
+      const testCodeToLabel = {};
+      document.querySelectorAll('[data-test-group]').forEach(el => {
+        testCodeToLabel[el.value] = el.closest('label').textContent.trim();
+      });
 
       if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
         document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
@@ -341,7 +345,7 @@
       const fmt = (v, suffix = '') => v != null ? v.toFixed(1) + suffix : 'N/A';
 
       const groups = combos.map(([pc, model, cat, qtype, test]) => {
-        const label = [pc, model, cat, qtype, test].filter(Boolean).join(' / ');
+        const label = [pc, model, cat, qtype, test != null ? testCodeToLabel[test] : null].filter(Boolean).join(' / ');
         const subset = testData.filter(t =>
           (pc == null || t.PcCode === pc) &&
           (model == null || t['ModelName-search'] === model) &&
