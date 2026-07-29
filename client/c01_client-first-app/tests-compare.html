@@ -488,9 +488,13 @@
     }
 
     function zoomChart(metricIndex) {
-      sessionStorage.setItem('zoomData', JSON.stringify(window._lastGroups));
+      const selPc = [...document.querySelectorAll('#comparePcCodes input:checked')].map(el => el.value);
+      const selModels = [...document.querySelectorAll('#compareModels input:checked')].map(el => el.value);
+      const selCats = [...document.querySelectorAll('#compareCategories input:checked')].map(el => el.value);
+      const selQTypes = [...document.querySelectorAll('#compareQueryTypes input:checked')].map(el => el.value);
+      const selTests = [...document.querySelectorAll('[data-test-group]:checked')].map(el => el.value);
       sessionStorage.setItem('zoomMetricIndex', metricIndex);
-      sessionStorage.setItem('zoomMetrics', JSON.stringify(window._lastMetrics));
+      sessionStorage.setItem('zoomSelectors', JSON.stringify({ pcCodes: selPc, models: selModels, cats: selCats, qTypes: selQTypes, tests: selTests }));
       window.location.href = 'tests-compare-zoom.html';
     }
 

@@ -19,7 +19,7 @@
   </script>
   <style>
     .analyze-container {
-      max-width: 1000px;
+      max-width: 1400px;
       margin: 2rem auto;
       padding: 0 2rem;
     }
@@ -38,15 +38,78 @@
       gap: 0.4rem;
       font-size: 0.9rem;
       margin-bottom: 1rem;
-      color: var(--link-color);
+      color: #3498db;
       text-decoration: none;
     }
 
     .back-link:hover { text-decoration: underline; }
 
+    .compare-selectors {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .compare-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 160px;
+    }
+
+    .compare-group label.group-label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-bottom: 0.2rem;
+    }
+
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      background: var(--card-bg);
+    }
+
+    .checkbox-list label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .metric-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .metric-selector label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .metric-selector select {
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
     .zoom-chart-wrap {
       position: relative;
-      height: 420px;
+      height: 480px;
     }
 
     .data-table {
@@ -87,9 +150,78 @@
   <div class="page-content">
     <main class="analyze-container">
       <a href="tests-compare.html" class="back-link">← Back to Compare</a>
+      <h1 id="pageTitle">Compare Zoom</h1>
 
-      <div class="analyze-section" id="chartSection">
-        <h2 id="chartTitle">Loading…</h2>
+      <div class="analyze-section">
+        <h2>Comparison Analysis</h2>
+        <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Select one or more values in each group. Each unique combination becomes a column.</p>
+        <div class="compare-selectors">
+          <div class="compare-group">
+            <label class="group-label">PC Code</label>
+            <div class="checkbox-list" id="comparePcCodes"></div>
+          </div>
+          <div class="compare-group">
+            <label class="group-label">Model</label>
+            <div class="checkbox-list" id="compareModels"></div>
+          </div>
+          <div class="compare-group">
+            <label class="group-label">Test Category</label>
+            <div class="checkbox-list" id="compareCategories"></div>
+          </div>
+          <div class="compare-group">
+            <label class="group-label">Query Type</label>
+            <div class="checkbox-list" id="compareQueryTypes">
+              <label><input type="checkbox" value="fact"> Fact</label>
+              <label><input type="checkbox" value="analysis"> Analysis</label>
+              <label><input type="checkbox" value="creative"> Creative</label>
+              <label><input type="checkbox" value="other"> Other</label>
+            </div>
+          </div>
+          <div class="compare-group">
+            <label class="group-label">Test</label>
+            <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
+            <div class="checkbox-list" id="compareTests-email">
+              <label><input type="checkbox" data-test-group="email" value="t27811113351"> E1 — Find emails about parts orders</label>
+              <label><input type="checkbox" data-test-group="email" value="t27812113351"> E2 — What parts were ordered from…</label>
+              <label><input type="checkbox" data-test-group="email" value="t27813113351"> E3 — What is the main business rel…</label>
+              <label><input type="checkbox" data-test-group="email" value="t27814113351"> E4 — Find emails about monthly rep…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
+            <div class="checkbox-list" id="compareTests-federalist">
+              <label><input type="checkbox" data-test-group="federalist" value="t27411135461"> F1 — What arguments does Hamilton…</label>
+              <label><input type="checkbox" data-test-group="federalist" value="t27412135461"> F2 — Compare the arguments for Un…</label>
+              <label><input type="checkbox" data-test-group="federalist" value="t27413135461"> F3 — Summarize the main themes of…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
+            <div class="checkbox-list" id="compareTests-legal">
+              <label><input type="checkbox" data-test-group="legal" value="t27611114321"> L1 — Which clients have durable po…</label>
+              <label><input type="checkbox" data-test-group="legal" value="t27612114321"> L2 — Show upcoming appointments</label>
+              <label><input type="checkbox" data-test-group="legal" value="t27613114321"> L3 — What are the most common type…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
+            <div class="checkbox-list" id="compareTests-medical">
+              <label><input type="checkbox" data-test-group="medical" value="t27711115451"> M1 — Find patients with diabetes</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27712115451"> M2 — What medications is William A…</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27713115451"> M3 — Find all patients with cancer</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27714115451"> M4 — Compare treatment approaches…</label>
+              <label><input type="checkbox" data-test-group="medical" value="t27715115451"> M5 — Summarize the types of condi…</label>
+            </div>
+          </div>
+        </div>
+        <div class="metric-selector">
+          <label>Metric:</label>
+          <select id="metricSelect">
+            <option value="0">Avg Score</option>
+            <option value="1">Similarity</option>
+            <option value="2">Avg Duration</option>
+            <option value="3">Tokens/sec</option>
+          </select>
+        </div>
+        <button onclick="runZoom()" class="update-analysis-btn">Run Comparison</button>
+      </div>
+
+      <div class="analyze-section" id="zoomSection" style="display:none">
+        <h2 id="chartTitle"></h2>
         <div class="zoom-chart-wrap">
           <canvas id="zoomCanvas"></canvas>
         </div>
@@ -101,36 +233,177 @@
   <div id="footer-placeholder"></div>
 
   <script>
+    let testData = [];
+    let activeChart = null;
+
+    const METRICS = [
+      { label: 'Avg Score',    key: 'avgScore',    suffix: '%', higherBetter: true },
+      { label: 'Similarity',   key: 'avgSimilarity', suffix: '%', higherBetter: true },
+      { label: 'Avg Duration', key: 'avgDuration', suffix: 's', higherBetter: false },
+      { label: 'Tokens/sec',   key: 'avgTokens',   suffix: '',  higherBetter: true }
+    ];
+
+    const CHART_COLORS = ['#3498db','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'];
+
     document.addEventListener('DOMContentLoaded', function() {
-      const groups = JSON.parse(sessionStorage.getItem('zoomData') || 'null');
-      const metricIndex = parseInt(sessionStorage.getItem('zoomMetricIndex') || '0', 10);
-      const metrics = JSON.parse(sessionStorage.getItem('zoomMetrics') || 'null');
+      loadTestData();
 
-      if (!groups || !metrics) {
-        document.getElementById('chartSection').innerHTML = '<p>No data. Please run a comparison on the <a href="tests-compare.html">Compare page</a> first.</p>';
+      // Restore state from sessionStorage if coming from Zoom In button
+      const savedIndex = sessionStorage.getItem('zoomMetricIndex');
+      const savedSelectors = sessionStorage.getItem('zoomSelectors');
+      if (savedIndex !== null) {
+        document.getElementById('metricSelect').value = savedIndex;
+      }
+      if (savedSelectors) {
+        const sel = JSON.parse(savedSelectors);
+        restoreSelectors(sel);
+      }
+    });
+
+    async function loadTestData() {
+      try {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return;
+        const response = await fetch(`${window.API_BASE_URL}/api/database/tests`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail }
+        });
+        const data = await response.json();
+        if (data.success) {
+          testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
+          populateSelectors();
+          // Auto-run if coming from Zoom In
+          if (sessionStorage.getItem('zoomMetricIndex') !== null) {
+            runZoom();
+            sessionStorage.removeItem('zoomMetricIndex');
+            sessionStorage.removeItem('zoomSelectors');
+          }
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function populateSelectors() {
+      const pcCodes = [...new Set(testData.map(t => t.PcCode).filter(Boolean))];
+      const models = [...new Set(testData.map(t => t['ModelName-search']).filter(Boolean))];
+      const categories = [...new Set(testData.map(t => t.TestCategory).filter(Boolean))].sort();
+
+      document.getElementById('comparePcCodes').innerHTML = pcCodes.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareModels').innerHTML = models.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareCategories').innerHTML = categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+
+      const qTypeTests = {
+        fact: ['t27811113351','t27812113351','t27814113351','t27411135461','t27611114321','t27612114321','t27711115451','t27712115451','t27713115451'],
+        analysis: ['t27813113351','t27412135461','t27613114321','t27714115451'],
+        creative: ['t27413135461','t27715115451']
+      };
+      document.querySelectorAll('#compareQueryTypes input').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const selected = [...document.querySelectorAll('#compareQueryTypes input:checked')].map(el => el.value);
+          const toCheck = new Set(selected.flatMap(qt => qTypeTests[qt] || []));
+          document.querySelectorAll('[data-test-group]').forEach(t => { t.checked = toCheck.has(t.value); });
+        });
+      });
+      document.querySelectorAll('[data-test-group]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          if (cb.checked) {
+            document.querySelectorAll(`[data-test-group]:not([data-test-group="${cb.dataset.testGroup}"])`)
+              .forEach(other => { other.checked = false; });
+          }
+        });
+      });
+    }
+
+    function restoreSelectors(sel) {
+      sel.pcCodes.forEach(v => { const el = document.querySelector(`#comparePcCodes input[value="${v}"]`); if (el) el.checked = true; });
+      sel.models.forEach(v => { const el = document.querySelector(`#compareModels input[value="${v}"]`); if (el) el.checked = true; });
+      sel.cats.forEach(v => { const el = document.querySelector(`#compareCategories input[value="${v}"]`); if (el) el.checked = true; });
+      sel.qTypes.forEach(v => { const el = document.querySelector(`#compareQueryTypes input[value="${v}"]`); if (el) el.checked = true; });
+      sel.tests.forEach(v => { const el = document.querySelector(`[data-test-group][value="${v}"]`); if (el) el.checked = true; });
+    }
+
+    function queryType(t) {
+      const d = (t.TestDescription || t.TestCategory || '').toLowerCase();
+      if (d.includes('fact')) return 'fact';
+      if (d.includes('analysis')) return 'analysis';
+      if (d.includes('creative')) return 'creative';
+      return 'other';
+    }
+
+    function runZoom() {
+      const checked = id => [...document.querySelectorAll(`#${id} input:checked`)].map(el => el.value);
+      const selPc = checked('comparePcCodes');
+      const selModels = checked('compareModels');
+      const selCats = checked('compareCategories');
+      const selQTypes = checked('compareQueryTypes');
+      const selTests = [...document.querySelectorAll('[data-test-group]:checked')].map(el => el.value);
+      const testCodeToLabel = {};
+      document.querySelectorAll('[data-test-group]').forEach(el => {
+        testCodeToLabel[el.value] = el.closest('label').textContent.trim();
+      });
+
+      if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
+        document.getElementById('zoomSection').style.display = 'none';
         return;
       }
 
-      const chartMetrics = metrics.filter(m => m.key !== 'n');
-      const m = chartMetrics[metricIndex];
-      if (!m) {
-        document.getElementById('chartSection').innerHTML = '<p>Invalid metric. <a href="tests-compare.html">Go back</a>.</p>';
-        return;
+      function cartesian(...arrays) {
+        return arrays.reduce((acc, arr) =>
+          arr.length ? acc.flatMap(a => arr.map(b => [...a, b])) : acc, [[]]);
       }
+      const combos = cartesian(
+        selPc.length ? selPc : [null],
+        selModels.length ? selModels : [null],
+        selCats.length ? selCats : [null],
+        selQTypes.length ? selQTypes : [null],
+        selTests.length ? selTests : [null]
+      );
 
-      document.title = `${m.label} — Compare Zoom`;
+      const avg = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : null;
+
+      const groups = combos.map(([pc, model, cat, qtype, test]) => {
+        const label = [pc, model, cat, qtype, test != null ? testCodeToLabel[test] : null].filter(Boolean).join(' / ');
+        const subset = testData.filter(t =>
+          (pc == null || t.PcCode === pc) &&
+          (model == null || t['ModelName-search'] === model) &&
+          (cat == null || t.TestCategory === cat) &&
+          (qtype == null || queryType(t) === qtype) &&
+          (test == null || t.TestCode === test)
+        );
+        const scored = subset.filter(t => t['WeightedScore-pct'] != null);
+        return {
+          label, n: subset.length,
+          avgScore: avg(scored.map(t => t['WeightedScore-pct'])),
+          avgSimilarity: avg(scored.map(t => parseFloat(t.SimilarityScore)).filter(v => !isNaN(v))),
+          avgDuration: avg(subset.map(t => t['Duration-search-s']).filter(v => v != null)),
+          avgTokens: avg(subset.map(t => t['EvalTokensPerSecond-ssearch']).filter(v => v != null))
+        };
+      });
+
+      const metricIndex = parseInt(document.getElementById('metricSelect').value, 10);
+      const m = METRICS[metricIndex];
+
+      document.getElementById('pageTitle').textContent = `Compare Zoom — ${m.label}`;
       document.getElementById('chartTitle').textContent = m.label;
+      document.getElementById('zoomSection').style.display = '';
 
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#ecf0f1' : '#2c3e50';
       const gridColor = isDark ? '#34495e' : '#dce1e7';
 
-      const CHART_COLORS = ['#3498db','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'];
       const vals = groups.map(g => g[m.key]);
       const numeric = vals.filter(v => v != null);
       const yMin = numeric.length ? Math.floor(Math.min(...numeric) * 0.95) : 0;
 
-      new Chart(document.getElementById('zoomCanvas').getContext('2d'), {
+      if (activeChart) { activeChart.destroy(); activeChart = null; }
+
+      // Replace canvas to avoid reuse errors
+      const wrap = document.querySelector('.zoom-chart-wrap');
+      wrap.innerHTML = '<canvas id="zoomCanvas"></canvas>';
+
+      activeChart = new Chart(document.getElementById('zoomCanvas').getContext('2d'), {
         type: 'bar',
         data: {
           labels: groups.map(g => g.label),
@@ -147,7 +420,6 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            datalabels: { display: false },
             tooltip: { callbacks: { label: ctx => `${ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : 'N/A'}${m.suffix}` } }
           },
           scales: {
@@ -176,7 +448,7 @@
       // Data table
       const best = numeric.length ? (m.higherBetter ? Math.max(...numeric) : Math.min(...numeric)) : null;
       const worst = numeric.length > 1 ? (m.higherBetter ? Math.min(...numeric) : Math.max(...numeric)) : null;
-      let tHtml = '<thead><tr><th>Group</th><th>' + m.label + '</th><th>Tests (n)</th></tr></thead><tbody>';
+      let tHtml = `<thead><tr><th>Group</th><th>${m.label}</th><th>Tests (n)</th></tr></thead><tbody>`;
       groups.forEach(g => {
         const v = g[m.key];
         const display = v != null ? v.toFixed(1) + m.suffix : 'N/A';
@@ -189,7 +461,7 @@
       });
       tHtml += '</tbody>';
       document.getElementById('dataTable').innerHTML = tHtml;
-    });
+    }
   </script>
 </body>
 </html>
