@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Zoom - AIPrivateSearch</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="./shared/utils/apiConfig.js"></script>
+  <script src="shared/license-checker.js"></script>
+  <script type="module" src="shared/common.js"></script>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) localStorage.setItem('theme', theme);
+    })();
+  </script>
+  <style>
+    .analyze-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .analyze-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: var(--link-color);
+      text-decoration: none;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .zoom-chart-wrap {
+      position: relative;
+      height: 420px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 0.75rem;
+      text-align: center;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+
+    .data-table th {
+      background: var(--bg-color);
+      font-weight: bold;
+    }
+
+    .data-table tbody tr:nth-child(even) { background: var(--bg-color); }
+    .data-table tbody tr:hover { background: var(--border-color); }
+
+    [data-theme="dark"] .data-table th { background: #2c3e50; border-color: #34495e; }
+    [data-theme="dark"] .data-table tbody tr:nth-child(even) { background: #34495e; }
+    [data-theme="dark"] .data-table tbody tr:hover { background: #3c5a78; }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #87ceeb; }
+
+    .best-score { background: #1a7a3a !important; color: #fff; font-weight: bold; }
+    .worst-score { background: #7a1a1a !important; color: #fff; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="page-content">
+    <main class="analyze-container">
+      <a href="tests-compare.html" class="back-link">← Back to Compare</a>
+
+      <div class="analyze-section" id="chartSection">
+        <h2 id="chartTitle">Loading…</h2>
+        <div class="zoom-chart-wrap">
+          <canvas id="zoomCanvas"></canvas>
+        </div>
+        <table class="data-table" id="dataTable"></table>
+      </div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const groups = JSON.parse(sessionStorage.getItem('zoomData') || 'null');
+      const metricIndex = parseInt(sessionStorage.getItem('zoomMetricIndex') || '0', 10);
+      const metrics = JSON.parse(sessionStorage.getItem('zoomMetrics') || 'null');
+
+      if (!groups || !metrics) {
+        document.getElementById('chartSection').innerHTML = '<p>No data. Please run a comparison on the <a href="tests-compare.html">Compare page</a> first.</p>';
+        return;
+      }
+
+      const chartMetrics = metrics.filter(m => m.key !== 'n');
+      const m = chartMetrics[metricIndex];
+      if (!m) {
+        document.getElementById('chartSection').innerHTML = '<p>Invalid metric. <a href="tests-compare.html">Go back</a>.</p>';
+        return;
+      }
+
+      document.title = `${m.label} — Compare Zoom`;
+      document.getElementById('chartTitle').textContent = m.label;
+
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#ecf0f1' : '#2c3e50';
+      const gridColor = isDark ? '#34495e' : '#dce1e7';
+
+      const CHART_COLORS = ['#3498db','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'];
+      const vals = groups.map(g => g[m.key]);
+      const numeric = vals.filter(v => v != null);
+      const yMin = numeric.length ? Math.floor(Math.min(...numeric) * 0.95) : 0;
+
+      new Chart(document.getElementById('zoomCanvas').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: groups.map(g => g.label),
+          datasets: [{
+            label: m.label,
+            data: vals,
+            backgroundColor: groups.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + 'cc'),
+            borderColor: groups.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: { display: false },
+            tooltip: { callbacks: { label: ctx => `${ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : 'N/A'}${m.suffix}` } }
+          },
+          scales: {
+            x: { ticks: { color: textColor, font: { size: 13 } }, grid: { color: gridColor } },
+            y: { ticks: { color: textColor, font: { size: 13 }, callback: v => v + m.suffix }, grid: { color: gridColor }, beginAtZero: false, min: yMin }
+          }
+        },
+        plugins: [{
+          id: 'valueLabels',
+          afterDatasetsDraw(chart) {
+            const { ctx, data } = chart;
+            ctx.save();
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = textColor;
+            chart.getDatasetMeta(0).data.forEach((bar, i) => {
+              const v = data.datasets[0].data[i];
+              if (v != null) ctx.fillText(v.toFixed(1) + m.suffix, bar.x, bar.y - 4);
+            });
+            ctx.restore();
+          }
+        }]
+      });
+
+      // Data table
+      const best = numeric.length ? (m.higherBetter ? Math.max(...numeric) : Math.min(...numeric)) : null;
+      const worst = numeric.length > 1 ? (m.higherBetter ? Math.min(...numeric) : Math.max(...numeric)) : null;
+      let tHtml = '<thead><tr><th>Group</th><th>' + m.label + '</th><th>Tests (n)</th></tr></thead><tbody>';
+      groups.forEach(g => {
+        const v = g[m.key];
+        const display = v != null ? v.toFixed(1) + m.suffix : 'N/A';
+        let cls = '';
+        if (m.higherBetter !== null && v != null) {
+          if (v === best) cls = 'best-score';
+          else if (v === worst) cls = 'worst-score';
+        }
+        tHtml += `<tr><td style="text-align:left">${g.label}</td><td class="${cls}">${display}</td><td>${g.n}</td></tr>`;
+      });
+      tHtml += '</tbody>';
+      document.getElementById('dataTable').innerHTML = tHtml;
+    });
+  </script>
+</body>
+</html>

@@ -398,6 +398,8 @@
       html += '</tbody></table></div>';
 
       const resultType = document.getElementById('resultType').value;
+      window._lastGroups = groups.map(g => ({ label: g.label, n: g.n, avgScore: g.avgScore, avgSimilarity: g.avgSimilarity, avgDuration: g.avgDuration, avgTokens: g.avgTokens }));
+      window._lastMetrics = metrics;
       if (resultType === 'chart') {
         renderCharts(groups, metrics);
       } else {
@@ -445,7 +447,7 @@
       const gridColor = isDark ? '#34495e' : '#dce1e7';
 
       let html = '<div class="chart-grid">';
-      chartMetrics.forEach((m, i) => html += `<div class="chart-card"><h4>${m.label}</h4><canvas id="chart_${i}"></canvas></div>`);
+      chartMetrics.forEach((m, i) => html += `<div class="chart-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem"><h4 style="margin:0">${m.label}</h4><a href="tests-compare-zoom.html" onclick="zoomChart(event, ${i})" style="font-size:0.8rem">Zoom In</a></div><canvas id="chart_${i}"></canvas></div>`);
       html += '</div>';
       document.getElementById('compareResults').innerHTML = html;
 
@@ -483,6 +485,14 @@
           }
         }));
       });
+    }
+
+    function zoomChart(e, metricIndex) {
+      e.preventDefault();
+      sessionStorage.setItem('zoomData', JSON.stringify(window._lastGroups));
+      sessionStorage.setItem('zoomMetricIndex', metricIndex);
+      sessionStorage.setItem('zoomMetrics', JSON.stringify(window._lastMetrics));
+      window.location.href = 'tests-compare-zoom.html';
     }
 
     function showError(message) {
