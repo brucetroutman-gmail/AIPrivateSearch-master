@@ -533,8 +533,10 @@
         const score = t['WeightedScore-pct'] != null ? `${parseFloat(t['WeightedScore-pct']).toFixed(1)}%` : null;
         const dur = t['Duration-search-s'] != null ? `${parseFloat(t['Duration-search-s']).toFixed(1)}s` : null;
         const model = t['ModelName-search'] || null;
-        const tags = [t.TestCode, model, t.TestCategory, score ? `Score: ${score}` : null, dur ? `⏱ ${dur}` : null]
-          .filter(Boolean).map(v => `<span class="answer-tag">${v}</span>`).join('');
+        const pcTooltip = [t.UserEmail, t.PcCPU, t.PcGraphics, t.PcRAM, t.PcOS].filter(Boolean).join('\n');
+        const pcTag = t.PcCode ? `<span class="answer-tag pc-tooltip" data-tooltip="${pcTooltip.replace(/"/g, '&quot;')}">${t.PcCode}</span>` : '';
+        const tags = [pcTag, model, t.TestCategory, score ? `Score: ${score}` : null, dur ? `⏱ ${dur}` : null]
+          .filter(Boolean).map((v, i) => i === 0 ? v : `<span class="answer-tag">${v}</span>`).join('');
         const query = String(t.TestDescription || '').replace(/</g, '&lt;');
         const answer = String(t['Answer-search'] || '').replace(/</g, '&lt;');
         return `<div class="answer-card">
