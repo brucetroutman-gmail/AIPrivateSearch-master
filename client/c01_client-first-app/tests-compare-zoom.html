@@ -246,19 +246,24 @@
     const CHART_COLORS = ['#3498db','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'];
 
     document.addEventListener('DOMContentLoaded', function() {
+      preFillFromCache();
       loadTestData();
-
-      // Restore state from sessionStorage if coming from Zoom In button
       const savedIndex = sessionStorage.getItem('zoomMetricIndex');
-      const savedSelectors = sessionStorage.getItem('zoomSelectors');
       if (savedIndex !== null) {
         document.getElementById('metricSelect').value = savedIndex;
       }
-      if (savedSelectors) {
-        const sel = JSON.parse(savedSelectors);
-        restoreSelectors(sel);
-      }
     });
+
+    function preFillFromCache() {
+      const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');
+      if (!cached) return;
+      document.getElementById('comparePcCodes').innerHTML = cached.pcCodes.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareModels').innerHTML = cached.models.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareCategories').innerHTML = cached.categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+    }
 
     async function loadTestData() {
       try {
@@ -272,7 +277,12 @@
         if (data.success) {
           testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
           populateSelectors();
-          // Auto-run if coming from Zoom In
+          const pcCodes = [...new Set(testData.map(t => t.PcCode).filter(Boolean))];
+          const models = [...new Set(testData.map(t => t['ModelName-search']).filter(Boolean))];
+          const categories = [...new Set(testData.map(t => t.TestCategory).filter(Boolean))].sort();
+          localStorage.setItem('aips-compare-selectors', JSON.stringify({ pcCodes, models, categories }));
+          const savedSelectors = sessionStorage.getItem('zoomSelectors');
+          if (savedSelectors) restoreSelectors(JSON.parse(savedSelectors));
           if (sessionStorage.getItem('zoomMetricIndex') !== null) {
             runZoom();
             sessionStorage.removeItem('zoomMetricIndex');

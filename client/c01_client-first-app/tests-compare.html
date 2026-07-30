@@ -244,8 +244,20 @@
     let testData = [];
 
     document.addEventListener('DOMContentLoaded', function() {
+      preFillFromCache();
       loadTestData();
     });
+
+    function preFillFromCache() {
+      const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');
+      if (!cached) return;
+      document.getElementById('comparePcCodes').innerHTML = cached.pcCodes.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareModels').innerHTML = cached.models.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('compareCategories').innerHTML = cached.categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+    }
 
     async function loadTestData() {
       try {
@@ -260,6 +272,10 @@
         if (data.success) {
           testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
           populateCompareSelectors();
+          const pcCodes = [...new Set(testData.map(t => t.PcCode).filter(Boolean))];
+          const models = [...new Set(testData.map(t => t['ModelName-search']).filter(Boolean))];
+          const categories = [...new Set(testData.map(t => t.TestCategory).filter(Boolean))].sort();
+          localStorage.setItem('aips-compare-selectors', JSON.stringify({ pcCodes, models, categories }));
         } else {
           showError('Failed to load test data: ' + data.error);
         }
