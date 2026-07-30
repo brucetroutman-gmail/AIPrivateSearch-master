@@ -14,7 +14,8 @@ try {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_DATABASE || 'aiprivatesearch',
     connectionLimit: 10,
-    idleTimeout: 300000
+    idleTimeout: 300000,
+    typeCast: (field, next) => field.type === 'BLOB' || field.type === 'VAR_STRING' || field.type === 'STRING' || field.type === 'LONG_BLOB' || field.type === 'MEDIUM_BLOB' ? field.string() : next()
   });
   logger.log('Shared DB pool created');
 } catch (error) {
