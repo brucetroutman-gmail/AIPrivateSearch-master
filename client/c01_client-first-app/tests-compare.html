@@ -535,7 +535,7 @@
         const model = t['ModelName-search'] || null;
         const tags = [t.TestCode, model, t.TestCategory, score ? `Score: ${score}` : null, dur ? `⏱ ${dur}` : null]
           .filter(Boolean).map(v => `<span class="answer-tag">${v}</span>`).join('');
-        const query = String(t.Prompt || t.TestDescription || '').replace(/</g, '&lt;');
+        const query = String(t.TestDescription || '').replace(/</g, '&lt;');
         const answer = String(t['Answer-search'] || '').replace(/</g, '&lt;');
         return `<div class="answer-card">
           <div class="answer-card-header">${tags}</div>
