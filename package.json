@@ -1,6 +1,6 @@
 {
   "name": "aiprivatesearch",
-  "version": "21.29",
+  "version": "21.30",
   "scripts": {
     "lint": "eslint .",
     "lint:security": "eslint . --config security/eslint.security.config.mjs",
