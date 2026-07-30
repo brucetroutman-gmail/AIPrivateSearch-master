@@ -158,6 +158,50 @@
       font-size: 0.9rem;
       color: var(--text-color);
     }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .answer-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .answer-card-header {
+      background: var(--card-bg);
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      align-items: center;
+    }
+
+    .answer-card-header strong { font-size: 0.85rem; }
+
+    .answer-card-body {
+      padding: 0.75rem 0.8rem;
+      font-size: 0.83rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      max-height: 320px;
+      overflow-y: auto;
+      color: var(--text-color);
+    }
+
+    .answer-tag {
+      background: var(--border-color);
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.78rem;
+    }
   </style>
 </head>
 <body>
@@ -229,11 +273,11 @@
           <select id="resultType">
             <option value="table">Table</option>
             <option value="chart" selected>Bar Chart</option>
+            <option value="answers">Answers</option>
           </select>
         </div>
         <button onclick="runComparison()" class="update-analysis-btn">Run Comparison</button>
         <div id="compareResults" style="margin-top:1.5rem"></div>
-        <div id="compareAnswers" style="margin-top:1.5rem"></div>
       </div>
     </main>
   </div>
@@ -341,7 +385,6 @@
 
       if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
         document.getElementById('compareResults').innerHTML = '<p>Select at least one value in any group.</p>';
-        document.getElementById('compareAnswers').innerHTML = '';
         return;
       }
 
@@ -418,34 +461,11 @@
       window._lastMetrics = metrics;
       if (resultType === 'chart') {
         renderCharts(groups, metrics);
+      } else if (resultType === 'answers') {
+        renderAnswers(groups);
       } else {
         document.getElementById('compareResults').innerHTML = html;
       }
-
-      const withAnswers = groups.filter(g => g.subset.some(t => t['Answer-search']));
-      if (!withAnswers.length) { document.getElementById('compareAnswers').innerHTML = ''; return; }
-
-      let aHtml = '<h4 style="margin-top:1.5rem">Answer-Search Comparison</h4>';
-      groups.forEach((g, gi) => {
-        const tests = g.subset.filter(t => t['Answer-search']);
-        if (!tests.length) return;
-        aHtml += `<div style="margin-bottom:1.5rem;border:1px solid var(--border-color);border-radius:6px;overflow:hidden">`;
-        aHtml += `<div style="background:var(--bg-color);padding:0.6rem 1rem;font-weight:bold;border-bottom:1px solid var(--border-color)">${g.label} — ${tests.length} answer(s)</div>`;
-        tests.forEach((t, ti) => {
-          const score = t['WeightedScore-pct'] != null ? `${t['WeightedScore-pct']}%` : '-';
-          const uid = `ans_${gi}_${ti}`;
-          aHtml += `
-            <div style="padding:0.6rem 1rem;border-bottom:1px solid var(--border-color)">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-                <span style="font-size:0.85rem"><strong>${t.TestCode || '-'}</strong> &nbsp;|&nbsp; ${t['ModelName-search'] || '-'} &nbsp;|&nbsp; ${t.TestCategory || '-'} &nbsp;|&nbsp; Score: ${score}</span>
-                <button onclick="document.getElementById('${uid}').style.display=document.getElementById('${uid}').style.display==='none'?'block':'none'" style="padding:0.2rem 0.6rem;white-space:nowrap">View Answer</button>
-              </div>
-              <div id="${uid}" style="display:none;margin-top:0.6rem;padding:0.75rem;background:var(--bg-color);border-radius:4px;white-space:pre-wrap;font-size:0.85rem;line-height:1.5">${(t['Answer-search'] || '').replace(/</g, '&lt;')}</div>
-            </div>`;
-        });
-        aHtml += '</div>';
-      });
-      document.getElementById('compareAnswers').innerHTML = aHtml;
     }
 
     const CHART_COLORS = [
@@ -501,6 +521,29 @@
           }
         }));
       });
+    }
+
+    function renderAnswers(groups) {
+      const allTests = groups.flatMap(g => g.subset.filter(t => t['Answer-search']));
+      if (!allTests.length) {
+        document.getElementById('compareResults').innerHTML = '<p>No answers found for the selected filters.</p>';
+        return;
+      }
+      const cards = allTests.map(t => {
+        const score = t['WeightedScore-pct'] != null ? `${parseFloat(t['WeightedScore-pct']).toFixed(1)}%` : null;
+        const dur = t['Duration-search-s'] != null ? `${parseFloat(t['Duration-search-s']).toFixed(1)}s` : null;
+        const model = t['ModelName-search'] || null;
+        const tags = [t.TestCode, model, t.TestCategory, score ? `Score: ${score}` : null, dur ? `⏱ ${dur}` : null]
+          .filter(Boolean).map(v => `<span class="answer-tag">${v}</span>`).join('');
+        const query = (t.Prompt || t.TestDescription || '').replace(/</g, '&lt;');
+        const answer = (t['Answer-search'] || '').replace(/</g, '&lt;');
+        return `<div class="answer-card">
+          <div class="answer-card-header">${tags}</div>
+          ${query ? `<div style="padding:0.5rem 0.8rem;font-size:0.8rem;opacity:0.7;border-bottom:1px solid var(--border-color)">Q: ${query}</div>` : ''}
+          <div class="answer-card-body">${answer}</div>
+        </div>`;
+      }).join('');
+      document.getElementById('compareResults').innerHTML = `<div class="answer-grid">${cards}</div>`;
     }
 
     function zoomChart(metricIndex) {
