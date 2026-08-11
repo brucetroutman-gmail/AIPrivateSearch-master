@@ -231,6 +231,11 @@
         <div class="compare-selectors">
 
           <div class="compare-group">
+            <label class="group-label">PC Code</label>
+            <div class="checkbox-list" id="raPcCodes"></div>
+          </div>
+
+          <div class="compare-group">
             <label class="group-label">Models</label>
             <div class="checkbox-list" id="raModels"></div>
           </div>
@@ -300,6 +305,8 @@
     function preFillFromCache() {
       const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');
       if (!cached) return;
+      document.getElementById('raPcCodes').innerHTML = cached.pcCodes.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
       document.getElementById('raModels').innerHTML = cached.models.map(v =>
         `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
       document.getElementById('raCategories').innerHTML = cached.categories.map(v =>
@@ -324,6 +331,9 @@
           models, categories
         }));
 
+        const pcCodes = [...new Set(testData.map(t => t.PcCode).filter(Boolean))].sort();
+        document.getElementById('raPcCodes').innerHTML = pcCodes.map(v =>
+          `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
         document.getElementById('raModels').innerHTML = models.map(v =>
           `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
         document.getElementById('raCategories').innerHTML = categories.map(v =>
@@ -355,6 +365,7 @@
     }
 
     async function runAnalysis() {
+      const selPc = checked('raPcCodes');
       const selModels = checked('raModels');
       const selCats = checked('raCategories');
       const testEl = document.querySelector('input[name="raTest"]:checked');
@@ -376,20 +387,27 @@
       const testCode = testEl.value;
       const testLabel = testEl.closest('label').textContent.trim();
 
-      // Build advisors: Model × Category combos that have an Answer-search
+      // Build advisors: all matching records per PC × Model × Category combo
       const advisors = [];
       const missing = [];
-      for (const model of selModels) {
-        for (const cat of selCats) {
-          const match = testData.find(t =>
-            t['ModelName-search'] === model &&
-            t.TestCategory === cat &&
-            t.TestCode === testCode &&
-            t['Answer-search']
-          );
-          const label = `${model} / ${cat}`;
-          if (match) advisors.push({ label, model, cat, answer: String(match['Answer-search']), score: match['WeightedScore-pct'], question: String(match.TestDescription || '') });
-          else missing.push(label);
+      const pcs = selPc.length ? selPc : [null];
+      for (const pc of pcs) {
+        for (const model of selModels) {
+          for (const cat of selCats) {
+            const matches = testData.filter(t =>
+              (pc == null || t.PcCode === pc) &&
+              t['ModelName-search'] === model &&
+              t.TestCategory === cat &&
+              t.TestCode === testCode &&
+              t['Answer-search']
+            );
+            const label = [pc, model, cat].filter(Boolean).join(' / ');
+            if (matches.length) {
+              matches.forEach(m => advisors.push({ label, model, cat, pc, answer: String(m['Answer-search']), score: m['WeightedScore-pct'], question: String(m.TestDescription || '') }));
+            } else {
+              missing.push(label);
+            }
+          }
         }
       }
 
