@@ -4,6 +4,11 @@
 
 ---
 
+touch ups:
+1. Pccode tooltips are not working
+2. if 3 results in anaswers are shown then another run has 2 result, 3 cards are still showing.
+3. 
+
 ## IMMEDIATE PRIORITY
 
 ### I-001 — Fix ScoringService Path Bug ✅ v20.51

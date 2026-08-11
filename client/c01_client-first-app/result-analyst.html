@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Result Analyst - AIPrivateSearch</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="./shared/utils/apiConfig.js"></script>
+  <script src="shared/license-checker.js"></script>
+  <script type="module" src="shared/common.js"></script>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) localStorage.setItem('theme', theme);
+    })();
+  </script>
+  <style>
+    .analyze-container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .analyze-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+
+    .compare-selectors {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .compare-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 160px;
+    }
+
+    .compare-group label.group-label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-bottom: 0.2rem;
+    }
+
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      background: var(--card-bg);
+    }
+
+    .checkbox-list label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .radio-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      background: var(--card-bg);
+    }
+
+    .radio-list label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .chairman-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .chairman-row label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-color);
+      white-space: nowrap;
+    }
+
+    .chairman-row select {
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      font-size: 0.9rem;
+      min-width: 220px;
+    }
+
+    .advisor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .advisor-card {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .advisor-card-header {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.82rem;
+      font-weight: bold;
+      background: var(--bg-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .advisor-card-body {
+      padding: 0.75rem 0.8rem;
+      font-size: 0.83rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow-y: auto;
+      color: var(--text-color);
+    }
+
+    .advisor-status {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      font-weight: normal;
+    }
+
+    .verdict-section {
+      margin-bottom: 1.2rem;
+    }
+
+    .verdict-section h4 {
+      font-size: 0.95rem;
+      margin: 0 0 0.5rem;
+      color: #3498db;
+    }
+
+    .verdict-section p {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .verdict-highlight {
+      background: var(--bg-color);
+      border-left: 3px solid #3498db;
+      padding: 0.75rem 1rem;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .progress-bar-wrap {
+      background: var(--border-color);
+      border-radius: 4px;
+      height: 6px;
+      margin: 0.5rem 0 1rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #3498db;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .status-msg {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .missing-warning {
+      font-size: 0.82rem;
+      color: #e67e22;
+      margin-bottom: 0.75rem;
+    }
+
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #87ceeb; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="page-content">
+    <main class="analyze-container">
+      <h1>Result Analyst</h1>
+      <p>Select models, test categories, and one test. Each Model × Category combination becomes an advisor. The chairman synthesizes a verdict.</p>
+
+      <div class="analyze-section">
+        <h2>Selections</h2>
+        <div class="compare-selectors">
+
+          <div class="compare-group">
+            <label class="group-label">Models</label>
+            <div class="checkbox-list" id="raModels"></div>
+          </div>
+
+          <div class="compare-group">
+            <label class="group-label">Test Category</label>
+            <div class="checkbox-list" id="raCategories"></div>
+          </div>
+
+          <div class="compare-group">
+            <label class="group-label">Test <span style="font-weight:normal;opacity:0.7">(pick one)</span></label>
+            <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
+            <div class="radio-list" id="raTests-email">
+              <label><input type="radio" name="raTest" value="t27811113351"> E1 — Find emails about parts orders</label>
+              <label><input type="radio" name="raTest" value="t27812113351"> E2 — What parts were ordered from…</label>
+              <label><input type="radio" name="raTest" value="t27813113351"> E3 — What is the main business rel…</label>
+              <label><input type="radio" name="raTest" value="t27814113351"> E4 — Find emails about monthly rep…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
+            <div class="radio-list" id="raTests-federalist">
+              <label><input type="radio" name="raTest" value="t27411135461"> F1 — What arguments does Hamilton…</label>
+              <label><input type="radio" name="raTest" value="t27412135461"> F2 — Compare the arguments for Un…</label>
+              <label><input type="radio" name="raTest" value="t27413135461"> F3 — Summarize the main themes of…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
+            <div class="radio-list" id="raTests-legal">
+              <label><input type="radio" name="raTest" value="t27611114321"> L1 — Which clients have durable po…</label>
+              <label><input type="radio" name="raTest" value="t27612114321"> L2 — Show upcoming appointments</label>
+              <label><input type="radio" name="raTest" value="t27613114321"> L3 — What are the most common type…</label>
+            </div>
+            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
+            <div class="radio-list" id="raTests-medical">
+              <label><input type="radio" name="raTest" value="t27711115451"> M1 — Find patients with diabetes</label>
+              <label><input type="radio" name="raTest" value="t27712115451"> M2 — What medications is William A…</label>
+              <label><input type="radio" name="raTest" value="t27713115451"> M3 — Find all patients with cancer</label>
+              <label><input type="radio" name="raTest" value="t27714115451"> M4 — Compare treatment approaches…</label>
+              <label><input type="radio" name="raTest" value="t27715115451"> M5 — Summarize the types of condi…</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="chairman-row">
+          <label>Chairman Model:</label>
+          <select id="chairmanModel">
+            <option value="">— select model —</option>
+          </select>
+        </div>
+
+        <button onclick="runAnalysis()" class="update-analysis-btn">Run Analysis</button>
+      </div>
+
+      <div id="raResults"></div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script>
+    let testData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      preFillFromCache();
+      loadData();
+    });
+
+    function preFillFromCache() {
+      const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');
+      if (!cached) return;
+      document.getElementById('raModels').innerHTML = cached.models.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+      document.getElementById('raCategories').innerHTML = cached.categories.map(v =>
+        `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+    }
+
+    async function loadData() {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) return;
+      try {
+        const res = await fetch(`${window.API_BASE_URL}/api/database/tests`, {
+          headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail }
+        });
+        const data = await res.json();
+        if (!data.success) return;
+        testData = data.tests.filter(t => t.SourceType && t.SourceType !== 'Local Model Only');
+
+        const models = [...new Set(testData.map(t => t['ModelName-search']).filter(Boolean))];
+        const categories = [...new Set(testData.map(t => t.TestCategory).filter(Boolean))].sort();
+        localStorage.setItem('aips-compare-selectors', JSON.stringify({
+          pcCodes: [...new Set(testData.map(t => t.PcCode).filter(Boolean))],
+          models, categories
+        }));
+
+        document.getElementById('raModels').innerHTML = models.map(v =>
+          `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById('raCategories').innerHTML = categories.map(v =>
+          `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+
+        // Populate chairman model dropdown from Ollama
+        loadOllamaModels();
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadOllamaModels() {
+      try {
+        const res = await fetch(`${window.API_BASE_URL}/api/models`);
+        const data = await res.json();
+        const models = (data.models || []).map(m => m.name || m).filter(Boolean);
+        const sel = document.getElementById('chairmanModel');
+        models.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m; opt.textContent = m;
+          sel.appendChild(opt);
+        });
+        const saved = localStorage.getItem('aips-chairman-model');
+        if (saved && models.includes(saved)) sel.value = saved;
+      } catch (e) { console.error(e); }
+    }
+
+    function checked(id) {
+      return [...document.querySelectorAll(`#${id} input:checked`)].map(el => el.value);
+    }
+
+    async function runAnalysis() {
+      const selModels = checked('raModels');
+      const selCats = checked('raCategories');
+      const testEl = document.querySelector('input[name="raTest"]:checked');
+      const chairmanModel = document.getElementById('chairmanModel').value;
+
+      if (!selModels.length || !selCats.length || !testEl) {
+        document.getElementById('raResults').innerHTML =
+          '<div class="analyze-section"><p>Select at least one model, one category, and one test.</p></div>';
+        return;
+      }
+      if (!chairmanModel) {
+        document.getElementById('raResults').innerHTML =
+          '<div class="analyze-section"><p>Select a chairman model.</p></div>';
+        return;
+      }
+
+      localStorage.setItem('aips-chairman-model', chairmanModel);
+
+      const testCode = testEl.value;
+      const testLabel = testEl.closest('label').textContent.trim();
+
+      // Build advisors: Model × Category combos that have an Answer-search
+      const advisors = [];
+      const missing = [];
+      for (const model of selModels) {
+        for (const cat of selCats) {
+          const match = testData.find(t =>
+            t['ModelName-search'] === model &&
+            t.TestCategory === cat &&
+            t.TestCode === testCode &&
+            t['Answer-search']
+          );
+          const label = `${model} / ${cat}`;
+          if (match) advisors.push({ label, model, cat, answer: String(match['Answer-search']), score: match['WeightedScore-pct'], question: String(match.TestDescription || '') });
+          else missing.push(label);
+        }
+      }
+
+      if (advisors.length < 2) {
+        document.getElementById('raResults').innerHTML =
+          '<div class="analyze-section"><p>Need at least 2 advisor answers in the DB for the selected combination. Run those tests first.</p></div>';
+        return;
+      }
+
+      renderShell(advisors, missing, testLabel);
+      await runPeerReview(advisors, chairmanModel, testLabel);
+    }
+
+    function renderShell(advisors, missing, testLabel) {
+      const missingHtml = missing.length
+        ? `<div class="missing-warning">⚠ No answer found for: ${missing.join(', ')} — skipped.</div>` : '';
+
+      const cards = advisors.map((a, i) => `
+        <div class="advisor-card" id="advisor-card-${i}">
+          <div class="advisor-card-header">
+            <span>${a.label}</span>
+            <span class="advisor-status" id="advisor-status-${i}">${a.score != null ? parseFloat(a.score).toFixed(1) + '%' : '—'}</span>
+          </div>
+          <div class="advisor-card-body">${String(a.answer).replace(/</g, '&lt;')}</div>
+        </div>`).join('');
+
+      document.getElementById('raResults').innerHTML = `
+        <div class="analyze-section">
+          <h2>Advisors — ${testLabel}</h2>
+          ${missingHtml}
+          <div class="advisor-grid">${cards}</div>
+        </div>
+        <div class="analyze-section" id="reviewSection" style="display:none">
+          <h2>Peer Review</h2>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="reviewProgress"></div></div>
+          <div class="status-msg" id="reviewStatus">Running peer reviews…</div>
+          <div id="reviewCards"></div>
+        </div>
+        <div class="analyze-section" id="verdictSection" style="display:none">
+          <h2>Chairman's Verdict</h2>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="verdictProgress"></div></div>
+          <div class="status-msg" id="verdictStatus">Synthesizing…</div>
+          <div id="verdictContent"></div>
+        </div>`;
+    }
+
+    async function ollamaGenerate(model, prompt) {
+      const res = await fetch(`${window.API_BASE_URL}/api/search/ai-direct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Email': localStorage.getItem('userEmail') },
+        body: JSON.stringify({ model, query: prompt, stream: false })
+      });
+      const data = await res.json();
+      return data.answer || data.response || '';
+    }
+
+    async function runPeerReview(advisors, chairmanModel, testLabel) {
+      document.getElementById('reviewSection').style.display = '';
+
+      // Anonymize
+      const letters = 'ABCDEFGH';
+      const anonMap = advisors.map((a, i) => ({ ...a, letter: letters[i] }));
+      const anonBlock = anonMap.map(a =>
+        `Response ${a.letter}:\n${a.answer}`).join('\n\n---\n\n');
+
+      const question = advisors[0].question;
+      const reviews = [];
+
+      for (let i = 0; i < advisors.length; i++) {
+        document.getElementById('reviewProgress').style.width = `${Math.round((i / advisors.length) * 100)}%`;
+        document.getElementById('reviewStatus').textContent = `Peer review ${i + 1} of ${advisors.length}…`;
+
+        const prompt = `You are reviewing ${advisors.length} AI model answers to the same question.
+
+Question: ${question}
+
+${anonBlock}
+
+Answer these three questions. Be specific. Reference responses by letter.
+1. Which response is the strongest and why?
+2. Which response has the biggest blind spot or weakness?
+3. What did ALL responses miss that should be considered?
+
+Keep your review under 200 words. Be direct.`;
+
+        const review = await ollamaGenerate(chairmanModel, prompt);
+        reviews.push({ reviewer: advisors[i].label, review });
+
+        document.getElementById('reviewCards').innerHTML += `
+          <div style="margin-bottom:1rem;border:1px solid var(--border-color);border-radius:6px;overflow:hidden">
+            <div style="padding:0.4rem 0.8rem;background:var(--bg-color);font-size:0.82rem;font-weight:bold;border-bottom:1px solid var(--border-color)">Reviewer: ${advisors[i].label}</div>
+            <div style="padding:0.75rem 0.8rem;font-size:0.83rem;line-height:1.55;white-space:pre-wrap">${review.replace(/</g, '&lt;')}</div>
+          </div>`;
+      }
+
+      document.getElementById('reviewProgress').style.width = '100%';
+      document.getElementById('reviewStatus').textContent = 'Peer reviews complete.';
+
+      await runChairman(advisors, anonMap, reviews, chairmanModel, testLabel, question);
+    }
+
+    async function runChairman(advisors, anonMap, reviews, chairmanModel, testLabel, question) {
+      document.getElementById('verdictSection').style.display = '';
+      document.getElementById('verdictProgress').style.width = '40%';
+
+      const advisorBlock = anonMap.map(a =>
+        `${a.label} (Response ${a.letter}):\n${a.answer}`).join('\n\n---\n\n');
+      const reviewBlock = reviews.map((r, i) =>
+        `Review by ${r.reviewer}:\n${r.review}`).join('\n\n---\n\n');
+
+      const prompt = `You are the chairman synthesizing ${advisors.length} AI model answers and their peer reviews into a final verdict.
+
+Question: ${question}
+Test: ${testLabel}
+
+ADVISOR ANSWERS:
+${advisorBlock}
+
+PEER REVIEWS:
+${reviewBlock}
+
+Produce the verdict using exactly this structure:
+
+## Where the Advisors Agree
+[Points multiple advisors converged on independently.]
+
+## Where the Advisors Clash
+[Genuine disagreements. Present both sides.]
+
+## Blind Spots Caught
+[Things that only emerged through peer review.]
+
+## The Recommendation
+[Which answer is strongest and why. Be direct.]
+
+## The One Thing to Improve
+[The single most impactful improvement any model could make.]`;
+
+      const verdict = await ollamaGenerate(chairmanModel, prompt);
+      document.getElementById('verdictProgress').style.width = '100%';
+      document.getElementById('verdictStatus').textContent = 'Analysis complete.';
+
+      // Parse sections for display
+      const sections = [
+        { key: '## Where the Advisors Agree', label: 'Where the Advisors Agree' },
+        { key: '## Where the Advisors Clash', label: 'Where the Advisors Clash' },
+        { key: '## Blind Spots Caught', label: 'Blind Spots Caught' },
+        { key: '## The Recommendation', label: 'The Recommendation' },
+        { key: '## The One Thing to Improve', label: 'The One Thing to Improve' }
+      ];
+
+      let html = '';
+      sections.forEach((s, i) => {
+        const start = verdict.indexOf(s.key);
+        if (start === -1) return;
+        const nextStart = sections.slice(i + 1).map(n => verdict.indexOf(n.key)).find(p => p > start) ?? verdict.length;
+        const content = verdict.slice(start + s.key.length, nextStart).trim();
+        const isRec = i === 3 || i === 4;
+        html += `<div class="verdict-section">
+          <h4>${s.label}</h4>
+          ${isRec ? `<div class="verdict-highlight">${content.replace(/</g, '&lt;')}</div>` : `<p>${content.replace(/</g, '&lt;')}</p>`}
+        </div>`;
+      });
+
+      // Fallback: show raw if parsing failed
+      if (!html) html = `<div class="verdict-highlight">${verdict.replace(/</g, '&lt;')}</div>`;
+
+      document.getElementById('verdictContent').innerHTML = html;
+    }
+  </script>
+</body>
+</html>
