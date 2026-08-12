@@ -159,6 +159,9 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       
       const result = await response.json();
       searchResponse = result.message?.content || 'No response generated';
+      // Strip chain-of-thought <think>...</think> blocks (qwen3.5, gemma4, etc.)
+      searchResponse = searchResponse.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+      if (!searchResponse) searchResponse = 'No response generated';
       
       // Capture search metrics
       searchMetrics = {
