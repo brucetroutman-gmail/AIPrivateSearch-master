@@ -118,6 +118,9 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       // Extract chunks if available (for AI Document Chat searches)
       if (searchType === 'ai-document-chat' && methodResult.results && methodResult.results[0] && methodResult.results[0].chunks) {
         chunks = methodResult.results[0].chunks;
+      } else if (methodResult.results && methodResult.results.length) {
+        // For all other document search types, use result excerpts as source chunks
+        chunks = methodResult.results.slice(0, 8).map(r => r.excerpt || r.content || '').filter(Boolean);
       }
       
       // Create search metrics for document searches
@@ -182,7 +185,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let scoringMetrics = null;
     if (score && scoreModel) {
       try {
-        const scoringResult = await scoringService.score(query, searchResponse, scoreModel);
+        const scoringResult = await scoringService.score(query, searchResponse, scoreModel, 0.1, 2048, chunks);
         scores = scoringResult.scores;
         scoringMetrics = scoringResult.metrics;
       } catch (error) {

@@ -22,8 +22,8 @@
     },
     {
       "category": "score",
-      "modelName": "gemma2:2b",
-      "size": "1.6 GB"
+      "modelName": "mistral:7b",
+      "size": "4.4 GB"
     },
     {
       "category": "search",

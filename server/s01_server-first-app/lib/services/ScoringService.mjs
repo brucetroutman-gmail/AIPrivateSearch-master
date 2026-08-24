@@ -23,21 +23,30 @@ class ScoringService {
     return settings;
   }
 
-  async score(query, answer, scoreModel, temperature = 0.1, context = 2048) {
+  async score(query, answer, scoreModel, temperature = 0.1, context = 2048, chunks = null) {
     try {
       logger.log('Starting scoring process');
       
       if (!scoreModel) {
         throw new Error('Score model is required for scoring');
       }
-      
+
+      const sourceSection = chunks && chunks.length
+        ? `\nSOURCE DOCUMENTS (retrieved chunks):\n${chunks.slice(0, 5).map((c, i) => `[${i+1}] ${typeof c === 'string' ? c : c.excerpt || c.content || ''}`.trim()).join('\n---\n')}\n`
+        : '';
+
       const scoringPrompt = `Evaluate this answer using a 1-3 scale where:
 1 = Poor/Incorrect
 2 = Adequate/Mostly correct  
 3 = Excellent/Completely correct
 
 Query: ${query}
+${sourceSection}
 Answer: ${answer}
+
+IMPORTANT RULES:
+- If the answer is fewer than 15 words, or is a non-answer (e.g. "yes", "no", a single word, or clearly incomplete), score Accuracy=1 and Relevance=1.
+- If source documents are provided, check whether the answer correctly reflects what is in those sources. An answer claiming information is unavailable when the sources clearly contain it must score Accuracy=1.${sourceSection ? '\n- Base your Accuracy score on whether the answer matches the source documents above.' : ''}
 
 Rate each criterion (1-3):
 Accuracy (factual correctness): 
@@ -53,7 +62,7 @@ Respond with only three numbers, one per line.`;
         think: false,
         options: {
           temperature: temperature,
-          num_ctx: context,
+          num_ctx: chunks && chunks.length ? 8192 : context,
           num_predict: 200
         }
       });
@@ -135,13 +144,13 @@ Respond with only three numbers, one per line.`;
         scoreObj.relevance = relevance;
         scoreObj.organization = organization;
         
-        // Calculate weighted score
-        const rawScore = (3 * accuracy) + (2 * relevance) + (1 * organization);
-        scoreObj.total = Math.round((rawScore / 18) * 100);
+        // Calculate weighted score: Accuracy 4x, Relevance 3x, Organization 1x (max = 24)
+        const rawScore = (4 * accuracy) + (3 * relevance) + (1 * organization);
+        scoreObj.total = Math.round((rawScore / 24) * 100);
         
         logger.log(`Parsed scores: A=${accuracy}, R=${relevance}, O=${organization}`);
-        logger.log(`Calculation: (3×${accuracy}) + (2×${relevance}) + (1×${organization}) = ${rawScore}`);
-        logger.log(`Percentage: ${rawScore}/18 × 100 = ${scoreObj.total}%`);
+        logger.log(`Calculation: (4×${accuracy}) + (3×${relevance}) + (1×${organization}) = ${rawScore}`);
+        logger.log(`Percentage: ${rawScore}/24 × 100 = ${scoreObj.total}%`);
       }
       
       return scoreObj;
