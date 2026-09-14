@@ -2,25 +2,10 @@
  
 import { Ollama } from 'ollama';
 import { logger } from '../../../../shared/utils/logger.mjs';
-import { AppConfig } from '../utils/appConfig.mjs';
-import fs from 'fs';
-import path from 'path';
 
 class ScoringService {
   constructor() {
     this.ollama = new Ollama({ host: 'http://localhost:11434' });
-    this.scoreSettings = this.loadScoreSettings();
-  }
-
-  loadScoreSettings() {
-    const configPath = path.join(AppConfig.getConfigLocation(), 'score-settings');
-     
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    const settings = {};
-    config['score-settings'].forEach(item => {
-      Object.assign(settings, item);
-    });
-    return settings;
   }
 
   async score(query, answer, scoreModel, temperature = 0.1, context = 2048, chunks = null) {

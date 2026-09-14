@@ -457,8 +457,6 @@
       html += '</tbody></table></div>';
 
       const resultType = document.getElementById('resultType').value;
-      window._lastGroups = groups.map(g => ({ label: g.label, n: g.n, avgScore: g.avgScore, avgSimilarity: g.avgSimilarity, avgDuration: g.avgDuration, avgTokens: g.avgTokens }));
-      window._lastMetrics = metrics;
       if (resultType === 'chart') {
         renderCharts(groups, metrics);
       } else if (resultType === 'answers') {
