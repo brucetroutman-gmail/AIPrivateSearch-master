@@ -1,4 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
+ 
  
 import { Ollama } from 'ollama';
 import { logger } from '../../../../shared/utils/logger.mjs';
