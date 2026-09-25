@@ -5,70 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentence Transformers Test - AIPrivateSearch</title>
     <link rel="stylesheet" href="shared/styles.css">
-    <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-            --card-bg: white;
-            --border-color: #ddd;
-            --results-bg: #f8f9fa;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1a1a1a;
-                --text-color: #e0e0e0;
-                --card-bg: #2d2d2d;
-                --border-color: #444;
-                --results-bg: #333;
-            }
-        }
-        
-        body { 
-            background: var(--bg-color); 
-            color: var(--text-color); 
-            font-family: system-ui, sans-serif;
-            margin: 0;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section { 
-            margin: 2rem 0; 
-            padding: 1.5rem; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            background: var(--card-bg); 
-        }
-        .results { 
-            margin-top: 1rem; 
-            padding: 1rem; 
-            background: var(--results-bg); 
-            border-radius: 4px; 
-            min-height: 50px; 
-            border: 1px solid var(--border-color);
-        }
-        label { display: block; margin: 0.5rem 0; font-weight: bold; color: var(--text-color); }
-        select, textarea, input { 
-            width: 100%; 
-            padding: 0.5rem; 
-            margin: 0.25rem 0; 
-            border: 1px solid var(--border-color); 
-            border-radius: 4px; 
-            background: var(--card-bg);
-            color: var(--text-color);
-        }
-        button { 
-            background: #007bff; 
-            color: white; 
-            padding: 0.75rem 1.5rem; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            margin: 0.5rem 0; 
-        }
-        button:hover { background: #0056b3; }
-        h1, h3 { color: var(--text-color); }
-    </style>
     <script src="csrf.js"></script>
     <script type="module" src="shared/common.js"></script>
     <script>
@@ -83,7 +19,7 @@
         })();
     </script>
 </head>
-<body>
+<body class="st-page">
     <div id="header-placeholder"></div>
 
     <div class="page-content">
@@ -98,13 +34,13 @@
             
             <div class="section">
                 <h3>Single Text Embedding</h3>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Model:</label>
                     <select id="singleModel">
                         <option value="nomic-embed-text">nomic-embed-text (Accurate, 768d)</option>
                     </select>
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Text:</label>
                     <textarea id="singleText" rows="3" placeholder="Enter text to embed...">The quick brown fox jumps over the lazy dog.</textarea>
                 </div>
@@ -114,17 +50,17 @@
             
             <div class="section">
                 <h3>Similarity Comparison</h3>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Model:</label>
                     <select id="compareModel">
                         <option value="nomic-embed-text">nomic-embed-text (Accurate, 768d)</option>
                     </select>
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Text 1:</label>
                     <textarea id="text1" rows="2" placeholder="First text...">The cat sat on the mat.</textarea>
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Text 2:</label>
                     <textarea id="text2" rows="2" placeholder="Second text...">A feline rested on the rug.</textarea>
                 </div>
@@ -134,17 +70,17 @@
             
             <div class="section">
                 <h3>Document Search Test</h3>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Collection:</label>
                     <select id="testCollection">
                         <option value="">Select collection...</option>
                     </select>
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>Query:</label>
                     <input type="text" id="testQuery" placeholder="Enter search query..." value="medical treatment">
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="st-field">
                     <label>
                         <input type="checkbox" id="useTransformers"> Use Sentence Transformers
                     </label>
@@ -163,7 +99,7 @@
         async function loadModels() {
             const modelsList = document.getElementById('modelsList');
             modelsList.innerHTML = `
-                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background: var(--card-bg);">
+                <div class="st-similarity-box">
                     <strong>nomic-embed-text</strong> (768d, 8192 tokens)<br>
                     <small>High accuracy, long context - Primary embedding model</small>
                 </div>
@@ -222,10 +158,10 @@
                         <p><strong>First 10 values:</strong> [${result.embedding.slice(0, 10).map(v => v.toFixed(4)).join(', ')}...]</p>
                     `;
                 } else {
-                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error}</div>`;
+                    resultDiv.innerHTML = `<div class="st-error">Error: ${result.error}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="st-error">Error: ${error.message}</div>`;
             } finally {
                 isProcessing = false;
             }
@@ -266,22 +202,22 @@
                 
                 if (response.ok) {
                     const similarityPercent = (result.similarity * 100).toFixed(1);
-                    const similarityColor = result.similarity > 0.7 ? 'green' : result.similarity > 0.4 ? 'orange' : 'red';
+                    const similarityColor = result.similarity > 0.7 ? 'st-sim-green' : result.similarity > 0.4 ? 'st-sim-orange' : 'st-sim-red';
                     
                     resultDiv.innerHTML = `
                         <h4>Similarity Comparison (${elapsedTime}ms)</h4>
                         <p><strong>Model:</strong> ${result.model}</p>
-                        <p><strong>Similarity:</strong> <span style="color: ${similarityColor}; font-weight: bold;">${similarityPercent}%</span></p>
-                        <div style="margin-top: 10px;">
+                        <p><strong>Similarity:</strong> <span class="${similarityColor}">${similarityPercent}%</span></p>
+                        <div class="st-spaced-top">
                             <p><strong>Text 1:</strong> "${result.text1}"</p>
                             <p><strong>Text 2:</strong> "${result.text2}"</p>
                         </div>
                     `;
                 } else {
-                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error}</div>`;
+                    resultDiv.innerHTML = `<div class="st-error">Error: ${result.error}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="st-error">Error: ${error.message}</div>`;
             } finally {
                 isProcessing = false;
             }
@@ -329,21 +265,21 @@
                         <h4>Search Results (${elapsedTime}ms)</h4>
                         <p><strong>Method:</strong> ${useTransformers ? 'Sentence Transformers' : 'Ollama Embeddings'}</p>
                         <p><strong>Results:</strong> ${result.results.length}</p>
-                        <div style="margin-top: 10px;">
+                        <div class="st-spaced-top">
                             ${result.results.slice(0, 3).map((chunk, i) => `
-                                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <div class="st-chunk-box">
                                     <strong>Result ${i + 1}</strong> (${(chunk.similarity * 100).toFixed(1)}% similarity)<br>
                                     <small><strong>File:</strong> ${chunk.filename}</small><br>
-                                    <div style="margin-top: 5px;">${chunk.content.substring(0, 200)}...</div>
+                                    <div class="st-chunk-content">${chunk.content.substring(0, 200)}...</div>
                                 </div>
                             `).join('')}
                         </div>
                     `;
                 } else {
-                    resultDiv.innerHTML = `<div style="color: red;">Error: ${result.error || 'Search failed'}</div>`;
+                    resultDiv.innerHTML = `<div class="st-error">Error: ${result.error || 'Search failed'}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="st-error">Error: ${error.message}</div>`;
             } finally {
                 isProcessing = false;
             }

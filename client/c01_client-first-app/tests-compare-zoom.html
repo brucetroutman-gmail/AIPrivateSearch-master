@@ -17,144 +17,18 @@
       if (!savedTheme) localStorage.setItem('theme', theme);
     })();
   </script>
-  <style>
-    .analyze-container {
-      max-width: 1400px;
-      margin: 2rem auto;
-      padding: 0 2rem;
-    }
-
-    .analyze-section {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 10px var(--shadow);
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      color: #3498db;
-      text-decoration: none;
-    }
-
-    .back-link:hover { text-decoration: underline; }
-
-    .compare-selectors {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .compare-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      min-width: 160px;
-    }
-
-    .compare-group label.group-label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text-color);
-      margin-bottom: 0.2rem;
-    }
-
-    .checkbox-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.4rem 0.6rem;
-      background: var(--card-bg);
-    }
-
-    .checkbox-list label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      color: var(--text-color);
-    }
-
-    .metric-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .metric-selector label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-
-    .metric-selector select {
-      padding: 0.3rem 0.6rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: var(--card-bg);
-      color: var(--text-color);
-    }
-
-    .zoom-chart-wrap {
-      position: relative;
-      height: 480px;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5rem;
-    }
-
-    .data-table th,
-    .data-table td {
-      border: 1px solid var(--border-color);
-      padding: 0.6rem 0.75rem;
-      text-align: center;
-      color: var(--text-color);
-      font-size: 0.9rem;
-    }
-
-    .data-table th {
-      background: var(--bg-color);
-      font-weight: bold;
-    }
-
-    .data-table tbody tr:nth-child(even) { background: var(--bg-color); }
-    .data-table tbody tr:hover { background: var(--border-color); }
-
-    [data-theme="dark"] .data-table th { background: #2c3e50; border-color: #34495e; }
-    [data-theme="dark"] .data-table tbody tr:nth-child(even) { background: #34495e; }
-    [data-theme="dark"] .data-table tbody tr:hover { background: #3c5a78; }
-    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #87ceeb; }
-
-    .best-score { background: #1a7a3a !important; color: #fff; font-weight: bold; }
-    .worst-score { background: #7a1a1a !important; color: #fff; }
-  </style>
 </head>
 <body>
   <div id="header-placeholder"></div>
 
   <div class="page-content">
-    <main class="analyze-container">
+    <main class="analyze-container tcz-page">
       <a href="tests-compare.html" class="back-link">← Back to Compare</a>
       <h1 id="pageTitle">Compare Zoom</h1>
 
       <div class="analyze-section">
         <h2>Comparison Analysis</h2>
-        <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Select one or more values in each group. Each unique combination becomes a column.</p>
+        <p class="compare-note">Select one or more values in each group. Each unique combination becomes a column.</p>
         <div class="compare-selectors">
           <div class="compare-group">
             <label class="group-label">PC Code</label>
@@ -179,26 +53,26 @@
           </div>
           <div class="compare-group">
             <label class="group-label">Test</label>
-            <div style="font-size:0.8rem;font-weight:bold;margin-bottom:0.3rem;opacity:0.7">Email</div>
+            <div class="compare-subhead">Email</div>
             <div class="checkbox-list" id="compareTests-email">
               <label><input type="checkbox" data-test-group="email" value="t27811113351"> E1 — Find emails about parts orders</label>
               <label><input type="checkbox" data-test-group="email" value="t27812113351"> E2 — What parts were ordered from…</label>
               <label><input type="checkbox" data-test-group="email" value="t27813113351"> E3 — What is the main business rel…</label>
               <label><input type="checkbox" data-test-group="email" value="t27814113351"> E4 — Find emails about monthly rep…</label>
             </div>
-            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Federalist</div>
+            <div class="compare-subhead-spaced">Federalist</div>
             <div class="checkbox-list" id="compareTests-federalist">
               <label><input type="checkbox" data-test-group="federalist" value="t27411135461"> F1 — What arguments does Hamilton…</label>
               <label><input type="checkbox" data-test-group="federalist" value="t27412135461"> F2 — Compare the arguments for Un…</label>
               <label><input type="checkbox" data-test-group="federalist" value="t27413135461"> F3 — Summarize the main themes of…</label>
             </div>
-            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Legal</div>
+            <div class="compare-subhead-spaced">Legal</div>
             <div class="checkbox-list" id="compareTests-legal">
               <label><input type="checkbox" data-test-group="legal" value="t27611114321"> L1 — Which clients have durable po…</label>
               <label><input type="checkbox" data-test-group="legal" value="t27612114321"> L2 — Show upcoming appointments</label>
               <label><input type="checkbox" data-test-group="legal" value="t27613114321"> L3 — What are the most common type…</label>
             </div>
-            <div style="font-size:0.8rem;font-weight:bold;margin:0.5rem 0 0.3rem;opacity:0.7">Medical</div>
+            <div class="compare-subhead-spaced">Medical</div>
             <div class="checkbox-list" id="compareTests-medical">
               <label><input type="checkbox" data-test-group="medical" value="t27711115451"> M1 — Find patients with diabetes</label>
               <label><input type="checkbox" data-test-group="medical" value="t27712115451"> M2 — What medications is William A…</label>
@@ -220,7 +94,7 @@
         <button onclick="runZoom()" class="update-analysis-btn">Run Comparison</button>
       </div>
 
-      <div class="analyze-section" id="zoomSection" style="display:none">
+      <div class="analyze-section hidden" id="zoomSection">
         <h2 id="chartTitle"></h2>
         <div class="zoom-chart-wrap">
           <canvas id="zoomCanvas"></canvas>
@@ -355,7 +229,7 @@
       });
 
       if (!selPc.length && !selModels.length && !selCats.length && !selQTypes.length && !selTests.length) {
-        document.getElementById('zoomSection').style.display = 'none';
+        document.getElementById('zoomSection').classList.add('hidden');
         return;
       }
 
@@ -397,7 +271,7 @@
 
       document.getElementById('pageTitle').textContent = `Compare Zoom — ${m.label}`;
       document.getElementById('chartTitle').textContent = m.label;
-      document.getElementById('zoomSection').style.display = '';
+      document.getElementById('zoomSection').classList.remove('hidden');
 
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#ecf0f1' : '#2c3e50';
@@ -467,7 +341,7 @@
           if (v === best) cls = 'best-score';
           else if (v === worst) cls = 'worst-score';
         }
-        tHtml += `<tr><td style="text-align:left">${g.label}</td><td class="${cls}">${display}</td><td>${g.n}</td></tr>`;
+        tHtml += `<tr><td class="metric-label-cell">${g.label}</td><td class="${cls}">${display}</td><td>${g.n}</td></tr>`;
       });
       tHtml += '</tbody>';
       document.getElementById('dataTable').innerHTML = tHtml;

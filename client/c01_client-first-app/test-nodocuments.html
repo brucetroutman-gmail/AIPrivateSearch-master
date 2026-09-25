@@ -21,44 +21,8 @@
             }
         })();
     </script>
-    <style>
-        :root {
-            --success-bg: #d4edda;
-            --success-border: #28a745;
-            --error-bg: #f8d7da;
-            --error-border: #dc3545;
-            --status-bg: #f39c12;
-        }
-        
-        [data-theme="dark"] {
-            --success-bg: #1e4d3a;
-            --success-border: #28a745;
-            --error-bg: #4d1e1e;
-            --error-border: #dc3545;
-            --status-bg: #f39c12;
-        }
-        
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
-        .section { margin: 20px 0; border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; background: var(--card-bg); transition: background-color 0.3s; }
-        .section-header { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
-        .subsection { margin: 10px 0 10px 20px; }
-        .subsection-header { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        .test-item { margin: 5px 0; padding: 5px; }
-        .test-code { font-family: monospace; font-weight: bold; color: #0066cc; }
-        .controls { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; transition: background-color 0.3s; }
-        .execute-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        .execute-btn:hover { background: #0056b3; }
-        .execute-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .results { margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 5px; min-height: 100px; transition: background-color 0.3s; }
-        .test-item.disabled { opacity: 0.5; }
-        .test-item.disabled input { cursor: not-allowed; }
-        .test-item.disabled label { color: #999; cursor: not-allowed; }
-        .section-header.disabled { opacity: 0.5; }
-        .section-header.disabled input { cursor: not-allowed; }
-        .section-header.disabled label { color: #999; cursor: not-allowed; }
-    </style>
 </head>
-<body>
+<body class="test-nodocuments-page">
     <div id="header-placeholder"></div>
 
     <div class="page-content">

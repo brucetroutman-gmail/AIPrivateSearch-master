@@ -91,6 +91,7 @@ class TierAccessManager {
       const els = document.querySelectorAll(className);
       console.log(`🔐 TIER CSS SHOW: ${className} → found ${els.length} elements`);
       els.forEach(el => {
+        el.classList.remove('hidden');
         el.style.display = '';
       });
     });
@@ -100,7 +101,7 @@ class TierAccessManager {
       const els = document.querySelectorAll(className);
       console.log(`🔐 TIER CSS HIDE: ${className} → found ${els.length} elements`);
       els.forEach(el => {
-        el.style.display = 'none';
+        el.classList.add('hidden');
       });
     });
   }

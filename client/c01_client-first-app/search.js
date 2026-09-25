@@ -17,6 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     tokens: 'tokens',
     topk: 'topk'
   });
+  
+  // Initialize mode toggle handlers
+  if (modeAutoRadio && modeManualRadio) {
+    modeAutoRadio.addEventListener('change', handleModeChange);
+    modeManualRadio.addEventListener('change', handleModeChange);
+    // Initialize to Auto mode
+    handleModeChange();
+  }
 });
 
 const form       = document.getElementById('searchForm');
@@ -41,12 +49,80 @@ const vectorDBEl = document.getElementById('vectorDB');
 const vectorDBSection = document.getElementById('vectorDBSection');
 const addMetaPromptEl = document.getElementById('addMetaPrompt');
 
+// Query Intelligence Layer elements
+const modeAutoRadio = document.getElementById('modeAuto');
+const modeManualRadio = document.getElementById('modeManual');
+const manualControlsSection = document.getElementById('manualControlsSection');
+const smartSearchInfo = document.getElementById('smartSearchInfo');
+const detectedTypeEl = document.getElementById('detectedType');
+const selectedMethodEl = document.getElementById('selectedMethod');
+const queryImprovedSection = document.getElementById('queryImprovedSection');
+const improvedQueryEl = document.getElementById('improvedQuery');
+
 let systemPrompts = [];
 let visibilityConfig = null;
 
 // Utility function to format CreatedAt timestamps
 function formatCreatedAt(timestamp) {
   return timestamp ? new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ') : null;
+}
+
+// Handle search mode toggle (Auto vs Advanced)
+function handleModeChange() {
+  const isAutoMode = modeAutoRadio && modeAutoRadio.checked;
+  
+  // Show/hide manual controls based on mode
+  if (manualControlsSection) {
+    if (isAutoMode) {
+      manualControlsSection.classList.add('hidden');
+    } else {
+      manualControlsSection.classList.remove('hidden');
+    }
+  }
+  
+  logger.log(`[Mode] Switched to ${isAutoMode ? 'Auto' : 'Advanced'} mode`);
+}
+
+// Display query intelligence metadata
+function displayQueryMetadata(metadata) {
+  if (!metadata || !smartSearchInfo) return;
+  
+  // Only show if intelligence was used
+  if (metadata.intelligenceUsed && !metadata.testMode) {
+    // Show the section
+    smartSearchInfo.classList.remove('hidden');
+    
+    // Display detected type with badge
+    if (detectedTypeEl && metadata.detectedType) {
+      const badge = document.createElement('span');
+      badge.className = `badge badge-${metadata.detectedType}`;
+      badge.textContent = metadata.detectedType;
+      detectedTypeEl.textContent = '';
+      detectedTypeEl.appendChild(badge);
+    }
+    
+    // Display selected method
+    if (selectedMethodEl && metadata.autoSelectedMethod) {
+      const methodBadge = document.createElement('span');
+      methodBadge.className = 'badge badge-auto';
+      methodBadge.textContent = 'auto-selected';
+      selectedMethodEl.textContent = '';
+      selectedMethodEl.appendChild(methodBadge);
+    }
+    
+    // Display query improvement if applicable
+    if (metadata.wasImproved && queryImprovedSection && improvedQueryEl) {
+      queryImprovedSection.classList.remove('hidden');
+      improvedQueryEl.textContent = metadata.originalQuery;
+    } else if (queryImprovedSection) {
+      queryImprovedSection.classList.add('hidden');
+    }
+    
+    logger.log('[QueryMetadata] Displayed:', metadata);
+  } else {
+    // Hide the section if intelligence wasn't used
+    smartSearchInfo.classList.add('hidden');
+  }
 }
 
 // Load collections using same method as multi-mode page
@@ -866,6 +942,11 @@ function render(result) {
   
   // Store result for export
   window.currentResult = result;
+  
+  // Display query intelligence metadata if present
+  if (result.queryMetadata) {
+    displayQueryMetadata(result.queryMetadata);
+  }
 
   // 1. the answer using multi-mode format
   const answerH = document.createElement('h3');
@@ -1176,10 +1257,10 @@ form.addEventListener('submit', async (e) => {
   updateProgress('Loading');
 
   try {
-    // Get selected system prompt
-    const selectedPrompt = systemPrompts.find(p => p.name === assistantTypeEl.value);
-    const systemPrompt = selectedPrompt ? selectedPrompt.prompt : null;
-    const systemPromptName = selectedPrompt ? selectedPrompt.name : null;
+    // Assistant Type is temporarily disabled (not wired to the model); send null.
+    // Revisit later — see systemPrompt handling in routes/search.mjs and lib/search AI methods.
+    const systemPrompt = null;
+    const systemPromptName = null;
     
     // Get token limit
     const tokenLimit = tokensEl.value ? parseInt(tokensEl.value) : 1024;
@@ -1190,9 +1271,19 @@ form.addEventListener('submit', async (e) => {
     // Generate TestCode
     const testCode = generateTestCode();
     
+    // Determine search mode and type
+    const isAutoMode = modeAutoRadio && modeAutoRadio.checked;
+    
     // Get collection and search type if Local Documents source type is selected
     const collection = (sourceTypeEl.value.includes('Docu')) ? collectionEl.value : null;
-    const searchType = (sourceTypeEl.value.includes('Docu')) ? searchTypeEl.value : null;
+    let searchType = null;
+    
+    if (sourceTypeEl.value.includes('Docu')) {
+      // If Auto mode, send 'auto' to let backend decide
+      // If Advanced mode, use selected search type
+      searchType = isAutoMode ? 'auto' : searchTypeEl.value;
+    }
+    
     const showChunks = document.getElementById('showChunksToggle').checked;
     const scoreModel = scoreTglEl.checked ? document.getElementById('scoreModel').value : null;
     const addMetaPrompt = addMetaPromptEl ? addMetaPromptEl.checked : false;
@@ -1211,7 +1302,10 @@ form.addEventListener('submit', async (e) => {
     window._lastSearchQuery = trimmedQuery;
     
     let result;
-    if (searchType === 'document-search') {
+    // Note: In auto mode, searchType will be 'auto' initially, but backend returns the actual selected method
+    const actualSearchType = isAutoMode ? null : searchType; // Only use for routing if not auto mode
+    
+    if (actualSearchType === 'document-search') {
       // Use same endpoint as multi-mode for document-search searches
       const searchStartTime = Date.now();
       const searchResult = await window.documentSearchCommon.performDocumentSearch(trimmedQuery, collection);
@@ -1271,10 +1365,11 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'ai-document-chat') {
-      // Use main search endpoint for AI Document Chat searches to support scoring
+    } else if (actualSearchType === 'ai-document-chat' || isAutoMode) {
+      // Use main search endpoint for AI Document Chat or Auto mode
+      // Auto mode sends 'auto' and backend will select the appropriate method
       result = await search(trimmedQuery, scoreTglEl.checked, modelEl.value, parseFloat(temperatureEl.value), parseFloat(contextEl.value), systemPrompt, systemPromptName, tokenLimit, sourceTypeEl.value, testCode, collection, showChunks, scoreModel, addMetaPrompt, searchType, topK);
-    } else if (searchType === 'document-index') {
+    } else if (actualSearchType === 'document-index') {
       // Use metadata search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.documentIndexSearchCommon.performDocumentIndexSearch(trimmedQuery, collection);
@@ -1301,7 +1396,7 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'smart-search') {
+    } else if (actualSearchType === 'smart-search') {
       // Use Smart Search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.smartSearchCommon.performSmartSearch(trimmedQuery, collection, 5);
@@ -1327,7 +1422,7 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'hybrid-search') {
+    } else if (actualSearchType === 'hybrid-search') {
       // Use Hybrid Search common utility
       const searchStartTime = Date.now();
       const searchResult = await window.hybridSearchCommon.performHybridSearch(trimmedQuery, collection, 5);
@@ -1353,7 +1448,7 @@ form.addEventListener('submit', async (e) => {
           }
         }
       };
-    } else if (searchType === 'ai-direct') {
+    } else if (actualSearchType === 'ai-direct') {
       // Use AI Direct common utility
       const searchStartTime = Date.now();
       result = await window.aiDirectCommon.handleSearchPageAIDirectSearch(trimmedQuery, collection, {

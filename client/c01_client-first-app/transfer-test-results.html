@@ -14,74 +14,11 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
-  <style>
-    .transfer-container {
-      max-width: 600px;
-      margin: 2rem auto;
-      padding: 0 2rem;
-    }
-    .transfer-section {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 10px var(--shadow);
-    }
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      margin-bottom: 1rem;
-    }
-    .field-group label {
-      font-weight: bold;
-      font-size: 0.9rem;
-      color: var(--text-color);
-    }
-    .field-group select {
-      padding: 0.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: var(--card-bg);
-      color: var(--text-color);
-      font-size: 1rem;
-    }
-    .transfer-btn {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-    .transfer-btn:hover { background: #c0392b; }
-    .transfer-btn:disabled { background: #999; cursor: not-allowed; }
-    .result-msg {
-      margin-top: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 4px;
-      display: none;
-    }
-    .result-msg.success { }
-    .result-msg.error   { }
-    .warning-box {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffc107;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-    [data-theme="dark"] .warning-box { background: #3d2e00; color: #ffc107; border-color: #856404; }
-  </style>
 </head>
 <body>
   <div id="header-placeholder"></div>
   <div class="page-content">
-    <main class="transfer-container">
+    <main class="transfer-container transfer-page">
       <h1>Transfer to Test Results</h1>
       <p>Copies rows from <strong>searches</strong> to <strong>searches-testresults</strong> for the selected Test Category and PC Code. Existing rows with the same category and PC code in searches-testresults are deleted first.</p>
 

@@ -38,12 +38,13 @@ Primary search with optional AI scoring.
   "model": "qwen2.5:3b",
   "sourceType": "local-documents | local-model",
   "collection": "collection-name",
-  "searchType": "line-search | document-search | smart-search | ...",
+  "searchType": "auto | line-search | document-search | smart-search | ...",
   "score": false,
   "scoreModel": "gemma2:2b",
   "temperature": 0.7,
   "tokenLimit": 2048,
-  "useWildcards": true
+  "useWildcards": true,
+  "useIntelligence": true
 }
 
 // Response
@@ -61,11 +62,65 @@ Primary search with optional AI scoring.
   "metrics": {
     "search": { "model": "...", "total_duration": 0, "eval_count": 0 },
     "scoring": { "model": "...", "total_duration": 0, "eval_count": 0 }
+  },
+  "queryMetadata": {
+    "originalQuery": "...",
+    "wasImproved": false,
+    "detectedType": "fact | analysis | creative | null",
+    "autoSelectedMethod": false,
+    "testMode": false,
+    "intelligenceUsed": true,
+    "improvementReason": "...",
+    "configReasoning": "..."
   }
 }
 ```
 
+**Query Intelligence Layer** — when `searchType` is `"auto"` (or omitted), the server analyzes the query, may improve it, and auto-selects a search method and parameters. Behavior is controlled by:
+
+- `searchType: "auto"` — request automatic method selection.
+- `useIntelligence` (boolean, default `true`) — the **only** way to disable analysis/improvement/auto-selection. Set `false` to turn the layer off.
+- `testCode` present — **test mode**: flagged in `queryMetadata.testMode`, but the intelligence layer **still runs**. Query analysis and query improvement are applied to the test prompt. Any `searchType` and parameters (temperature, context, topK) explicitly supplied by the test are preserved — auto-selection and auto-configuration only fill in values that were not supplied. To run a test with the layer off, send `useIntelligence: false`.
+
+The `queryMetadata` object reports what the intelligence layer did: `detectedType` is the query classification, `wasImproved` indicates the query was rewritten, `autoSelectedMethod` indicates the method was chosen automatically, and `intelligenceUsed`/`testMode` reflect whether analysis ran and whether a `testCode` was present.
+
 **Rate limit**: 30 requests / 60s
+
+---
+
+### POST `/api/search/analyze-query`
+Analyze a query **without** running a search. Used by the Auto mode UI and the `test-query-intelligence.html` page.
+
+```json
+// Request
+{ "query": "clients with POA" }
+
+// Response
+{
+  "original": "clients with POA",
+  "analysis": {
+    "type": "fact | analysis | creative",
+    "quality": "good | needs-improvement",
+    "improved_query": "Which clients have power of attorney documents?",
+    "reasoning": "..."
+  },
+  "improved": {
+    "original": "clients with POA",
+    "enhanced": "Which clients have power of attorney documents?",
+    "wasImproved": true,
+    "reasoning": "..."
+  },
+  "recommendedMethod": "hybrid-search",
+  "recommendedParams": {
+    "temperature": 0.1,
+    "topK": 10,
+    "context": 4096,
+    "systemPrompt": "..."
+  }
+}
+```
+
+Returns `400` if `query` is missing, `500` if analysis fails.
 
 ---
 

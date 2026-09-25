@@ -62,14 +62,33 @@ Best for finding specific text, phrases, names, or dates in your documents.
 
 Best for questions requiring understanding, reasoning, or synthesis across documents.
 
-### Steps
+### Using Auto Mode
+
+The AI Search page opens in **Auto mode** by default. In Auto mode you don't need to pick a method — the system reads your query and does the work for you:
+
 1. Go to **AI Search**
-2. Select a **Collection** (for document-based methods)
-3. Select an **AI Model** (e.g. qwen2.5:3b, llama3.2:3b)
-4. Choose one or more AI methods
-5. Enter your **query**
-6. Optionally enable **scoring** and select a score model
-7. Click **Search Selected Methods**
+2. Make sure the mode toggle at the top is set to **🤖 Auto** (the default)
+3. Select a **Collection** and an **AI Model**
+4. Enter your **query**
+5. Click **Search**
+
+The system will:
+- Detect what kind of query you asked (a fact, an analysis, or creative content)
+- Improve vague queries automatically (and show you the improved version)
+- Pick the best AI method and settings for you
+- Show a **🧠 Smart Search Details** panel explaining what it did
+
+If you want full control, switch the toggle to **⚙️ Advanced** to choose and compare methods manually (the steps below).
+
+### Advanced Mode Steps
+1. Go to **AI Search**
+2. Switch the mode toggle to **⚙️ Advanced**
+3. Select a **Collection** (for document-based methods)
+4. Select an **AI Model** (e.g. qwen2.5:3b, llama3.2:3b)
+5. Choose one or more AI methods
+6. Enter your **query**
+7. Optionally enable **scoring** and select a score model
+8. Click **Search Selected Methods**
 
 ### When to use each method
 

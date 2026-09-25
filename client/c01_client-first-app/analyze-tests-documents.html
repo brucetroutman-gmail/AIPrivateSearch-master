@@ -19,192 +19,12 @@
       }
     })();
   </script>
-  <style>
-    .analyze-container {
-      max-width: 1400px;
-      margin: 2rem auto;
-      padding: 0 2rem;
-    }
-    
-    .analyze-section {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 10px var(--shadow);
-    }
-    
-    .filters {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    
-    .filter-group label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-    
-    .filter-group select {
-      padding: 0.4rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: var(--card-bg);
-      color: var(--text-color);
-    }
-    
-    .report-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid var(--border-color);
-    }
-    
-    .tab-button {
-      padding: 0.5rem 1rem;
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.3s;
-    }
-    
-    .tab-button.active {
-      border-bottom-color: #3498db;
-      color: #3498db;
-    }
-    
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background: var(--card-bg);
-    }
-    
-    .comparison-table th,
-    .comparison-table td {
-      border: 1px solid var(--border-color);
-      padding: 0.75rem 0.5rem;
-      text-align: center;
-      color: var(--text-color);
-    }
-    
-    .comparison-table th {
-      background: var(--bg-color);
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    
-    .comparison-table tbody tr:nth-child(even) {
-      background: var(--bg-color);
-    }
-    
-    .comparison-table tbody tr:hover {
-      background: var(--border-color);
-    }
-    
-    [data-theme="dark"] .comparison-table th {
-      background: #2c3e50;
-      border-color: #34495e;
-    }
-    
-    [data-theme="dark"] .comparison-table tbody tr:nth-child(even) {
-      background: #34495e;
-    }
-    
-    [data-theme="dark"] .comparison-table tbody tr:hover {
-      background: #3c5a78;
-    }
-    
-    .chart-container {
-      margin: 1rem 0;
-      background: var(--bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 1rem;
-      color: var(--text-color);
-      overflow-x: auto;
-    }
-    
-    .chart-container .comparison-table {
-      margin: 0;
-    }
-    
-    .chart-container .comparison-table td small {
-      color: var(--text-color);
-      opacity: 0.7;
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-    
-    .stat-card {
-      background: var(--bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 1rem;
-      text-align: center;
-    }
-    
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #3498db;
-    }
-    
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-color);
-      margin-top: 0.5rem;
-    }
-    
-    [data-theme="dark"] h1 {
-      color: #87ceeb;
-    }
-    
-    [data-theme="dark"] h2, [data-theme="dark"] h3 {
-      color: #87ceeb;
-    }
-    
-    [data-theme="dark"] tr[style*="background:#fff8e1"] {
-      background: #3d3000 !important;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-color);
-    }
-  </style>
 </head>
 <body>
   <div id="header-placeholder"></div>
 
   <div class="page-content">
-    <main class="analyze-container">
+    <main class="analyze-container analyze-tests-page">
       <h1>Document Collection Analysis</h1>
       <p>Analysis of AI model performance on document collection searches (Local Documents and Local Model + Documents).</p>
       
@@ -307,7 +127,7 @@
         
         <div id="searchscore" class="tab-content">
           <h3>Search × Score Model Combinations</h3>
-          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Each row is a unique (search model, score model) pair. <span style="background:#fff3cd;color:#856404;padding:0.1rem 0.4rem;border-radius:3px">⚠ Same model</span> pairs may inflate scores (self-preference).</p>
+          <p class="analyze-note">Each row is a unique (search model, score model) pair. <span class="same-model-badge">⚠ Same model</span> pairs may inflate scores (self-preference).</p>
           <table class="comparison-table" id="searchScoreTable">
             <thead>
               <tr>
@@ -427,7 +247,7 @@
             </thead>
             <tbody><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
           </table>
-          <h4 style="margin-top:1.5rem">Chunk Count vs Score</h4>
+          <h4 class="chart-heading">Chunk Count vs Score</h4>
           <table class="comparison-table" id="chunkCountScoreTable">
             <thead>
               <tr>
@@ -439,7 +259,7 @@
             </thead>
             <tbody><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
           </table>
-          <h4 style="margin-top:1.5rem">Recent Tests with Chunks</h4>
+          <h4 class="chart-heading">Recent Tests with Chunks</h4>
           <table class="comparison-table" id="chunkDetailTable">
             <thead>
               <tr>
@@ -454,9 +274,9 @@
             </thead>
             <tbody><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
           </table>
-          <div id="chunkDrilldown" style="display:none;margin-top:1rem" class="chart-container">
+          <div id="chunkDrilldown" class="chart-container chunk-drilldown">
             <strong id="chunkDrilldownTitle"></strong>
-            <table class="comparison-table" style="margin-top:0.5rem" id="chunkDrilldownTable">
+            <table class="comparison-table chunk-drilldown-table" id="chunkDrilldownTable">
               <thead><tr><th>#</th><th>File</th><th>Chunk</th><th>Similarity</th><th>Content Preview</th></tr></thead>
               <tbody></tbody>
             </table>
@@ -465,7 +285,7 @@
 
         <div id="rag" class="tab-content">
           <h3>RAG Optimization — Best Settings by Collection &amp; Query Type</h3>
-          <p style="font-size:0.9rem;color:var(--text-color);opacity:0.8">Based on <strong>searches-testresults</strong> baseline data. Shows top-scoring model + settings per combination. Minimum 2 scored tests required.</p>
+          <p class="analyze-note">Based on <strong>searches-testresults</strong> baseline data. Shows top-scoring model + settings per combination. Minimum 2 scored tests required.</p>
 
           <h4>Best Model × Query Type</h4>
           <table class="comparison-table" id="ragQueryTypeTable">
@@ -473,19 +293,19 @@
             <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
           </table>
 
-          <h4 style="margin-top:1.5rem">Best Model × Collection</h4>
+          <h4 class="chart-heading">Best Model × Collection</h4>
           <table class="comparison-table" id="ragCollectionTable">
             <thead><tr><th>Collection</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>PcCode</th><th>Tests</th></tr></thead>
             <tbody><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
           </table>
 
-          <h4 style="margin-top:1.5rem">Model × Query Type Matrix</h4>
+          <h4 class="chart-heading">Model × Query Type Matrix</h4>
           <div id="ragModelQueryMatrix" class="chart-container"><div class="loading">Loading...</div></div>
 
-          <h4 style="margin-top:1.5rem">Model × Collection Matrix</h4>
+          <h4 class="chart-heading">Model × Collection Matrix</h4>
           <div id="ragModelCollectionMatrix" class="chart-container"><div class="loading">Loading...</div></div>
 
-          <h4 style="margin-top:1.5rem">Best Settings per Collection × Query Type</h4>
+          <h4 class="chart-heading">Best Settings per Collection × Query Type</h4>
           <table class="comparison-table" id="ragBestSettingsTable">
             <thead><tr><th>Collection</th><th>Query Type</th><th>Best Model</th><th>Avg Score</th><th>Temp</th><th>Context</th><th>TopK</th><th>Token Limit</th><th>Hardware</th><th>Tests</th></tr></thead>
             <tbody><tr><td colspan="10" class="loading">Loading...</td></tr></tbody>
@@ -1093,7 +913,7 @@
           maxSim = Math.max(...chunks.map(c => c.similarity)).toFixed(3);
         } catch { /* skip */ }
         const score = t['WeightedScore-pct'] ? t['WeightedScore-pct'] + '%' : '-';
-        return `<tr><td>${t.TestCode||'-'}</td><td>${t['ModelName-search']||'-'}</td><td>${t.CollectionName||'-'}</td><td>${chunkCount}</td><td>${maxSim}</td><td>${score}</td><td><button onclick="showChunkDrilldown(${i})" style="padding:0.2rem 0.5rem;cursor:pointer">View</button></td></tr>`;
+        return `<tr><td>${t.TestCode||'-'}</td><td>${t['ModelName-search']||'-'}</td><td>${t.CollectionName||'-'}</td><td>${chunkCount}</td><td>${maxSim}</td><td>${score}</td><td><button onclick="showChunkDrilldown(${i})" class="view-btn">View</button></td></tr>`;
       }).join('');
       document.querySelector('#chunkDetailTable tbody').innerHTML = detailRows || '<tr><td colspan="7">No chunk data</td></tr>';
 
@@ -1109,7 +929,7 @@
       chunks.sort((a, b) => b.similarity - a.similarity);
       document.getElementById('chunkDrilldownTitle').textContent = `Chunks for TestCode: ${t.TestCode || '-'} | ${t['ModelName-search'] || '-'} | ${t.CollectionName || '-'}`;
       const rows = chunks.map((c, i) =>
-        `<tr><td>${i+1}</td><td>${c.filename}</td><td>${c.chunk_index}</td><td>${c.similarity.toFixed(4)}</td><td style="text-align:left;max-width:400px;white-space:pre-wrap">${c.content.substring(0,200).replace(/</g,'&lt;')}…</td></tr>`
+        `<tr><td>${i+1}</td><td>${c.filename}</td><td>${c.chunk_index}</td><td>${c.similarity.toFixed(4)}</td><td class="chunk-content-td">${c.content.substring(0,200).replace(/</g,'&lt;')}…</td></tr>`
       ).join('');
       document.querySelector('#chunkDrilldownTable tbody').innerHTML = rows;
       document.getElementById('chunkDrilldown').style.display = 'block';
@@ -1233,12 +1053,12 @@
         .sort((a,b) => parseFloat(b.scores.reduce((s,v)=>s+v,0)/b.scores.length) - parseFloat(a.scores.reduce((s,v)=>s+v,0)/a.scores.length))
         .map(d => {
           const sameModel = d.sm === d.sc;
-          const rowStyle = sameModel ? 'background:#fff8e1' : '';
+          const rowStyle = sameModel ? 'same-model-row' : '';
           const flag = sameModel ? ' ⚠' : '';
           const avgScore = avg(d.scores);
           const avgSim = avg(d.sims);
           const avgDur = avg(d.durations);
-          return `<tr style="${rowStyle}">
+          return `<tr class="${rowStyle}">
             <td>${d.sm}</td>
             <td>${d.sc}${flag}</td>
             <td>${avgScore !== 'N/A' ? avgScore + '%' : 'N/A'}</td>

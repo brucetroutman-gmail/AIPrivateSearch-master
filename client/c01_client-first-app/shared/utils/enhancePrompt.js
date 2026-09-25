@@ -13,7 +13,11 @@
 
     const updateEnhanceBtn = () => {
       if (enhanceBtn) {
-        enhanceBtn.style.display = collectionSelect && collectionSelect.value ? 'inline-block' : 'none';
+        if (collectionSelect && collectionSelect.value) {
+          enhanceBtn.classList.remove('hidden');
+        } else {
+          enhanceBtn.classList.add('hidden');
+        }
       }
     };
 
@@ -61,7 +65,7 @@
       pendingEnhanced = data.enhanced;
       document.getElementById('originalPromptPreview').textContent = query;
       document.getElementById('enhancedPromptPreview').textContent = data.enhanced;
-      document.getElementById('enhancePreview').style.display = 'block';
+      document.getElementById('enhancePreview').classList.remove('hidden');
     } catch (err) {
       window.showUserMessage('Prompt enhancement unavailable — using original query', 'warning');
     } finally {
@@ -74,10 +78,10 @@
     const cfg = window._enhanceConfig || { queryFieldId: 'query' };
     const queryEl = document.getElementById(cfg.queryFieldId);
     if (queryEl) queryEl.value = pendingEnhanced;
-    document.getElementById('enhancePreview').style.display = 'none';
+    document.getElementById('enhancePreview').classList.add('hidden');
   };
 
   window.cancelEnhance = function() {
-    document.getElementById('enhancePreview').style.display = 'none';
+    document.getElementById('enhancePreview').classList.add('hidden');
   };
 })();

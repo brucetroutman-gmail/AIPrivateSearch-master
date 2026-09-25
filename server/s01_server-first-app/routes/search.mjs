@@ -8,12 +8,14 @@ const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 import { DeviceLicenseClient } from '../lib/licensing/device-license-client.mjs';
 import { SearchLogger } from '../lib/utils/searchLogger.mjs';
+import { QueryAnalyzer } from '../lib/search/QueryAnalyzer.mjs';
 
 const router = express.Router();
 
 // Create instances of services
 const searchOrchestrator = new SearchOrchestrator();
 const scoringService = new ScoringService();
+const queryAnalyzer = new QueryAnalyzer();
 
 
 
@@ -21,11 +23,105 @@ const scoringService = new ScoringService();
 router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
   try {
     logger.log('Received request with keys:', Object.keys(req.body));
-    const { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, topK, sourceType, testCode, collection, showChunks, scoreModel, searchType } = req.body;
+    let { query, score, model, temperature, context, systemPrompt, systemPromptName, tokenLimit, topK, sourceType, testCode, collection, showChunks, scoreModel, searchType, useIntelligence } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
     }
+
+    // ============================================================
+    // QUERY INTELLIGENCE LAYER
+    // ============================================================
+    
+    // Detect test mode and intelligence preference
+    const isTestMode = testCode != null;
+    const shouldUseIntelligence = useIntelligence !== false; // Default true, can be explicitly disabled
+
+    let queryMetadata = {
+      originalQuery: query,
+      wasImproved: false,
+      detectedType: null,
+      autoSelectedMethod: false,
+      testMode: isTestMode,
+      intelligenceUsed: false
+    };
+
+    // Apply the Query Intelligence Layer unless it is explicitly disabled
+    // (useIntelligence: false). Test scenarios (testCode present) DO use the
+    // intelligence layer for their prompts; any explicit searchType/parameters
+    // provided by a test are still respected (auto-select and auto-config only
+    // fill in values that were not explicitly supplied).
+    const applyIntelligence = shouldUseIntelligence;
+
+    if (applyIntelligence) {
+      try {
+        logger.log('[QueryIntelligence] Analyzing query', isTestMode ? '(test mode)' : '');
+        
+        // Step 1: Analyze the query
+        const analysis = await queryAnalyzer.analyzeQuery(query, { testMode: false });
+        queryMetadata.detectedType = analysis.type;
+        
+        // Step 2: Improve query if needed
+        const queryInfo = await queryAnalyzer.enhanceQuery(query, analysis);
+        if (queryInfo.wasImproved) {
+          query = queryInfo.enhanced; // Use improved version for search
+          queryMetadata.wasImproved = true;
+          queryMetadata.improvementReason = queryInfo.reasoning;
+          logger.log('[QueryIntelligence] Query improved:', {
+            original: queryInfo.original,
+            enhanced: query
+          });
+        }
+        
+        // Step 3: Auto-select search method if not specified or set to 'auto'
+        if (!searchType || searchType === 'auto') {
+          searchType = queryAnalyzer.selectSearchMethod(analysis.type);
+          queryMetadata.autoSelectedMethod = true;
+          logger.log('[QueryIntelligence] Auto-selected method:', searchType);
+        }
+        
+        // Step 4: Auto-configure parameters if not explicitly set
+        const optimalParams = queryAnalyzer.getOptimalParameters(analysis.type);
+        
+        // Only override if user didn't explicitly set these
+        if (temperature === undefined || temperature === null) {
+          temperature = optimalParams.temperature;
+          queryMetadata.autoConfiguredTemp = true;
+        }
+        if (!topK) {
+          topK = optimalParams.topK;
+          queryMetadata.autoConfiguredTopK = true;
+        }
+        if (!context) {
+          context = optimalParams.context;
+          queryMetadata.autoConfiguredContext = true;
+        }
+        if (!systemPrompt) {
+          systemPrompt = optimalParams.systemPrompt;
+          queryMetadata.autoConfiguredPrompt = true;
+        }
+        
+        queryMetadata.intelligenceUsed = true;
+        queryMetadata.configReasoning = optimalParams.reasoning;
+        
+        logger.log('[QueryIntelligence] Configuration applied:', {
+          method: searchType,
+          temperature,
+          topK,
+          context
+        });
+        
+      } catch (error) {
+        logger.error('[QueryIntelligence] Failed, using defaults:', error.message);
+        // Continue with user-provided or default values on error
+      }
+    } else {
+      logger.log('[QueryIntelligence] Bypassed - explicitly disabled (useIntelligence: false)');
+    }
+
+    // ============================================================
+    // END QUERY INTELLIGENCE LAYER
+    // ============================================================
 
     logger.log('Processing query:', query);
     logger.log('Scoring enabled:', score);
@@ -63,7 +159,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
           collection,
           searchType,
           createdAt: new Date().toISOString(),
-          testCode
+          testCode,
+          queryMetadata
         });
       }
       
@@ -211,6 +308,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         ...(searchMetrics && { search: searchMetrics }),
         ...(scoringMetrics && { scoring: scoringMetrics })
       },
+      queryMetadata,
       ...(chunks && { chunks }),
       ...(feedbackToken && { feedbackToken, feedbackMeta }),
       ...(methodResult?.searchLog && { searchLog: methodResult.searchLog }),
@@ -255,6 +353,42 @@ router.post('/line-search', async (req, res) => {
     res.json(result.results['line-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Query Analysis endpoint - analyze query without running search
+router.post('/analyze-query', async (req, res) => {
+  try {
+    const { query } = req.body;
+    
+    if (!query) {
+      return res.status(400).json({ error: 'Query is required' });
+    }
+    
+    // Analyze query
+    const analysis = await queryAnalyzer.analyzeQuery(query, { testMode: false });
+    
+    // Get improvements
+    const improved = await queryAnalyzer.enhanceQuery(query, analysis);
+    
+    // Get recommendations
+    const recommendedMethod = queryAnalyzer.selectSearchMethod(analysis.type);
+    const recommendedParams = queryAnalyzer.getOptimalParameters(analysis.type);
+    
+    res.json({
+      original: query,
+      analysis: analysis,
+      improved: improved,
+      recommendedMethod: recommendedMethod,
+      recommendedParams: recommendedParams
+    });
+    
+  } catch (error) {
+    logger.error('Query analysis endpoint error:', error.message);
+    res.status(500).json({ 
+      error: 'Analysis failed',
+      message: error.message 
+    });
   }
 });
 

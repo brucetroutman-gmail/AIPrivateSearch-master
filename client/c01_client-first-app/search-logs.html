@@ -20,109 +20,8 @@
             }
         })();
     </script>
-    <style>
-        .logs-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .filters {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .filter-group label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        .filter-input {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background: var(--input-bg);
-            color: var(--text-color);
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn:hover {
-            opacity: 0.9;
-        }
-        .logs-table {
-            background: var(--card-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .table th,
-        .table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .table th {
-            background: var(--header-bg);
-            font-weight: 600;
-        }
-        .table tbody tr:hover {
-            background: var(--hover-bg);
-        }
-        .status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .status-success {
-        }
-        .status-error {
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-        .no-logs {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-        .prem-only {
-            display: none;
-        }
-        .tier-professional .prem-only {
-            display: block;
-        }
-    </style>
 </head>
-<body>
+<body class="search-logs-page">
     <div id="header-placeholder"></div>
 
     <div class="page-content">
@@ -162,8 +61,8 @@
 
             <div class="logs-table">
                 <div id="loading" class="loading">Loading logs...</div>
-                <div id="no-logs" class="no-logs" style="display: none;">No logs found for the selected criteria.</div>
-                <table id="logsTable" class="table" style="display: none;">
+                <div id="no-logs" class="no-logs hidden">No logs found for the selected criteria.</div>
+                <table id="logsTable" class="table hidden">
                     <thead>
                         <tr>
                             <th>Date/Time</th>
@@ -192,8 +91,8 @@
             const table = document.getElementById('logsTable');
             
             loading.style.display = 'block';
-            noLogs.style.display = 'none';
-            table.style.display = 'none';
+            noLogs.classList.add('hidden');
+            table.classList.add('hidden');
             
             try {
                 const startDate = document.getElementById('startDate').value;
@@ -214,7 +113,7 @@
             } catch (error) {
                 console.error('Error loading logs:', error);
                 loading.style.display = 'none';
-                noLogs.style.display = 'block';
+                noLogs.classList.remove('hidden');
                 noLogs.textContent = 'Error loading logs: ' + error.message;
             }
         }
@@ -228,8 +127,8 @@
             loading.style.display = 'none';
             
             if (!logs || logs.length === 0) {
-                noLogs.style.display = 'block';
-                table.style.display = 'none';
+                noLogs.classList.remove('hidden');
+                table.classList.add('hidden');
                 return;
             }
             
@@ -267,8 +166,8 @@
                 tbody.appendChild(row);
             });
             
-            noLogs.style.display = 'none';
-            table.style.display = 'table';
+            noLogs.classList.add('hidden');
+            table.classList.remove('hidden');
         }
         
         async function exportToDatabase() {

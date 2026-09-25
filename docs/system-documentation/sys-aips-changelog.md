@@ -5,6 +5,20 @@ Format: `vMAJOR.MINOR: Description`
 
 ---
 
+## v21.40
+- Query Intelligence Layer now applies to test scenarios: sending a `testCode` no longer bypasses analysis/query-improvement. Tests' explicit method and parameters are still preserved; only `useIntelligence: false` disables the layer
+- Updated backend validation script (`test-query-intelligence.mjs`) and API/search-methods docs to reflect the new test behavior
+
+## v21.39
+- Added Query Intelligence Layer: Auto mode analyzes queries, improves vague ones, and auto-selects the best search method and parameters
+- New endpoint `POST /api/search/analyze-query` returns query classification, improvement, and recommended method/params
+- Main search route (`POST /api/search`) accepts `searchType: "auto"` and `useIntelligence`, and returns a `queryMetadata` object
+- Test mode (`testCode` present) bypasses the intelligence layer by default so existing test results stay comparable
+- AI Search page: added Auto/Advanced mode toggle and 🧠 Smart Search Details panel (Auto mode runs the single recommended method, falling back to Hybrid Search for non-AI recommendations)
+- Added `test-query-intelligence.html` page to exercise the analyze-query endpoint
+- Documentation: updated user guide (Using Auto Mode), search methods (Automatic Method Selection), and API reference
+- Security: new frontend code uses `class="hidden"` and `.textContent`/`.appendChild` (no inline styles or innerHTML)
+
 ## v20.22 (current)
 - Unified footer: index.html now uses shared footer.html
 - Removed hardcoded footer and Team members section from index.html

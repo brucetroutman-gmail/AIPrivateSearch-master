@@ -21,122 +21,25 @@
             }
         })();
     </script>
-    <style>
-        :root {
-            --success-bg: #d4edda;
-            --success-border: #28a745;
-            --error-bg: #f8d7da;
-            --error-border: #dc3545;
-            --status-bg: #e3f2fd;
-        }
-        
-        [data-theme="dark"] {
-            --success-bg: #1e4d3a;
-            --success-border: #28a745;
-            --error-bg: #4d1e1e;
-            --error-border: #dc3545;
-            --status-bg: #1e3a4d;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .section {
-            margin: 20px 0;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 5px;
-            background: var(--card-bg);
-            transition: background-color 0.3s;
-        }
-        
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background: var(--card-bg);
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        
-        .update-btn {
-            background: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .update-btn:hover {
-            background: #0056b3;
-        }
-        
-        .update-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .results {
-            margin: 20px 0;
-            padding: 15px;
-            background: var(--card-bg);
-            border-radius: 5px;
-            min-height: 100px;
-            transition: background-color 0.3s;
-        }
-        
-        .model-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 5px;
-            background: var(--input-bg);
-            transition: background-color 0.3s;
-        }
-        
-        .model-item {
-            margin: 5px 0;
-            padding: 5px;
-        }
-    </style>
 </head>
 <body>
     <div id="header-placeholder"></div>
 
     <div class="page-content">
       <!-- Main Content -->
-      <main class="main-content">
+      <main class="model-main-content">
         <h1>Manage Models</h1>
         <p>Add, update, or remove models from Ollama registry.</p>
         
         <div class="section">
-            <div style="font-weight: bold; margin-bottom: 10px;">Add New Model: <a href="http://ollama.com/library" target="_blank" style="font-weight: normal; color: #007bff;">Browse Ollama Library</a></div>
-            <div style="margin-bottom: 10px;">
-                <label style="display: inline-block; width: 100px; font-weight: bold;">Model Name:</label>
-                <input type="text" id="newModelName" placeholder="Enter model name (e.g., llama2, gemma:2b)" style="width: 300px; padding: 0.5rem; margin-right: 10px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+            <div class="model-field-title">Add New Model: <a href="http://ollama.com/library" target="_blank" class="model-library-link">Browse Ollama Library</a></div>
+            <div class="model-field-row">
+                <label class="model-field-label">Model Name:</label>
+                <input type="text" id="newModelName" placeholder="Enter model name (e.g., llama2, gemma:2b)" class="model-name-input">
             </div>
-            <div style="margin-bottom: 10px;">
-                <label style="display: inline-block; width: 100px; font-weight: bold; vertical-align: top;">Category:</label>
-                <div style="display: inline-block;">
+            <div class="model-field-row">
+                <label class="model-field-label-top">Category:</label>
+                <div class="model-inline-block">
                     <label><input type="checkbox" id="categorySearch" value="search"> Search</label><br>
                     <label><input type="checkbox" id="categoryScore" value="score"> Score</label><br>
                     <label><input type="checkbox" id="categoryEmbed" value="embed"> Embed</label><br>
@@ -149,17 +52,17 @@
         <div class="controls">
             <label><input type="checkbox" id="selectAllModels"> Select All Models</label>
             <button class="update-btn" onclick="updateSelectedModels()">Update Selected Models</button>
-            <button class="update-btn" style="background: #dc3545;" onclick="removeSelectedModels()">Remove Selected Models</button>
-            <button class="update-btn" style="background: #ffc107; color: #000;" onclick="removeUnusedModels()">Remove Unlisted Models</button>
+            <button class="update-btn update-btn-danger" onclick="removeSelectedModels()">Remove Selected Models</button>
+            <button class="update-btn update-btn-warning" onclick="removeUnusedModels()">Remove Unlisted Models</button>
             <span id="selectedCount">0 models selected</span>
-            <div id="updateStatus" style="margin-top: 10px; padding: 10px; background: var(--status-bg); border-radius: 5px; display: none; color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+            <div id="updateStatus" class="model-update-status hidden">
                 <strong>🔄 Model Update in Progress...</strong>
                 <div id="progressIndicator"></div>
             </div>
         </div>
 
         <div class="section">
-            <div style="font-weight: bold; margin-bottom: 10px;">Installed Models (Update):</div>
+            <div class="model-field-title">Installed Models (Update):</div>
             <div id="modelList" class="model-list">
                 Loading models...
             </div>
@@ -222,12 +125,11 @@
                         const config = modelConfig[modelName];
                         const categoriesText = config.categories.join(', ');
                         const label = document.createElement('label');
-                        label.className = 'model-item';
-                        label.style.display = 'block';
+                        label.className = 'model-item model-item-block';
                         label.innerHTML = `
                             <input type="checkbox" class="model-checkbox" value="${modelName}"> 
                             <strong>${modelName}</strong> 
-                            <span style="color: #666; margin-left: 10px;">[${categoriesText}] ${config.size}</span>
+                            <span class="model-cat-size">[${categoriesText}] ${config.size}</span>
                         `;
                         modelList.appendChild(label);
                     });
@@ -282,7 +184,7 @@
             const progressDiv = document.getElementById('progressIndicator');
             const resultsDiv = document.getElementById('updateResults');
             
-            statusDiv.style.display = 'block';
+            statusDiv.classList.remove('hidden');
             progressDiv.innerHTML = `Adding ${modelName}...`;
             
             const startTime = Date.now();
@@ -361,7 +263,7 @@
                             const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                             const sizeNote = size === 'unknown' ? ' (size detection failed)' : '';
                             const resultHtml = `
-                                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                <div class="model-result model-result-success">
                                     <strong>${modelName}</strong> ${elapsedTime}s - ✅ Added Successfully [${selectedCategories.join(', ')}] ${size}${sizeNote}
                                 </div>
                             `;
@@ -375,7 +277,7 @@
                     } catch (configError) {
                         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                         const resultHtml = `
-                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <div class="model-result model-result-error">
                                 <strong>${modelName}</strong> ${elapsedTime}s - ✅ Ollama Pull OK, ❌ Config Save Failed
                                 <br><small>Error: ${configError.message}</small>
                             </div>
@@ -386,7 +288,7 @@
                     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                     const errorText = await response.text();
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <div class="model-result model-result-error">
                             <strong>${modelName}</strong> ${elapsedTime}s - ❌ Ollama Pull Failed
                             <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
                         </div>
@@ -396,14 +298,14 @@
             } catch (error) {
                 const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                 const resultHtml = `
-                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                    <div class="model-result model-result-error">
                         <strong>${modelName}</strong> ${elapsedTime}s - ❌ Add Failed
                         <br><small>Network Error: ${error.message}</small>
                     </div>
                 `;
                 resultsDiv.innerHTML = resultHtml;
             } finally {
-                statusDiv.style.display = 'none';
+                statusDiv.classList.add('hidden');
                 setProcessingState(false);
             }
         }
@@ -479,7 +381,7 @@
                 const progressDiv = document.getElementById('progressIndicator');
                 const resultsDiv = document.getElementById('updateResults');
                 
-                statusDiv.style.display = 'block';
+                statusDiv.classList.remove('hidden');
                 
                 for (const modelName of unlistedModels) {
                     const startTime = Date.now();
@@ -496,7 +398,7 @@
                         
                         if (response.ok) {
                             const resultHtml = `
-                                <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                                <div class="model-result model-result-success">
                                     <strong>${modelName}</strong> ${elapsedTime}s - ✅ Unlisted Model Removed
                                 </div>
                             `;
@@ -511,7 +413,7 @@
                     } catch (error) {
                         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                         const resultHtml = `
-                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                            <div class="model-result model-result-error">
                                 <strong>${modelName}</strong> ${elapsedTime}s - ❌ Remove Failed
                                 <br><small>Error: ${error.message}</small>
                             </div>
@@ -524,7 +426,7 @@
                     }
                 }
                 
-                statusDiv.style.display = 'none';
+                statusDiv.classList.add('hidden');
                 setProcessingState(false);
                 loadModels();
                 
@@ -552,7 +454,7 @@
             const progressDiv = document.getElementById('progressIndicator');
             const resultsDiv = document.getElementById('updateResults');
             
-            statusDiv.style.display = 'block';
+            statusDiv.classList.remove('hidden');
             
             for (const modelName of selectedModels) {
                 const startTime = Date.now();
@@ -584,7 +486,7 @@
                         
                         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                         const resultHtml = `
-                            <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                            <div class="model-result model-result-success">
                                 <strong>${modelName}</strong> ${elapsedTime}s - ✅ Removed Successfully
                             </div>
                         `;
@@ -599,7 +501,7 @@
                 } catch (error) {
                     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <div class="model-result model-result-error">
                             <strong>${modelName}</strong> ${elapsedTime}s - ❌ Remove Failed
                             <br><small>Error: ${error.message}</small>
                         </div>
@@ -612,7 +514,7 @@
                 }
             }
             
-            statusDiv.style.display = 'none';
+            statusDiv.classList.add('hidden');
             setProcessingState(false);
             loadModels();
         }
@@ -622,7 +524,7 @@
             const progressDiv = document.getElementById('progressIndicator');
             const resultsDiv = document.getElementById('updateResults');
             
-            statusDiv.style.display = 'block';
+            statusDiv.classList.remove('hidden');
             progressDiv.innerHTML = `${action === 'add' ? 'Adding' : 'Updating'} ${modelName}...`;
             
             const startTime = Date.now();
@@ -677,7 +579,7 @@
                     const isActualError = finalStatus.toLowerCase().includes('error') || finalStatus.toLowerCase().includes('failed');
                     
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(${isActualError ? '--error-border' : '--success-border'}); border-radius: 5px; background: var(${isActualError ? '--error-bg' : '--success-bg'}); color: var(--text-color);">
+                        <div class="model-result ${isActualError ? 'model-result-error' : 'model-result-success'}">
                             <strong>${modelName}</strong> ${elapsedTime}s - ${isActualError ? '❌' : '✅'} ${action === 'add' ? 'Add' : 'Update'} ${isActualError ? 'Failed' : 'Successful'}
                             <br><small>Ollama: ${finalStatus}</small>
                         </div>
@@ -691,7 +593,7 @@
                     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                     const errorText = await response.text();
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <div class="model-result model-result-error">
                             <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
                             <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
                         </div>
@@ -705,7 +607,7 @@
             } catch (error) {
                 const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                 const resultHtml = `
-                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                    <div class="model-result model-result-error">
                         <strong>${modelName}</strong> ${elapsedTime}s - ❌ ${action === 'add' ? 'Add' : 'Update'} Failed
                         <br><small>Network Error: ${error.message}</small>
                     </div>
@@ -717,7 +619,7 @@
                 }
             }
             
-            statusDiv.style.display = 'none';
+            statusDiv.classList.add('hidden');
         }
         
         async function removeModel(modelName) {
@@ -725,7 +627,7 @@
             const progressDiv = document.getElementById('progressIndicator');
             const resultsDiv = document.getElementById('updateResults');
             
-            statusDiv.style.display = 'block';
+            statusDiv.classList.remove('hidden');
             progressDiv.innerHTML = `Removing ${modelName}...`;
             
             const startTime = Date.now();
@@ -740,7 +642,7 @@
                 
                 if (response.ok) {
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color);">
+                        <div class="model-result model-result-success">
                             <strong>${modelName}</strong> ${elapsedTime}s - ✓ Remove Successful
                         </div>
                     `;
@@ -752,7 +654,7 @@
                 } else {
                     const errorText = await response.text();
                     const resultHtml = `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                        <div class="model-result model-result-error">
                             <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
                             <br><small>HTTP ${response.status}: ${errorText || 'Unknown error'}</small>
                         </div>
@@ -766,7 +668,7 @@
             } catch (error) {
                 const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
                 const resultHtml = `
-                    <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color);">
+                    <div class="model-result model-result-error">
                         <strong>${modelName}</strong> ${elapsedTime}s - ✗ Remove Failed
                         <br><small>Network Error: ${error.message}</small>
                     </div>
@@ -778,7 +680,7 @@
                 }
             }
             
-            statusDiv.style.display = 'none';
+            statusDiv.classList.add('hidden');
         }
 
         function displayUpdateResults(results) {
@@ -788,13 +690,13 @@
             results.forEach(({ model, success, error, elapsedTime }) => {
                 if (success) {
                     html += `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--success-border); border-radius: 5px; background: var(--success-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                        <div class="model-result model-result-success model-result-animated">
                             <strong>${model}</strong> ${elapsedTime}s - ✅ Updated Successfully
                         </div>
                     `;
                 } else {
                     html += `
-                        <div style="margin: 10px 0; padding: 10px; border: 1px solid var(--error-border); border-radius: 5px; background: var(--error-bg); color: var(--text-color); transition: background-color 0.3s, color 0.3s;">
+                        <div class="model-result model-result-error model-result-animated">
                             <strong>${model}</strong> ${elapsedTime}s - ❌ Update Failed
                             <br><small>Error: ${error}</small>
                         </div>
@@ -805,7 +707,7 @@
             // Calculate and display total elapsed time
             const totalElapsedTime = results.reduce((sum, result) => sum + parseFloat(result.elapsedTime), 0).toFixed(1);
             html += `
-                <div style="margin: 20px 0; padding: 15px; border: 2px solid var(--border-color); border-radius: 5px; background: var(--card-bg); color: var(--text-color); text-align: left; font-weight: bold; transition: background-color 0.3s, color 0.3s;">
+                <div class="model-result-total">
                     Total Elapsed Time: ${totalElapsedTime}s
                 </div>
             `;

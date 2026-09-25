@@ -23,77 +23,8 @@
             }
         })();
     </script>
-    
-    <!-- Page-specific styles -->
-    <style>
-        .page-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .content-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-        }
-        
-        /* Tier-based visibility classes */
-        .prem-only {
-            display: none;
-        }
-        
-        .pro-only {
-            display: none;
-        }
-        
-        .admin-only {
-            display: none;
-        }
-        
-        .searcher-only {
-            display: none;
-        }
-        
-        /* Show classes based on user tier (applied by common.js) */
-        .tier-premium .prem-only,
-        .tier-professional .prem-only {
-            display: block;
-        }
-        
-        .tier-professional .pro-only {
-            display: block;
-        }
-        
-        .role-admin .admin-only {
-            display: block;
-        }
-        
-        .role-searcher .searcher-only {
-            display: block;
-        }
-    </style>
 </head>
-<body>
+<body class="template-page">
     <!-- Header (loaded by common.js) -->
     <div id="header-placeholder"></div>
 
@@ -188,7 +119,7 @@
         function showError(message) {
             // Simple error display
             const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin: 10px 0;';
+            errorDiv.className = 'error-flash';
             errorDiv.textContent = message;
             document.querySelector('.page-container').prepend(errorDiv);
             
@@ -199,7 +130,7 @@
         function showSuccess(message) {
             // Simple success display
             const successDiv = document.createElement('div');
-            successDiv.style.cssText = 'background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin: 10px 0;';
+            successDiv.className = 'success-flash';
             successDiv.textContent = message;
             document.querySelector('.page-container').prepend(successDiv);
             

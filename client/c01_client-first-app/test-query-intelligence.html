@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Query Intelligence Test - AIPrivateSearch</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <script src="./shared/utils/apiConfig.js"></script>
+  <script src="csrf.js"></script>
+  <script type="module" src="shared/common.js"></script>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const theme = savedTheme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      if (!savedTheme) localStorage.setItem('theme', theme);
+    })();
+  </script>
+  <script type="module" src="shared/utils/domSanitizer.js"></script>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="container test-container">
+    <div class="test-header">
+      <h1>🧠 Query Intelligence Test</h1>
+      <p>Analyze a query without running a search. Uses the <code>/api/search/analyze-query</code> endpoint.</p>
+    </div>
+
+    <div class="field">
+      <label for="testQuery">Enter a query to analyze</label>
+      <input type="text" id="testQuery" class="search-input" placeholder="e.g. clients with POA">
+    </div>
+
+    <div class="field">
+      <button id="analyzeBtn" class="search-button">Analyze Query</button>
+      <button id="runSamplesBtn" class="search-button">Run Sample Queries</button>
+    </div>
+
+    <div id="results"></div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script type="module" src="test-query-intelligence.js"></script>
+</body>
+</html>

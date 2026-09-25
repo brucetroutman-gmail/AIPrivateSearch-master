@@ -98,58 +98,6 @@
 
     <div id="footer-placeholder"></div>
 
-    <style>
-        .guides-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .guide-section {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .guide-section h2 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
-        .guide-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .guide-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        .guide-section a {
-            color: var(--text-color);
-            text-decoration: none;
-            padding: 0.25rem 0;
-            display: block;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .guide-section a:hover {
-            background-color: var(--hover-bg);
-            padding-left: 0.5rem;
-        }
-
-        .guide-section a[target="_blank"]::after {
-            content: " ↗";
-            font-size: 0.8em;
-            opacity: 0.6;
-        }
-
-    </style>
-
     <script>
         // Load app name and version information for title
         async function loadTitleInfo() {

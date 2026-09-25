@@ -29,6 +29,37 @@ AIPrivateSearch provides 7 search methods split into two categories:
 
 ---
 
+## Automatic Method Selection (Auto Mode)
+
+The AI Search page supports an **Auto mode** (default) that selects a search method for you using the Query Intelligence Layer. Instead of choosing a method manually, you enter a query and the system:
+
+1. **Classifies the query** into one of three types:
+   - `fact` — looking for specific information or facts
+   - `analysis` — asking for summaries, comparisons, or reasoning over documents
+   - `creative` — asking the model to generate or draft content
+2. **Improves the query** if it is vague (e.g. `clients POA` → `Which clients have power of attorney documents?`). The original and improved versions are shown transparently in **Smart Search Details**.
+3. **Selects the method** based on the detected type:
+
+   | Detected type | Selected method |
+   |---------------|-----------------|
+   | fact | Hybrid Search |
+   | analysis | AI Document Chat |
+   | creative | AI Document Chat |
+
+4. **Configures parameters** (temperature, topK, context, system prompt) tuned for the detected type.
+
+> On the AI Search page, if the intelligence layer recommends a non-AI method (e.g. Line Search) for a very literal query, Auto mode falls back to **Hybrid Search** so results stay within AI methods. Use **Exact Search** for purely literal lookups.
+
+### Overriding Auto Mode
+
+Switch the toggle at the top of the AI Search page from **Auto** to **Advanced** to choose and compare methods manually. In Advanced mode the query is still analyzed for metadata, but your method selection is always respected (`autoSelectedMethod: false`).
+
+### Test Mode
+
+Automated tests that send a `testCode` **use the intelligence layer** for their prompts — the query is analyzed and may be improved before searching. A test's explicitly chosen method and parameters are still respected; only unspecified values are auto-filled. To run a test with the layer disabled, send `useIntelligence: false`. See the API reference for details.
+
+---
+
 ## Exact Methods
 
 ### 1. Line Search

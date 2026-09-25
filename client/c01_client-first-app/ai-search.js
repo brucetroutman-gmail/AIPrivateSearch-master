@@ -11,6 +11,18 @@ const performanceSection = document.getElementById('performanceSection');
 const performanceTableBody = document.getElementById('performanceTableBody');
 const selectAllAICheckbox = document.getElementById('selectAllAI');
 
+// Query Intelligence Layer elements
+const modeAutoRadio = document.getElementById('modeAuto');
+const modeManualRadio = document.getElementById('modeManual');
+const manualControlsSection = document.getElementById('manualControlsSection');
+const autoControlsSection = document.getElementById('autoControlsSection');
+const autoSearchBtn = document.getElementById('autoSearchBtn');
+const smartSearchInfo = document.getElementById('smartSearchInfo');
+const detectedTypeEl = document.getElementById('detectedType');
+const selectedMethodEl = document.getElementById('selectedMethod');
+const queryImprovedSection = document.getElementById('queryImprovedSection');
+const improvedQueryEl = document.getElementById('improvedQuery');
+
 const searchMethods = {
     'smart-search': { name: 'Smart Search' },
     'hybrid-search': { name: 'Hybrid Search' },
@@ -157,6 +169,149 @@ async function performAllSearches() {
         searchAllBtn.disabled = false;
     }
 }
+// Handle search mode toggle (Auto vs Advanced)
+function handleModeChange() {
+    const isAutoMode = modeAutoRadio && modeAutoRadio.checked;
+
+    if (manualControlsSection) {
+        manualControlsSection.classList.toggle('hidden', isAutoMode);
+    }
+    if (autoControlsSection) {
+        autoControlsSection.classList.toggle('hidden', !isAutoMode);
+    }
+    // Hide the multi-method comparison table when switching to Auto mode
+    if (performanceSection && isAutoMode) {
+        performanceSection.classList.add('hidden');
+        performanceSection.style.display = 'none';
+    }
+    if (window.logger) window.logger.log(`[Mode] Switched to ${isAutoMode ? 'Auto' : 'Advanced'} mode`);
+}
+
+// Display query intelligence metadata in the Smart Search Details panel
+function displayQueryMetadata(metadata, resolvedMethod) {
+    if (!metadata || !smartSearchInfo) return;
+
+    if (metadata.intelligenceUsed && !metadata.testMode) {
+        smartSearchInfo.classList.remove('hidden');
+
+        // Detected query type badge
+        if (detectedTypeEl && metadata.detectedType) {
+            const badge = document.createElement('span');
+            badge.className = `badge badge-${metadata.detectedType}`;
+            badge.textContent = metadata.detectedType;
+            detectedTypeEl.textContent = '';
+            detectedTypeEl.appendChild(badge);
+        }
+
+        // Selected method
+        if (selectedMethodEl) {
+            selectedMethodEl.textContent = '';
+            const methodName = (searchMethods[resolvedMethod] && searchMethods[resolvedMethod].name) || resolvedMethod || 'unknown';
+            selectedMethodEl.appendChild(document.createTextNode(`${methodName} `));
+            if (metadata.autoSelectedMethod) {
+                const methodBadge = document.createElement('span');
+                methodBadge.className = 'badge badge-auto';
+                methodBadge.textContent = 'auto-selected';
+                selectedMethodEl.appendChild(methodBadge);
+            }
+        }
+
+        // Query improvement
+        if (metadata.wasImproved && queryImprovedSection && improvedQueryEl) {
+            queryImprovedSection.classList.remove('hidden');
+            improvedQueryEl.textContent = metadata.improvedQuery || '';
+        } else if (queryImprovedSection) {
+            queryImprovedSection.classList.add('hidden');
+        }
+    } else {
+        smartSearchInfo.classList.add('hidden');
+    }
+}
+
+// Auto mode: analyze the query, then run the single recommended method
+async function performAutoSearch() {
+    const query = DOMSanitizer.sanitizeText(searchQueryEl.value.trim());
+    const collection = DOMSanitizer.sanitizeText(document.getElementById('collectionSelect').value);
+    const model = DOMSanitizer.sanitizeText(document.getElementById('modelSelect').value);
+    const temperatureEl = document.getElementById('temperatureSelect');
+    const contextEl = document.getElementById('contextSelect');
+    const tokensEl = document.getElementById('tokensSelect');
+    const topK = parseInt(document.getElementById('topKSelect')?.value || '10');
+    const temperature = parseFloat(temperatureEl?.value || '0.3');
+    const contextSize = parseInt(contextEl?.value || '4096');
+    const tokenLimit = DOMSanitizer.sanitizeText(tokensEl?.value || 'No Limit');
+
+    if (!query) { window.showUserMessage('Please enter a search query', 'error'); return; }
+    if (!collection) { window.showUserMessage('Please select a collection', 'error'); return; }
+    if (!model) { window.showUserMessage('Please select a model', 'error'); return; }
+
+    window._lastSearchQuery = query;
+    if (window.logger) window.logger.crumb('auto_search_submitted', { collection, model, temperature, contextSize });
+
+    autoSearchBtn.textContent = 'Analyzing...';
+    autoSearchBtn.disabled = true;
+    if (smartSearchInfo) smartSearchInfo.classList.add('hidden');
+
+    try {
+        // Step 1: Analyze query via intelligence endpoint
+        const analyzeRes = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/search/analyze-query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        if (!analyzeRes.ok) throw new Error(`Analysis failed (${analyzeRes.status})`);
+        const analysis = await analyzeRes.json();
+
+        // Resolve method and effective query
+        let method = analysis.recommendedMethod;
+        if (!AI_METHODS.includes(method)) {
+            // Intelligence may recommend a non-AI method; on the AI page fall back to hybrid-search
+            method = 'hybrid-search';
+        }
+        const wasImproved = analysis.improved && analysis.improved.wasImproved;
+        const effectiveQuery = wasImproved ? analysis.improved.enhanced : query;
+
+        // Build metadata for display (mirrors the main search route's queryMetadata shape)
+        const metadata = {
+            intelligenceUsed: true,
+            testMode: false,
+            detectedType: analysis.analysis ? analysis.analysis.type : null,
+            autoSelectedMethod: true,
+            wasImproved: !!wasImproved,
+            improvedQuery: wasImproved ? analysis.improved.enhanced : null
+        };
+        displayQueryMetadata(metadata, method);
+
+        // Step 2: Run only the recommended method
+        autoSearchBtn.textContent = 'Searching...';
+
+        // Show only the selected method's result column
+        document.querySelectorAll('.result-column').forEach(col => { col.style.display = 'none'; });
+        const activeCol = document.getElementById(`${method}-results`);
+        if (activeCol) activeCol.style.display = 'block';
+
+        const container = document.getElementById(`${method}-container`);
+        if (container) {
+            while (container.firstChild) container.removeChild(container.firstChild);
+            const loading = document.createElement('div');
+            loading.className = 'loading';
+            loading.textContent = 'Searching...';
+            container.appendChild(loading);
+        }
+
+        const options = { collection, model, temperature, contextSize, tokenLimit, topK };
+        const result = await window.searchManager.executeSearch(method, effectiveQuery, options);
+        renderResults(`${method}-container`, result);
+        updatePerformanceTable({ [method]: result });
+    } catch (err) {
+        if (window.logger) window.logger.crumb('auto_search_error', { error: err?.message || 'unknown' });
+        window.showUserMessage('Auto search failed. Please try again.', 'error');
+    } finally {
+        autoSearchBtn.textContent = 'Search';
+        autoSearchBtn.disabled = false;
+    }
+}
+
 
 function getSelectedMethods() {
     const selected = [];
@@ -212,7 +367,9 @@ function updateSelectAllState() {
 }
 
 searchAllBtn.addEventListener('click', performAllSearches);
-searchQueryEl.addEventListener('keypress', e => { if (e.key === 'Enter') performAllSearches(); });
+searchQueryEl.addEventListener('keypress', e => {
+    if (e.key === 'Enter' && (!modeAutoRadio || !modeAutoRadio.checked)) performAllSearches();
+});
 searchQueryEl.addEventListener('input', e => {
     const val = DOMSanitizer.sanitizeText(e.target.value);
     localStorage.setItem('aiSearchQuery', val);
@@ -313,5 +470,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.querySelectorAll('.sortable').forEach(th => {
         th.addEventListener('click', () => sortPerformanceTable(th.dataset.sort));
+    });
+
+    // Query Intelligence: wire mode toggle and auto search
+    if (modeAutoRadio && modeManualRadio) {
+        modeAutoRadio.addEventListener('change', handleModeChange);
+        modeManualRadio.addEventListener('change', handleModeChange);
+        handleModeChange();
+    }
+    if (autoSearchBtn) {
+        autoSearchBtn.addEventListener('click', performAutoSearch);
+    }
+    searchQueryEl.addEventListener('keypress', e => {
+        if (e.key === 'Enter' && modeAutoRadio && modeAutoRadio.checked) {
+            e.preventDefault();
+            performAutoSearch();
+        }
     });
 });

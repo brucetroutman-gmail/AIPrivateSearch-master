@@ -20,16 +20,16 @@
                     <input type="password" id="loginPassword" placeholder="Password" required>
                     <button type="submit">Login</button>
                 </form>
-                <div style="margin-top: 10px; text-align: center; display: none;">
-                    <button onclick="debugAdminAccount()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Debug Admin Account</button>
-                    <button onclick="showDefaultCredentials()" style="background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Show Default Credentials</button>
-                    <button onclick="clearSession()" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px; margin-left: 5px;">Clear Session</button>
+                <div class="um-debug-row hidden">
+                    <button onclick="debugAdminAccount()" class="um-btn-debug">Debug Admin Account</button>
+                    <button onclick="showDefaultCredentials()" class="um-btn-info">Show Default Credentials</button>
+                    <button onclick="clearSession()" class="um-btn-clear">Clear Session</button>
                     <br><br>
-                    <button onclick="createTestAdmin()" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 12px;">Create Test Admin</button>
+                    <button onclick="createTestAdmin()" class="um-btn-create">Create Test Admin</button>
                 </div>
             </div>
             
-            <div id="register-form" class="auth-form" style="display: none;">
+            <div id="register-form" class="auth-form hidden">
                 <h2>Register New User</h2>
                 <form id="registerForm">
                     <input type="email" id="registerEmail" placeholder="Email" required>
@@ -44,31 +44,31 @@
             </div>
         </div>
         
-        <div id="user-dashboard" style="display: none;">
+        <div id="user-dashboard" class="hidden">
             <div class="user-info">
                 <h2>Welcome, <span id="currentUserEmail"></span></h2>
                 <p>Role: <span id="currentUserRole"></span></p>
-                <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.location.href='exact-search.html'" style="background: #28a745;">Go to Application</button>
+                <div class="um-dashboard-actions">
+                    <button onclick="window.location.href='exact-search.html'" class="um-btn-goto">Go to Application</button>
                     <button id="logoutBtn">Logout</button>
                 </div>
             </div>
             
-            <div class="license-info" style="margin: 20px 0; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg);">
+            <div class="license-info um-license-info">
                 <h3>License Information</h3>
                 <div id="licenseStatus">Loading license status...</div>
-                <div style="margin-top: 15px; text-align: center;">
-                    <button id="refreshLicenseBtn" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Refresh License</button>
+                <div class="um-license-refresh-row">
+                    <button id="refreshLicenseBtn" class="um-btn-refresh">Refresh License</button>
                 </div>
             </div>
             
-            <div id="admin-panel" class="prem-only" style="display: none;">
+            <div id="admin-panel" class="prem-only hidden">
                 <h3>User Management</h3>
                 <button id="showRegisterBtn">Add New User</button>
                 <div id="users-list"></div>
             </div>
             
-            <div id="user-profile" style="display: none;">
+            <div id="user-profile" class="hidden">
                 <h3>My Profile</h3>
                 <div class="profile-form">
                     <div class="form-group">
@@ -361,13 +361,13 @@
             
             showLogin() {
                 document.getElementById('login-form').style.display = 'block';
-                document.getElementById('user-dashboard').style.display = 'none';
-                document.getElementById('register-form').style.display = 'none';
+                document.getElementById('user-dashboard').classList.add('hidden');
+                document.getElementById('register-form').classList.add('hidden');
             }
             
             showDashboard() {
                 document.getElementById('login-form').style.display = 'none';
-                document.getElementById('user-dashboard').style.display = 'block';
+                document.getElementById('user-dashboard').classList.remove('hidden');
                 document.getElementById('currentUserEmail').textContent = this.currentUser.email;
                 document.getElementById('currentUserRole').textContent = this.currentUser.userRole;
                 
@@ -375,12 +375,12 @@
                 this.loadLicenseInfo();
                 
                 if (this.currentUser.userRole === 'admin') {
-                    document.getElementById('admin-panel').style.display = 'block';
-                    document.getElementById('user-profile').style.display = 'none';
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    document.getElementById('user-profile').classList.add('hidden');
                     this.loadUsers();
                 } else {
-                    document.getElementById('admin-panel').style.display = 'none';
-                    document.getElementById('user-profile').style.display = 'block';
+                    document.getElementById('admin-panel').classList.add('hidden');
+                    document.getElementById('user-profile').classList.remove('hidden');
                     this.loadUserProfile();
                 }
                 
@@ -394,7 +394,7 @@
             
             toggleRegisterForm() {
                 const form = document.getElementById('register-form');
-                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                form.classList.toggle('hidden');
             }
             
             async loadUsers() {
@@ -426,13 +426,13 @@
                             <option value="searcher" ${user.userRole === 'searcher' ? 'selected' : ''}>Searcher</option>
                             <option value="admin" ${user.userRole === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
-                        <button onclick="authManager.editUser('${user.id}', '${user.email}')" style="background: #007bff; color: white; border: none; padding: 4px 8px; margin: 0 2px;">
+                        <button onclick="authManager.editUser('${user.id}', '${user.email}')" class="um-btn-user-edit">
                             Edit
                         </button>
-                        <button onclick="authManager.toggleUserStatus('${user.id}', ${!user.active})" style="background: ${user.active ? '#dc3545' : '#28a745'}; color: white; border: none; padding: 4px 8px; margin: 0 2px;">
+                        <button onclick="authManager.toggleUserStatus('${user.id}', ${!user.active})" class="${user.active ? 'um-btn-user-deactivate' : 'um-btn-user-activate'}">
                             ${user.active ? 'Deactivate' : 'Activate'}
                         </button>
-                        <button onclick="authManager.deleteUser('${user.id}')" style="background: #dc3545; color: white; border: none; padding: 4px 8px; margin: 0 2px;">
+                        <button onclick="authManager.deleteUser('${user.id}')" class="um-btn-user-delete">
                             Delete
                         </button>
                     `;
@@ -604,7 +604,7 @@
                     this.displayLicenseInfo(status);
                 } catch (error) {
                     document.getElementById('licenseStatus').innerHTML = `
-                        <div style="color: #dc3545;">Failed to load license information</div>
+                        <div class="um-text-danger">Failed to load license information</div>
                     `;
                 }
             }
@@ -617,17 +617,17 @@
                                    status.tier === 2 ? 'Premium' : 'Professional';
                     
                     container.innerHTML = `
-                        <div style="color: #28a745; margin-bottom: 10px;"><strong>✓ License Active</strong></div>
+                        <div class="um-text-success"><strong>✓ License Active</strong></div>
                         <div><strong>Tier:</strong> ${tierName}</div>
                         <div><strong>Email:</strong> ${status.email}</div>
-                        ${status.gracePeriod ? '<div style="color: #ffc107;"><em>Grace period active</em></div>' : ''}
-                        ${status.expired ? '<div style="color: #ffc107;"><em>License expired but within grace period</em></div>' : ''}
+                        ${status.gracePeriod ? '<div class="um-text-warning"><em>Grace period active</em></div>' : ''}
+                        ${status.expired ? '<div class="um-text-warning"><em>License expired but within grace period</em></div>' : ''}
                     `;
                 } else {
                     container.innerHTML = `
-                        <div style="color: #dc3545; margin-bottom: 10px;"><strong>⚠ License Issue</strong></div>
+                        <div class="um-text-danger-mb"><strong>⚠ License Issue</strong></div>
                         <div><strong>Status:</strong> ${status.reason || 'Invalid license'}</div>
-                        ${status.requiresActivation ? '<div><a href="license-activation.html" style="color: #007bff;">Activate License</a></div>' : ''}
+                        ${status.requiresActivation ? '<div><a href="license-activation.html" class="um-link-primary">Activate License</a></div>' : ''}
                     `;
                 }
             }
