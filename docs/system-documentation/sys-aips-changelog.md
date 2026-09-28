@@ -7,6 +7,7 @@ Format: `vMAJOR.MINOR: Description`
 
 ## v21.40
 - Query Intelligence Layer now applies to test scenarios: sending a `testCode` no longer bypasses analysis/query-improvement. Tests' explicit method and parameters are still preserved; only `useIntelligence: false` disables the layer
+- `test-collections.html` now sends `searchType: 'auto'` instead of hardcoding `ai-document-chat`, so query-intelligence determines the method per query (e.g. fact queries route to Hybrid Search). Explicit temperature/context/topK per test are still preserved
 - Updated backend validation script (`test-query-intelligence.mjs`) and API/search-methods docs to reflect the new test behavior
 
 ## v21.39
