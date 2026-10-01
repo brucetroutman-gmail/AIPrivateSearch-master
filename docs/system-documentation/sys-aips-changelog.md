@@ -5,6 +5,13 @@ Format: `vMAJOR.MINOR: Description`
 
 ---
 
+## v21.42
+- Fixed Hybrid Search returning only one of several relevant documents and showing Keyword 0%:
+  - Merge now keys on document identity (normalized filename) instead of two mismatched synthetic IDs, so keyword and semantic scores actually combine (keyword contribution is no longer always 0%)
+  - Semantic chunks are deduped per document (keep best score), so sibling documents are no longer crowded out by multiple chunks of one file
+  - Hybrid index is now rebuilt per collection (was a once-only shared singleton that served a stale, desynced TF-IDF index for every collection after the first)
+- Verified against Sample_Law-Office: "durable power of attorney" now returns all three POA documents with non-zero keyword scores
+
 ## v21.41
 - PDF extraction now uses the `unpdf` npm library (pure JS, requires Node ≥22) instead of the `pdftotext`/poppler system binary — removes the brew dependency that silently corrupted PDF collections on hosts without poppler
 - Document processing is now fail-hard: all format processors throw on extraction failure instead of writing `[Error extracting …]` placeholder text into the `.md` (which previously poisoned the vector index)

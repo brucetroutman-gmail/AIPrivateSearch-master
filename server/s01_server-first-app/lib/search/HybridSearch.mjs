@@ -17,7 +17,7 @@ export class HybridSearch {
     this.vectorSearch = new SmartSearch();
     this.tfidf = new TfIdf();
     this.documents = new Map();
-    this.initialized = false;
+    this.indexedCollection = null;
   }
 
   async search(query, options = {}) {
@@ -76,9 +76,12 @@ export class HybridSearch {
   }
 
   async ensureInitialized(collection) {
-    if (!this.initialized) {
+    // Re-index whenever the collection changes. This instance is a shared singleton
+    // in SearchOrchestrator, so a once-only guard would serve a stale index (and a
+    // desynced TF-IDF) for every collection after the first.
+    if (this.indexedCollection !== collection) {
       await this.indexCollection(collection);
-      this.initialized = true;
+      this.indexedCollection = collection;
     }
   }
 
@@ -92,7 +95,12 @@ export class HybridSearch {
     );
     
     console.log(`Indexing ${documentFiles.length} documents for hybrid search`);
-    
+
+    // Fresh state scoped to this collection so TF-IDF document positions line up
+    // exactly with this.documents iteration order.
+    this.documents = new Map();
+    this.tfidf = new TfIdf();
+
     for (const filename of documentFiles) {
       const filePath = path.join(collectionPath, filename);
       const content = await secureFs.readFile(filePath, 'utf-8');
@@ -105,7 +113,7 @@ export class HybridSearch {
         collection
       });
       
-      // Add to TF-IDF index
+      // Add to TF-IDF index (position matches insertion order in this.documents)
       this.tfidf.addDocument(content);
     }
   }
@@ -113,6 +121,8 @@ export class HybridSearch {
   async getKeywordResults(query, collection, limit) {
     const results = [];
     const queryTerms = query.toLowerCase().split(/\s+/);
+    // documents only ever contains the current collection now, so array position
+    // equals the TF-IDF document index.
     const documentArray = Array.from(this.documents.values());
     
     documentArray.forEach((document, index) => {
@@ -161,7 +171,10 @@ export class HybridSearch {
     
     return vectorResults.results.map(result => ({
       id: result.id,
-      filename: result.title,
+      // Use the raw source filename (not the display title) so the hybrid merge key
+      // matches the keyword path, which also keys on the raw filename.
+      filename: result.source || result.title,
+      title: result.title,
       content: result.excerpt.replace('...', ''), // Remove truncation marker
       collection,
       semanticScore: result.score
@@ -170,32 +183,42 @@ export class HybridSearch {
 
   combineResults(keywordResults, semanticResults, keywordWeight, semanticWeight) {
     const combinedScores = new Map();
-    
+
+    // Merge on a stable per-document identity (normalized filename), NOT the two
+    // different synthetic ids produced by the keyword path (`${collection}_${filename}`)
+    // and the semantic path (`vector_${chunkId}`), which never matched before.
+    const docKeyOf = (r) => (r.filename || r.source || '').replace(/\.md$/i, '');
+
     // Normalize keyword scores (0-1 range)
     const maxKeywordScore = Math.max(...keywordResults.map(r => r.keywordScore), 0.001);
     keywordResults.forEach(result => {
+      const key = docKeyOf(result);
+      if (!key) return;
       const normalizedScore = result.keywordScore / maxKeywordScore;
-      combinedScores.set(result.id, {
+      combinedScores.set(key, {
         ...result,
         keywordScore: normalizedScore,
         semanticScore: 0
       });
     });
-    
-    // Add semantic scores (already 0-1 range)
+
+    // Add semantic scores (already 0-1 range). Multiple chunks can map to the same
+    // document — keep the document's best (highest) semantic score (per-document dedup).
     semanticResults.forEach(result => {
-      const existing = combinedScores.get(result.id);
+      const key = docKeyOf(result);
+      if (!key) return;
+      const existing = combinedScores.get(key);
       if (existing) {
-        existing.semanticScore = result.semanticScore;
+        existing.semanticScore = Math.max(existing.semanticScore, result.semanticScore);
       } else {
-        combinedScores.set(result.id, {
+        combinedScores.set(key, {
           ...result,
           keywordScore: 0,
           semanticScore: result.semanticScore
         });
       }
     });
-    
+
     // Calculate hybrid scores
     return Array.from(combinedScores.values())
       .map(item => ({
