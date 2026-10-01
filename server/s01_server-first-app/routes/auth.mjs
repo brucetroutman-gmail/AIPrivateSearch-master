@@ -189,7 +189,11 @@ router.post('/create-and-login-admin', async (req, res) => {
     const { email, password, userRole, subscriptionTier } = req.body;
     const adminEmail = email || DEFAULT_ADMIN_EMAIL;
     const adminPassword = password || DEFAULT_ADMIN_PASSWORD;
-    const tier = subscriptionTier || 'professional';
+    // Fail-fast: do not silently grant a tier. subscriptionTier must be explicit.
+    if (!subscriptionTier) {
+      return res.status(400).json({ error: 'subscriptionTier is required' });
+    }
+    const tier = subscriptionTier;
     
     // Check if admin already exists
     const existingUsers = await userManager.getAllUsers();

@@ -21,11 +21,11 @@ console.log('DB_PASSWORD length:', process.env.DB_PASSWORD ? process.env.DB_PASS
 console.log('DB_DATABASE:', process.env.DB_DATABASE);
 
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USERNAME || 'aips-readwrite',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_DATABASE || 'aiprivatesearch',
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   connectionLimit: 10,
   idleTimeout: 300000
 };

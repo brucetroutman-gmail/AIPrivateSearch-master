@@ -17,7 +17,7 @@
 ## Getting Started
 
 ### Quick Start
-1. **Launch**: Double-click `load-aiss.command` in `/Users/Shared/`
+1. **Launch**: Run **aiprivatesearch.app** and choose **Install** (first time) or **Update**
 2. **Access**: Open http://localhost:3000 in your browser
 3. **Email**: Enter your email address (required for all features)
 4. **First Search**: Select a model, enter a query, and click Search
@@ -219,7 +219,7 @@ Compare multiple search methods side-by-side to find the best approach for your 
 
 #### Port 3000 busy
 - **Cause**: Another application using the port
-- **Solution**: Close other applications, restart load-aiss.command
+- **Solution**: Close other applications, re-run aiprivatesearch.app
 
 ### Performance Tips
 - **Use Line Search** for exact matches (fastest)

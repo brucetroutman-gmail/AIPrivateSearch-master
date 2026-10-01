@@ -74,7 +74,7 @@ Most AI search tools send your documents to cloud servers for processing. For me
 | Backend | Node.js / Express |
 | AI Models | Ollama (local) |
 | Vector Search | LanceDB |
-| Database | MySQL (optional, for test results) |
+| Database | MySQL (required, for test results) |
 | Prompt Enhancement | Fabric (optional, via fabric.formr.net) |
 | Platform | macOS (tested on macOS 12+) |
 

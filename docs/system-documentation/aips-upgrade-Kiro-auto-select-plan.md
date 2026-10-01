@@ -1098,8 +1098,6 @@ ollama run gemma2:2b "test"  # Quick test
 ### Clear Browser Cache
 ```bash
 # Chrome: Cmd+Shift+Delete, select cache
-# Or run your clear-browser-cache.sh script
-./clear-browser-cache.sh
 ```
 
 ---

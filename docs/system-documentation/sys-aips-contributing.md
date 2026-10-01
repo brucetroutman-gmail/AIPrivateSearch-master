@@ -8,7 +8,7 @@
 
 ### Prerequisites
 - macOS 12+
-- Node.js (installed via `load-aiss.command` or manually)
+- Node.js (installed via **aiprivatesearch.app** → Install/Update, or manually)
 - Ollama at `/Users/Shared/AIPrivateSearch/ollama`
 - Git with SSH or HTTPS access to GitHub
 

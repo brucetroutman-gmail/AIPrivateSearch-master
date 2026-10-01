@@ -122,7 +122,7 @@ ls .git/hooks/pre-commit
 
 - All document content stays on-device — never sent to external AI services
 - Ollama runs locally at `http://localhost:11434`
-- MySQL (optional) stores test results only — no document content
+- MySQL (required) stores test results only — no document content
 - Fabric integration (optional) sends only the search query for prompt enhancement — not document content
 
 ---

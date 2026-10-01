@@ -18,13 +18,13 @@ async function queryMembers( req, res ) {  // A express route or endpoint handle
   var aEmail = "bruce.troutman@gmail.com"
      
   try {
-    // Create connection
+    // Create connection (fail-fast: no silent credential defaults)
     connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 3306,
-      user: process.env.DB_USERNAME || 'aips-readwrite',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_DATABASE || 'aiprivatesearch'
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
     });
  
     console.log('Connected to MySQL database');

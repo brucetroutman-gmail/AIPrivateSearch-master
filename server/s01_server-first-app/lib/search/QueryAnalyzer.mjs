@@ -59,16 +59,9 @@ export class QueryAnalyzer {
       return analysis;
 
     } catch (error) {
+      // Fail hard: no silent default classification. Let the caller surface it.
       logger.error('[QueryAnalyzer] Analysis failed:', error.message);
-      
-      // Fallback to safe defaults on error
-      return {
-        type: 'analysis',
-        quality: 'good',
-        improved_query: null,
-        reasoning: 'Analysis failed, using defaults',
-        error: error.message
-      };
+      throw new Error(`Query analysis failed: ${error.message}`);
     }
   }
 
@@ -140,15 +133,9 @@ Response format (valid JSON only):
       return analysis;
 
     } catch (error) {
+      // Fail hard: a parse failure must not become a silent default classification.
       logger.error('[QueryAnalyzer] Parse failed:', error.message);
-      
-      // Return safe defaults
-      return {
-        type: 'analysis',
-        quality: 'good',
-        improved_query: null,
-        reasoning: 'Parse failed, using defaults'
-      };
+      throw new Error(`Query analysis parse failed: ${error.message}`);
     }
   }
 

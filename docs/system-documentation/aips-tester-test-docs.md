@@ -58,7 +58,7 @@ This guide walks you through purchasing a Professional license, downloading, ins
 
 | Issue | Fix |
 |-------|-----|
-| Port 3000 busy | Close all Terminal windows, re-open AIPrivateSearch app |
+| Configured port busy (see `app.json`) | Close all Terminal windows, re-open AIPrivateSearch app |
 | No models in dropdown | Wait for Ollama model pull to complete |
 | Tests not saving to DB | Check `.env-aips` file exists in `/Users/Shared/AIPrivateSearch/` |
 | Score model causes crash | Do not use `nomic-embed-text` as score model — use a chat model |

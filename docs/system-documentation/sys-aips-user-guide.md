@@ -7,7 +7,7 @@
 ## Getting Started
 
 ### Launch the App
-- **Local Mac**: Double-click `load-aiss.command` in `/Users/Shared/`, then open http://localhost:3000
+- **Local Mac**: Run **aiprivatesearch.app** and choose **Install** (first time) or **Update**, then open `http://localhost:<frontend-port>` (port set in `app.json`)
 - **Remote Mac**: Open http://[host]:56305
 
 ### Login

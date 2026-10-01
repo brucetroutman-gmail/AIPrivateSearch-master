@@ -9,9 +9,9 @@
 ### App won't start
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Port 3000/56305 already in use | Previous instance still running | Close all Terminal windows, restart app |
+| Configured port already in use (see `app.json`) | Previous instance still running | Close all Terminal windows, restart app |
 | Folder locked error | VS Code or another app has the folder open | Close VS Code, restart app |
-| `npm: command not found` | Node.js not installed | Run `load-aiss.command` — it installs Node.js automatically |
+| `npm: command not found` | Node.js not installed | Run **aiprivatesearch.app** → **Install** — it installs Node.js automatically |
 | `ollama: command not found` | Ollama not in PATH | Add to `~/.zshrc`: `export PATH="/Users/Shared/AIPrivateSearch:$PATH"` |
 | Backend starts but frontend 404 | Wrong working directory | Ensure you're running from repo root |
 
@@ -130,7 +130,7 @@ Open browser DevTools → Application → Local Storage → delete `sessionId`, 
 |---------|-------|-----|
 | Results not saving | MySQL not running or wrong credentials | Check `.env-aips` credentials, verify MySQL is running |
 | "Database connection failed" | Wrong host/port | Verify `DB_HOST` and `DB_PORT` in `.env-aips` |
-| App works without database | Expected behavior | MySQL is optional — app functions fully without it |
+| App fails to start, "Missing required database configuration" | DB env vars absent | Set all DB_* variables in `/Users/Shared/AIPrivateSearch/.env-aips` — MySQL is required |
 
 ---
 

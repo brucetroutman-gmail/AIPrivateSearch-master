@@ -12,7 +12,7 @@ AIPrivateSearch is a local-first AI document search platform. All AI processing 
 │  exact-search.html  │  ai-search.html  │  index.html     │
 │  collections.html   │  options.html    │  ...            │
 └────────────────────────────┬────────────────────────────┘
-                             │ HTTP (localhost:3000)
+                             │ HTTP (localhost:<frontend-port>)
                              ▼
 ┌─────────────────────────────────────────────────────────┐
 │              Node.js / Express Backend                   │
@@ -159,7 +159,7 @@ Weighted percentage = `(accuracy×3 + relevance×2 + organization×1) / 18 × 10
 - **Static file serving** — frontend served directly by Express, no build step
 - **Config outside repo** — allows config changes without git commits on deployed machines
 - **Ollama local** — installed at `/Users/Shared/AIPrivateSearch/ollama`, added to PATH via `~/.zshrc`
-- **MySQL optional** — app works without it; only needed for test result persistence
+- **MySQL required** — the server fails fast at startup if DB configuration is missing; used for test result persistence
 - **Fabric integration** — optional prompt enhancement via `https://fabric.formr.net` (Ubuntu server, port 8081, systemd)
 
 ---
@@ -168,5 +168,7 @@ Weighted percentage = `(accuracy×3 + relevance×2 + organization×1) / 18 × 10
 
 | Environment | Frontend | Backend |
 |-------------|----------|---------|
-| Local dev | 3000 | 3001 |
-| Remote Mac | 56305 | 56306 |
+| Local dev | `ports.frontend` | `ports.backend` |
+| Remote Mac | `ports.frontend` | `ports.backend` |
+
+Ports come from `app.json` (`ports.frontend` / `ports.backend`); shipped defaults are 56305 / 56306.

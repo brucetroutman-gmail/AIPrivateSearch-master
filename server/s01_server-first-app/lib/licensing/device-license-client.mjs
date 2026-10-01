@@ -16,8 +16,12 @@ class DeviceLicenseClient {
     }
 
     async initialize(custmgrConfig) {
-        const protocol = custmgrConfig?.protocol || 'https';
-        const host = custmgrConfig?.host || 'custmgr.aiprivatesearch.com';
+        // Fail-fast: custmgr host/protocol must come from config, no silent defaults.
+        if (!custmgrConfig?.protocol || !custmgrConfig?.host) {
+            throw new Error('CRITICAL: custmgr configuration (protocol, host) is missing from app.json. Cannot initialize device licensing.');
+        }
+        const protocol = custmgrConfig.protocol;
+        const host = custmgrConfig.host;
         this.custmgrUrl = `${protocol}://${host}`;
         console.log('🔐 DEVICE LICENSE: Using custmgr URL:', this.custmgrUrl);
         

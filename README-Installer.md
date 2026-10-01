@@ -1,18 +1,13 @@
-# AIPrivateSearch Installer App
+# AIPrivateSearch Installer
 
 ## Customer Installation Guide
 
-### Option 1: Use the Installer App (Recommended)
-1. Download `AIPrivateSearch Installer.app`
-2. Double-click to run the installer
-3. Follow the on-screen prompts
-4. The app will automatically open in your browser when complete
+1. Go to **aiprivatesearch.com**, register, and download the AIPS DMG.
+2. Open the DMG and install **aiprivatesearch.app**.
+3. Run **aiprivatesearch.app** and choose **Install**.
+4. The app opens in your browser automatically when complete.
 
-### Option 2: Manual Installation
-1. Download `load-aiss.command`
-2. Move it to `/Users/Shared/`
-3. Double-click to run the installer
-4. Follow the prompts in Terminal
+To update later, run **aiprivatesearch.app** and choose **Update**.
 
 ## What Gets Installed
 
@@ -26,7 +21,6 @@ The installer will set up:
 ## Installation Location
 
 - Main application: `/Users/Shared/repos/aiprivatesearch/`
-- Installer script: `/Users/Shared/load-aiss.command`
 
 ## After Installation
 
@@ -36,9 +30,7 @@ The installer will set up:
 
 ## Restarting the Application
 
-To restart AIPrivateSearch anytime:
-1. Navigate to `/Users/Shared/`
-2. Double-click `load-aiss.command`
+To restart AIPrivateSearch anytime, run **aiprivatesearch.app** (choose **Update** to also pull the latest version).
 
 ## System Requirements
 

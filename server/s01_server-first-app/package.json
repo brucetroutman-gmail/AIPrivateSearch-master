@@ -1,6 +1,6 @@
 {
   "name": "ai-search-score-server",
-  "version": "21.40",
+  "version": "21.41",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
@@ -27,6 +27,7 @@
     "public-ip": "^8.0.0",
     "sql.js": "^1.10.3",
     "stopword": "^3.1.5",
+    "unpdf": "1.8.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

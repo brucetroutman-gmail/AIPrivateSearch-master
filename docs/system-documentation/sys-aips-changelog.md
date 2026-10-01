@@ -5,6 +5,16 @@ Format: `vMAJOR.MINOR: Description`
 
 ---
 
+## v21.41
+- PDF extraction now uses the `unpdf` npm library (pure JS, requires Node ≥22) instead of the `pdftotext`/poppler system binary — removes the brew dependency that silently corrupted PDF collections on hosts without poppler
+- Document processing is now fail-hard: all format processors throw on extraction failure instead of writing `[Error extracting …]` placeholder text into the `.md` (which previously poisoned the vector index)
+- Database is now **required**: the server fails fast at startup if any `DB_*` variable is missing (no silent localhost/blank-password defaults)
+- Removed silent config/credential fallbacks (Category 1): server ports now come solely from `app.json` via `AppConfig.getPorts()`; custmgr host/protocol required from config
+- Removed feature-degradation silent fallbacks (Category 2): Query Intelligence Layer and `QueryAnalyzer` now throw (HTTP 500) on failure instead of defaulting to `type:'analysis'`; metadata model selection and document NLP/AI analysis fail hard instead of indexing placeholder metadata
+- Removed privilege-escalation default (Category 3): admin creation requires an explicit `subscriptionTier` (no silent grant of "professional"); least-privilege tier defaults retained as fail-closed
+- Removed `load-aiss.command` and `clear-browser-cache.sh` and all references; install/update is via `aiprivatesearch.app` (Install/Update)
+- Docs: ports now referenced from `app.json` config instead of hardcoded 3000/3001; DB documented as required; updated remote Mac test plan for all v21.41 behaviors
+
 ## v21.40
 - Query Intelligence Layer now applies to test scenarios: sending a `testCode` no longer bypasses analysis/query-improvement. Tests' explicit method and parameters are still preserved; only `useIntelligence: false` disables the layer
 - `test-collections.html` now sends `searchType: 'auto'` instead of hardcoding `ai-document-chat`, so query-intelligence determines the method per query (e.g. fact queries route to Hybrid Search). Explicit temperature/context/topK per test are still preserved

@@ -47,6 +47,8 @@ const debugValidateOrigin = (req, res, next) => {
 import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
+import { AppConfig } from './lib/utils/appConfig.mjs';
+
 const app = express();
 
 // Global request logging
@@ -80,24 +82,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Load CORS origins from app.json config
-let corsOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'];
-try {
-  const fs = await import('fs/promises');
-  const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
-  if (appConfig.ports) {
-    const frontendPort = appConfig.ports.frontend || 3000;
-    const backendPort = appConfig.ports.backend || 3001;
-    corsOrigins = [
-      `http://localhost:${frontendPort}`,
-      `http://localhost:${backendPort}`,
-      `http://127.0.0.1:${frontendPort}`,
-      `http://127.0.0.1:${backendPort}`
-    ];
-  }
-} catch (error) {
-  // Use defaults if config can't be read
-}
+// Load CORS origins from app.json config (fail-fast: no silent port defaults)
+const { frontend: corsFrontendPort, backend: corsBackendPort } = AppConfig.getPorts();
+const corsOrigins = [
+  `http://localhost:${corsFrontendPort}`,
+  `http://localhost:${corsBackendPort}`,
+  `http://127.0.0.1:${corsFrontendPort}`,
+  `http://127.0.0.1:${corsBackendPort}`
+];
 
 app.use(cors({
   origin: corsOrigins,
@@ -186,16 +178,9 @@ app.use(errorHandler);
 
 
 
-// Load port from app.json config
-let PORT = process.env.PORT || 3001;
-try {
-  const fs = await import('fs/promises');
-  const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
-  PORT = process.env.PORT || appConfig.ports?.backend || 3001;
-} catch (error) {
-  // Fallback to default if config can't be read
-  PORT = process.env.PORT || 3001;
-}
+// Load backend port from app.json config (fail-fast: no silent port defaults).
+// An explicit PORT env var still overrides config when intentionally set.
+const PORT = process.env.PORT || AppConfig.getPorts().backend;
 const server = app.listen(PORT, async () => {
   logger.log(`Server running on port ${PORT}`);
   logger.log('Device-based licensing system ready');

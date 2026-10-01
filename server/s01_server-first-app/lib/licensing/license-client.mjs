@@ -13,7 +13,11 @@ async function loadCustmgrConfig() {
     const fs = await import('fs/promises');
     const appConfig = JSON.parse(await fs.readFile('../../client/c01_client-first-app/config/app.json', 'utf8'));
     if (appConfig.custmgr) {
-      const protocol = appConfig.custmgr.protocol || 'https';
+      // Fail-fast: protocol and host must be present, no silent defaults.
+      if (!appConfig.custmgr.protocol || !appConfig.custmgr.host) {
+        throw new Error('custmgr configuration incomplete in app.json (requires protocol and host)');
+      }
+      const protocol = appConfig.custmgr.protocol;
       const host = appConfig.custmgr.host;
       const port = appConfig.custmgr.port;
       

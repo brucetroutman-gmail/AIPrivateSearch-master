@@ -112,8 +112,9 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         });
         
       } catch (error) {
-        logger.error('[QueryIntelligence] Failed, using defaults:', error.message);
-        // Continue with user-provided or default values on error
+        // Fail hard: do not silently degrade to defaults. Surface the failure.
+        logger.error('[QueryIntelligence] Failed:', error.message);
+        throw new Error(`Query Intelligence Layer failed: ${error.message}`);
       }
     } else {
       logger.log('[QueryIntelligence] Bypassed - explicitly disabled (useIntelligence: false)');

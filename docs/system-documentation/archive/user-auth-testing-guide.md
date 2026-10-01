@@ -4,7 +4,7 @@
 Step-by-step guide for testing AIPrivateSearch user authentication system across all subscription tiers and user roles.
 
 ## Prerequisites
-- AIPrivateSearch running (`load-aiss.command` executed)
+- AIPrivateSearch running (via **aiprivatesearch.app** → Install/Update)
 - System accessible at `http://localhost:3000`
 - Test Results Tracker available at `http://localhost:3000/test-results/test-results-tracker.html`
 

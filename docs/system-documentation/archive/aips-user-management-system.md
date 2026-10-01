@@ -114,9 +114,8 @@ The AIPrivateSearch User Management System provides secure authentication, autho
 The system automatically configures itself when you start the application:
 
 ```bash
-# Use the standard AIPrivateSearch startup
-# Navigate to /Users/Shared and double-click:
-load-aiss.command
+# Use the standard AIPrivateSearch startup:
+# Run aiprivatesearch.app and choose Install (first time) or Update
 ```
 
 **What happens automatically**:

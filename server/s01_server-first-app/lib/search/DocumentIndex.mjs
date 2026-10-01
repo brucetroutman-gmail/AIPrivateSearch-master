@@ -325,36 +325,14 @@ export class DocumentIndex {
         
         // Get NLP analytics with error handling
         let nlpResults = {};
-        if (nlpAnalytics) {
-          try {
-            nlpResults = nlpAnalytics.analyzeText(content);
-          } catch (nlpError) {
-            console.log(`NLP analysis failed for ${filename}, using defaults:`, nlpError.message);
-            nlpResults = {
-              entities: { people: '', organizations: '', locations: '' },
-              dates: '',
-              keyPhrases: '',
-              wordCount: content.split(/\s+/).length,
-              sentenceCount: content.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
-              paragraphCount: content.split(/\n\s*\n/).filter(p => p.trim().length > 0).length,
-              uniqueWordCount: new Set(content.split(/\s+/).map(w => w.toLowerCase())).size,
-              averageSentenceLength: 25,
-              readingTime: Math.ceil(content.split(/\s+/).length / 200)
-            };
-          }
-        } else {
-          // Fallback when NLP analytics is not available
-          nlpResults = {
-            entities: { people: '', organizations: '', locations: '' },
-            dates: '',
-            keyPhrases: '',
-            wordCount: content.split(/\s+/).length,
-            sentenceCount: content.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
-            paragraphCount: content.split(/\n\s*\n/).filter(p => p.trim().length > 0).length,
-            uniqueWordCount: new Set(content.split(/\s+/).map(w => w.toLowerCase())).size,
-            averageSentenceLength: 25,
-            readingTime: Math.ceil(content.split(/\s+/).length / 200)
-          };
+        if (!nlpAnalytics) {
+          throw new Error(`NLP analytics unavailable while indexing ${filename}; cannot generate metadata.`);
+        }
+        try {
+          nlpResults = nlpAnalytics.analyzeText(content);
+        } catch (nlpError) {
+          // Fail hard: do not index placeholder/garbage metadata.
+          throw new Error(`NLP analysis failed for ${filename}: ${nlpError.message}`);
         }
         
         // Parse numbered AI response
@@ -832,7 +810,8 @@ export class DocumentIndex {
         
         console.log(`Fast AI analysis completed for ${filename}`);
       } catch (aiError) {
-        console.log(`AI analysis failed for ${filename} (${aiError.message}), using defaults`);
+        // Fail hard: do not index with default/empty AI metadata.
+        throw new Error(`AI analysis failed for ${filename}: ${aiError.message}`);
       }
       
       // Calculate text metrics

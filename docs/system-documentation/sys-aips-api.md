@@ -1,7 +1,9 @@
 # AIPrivateSearch API Reference
 
-**Base URL (local dev)**: `http://localhost:3001`
-**Base URL (remote Mac)**: `http://[host]:56306`
+**Base URL (local dev)**: `http://localhost:<backend-port>`
+**Base URL (remote Mac)**: `http://[host]:<backend-port>`
+
+> The backend port is read from `app.json` (`ports.backend`); the shipped default is 56306.
 **Auth**: Session cookie required on all endpoints except `/api/auth/*` and `/api/license/*`
 
 ---

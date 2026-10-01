@@ -83,31 +83,20 @@ export class DocumentProcessor {
   async getMetadataModel() {
     if (this.metadataModel) return this.metadataModel;
     
+    // Get the metadata model from config (fail-hard: no silent guess of an arbitrary model)
+    const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/model-list.json');
+    let modelList;
     try {
-      // First try to get metadata model from config
-      const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/model-list.json');
-      const modelList = JSON.parse(await secureFs.readFile(modelListPath, 'utf8'));
-      const metadataModels = modelList.models.filter(m => m.category === 'metadata');
-      
-      if (metadataModels.length > 0) {
-        this.metadataModel = metadataModels[0].name;
-        return this.metadataModel;
-      }
+      modelList = JSON.parse(await secureFs.readFile(modelListPath, 'utf8'));
     } catch (error) {
-      // Config file error, continue to fallback
+      throw new Error(`Cannot read metadata model config at ${modelListPath}: ${error.message}`);
     }
-    
-    // Fallback: get first available model from Ollama
-    try {
-      const response = await this.ollama.list();
-      if (response.models && response.models.length > 0) {
-        this.metadataModel = response.models[0].name;
-      } else {
-        throw new Error('No models available in Ollama');
-      }
-    } catch (error) {
-      throw new Error(`No models available for metadata generation: ${error.message}`);
+    const metadataModels = modelList.models.filter(m => m.category === 'metadata');
+    if (metadataModels.length === 0) {
+      throw new Error('No metadata model configured in model-list.json (category "metadata").');
     }
+    this.metadataModel = metadataModels[0].name;
+    return this.metadataModel;
     
     return this.metadataModel;
   }
@@ -192,29 +181,24 @@ export class DocumentProcessor {
   async processPDF(filePath) {
     const filename = path.basename(filePath, '.pdf');
     try {
-      const { exec } = await import('child_process');
-      const { promisify } = await import('util');
-      const execAsync = promisify(exec);
-      
-      // Use pdftotext to extract text from PDF
-      const { stdout, stderr } = await execAsync(`pdftotext "${filePath}" -`, { 
-        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-        timeout: 30000 // 30 second timeout
-      });
-      
-      if (stderr && stderr.trim()) {
-        console.warn(`PDF extraction warning for ${filename}:`, stderr);
+      // Extract text using unpdf (pure-JS PDF.js wrapper, no system binaries)
+      const { extractText, getDocumentProxy } = await import('unpdf');
+      const buffer = await secureFs.readFile(filePath);
+      const pdf = await getDocumentProxy(new Uint8Array(buffer));
+      const { text } = await extractText(pdf, { mergePages: true });
+
+      const extractedText = (text || '').trim();
+      if (extractedText.length < 10) {
+        throw new Error('No text content extracted from PDF (it may be image-based/scanned and require OCR)');
       }
-      
-      const extractedText = stdout.trim();
-      if (!extractedText || extractedText.length < 10) {
-        throw new Error('No text content extracted from PDF');
-      }
-      
+
       return `# ${filename}\n\n${extractedText}`;
     } catch (error) {
-      console.error(`PDF processing error for ${filename}:`, error.message);
-      return `# ${filename}\n\n[Error extracting PDF content: ${error.message}]\n\n*This PDF could not be processed. Please ensure the PDF contains extractable text and is not image-based.*`;
+      // Fail hard: never write the error into the document content. Log and throw
+      // so the caller stops processing rather than indexing a corrupt document.
+      const message = `PDF extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -228,7 +212,9 @@ export class DocumentProcessor {
       const result = await mammoth.extractRawText({ buffer });
       return `# ${filename}\n\n${result.value.trim()}`;
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting DOCX content: ${error.message}]`;
+      const message = `DOCX extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -256,7 +242,9 @@ export class DocumentProcessor {
         throw new Error('Conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting PowerPoint content: ${error.message}]\n\n*This PowerPoint file could not be processed. Please ensure LibreOffice is installed.*`;
+      const message = `PowerPoint extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -302,7 +290,9 @@ export class DocumentProcessor {
         throw new Error('Conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting Excel content: ${error.message}]\n\n*This Excel file could not be processed. Please ensure LibreOffice is installed.*`;
+      const message = `Excel extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -329,7 +319,9 @@ export class DocumentProcessor {
         throw new Error('Conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting RTF content: ${error.message}]\n\n*This RTF file could not be processed. Please ensure LibreOffice is installed.*`;
+      const message = `RTF extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -356,7 +348,9 @@ export class DocumentProcessor {
       
       return `# ${filename}\n\n${textContent}`;
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting HTML content: ${error.message}]`;
+      const message = `HTML extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -383,7 +377,9 @@ export class DocumentProcessor {
         throw new Error('Conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting ODT content: ${error.message}]\n\n*This ODT file could not be processed. Please ensure LibreOffice is installed.*`;
+      const message = `ODT extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -411,7 +407,9 @@ export class DocumentProcessor {
         throw new Error('Pandoc conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting EPUB content: ${error.message}]\n\n*This EPUB file could not be processed. Please ensure Pandoc is installed: brew install pandoc*`;
+      const message = `EPUB extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -438,7 +436,9 @@ export class DocumentProcessor {
         throw new Error('Conversion failed - no output file created');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting ODS content: ${error.message}]\n\n*This ODS file could not be processed. Please ensure LibreOffice is installed.*`;
+      const message = `ODS extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -448,8 +448,8 @@ export class DocumentProcessor {
     
     try {
       if (ext === '.key') {
-        // Keynote files need special handling - convert to PDF first
-        return `# ${filename}\n\n[Keynote files are not currently supported]\n\n*Please export your Keynote presentation to PowerPoint (.pptx) format first.*`;
+        // Keynote files need special handling - not supported for text extraction.
+        throw new Error('Keynote (.key) files are not supported. Export to PowerPoint (.pptx) first.');
       } else {
         // ODP files can be processed with LibreOffice
         const { exec } = await import('child_process');
@@ -471,7 +471,9 @@ export class DocumentProcessor {
         }
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error extracting presentation content: ${error.message}]\n\n*This presentation file could not be processed.*`;
+      const message = `Presentation extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -485,13 +487,15 @@ export class DocumentProcessor {
       if (ext === '.eml') {
         return await this.processEMLFile(content, filename);
       } else if (ext === '.msg') {
-        // MSG files are binary format, need different handling
-        return `# ${filename}\n\n[MSG files require specialized parsing]\n\n*MSG files are Microsoft Outlook binary format. Please export to EML format or forward as plain text.*`;
+        // MSG files are binary Outlook format we cannot parse to text.
+        throw new Error('MSG (Outlook binary) files are not supported. Export to EML or plain text.');
       }
-      
-      return `# ${filename}\n\n[Unknown email format: ${ext}]`;
+
+      throw new Error(`Unknown email format: ${ext}`);
     } catch (error) {
-      return `# ${filename}\n\n[Error processing email file: ${error.message}]\n\n*Email file could not be read or parsed.*`;
+      const message = `Email processing failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -524,7 +528,9 @@ export class DocumentProcessor {
       
       return markdown;
     } catch (error) {
-      return `# ${filename}\n\n[Error parsing EML content: ${error.message}]\n\n*EML file structure could not be parsed.*`;
+      const message = `EML parsing failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -746,7 +752,9 @@ export class DocumentProcessor {
       
       return `# ${filename}\n\n\`\`\`\n${content.trim()}\n\`\`\``;
     } catch (error) {
-      return `# ${filename}\n\n[Error processing structured data: ${error.message}]`;
+      const message = `Structured data extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -760,7 +768,9 @@ export class DocumentProcessor {
       
       return `# ${filename}\n\n\`\`\`${language}\n${content.trim()}\n\`\`\``;
     } catch (error) {
-      return `# ${filename}\n\n[Error processing code file: ${error.message}]`;
+      const message = `Code file extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -788,7 +798,9 @@ export class DocumentProcessor {
         throw new Error('Pandoc conversion failed');
       }
     } catch (error) {
-      return `# ${filename}\n\n[Error processing LaTeX file: ${error.message}]\n\n*Please ensure Pandoc is installed: brew install pandoc*`;
+      const message = `LaTeX extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -799,7 +811,9 @@ export class DocumentProcessor {
       const content = await secureFs.readFile(filePath, 'utf8');
       return `# ${filename}\n\n\`\`\`log\n${content.trim()}\n\`\`\``;
     } catch (error) {
-      return `# ${filename}\n\n[Error processing log file: ${error.message}]`;
+      const message = `Log file extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -810,7 +824,9 @@ export class DocumentProcessor {
       const content = await secureFs.readFile(filePath, 'utf8');
       return content; // Already markdown, return as-is
     } catch (error) {
-      return `# ${filename}\n\n[Error reading markdown file: ${error.message}]`;
+      const message = `Markdown read failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
@@ -822,14 +838,17 @@ export class DocumentProcessor {
       const content = await secureFs.readFile(filePath, 'utf8');
       return this.csvToMarkdown(content, filename, ext === '.tsv' ? '\t' : ',');
     } catch (error) {
-      return `# ${filename}\n\n[Error processing CSV/TSV file: ${error.message}]`;
+      const message = `CSV/TSV extraction failed for "${filename}": ${error.message}`;
+      console.error(message);
+      throw new Error(message);
     }
   }
 
   async processUnsupported(filePath, ext) {
     const filename = path.basename(filePath);
-    
-    return `# ${filename}\n\n**File Format Not Supported**\n\nThe file format \`${ext}\` cannot be processed by AIPrivateSearch.\n\n**Supported formats:**\n- Text: .txt, .md, .log\n- Office: .docx, .doc, .pptx, .ppt, .xlsx, .xls, .rtf, .odt, .ods\n- Web: .html, .htm\n- Data: .json, .yaml, .xml, .csv, .tsv\n- Code: .py, .js, .java, .cpp, .c, .h, .css, .sql\n- Other: .pdf, .epub, .tex\n\n**Recommendation:** Please convert this file to a supported format or contact support for additional format requests.`;
+    const message = `Unsupported file format "${ext}" for "${filename}"; cannot extract content.`;
+    console.error(message);
+    throw new Error(message);
   }
 
   csvToMarkdown(content, filename, delimiter = ',') {

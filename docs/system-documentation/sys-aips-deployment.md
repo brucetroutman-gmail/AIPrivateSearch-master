@@ -4,8 +4,10 @@
 
 | Environment | Frontend | Backend | Start method |
 |-------------|----------|---------|--------------|
-| Local dev Mac | localhost:3000 | localhost:3001 | `npm start` in repo root |
-| Remote Mac | [host]:56305 | [host]:56306 | `aiprivatesearch.app` |
+| Local dev Mac | localhost:`<ports.frontend>` | localhost:`<ports.backend>` | `npm start` in repo root |
+| Remote Mac | [host]:`<ports.frontend>` | [host]:`<ports.backend>` | `aiprivatesearch.app` |
+
+> Ports are read from `app.json` (`ports.frontend` / `ports.backend`). Defaults in the shipped config are 56305 (frontend) and 56306 (backend).
 
 ---
 
@@ -13,9 +15,9 @@
 
 ### Prerequisites
 - macOS 12+
-- Node.js (installed via `load-aiss.command` or manually)
+- Node.js (installed via **aiprivatesearch.app** → Install/Update, or manually)
 - Ollama at `/Users/Shared/AIPrivateSearch/ollama` (added to PATH in `~/.zshrc`)
-- MySQL (optional — for test result storage)
+- MySQL (required — the app fails to start without DB configuration in `.env-aips`)
 
 ### Start
 ```bash
@@ -38,7 +40,7 @@ rsync -a --delete /Users/Shared/AIPrivateSearch/config/ \
 ## Remote Mac Deployment
 
 ### First-time setup
-Double-click `load-aiss.command` in `/Users/Shared/`. This will:
+Run **aiprivatesearch.app** and choose **Install**. This will:
 1. Install Xcode Command Line Tools (Git, make, compilers)
 2. Install Node.js
 3. Install Ollama
@@ -137,7 +139,7 @@ See `aips-fabric-install.md` for full setup details.
 
 | Problem | Fix |
 |---------|-----|
-| Port 3000/56305 busy | Close Terminal windows, restart app |
+| Configured port busy (see `app.json`) | Close Terminal windows, restart app |
 | Folder locked | Close VS Code, restart app |
 | Menu not showing | Hard refresh (Cmd+Shift+R), check browser console for tier access logs |
 | Models not loading | Check `ollama list`, ensure Ollama service is running |

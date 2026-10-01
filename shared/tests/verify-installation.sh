@@ -61,16 +61,31 @@ fi
 # Test connectivity
 echo ""
 echo "🌐 Testing connectivity..."
-if curl -s http://localhost:3001/health > /dev/null 2>&1; then
-    echo "✅ Backend API accessible"
-else
-    echo "❌ Backend API not accessible"
-fi
 
-if curl -s http://localhost:3000 > /dev/null 2>&1; then
-    echo "✅ Frontend accessible"
+# Read ports from app.json (runtime config first, then repo template). Never hardcode.
+APP_CONFIG="/Users/Shared/AIPrivateSearch/config/app.json"
+if [ ! -f "$APP_CONFIG" ]; then
+    APP_CONFIG="client/c01_client-first-app/config/app.json"
+fi
+FRONTEND_PORT=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('$APP_CONFIG','utf8')).ports.frontend)}catch(e){process.exit(1)}")
+BACKEND_PORT=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('$APP_CONFIG','utf8')).ports.backend)}catch(e){process.exit(1)}")
+
+if [ -z "$FRONTEND_PORT" ] || [ -z "$BACKEND_PORT" ]; then
+    echo "❌ Could not read ports from app.json ($APP_CONFIG)"
 else
-    echo "❌ Frontend not accessible"
+    echo "ℹ️  Using ports from app.json — frontend: $FRONTEND_PORT, backend: $BACKEND_PORT"
+
+    if curl -s "http://localhost:$BACKEND_PORT/health" > /dev/null 2>&1; then
+        echo "✅ Backend API accessible"
+    else
+        echo "❌ Backend API not accessible"
+    fi
+
+    if curl -s "http://localhost:$FRONTEND_PORT" > /dev/null 2>&1; then
+        echo "✅ Frontend accessible"
+    else
+        echo "❌ Frontend not accessible"
+    fi
 fi
 
 echo ""

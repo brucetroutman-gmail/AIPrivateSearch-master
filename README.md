@@ -11,7 +11,7 @@ AIPrivateSearch is a local-first AI document search platform. It enables profess
 - **Automated Scoring**: 1-3 scale evaluation with weighted percentage scores (Accuracy 3x, Relevance 2x, Organization 1x)
 - **Document Collections**: Organize and search local documents with vector similarity search
 - **Performance Metrics**: Detailed timing and token usage statistics
-- **Database Integration**: MySQL storage for test results and analysis (optional)
+- **Database Integration**: MySQL storage for test results and analysis (required)
 - **Security**: Role-based access control, tier system, ESLint security hooks
 
 **Use Cases:**
@@ -26,17 +26,16 @@ AIPrivateSearch is a local-first AI document search platform. It enables profess
 - **macOS** (tested on macOS 12+)
 - **4GB+ RAM** available for AI models
 - **Internet connection** (for initial downloads)
-- **MySQL** database (optional, for result storage)
+- **MySQL** database (required — the app fails to start without DB configuration)
 
 ### Quick Start (2 Minutes)
 
-#### 1. Run AIPrivateSearch
-```bash
-# Navigate to /Users/Shared and double-click:
-load-aiss.command
-```
+#### 1. Install & Run AIPrivateSearch
+1. Go to **aiprivatesearch.com**, register, and download the AIPS DMG.
+2. Open the DMG and install **aiprivatesearch.app**.
+3. Run **aiprivatesearch.app** and choose **Install**.
 
-**That's it!** The load-aiss.command script will:
+**That's it!** Running aiprivatesearch.app (Install) will:
 - Install command line developer tools automatically (Xcode Command Line Tools with Git, make, etc.)
 - Install Node.js automatically (if not already installed)
 - Install Ollama automatically (if not already installed)
@@ -47,9 +46,10 @@ load-aiss.command
 - Install all dependencies
 - Start both frontend and backend servers
 
+To update later, run **aiprivatesearch.app** and choose **Update**.
+
 #### 2. Access Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
+Open the app at `http://localhost:<frontend-port>` and reach the API at `http://localhost:<backend-port>`, where the ports are set in `app.json` (`ports.frontend` / `ports.backend`).
 
 ### First Search
 1. **Enter Email**: Required for access
@@ -59,8 +59,8 @@ load-aiss.command
 5. **Enable Scoring** (AI Search): Check "Generate scores" and select score model
 6. **Submit**: View results with optional accuracy, relevance, and organization scores
 
-### Optional: Database Setup
-For result storage and analysis:
+### Required: Database Setup
+The app requires a configured MySQL database and will fail to start if any DB variable is missing. Create the `.env-aips` file with all variables:
 ```bash
 # Create .env-aips file in /Users/Shared/AIPrivateSearch/
 echo "NODE_ENV=development
@@ -80,8 +80,8 @@ To search your own documents:
 5. Query your documents with any search method
 
 ### Troubleshooting
-- **Port 3000 busy**: Close Terminal windows and restart load-aiss.command
-- **Folder locked**: Close VS Code and restart load-aiss.command
+- **Port already in use**: Close Terminal windows and re-run aiprivatesearch.app
+- **Folder locked**: Close VS Code and re-run aiprivatesearch.app
 - **Command Line Tools**: Script automatically installs Xcode Command Line Tools. Complete dialog if prompted and wait (up to 5 minutes)
 - **No scores**: Ensure score model is selected when scoring is enabled
 - **No Smart Search results**: Collection needs to be embedded first (Collections → Embed Source MDs)
@@ -151,4 +151,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 21.40 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch
+**Version**: 21.41 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch
