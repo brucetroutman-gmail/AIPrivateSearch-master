@@ -642,7 +642,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     CollectionName: result.collection || null,
     SearchMethodType: result.searchType || null,
     SystemPrompt: result.systemPromptName || null,
+    SystemPromptText: result.systemPromptText || null,
     Prompt: result.query || null,
+    OriginalPrompt: result.originalQuery || null,
+    QueryWasImproved: result.wasImproved ? 1 : 0,
+    DetectedQueryType: result.detectedType || null,
     'ModelName-search': result.metrics?.search?.model || null,
     'ModelContextSize-search': result.metrics?.search?.context_size || testParams?.context || null,
     'ModelTemperature-search': result.metrics?.search?.temperature || testParams?.temperature || null,
@@ -663,6 +667,7 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
       return isFinite(tokensPerSec) ? Math.round(tokensPerSec * 100) / 100 : null;
     })(),
     'Answer-search': result.response || null,
+    FullPrompt: result.fullPrompt || null,
     'Chunks-search': result.chunks?.length
       ? JSON.stringify(result.chunks.map(c => ({
           filename: c.filename,

@@ -31,13 +31,13 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
     
     const insertQuery = `
       INSERT INTO searches (
-        TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, Prompt,
+        TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, SystemPromptText, Prompt, OriginalPrompt, QueryWasImproved, DetectedQueryType,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTopK-search\`, \`ModelTokenLimit-search\`,
-        \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`, \`Chunks-search\`,
+        \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`, FullPrompt, \`Chunks-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`, \`ModelTokenLimit-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`, SimilarityScore
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const similarityScore = (() => {
@@ -62,7 +62,11 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data.SourceType || null,
       data.CollectionName || null,
       data.SystemPrompt || null,
+      data.SystemPromptText || null,
       data.Prompt || null,
+      data.OriginalPrompt || null,
+      (data.QueryWasImproved ? 1 : 0),
+      data.DetectedQueryType || null,
       data['ModelName-search'] || null,
       data['ModelContextSize-search'] || null,
       data['ModelTemperature-search'] || null,
@@ -72,6 +76,7 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data['Load-search-ms'] || null,
       data['EvalTokensPerSecond-ssearch'] || null,
       data['Answer-search'] || null,
+      data.FullPrompt || null,
       data['Chunks-search'] || null,
       
       data['ModelName-score'] || null,

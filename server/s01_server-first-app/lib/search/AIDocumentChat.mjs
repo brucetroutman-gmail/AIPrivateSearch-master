@@ -145,7 +145,7 @@ export class AIDocumentChat {
         console.log(`     ${c.content.substring(0, 150).replace(/\n/g, ' ')}`);
       });
 
-      const aiResponse = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit, collection);
+      const { response: aiResponse, fullPrompt } = await this.generateAIResponse(query, relevantChunks, model, temperature, contextSize, tokenLimit, collection);
 
       // Warn if keyword filter still found more matches than we could send
       const truncationWarning = keywordFiltered.length > relevantChunks.length
@@ -166,6 +166,7 @@ export class AIDocumentChat {
         }],
         method: 'ai-document-chat',
         total: 1,
+        fullPrompt,
         feedbackToken,
         feedbackMeta: { query, collection, model, topK: chunkLimit, contextSize, temperature, chunksUsed: relevantChunks.length, elapsedMs },
         searchLog
@@ -282,6 +283,6 @@ Answer (be specific, reference source numbers):`;
     console.log('-'.repeat(80));
     console.log(modelResponse);
     console.log('='.repeat(80) + '\n');
-    return modelResponse;
+    return { response: modelResponse, fullPrompt: enhancedPrompt };
   }
 }

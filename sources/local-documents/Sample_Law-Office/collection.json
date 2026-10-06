@@ -126,11 +126,11 @@
   "searchSettings": {
     "topK": 10,
     "temperature": 0.1,
-    "contextSize": 4096,
+    "contextSize": 8192,
     "tokenLimit": 1024,
-    "totalChunks": 21,
+    "totalChunks": 32,
     "totalDocs": 15,
-    "avgChunkSize": 855,
-    "generatedAt": "2026-07-03T17:44:01.318Z"
+    "avgChunkSize": 1339,
+    "generatedAt": "2026-10-05T16:37:31.286Z"
   }
 }

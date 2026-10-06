@@ -5,6 +5,16 @@ Format: `vMAJOR.MINOR: Description`
 
 ---
 
+## v21.43
+- Full-prompt capture: the search record now stores what the model actually received, not just parameters. New DB columns on `searches` and `searches-testresults`:
+  - `FullPrompt` — the exact assembled prompt sent to the model (AI Document Chat: domain context + instructions + injected document excerpts + question; direct/non-document path: the query)
+  - `SystemPromptText` — the resolved system-prompt text (previously only the prompt name was stored)
+  - `OriginalPrompt` — the user's query before query-intelligence improvement
+  - `QueryWasImproved` — whether the intelligence layer rewrote the query
+  - `DetectedQueryType` — fact / analysis / creative
+- `AIDocumentChat` now returns its assembled `fullPrompt`; the search route surfaces `systemPromptText`, `originalQuery`, `wasImproved`, `detectedType`, and `fullPrompt`, and the client `exportToDatabase` maps them into the new columns
+- Requires the accompanying DB migration (ALTER TABLE adding the 5 columns to both tables); see `docs/system-documentation/aips-fullprompt-capture-migration.sql`
+
 ## v21.42
 - Fixed Hybrid Search returning only one of several relevant documents and showing Keyword 0%:
   - Merge now keys on document identity (normalized filename) instead of two mismatched synthetic IDs, so keyword and semantic scores actually combine (keyword contribution is no longer always 0%)

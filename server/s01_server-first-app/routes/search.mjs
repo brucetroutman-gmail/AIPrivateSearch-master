@@ -135,6 +135,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let feedbackToken = null;
     let feedbackMeta = null;
     let methodResult = null;
+    let fullPrompt = null;
     
     // Phase 1: Search using SearchOrchestrator
     if (collection && searchType) {
@@ -152,6 +153,10 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       const endTime = Date.now();
       
       methodResult = searchResult.results[searchType];
+      // Capture the exact assembled prompt the method sent to the model (when provided)
+      if (methodResult && methodResult.fullPrompt) {
+        fullPrompt = methodResult.fullPrompt;
+      }
       if (!methodResult || !methodResult.results || methodResult.results.length === 0) {
         return res.json({
           response: 'No relevant documents found using the selected search method.',
@@ -237,6 +242,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     } else {
       // For non-document searches, use simple model response with metrics
       const startTime = Date.now();
+      // The direct-path prompt sent to the model is simply the (possibly improved) query.
+      fullPrompt = query;
       const response = await fetch('http://localhost:11434/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -305,6 +312,12 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       createdAt: new Date().toISOString(),
       testCode,
       scores,
+      // Full-prompt capture fields
+      systemPromptText: systemPrompt || null,
+      originalQuery: queryMetadata.originalQuery || null,
+      wasImproved: queryMetadata.wasImproved || false,
+      detectedType: queryMetadata.detectedType || null,
+      fullPrompt: fullPrompt || null,
       metrics: {
         ...(searchMetrics && { search: searchMetrics }),
         ...(scoringMetrics && { scoring: scoringMetrics })
