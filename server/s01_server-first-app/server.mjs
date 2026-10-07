@@ -48,6 +48,18 @@ import loggerPkg from '../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 
 import { AppConfig } from './lib/utils/appConfig.mjs';
+import { ErrorLogger } from './lib/utils/errorLogger.mjs';
+
+// Capture crashes and unhandled async failures to the central error log
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception:', err.message);
+  ErrorLogger.log(err, { source: 'uncaughtException' });
+});
+process.on('unhandledRejection', (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+  logger.error('Unhandled rejection:', err.message);
+  ErrorLogger.log(err, { source: 'unhandledRejection' });
+});
 
 const app = express();
 
@@ -144,6 +156,16 @@ app.get('/api/version', async (req, res) => {
 app.get('/api/search-logs-direct', (req, res) => {
   console.log('Direct search logs endpoint hit!');
   res.json({ message: 'Direct search logs working', timestamp: new Date().toISOString() });
+});
+
+// Central error log endpoints (no auth — local diagnostic tool)
+app.get('/api/error-log', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 200, 5000);
+  res.json({ entries: ErrorLogger.getRecent(limit) });
+});
+app.delete('/api/error-log', (req, res) => {
+  const ok = ErrorLogger.clear();
+  res.status(ok ? 200 : 500).json({ success: ok });
 });
 
 // Apply routes with specific middleware

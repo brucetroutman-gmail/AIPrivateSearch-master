@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Log Viewer - AI Private Search</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="shared/license-checker.js"></script>
+    <script src="shared/utils/apiConfig.js"></script>
+    <script src="csrf.js"></script>
+    <script type="module" src="shared/common.js"></script>
+    <script>
+        // Load theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const theme = savedTheme || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            if (!savedTheme) {
+                localStorage.setItem('theme', theme);
+            }
+        })();
+    </script>
+    <style>
+        .error-message { color: var(--error-color, #e74c3c); font-weight: 600; }
+        .error-stack { white-space: pre-wrap; font-family: monospace; font-size: 12px; max-width: 600px; overflow-x: auto; }
+        .error-row td { vertical-align: top; }
+        .source-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; background: var(--border-color, #444); font-size: 12px; }
+        .toggle-stack { cursor: pointer; text-decoration: underline; font-size: 12px; }
+        .hidden-stack { display: none; }
+    </style>
+</head>
+<body class="error-log-page">
+    <div id="header-placeholder"></div>
+
+    <div class="page-content">
+        <div class="logs-container">
+            <h1>Error Log Viewer</h1>
+            <p>Captures all backend errors (route failures, search/model errors, uncaught exceptions).</p>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="sourceFilter">Source</label>
+                    <select id="sourceFilter" class="filter-input">
+                        <option value="">All Sources</option>
+                        <option value="route">Route</option>
+                        <option value="search">Search</option>
+                        <option value="multi-search">Multi-Search</option>
+                        <option value="uncaughtException">Uncaught Exception</option>
+                        <option value="unhandledRejection">Unhandled Rejection</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="textFilter">Text Contains</label>
+                    <input type="text" id="textFilter" class="filter-input" placeholder="message, model, query...">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="renderFiltered()">Filter</button>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="loadErrors()">Refresh</button>
+                </div>
+                <div class="filter-group admin-only">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-danger" onclick="clearErrors()">Clear Log</button>
+                </div>
+            </div>
+
+            <div class="logs-table">
+                <div id="loading" class="loading">Loading errors...</div>
+                <div id="no-logs" class="no-logs hidden">No errors found. 🎉</div>
+                <table id="errorsTable" class="table hidden">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Source</th>
+                            <th>Message</th>
+                            <th>Context</th>
+                            <th>Stack</th>
+                        </tr>
+                    </thead>
+                    <tbody id="errorsBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allErrors = [];
+
+        async function loadErrors() {
+            const loading = document.getElementById('loading');
+            const noLogs = document.getElementById('no-logs');
+            const table = document.getElementById('errorsTable');
+
+            loading.style.display = 'block';
+            noLogs.classList.add('hidden');
+            table.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${window.API_BASE_URL}/api/error-log?limit=500`);
+                if (!response.ok) throw new Error('Failed to load error log');
+                const data = await response.json();
+                allErrors = data.entries || [];
+                renderFiltered();
+            } catch (error) {
+                console.error('Error loading error log:', error);
+                loading.style.display = 'none';
+                noLogs.classList.remove('hidden');
+                noLogs.textContent = 'Error loading error log: ' + error.message;
+            }
+        }
+
+        function renderFiltered() {
+            const source = document.getElementById('sourceFilter').value;
+            const text = document.getElementById('textFilter').value.toLowerCase().trim();
+
+            let filtered = allErrors;
+            if (source) filtered = filtered.filter(e => e.source === source);
+            if (text) {
+                filtered = filtered.filter(e => {
+                    const hay = [e.message, e.extra, e.url, e.name, e.user].filter(Boolean).join(' ').toLowerCase();
+                    return hay.includes(text);
+                });
+            }
+            displayErrors(filtered);
+        }
+
+        function displayErrors(errors) {
+            const loading = document.getElementById('loading');
+            const noLogs = document.getElementById('no-logs');
+            const table = document.getElementById('errorsTable');
+            const tbody = document.getElementById('errorsBody');
+
+            loading.style.display = 'none';
+            tbody.innerHTML = '';
+
+            if (!errors || errors.length === 0) {
+                noLogs.classList.remove('hidden');
+                noLogs.textContent = 'No errors found. 🎉';
+                table.classList.add('hidden');
+                return;
+            }
+
+            errors.forEach((e, idx) => {
+                const row = document.createElement('tr');
+                row.className = 'error-row';
+
+                // Date/Time
+                const tdDate = document.createElement('td');
+                tdDate.textContent = e.timestamp ? new Date(e.timestamp).toLocaleString() : 'N/A';
+                row.appendChild(tdDate);
+
+                // Source
+                const tdSource = document.createElement('td');
+                const sourceTag = document.createElement('span');
+                sourceTag.className = 'source-tag';
+                sourceTag.textContent = e.source || 'app';
+                tdSource.appendChild(sourceTag);
+                row.appendChild(tdSource);
+
+                // Message (textContent = safe against injection)
+                const tdMsg = document.createElement('td');
+                const msg = document.createElement('div');
+                msg.className = 'error-message';
+                msg.textContent = e.message || '(no message)';
+                tdMsg.appendChild(msg);
+                if (e.url) {
+                    const url = document.createElement('div');
+                    url.style.fontSize = '12px';
+                    url.textContent = (e.method ? e.method + ' ' : '') + e.url + (e.statusCode ? ' → ' + e.statusCode : '');
+                    tdMsg.appendChild(url);
+                }
+                row.appendChild(tdMsg);
+
+                // Context (extra JSON + user)
+                const tdCtx = document.createElement('td');
+                tdCtx.style.fontSize = '12px';
+                let ctxText = '';
+                if (e.extra) {
+                    try { ctxText = JSON.stringify(JSON.parse(e.extra), null, 1); }
+                    catch { ctxText = e.extra; }
+                }
+                if (e.user) ctxText = 'user: ' + e.user + (ctxText ? '\n' + ctxText : '');
+                tdCtx.textContent = ctxText || '—';
+                row.appendChild(tdCtx);
+
+                // Stack (collapsible)
+                const tdStack = document.createElement('td');
+                if (e.stack) {
+                    const toggle = document.createElement('span');
+                    toggle.className = 'toggle-stack';
+                    toggle.textContent = 'show';
+                    const pre = document.createElement('div');
+                    pre.className = 'error-stack hidden-stack';
+                    pre.textContent = e.stack;
+                    toggle.onclick = () => {
+                        const hidden = pre.classList.toggle('hidden-stack');
+                        toggle.textContent = hidden ? 'show' : 'hide';
+                    };
+                    tdStack.appendChild(toggle);
+                    tdStack.appendChild(pre);
+                } else {
+                    tdStack.textContent = '—';
+                }
+                row.appendChild(tdStack);
+
+                tbody.appendChild(row);
+            });
+
+            noLogs.classList.add('hidden');
+            table.classList.remove('hidden');
+        }
+
+        async function clearErrors() {
+            if (!confirm('Clear the entire error log? This cannot be undone.')) return;
+            try {
+                const response = await fetch(`${window.API_BASE_URL}/api/error-log`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Clear failed');
+                allErrors = [];
+                displayErrors([]);
+            } catch (error) {
+                console.error('Clear error:', error);
+                alert('Clear failed: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            setTimeout(() => { loadErrors(); }, 100);
+        });
+    </script>
+
+    <div id="footer-placeholder"></div>
+</body>
+</html>

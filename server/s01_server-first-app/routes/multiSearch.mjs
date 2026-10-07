@@ -2,6 +2,7 @@
  
 import express from 'express';
 import { SearchOrchestrator } from '../lib/search/SearchOrchestrator.mjs';
+import { ErrorLogger } from '../lib/utils/errorLogger.mjs';
 
 const router = express.Router();
 const searchOrchestrator = new SearchOrchestrator();
@@ -27,6 +28,13 @@ router.post('/multi-method', async (req, res) => {
     });
   } catch (error) {
     console.error('Multi-search error:', error);
+    ErrorLogger.log(error, {
+      source: 'multi-search',
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: 500,
+      extra: { query: req.body?.query, methods: req.body?.methods, options: req.body?.options }
+    });
     res.status(500).json({ 
       error: 'Search failed', 
       message: error.message 

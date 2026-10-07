@@ -156,7 +156,8 @@ else
 fi
 
 echo "🔧 Starting backend server..."
-npm start &
+mkdir -p /Users/Shared/AIPrivateSearch/logs
+npm start >> /Users/Shared/AIPrivateSearch/logs/server.log 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to start and verify it's running

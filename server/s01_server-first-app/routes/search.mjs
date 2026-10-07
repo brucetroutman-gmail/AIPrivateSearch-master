@@ -9,6 +9,7 @@ import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 import { DeviceLicenseClient } from '../lib/licensing/device-license-client.mjs';
 import { SearchLogger } from '../lib/utils/searchLogger.mjs';
 import { QueryAnalyzer } from '../lib/search/QueryAnalyzer.mjs';
+import { ErrorLogger } from '../lib/utils/errorLogger.mjs';
 
 const router = express.Router();
 
@@ -352,6 +353,14 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     
   } catch (error) {
     logger.error('Route error:', error.message);
+    ErrorLogger.log(error, {
+      source: 'search',
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: 500,
+      user: req.body?.userEmail,
+      extra: { query: req.body?.query, model: req.body?.model, searchType: req.body?.searchType }
+    });
     res.status(500).json({ 
       error: 'Internal server error',
       message: error.message 
