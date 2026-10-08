@@ -4173,6 +4173,12 @@ mark.search-highlight,
 .test-collections-page .tc-score-error { color: #dc3545; font-size: 0.75rem; }
 .test-collections-page .tc-score-none { color: var(--text-muted); font-size: 0.75rem; }
 .test-collections-page .tc-result-actions { display: flex; align-items: center; gap: 0.5rem; }
+/* per-collection scoring footer */
+.test-collections-page .tc-collection-summary-title { margin: 1.5rem 0 0.5rem; font-size: 1.1rem; }
+.test-collections-page .tc-collection-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.test-collections-page .tc-collection-card { margin-top: 0; padding: 1rem; }
+.test-collections-page .tc-collection-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; word-break: break-word; }
+.test-collections-page .tc-collection-score { font-size: 1.8rem; }
 
 /* ===== test-nodocuments.html ===== */
 body.test-nodocuments-page { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
