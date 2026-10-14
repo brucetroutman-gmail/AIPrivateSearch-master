@@ -112,16 +112,26 @@
         const list = document.getElementById(master.dataset.target);
         if (!list) return;
 
+        let bulkToggling = false;
+
         master.addEventListener('change', function() {
+          // Capture the intended state up front — dispatching change events
+          // below can otherwise flip master.checked mid-loop and skip boxes.
+          const target = master.checked;
+          bulkToggling = true;
           list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            if (cb.checked !== master.checked) {
-              cb.checked = master.checked;
+            if (cb.checked !== target) {
+              cb.checked = target;
               cb.dispatchEvent(new Event('change', { bubbles: true }));
             }
           });
+          bulkToggling = false;
+          master.checked = target;
+          master.indeterminate = false;
         });
 
         list.addEventListener('change', function() {
+          if (bulkToggling) return;
           const boxes = [...list.querySelectorAll('input[type="checkbox"]')];
           master.checked = boxes.length > 0 && boxes.every(cb => cb.checked);
           master.indeterminate = boxes.some(cb => cb.checked) && !master.checked;
