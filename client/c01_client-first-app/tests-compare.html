@@ -32,18 +32,22 @@
         <div class="compare-selectors">
           <div class="compare-group">
             <label class="group-label">PC Code</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="comparePcCodes"> Select all</label>
             <div class="checkbox-list" id="comparePcCodes"></div>
           </div>
           <div class="compare-group">
             <label class="group-label">Model</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="compareModels"> Select all</label>
             <div class="checkbox-list" id="compareModels"></div>
           </div>
           <div class="compare-group">
             <label class="group-label">Test Category</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="compareCategories"> Select all</label>
             <div class="checkbox-list" id="compareCategories"></div>
           </div>
           <div class="compare-group">
             <label class="group-label">Query Type</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="compareQueryTypes"> Select all</label>
             <div class="checkbox-list" id="compareQueryTypes">
               <label><input type="checkbox" value="fact"> Fact</label>
               <label><input type="checkbox" value="analysis"> Analysis</label>
@@ -104,7 +108,34 @@
     document.addEventListener('DOMContentLoaded', function() {
       preFillFromCache();
       loadTestData();
+      setupSelectAll();
     });
+
+    // Generic "Select all" wiring for checkbox-list groups.
+    // Works with dynamically populated lists and preserves each checkbox's
+    // own change handlers (e.g. Query Type → test cross-selection).
+    function setupSelectAll() {
+      document.querySelectorAll('.select-all').forEach(master => {
+        const list = document.getElementById(master.dataset.target);
+        if (!list) return;
+
+        master.addEventListener('change', function() {
+          list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            if (cb.checked !== master.checked) {
+              cb.checked = master.checked;
+              cb.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        });
+
+        // Keep the master in sync when individual boxes change.
+        list.addEventListener('change', function() {
+          const boxes = [...list.querySelectorAll('input[type="checkbox"]')];
+          master.checked = boxes.length > 0 && boxes.every(cb => cb.checked);
+          master.indeterminate = boxes.some(cb => cb.checked) && !master.checked;
+        });
+      });
+    }
 
     function preFillFromCache() {
       const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');

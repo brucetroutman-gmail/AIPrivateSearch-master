@@ -3714,6 +3714,16 @@ mark.search-highlight,
   color: var(--text-color);
   margin-bottom: 0.2rem;
 }
+.tc-page .select-all-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  cursor: pointer;
+  margin-bottom: 0.1rem;
+}
 .tc-page .checkbox-list {
   display: flex;
   flex-direction: column;
@@ -3971,6 +3981,16 @@ mark.search-highlight,
   font-weight: bold;
   color: var(--text-color);
   margin-bottom: 0.2rem;
+}
+.ra-page .select-all-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  cursor: pointer;
+  margin-bottom: 0.1rem;
 }
 .ra-page .checkbox-list {
   display: flex;

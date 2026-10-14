@@ -31,16 +31,19 @@
 
           <div class="compare-group">
             <label class="group-label">PC Code</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="raPcCodes"> Select all</label>
             <div class="checkbox-list" id="raPcCodes"></div>
           </div>
 
           <div class="compare-group">
             <label class="group-label">Models</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="raModels"> Select all</label>
             <div class="checkbox-list" id="raModels"></div>
           </div>
 
           <div class="compare-group">
             <label class="group-label">Test Category</label>
+            <label class="select-all-toggle"><input type="checkbox" class="select-all" data-target="raCategories"> Select all</label>
             <div class="checkbox-list" id="raCategories"></div>
           </div>
 
@@ -99,7 +102,32 @@
     document.addEventListener('DOMContentLoaded', () => {
       preFillFromCache();
       loadData();
+      setupSelectAll();
     });
+
+    // Generic "Select all" wiring for checkbox-list groups.
+    // Works with dynamically populated lists.
+    function setupSelectAll() {
+      document.querySelectorAll('.select-all').forEach(master => {
+        const list = document.getElementById(master.dataset.target);
+        if (!list) return;
+
+        master.addEventListener('change', function() {
+          list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            if (cb.checked !== master.checked) {
+              cb.checked = master.checked;
+              cb.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        });
+
+        list.addEventListener('change', function() {
+          const boxes = [...list.querySelectorAll('input[type="checkbox"]')];
+          master.checked = boxes.length > 0 && boxes.every(cb => cb.checked);
+          master.indeterminate = boxes.some(cb => cb.checked) && !master.checked;
+        });
+      });
+    }
 
     function preFillFromCache() {
       const cached = JSON.parse(localStorage.getItem('aips-compare-selectors') || 'null');
