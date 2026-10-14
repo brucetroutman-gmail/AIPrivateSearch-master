@@ -205,11 +205,11 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
           
           return `**Result ${index + 1}: ${filenameLink}**\n${result.excerpt}\n---\n`;
         }).join('\n');
-      } else if (searchType === 'ai-document-chat') {
-        // For AI Document Chat, use the formatted response directly
+      } else if (searchType === 'ai-document-chat' || searchType === 'hybrid-search') {
+        // For AI Document Chat and Hybrid Search (RAG), use the generated response directly
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
-        // Preserve feedback token for UI
+        // Preserve feedback token for UI (AI Document Chat only)
         if (methodResult.feedbackToken) {
           feedbackToken = methodResult.feedbackToken;
           feedbackMeta = methodResult.feedbackMeta;
@@ -219,8 +219,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
       }
       
-      // Extract chunks if available (for AI Document Chat searches)
-      if (searchType === 'ai-document-chat' && methodResult.results && methodResult.results[0] && methodResult.results[0].chunks) {
+      // Extract chunks if available (for RAG searches: AI Document Chat and Hybrid Search)
+      if ((searchType === 'ai-document-chat' || searchType === 'hybrid-search') && methodResult.results && methodResult.results[0] && methodResult.results[0].chunks) {
         chunks = methodResult.results[0].chunks;
       } else if (methodResult.results && methodResult.results.length) {
         // For all other document search types, use result excerpts as source chunks

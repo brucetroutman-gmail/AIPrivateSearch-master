@@ -1,22 +1,33 @@
 // Common Hybrid Search functionality for both search and multi-mode pages
 
 window.hybridSearchCommon = {
-    // Perform Hybrid Search combining keyword and semantic methods
-    async performHybridSearch(query, collection, topK = 5) {
+    // Perform Hybrid Search combining keyword and semantic methods.
+    // When a model is supplied, the server runs a RAG generation step over the
+    // reranked results and returns a grounded answer plus fullPrompt.
+    async performHybridSearch(query, collection, topK = 5, extraOptions = {}) {
         const startTime = Date.now();
-        
+
         try {
+            const options = {
+                collection,
+                topK,
+                ...(extraOptions.model !== undefined && { model: extraOptions.model }),
+                ...(extraOptions.temperature !== undefined && { temperature: extraOptions.temperature }),
+                ...(extraOptions.contextSize !== undefined && { contextSize: extraOptions.contextSize }),
+                ...(extraOptions.tokenLimit !== undefined && { tokenLimit: extraOptions.tokenLimit })
+            };
             const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/multi-search/hybrid-search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query, options: { collection, topK } })
+                body: JSON.stringify({ query, options })
             });
-            
+
             const data = await response.json();
-            return { 
-                results: data.results || [], 
-                time: Date.now() - startTime, 
-                method: 'hybrid-search' 
+            return {
+                results: data.results || [],
+                time: Date.now() - startTime,
+                method: 'hybrid-search',
+                ...(data.fullPrompt && { fullPrompt: data.fullPrompt })
             };
         } catch (error) {
             console.error('Hybrid Search error:', error);

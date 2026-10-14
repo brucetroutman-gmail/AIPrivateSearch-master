@@ -1,6 +1,6 @@
 # AIPrivateSearch Search Methods Guide
 
-**Version**: 20.22
+**Version**: 21.48
 
 ---
 
@@ -23,7 +23,7 @@ AIPrivateSearch provides 7 search methods split into two categories:
 | Find which documents cover a topic | Document Search |
 | Browse documents by subject | Document Index Cards |
 | Find conceptually related content | Smart Search |
-| Comprehensive coverage | Hybrid Search |
+| Grounded answer from both exact and conceptual matches | Hybrid Search |
 | General knowledge / reasoning | AI Direct |
 | Answer a question from your documents | AI Document Chat |
 
@@ -165,20 +165,21 @@ Semantic similarity search using vector embeddings.
 
 ### 5. Hybrid Search
 
-Combines keyword matching and semantic similarity.
+Combines keyword matching and semantic similarity, then generates an AI answer from the reranked results (RAG).
 
 **How it works:**
 - Runs both keyword (BM25-style) and semantic (embedding) search
 - Merges and reranks results using weighted scoring
-- Balances exact term matching with conceptual relevance
+- Packages the top reranked documents into a prompt and sends them to the Ollama model
+- Model generates an answer grounded in the reranked documents
 
-**Requires:** collection must be embedded
+**Requires:** collection must be embedded; an Ollama model must be selected
 
-**Best for:** comprehensive coverage, when you want both exact and conceptual matches
+**Best for:** fact-finding questions where you want both exact term matching and conceptual relevance feeding a grounded answer
 
-**Returns:** merged results from both methods, reranked
+**Returns:** AI-generated answer with source document references (and the full prompt is captured for test records)
 
-**Speed:** medium (runs both methods)
+**Speed:** slow (hybrid retrieval + AI inference)
 
 ---
 
@@ -236,7 +237,7 @@ AI response using relevant document chunks as context (RAG — Retrieval Augment
 | Document Search | ⚡⚡⚡ | None | No | Ranked docs |
 | Document Index Cards | ⚡⚡⚡ | Index | No | Doc summaries |
 | Smart Search | ⚡⚡ | Embed | No | Similar chunks |
-| Hybrid Search | ⚡⚡ | Embed | No | Mixed results |
+| Hybrid Search | ⚡ | Embed | Yes | Grounded AI response |
 | AI Direct | ⚡ | None | Yes | AI response |
 | AI Document Chat | ⚡ | Embed | Yes | Grounded AI response |
 

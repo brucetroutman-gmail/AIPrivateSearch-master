@@ -75,7 +75,7 @@ class SearchManager {
           result = await window.smartSearchCommon.performSmartSearch(query, options.collection, 5);
           break;
         case 'hybrid-search':
-          result = await window.hybridSearchCommon.performHybridSearch(query, options.collection, 5);
+          result = await this.performHybridSearch(query, options);
           break;
         case 'document-index':
           result = await window.documentIndexSearchCommon.performDocumentIndexSearch(query, options.collection);
@@ -121,6 +121,22 @@ class SearchManager {
     } catch {
       return { topK: 10, temperature: 0.3, contextSize: 4096, tokenLimit: null };
     }
+  }
+
+  async performHybridSearch(query, options) {
+    // Hybrid Search now runs a RAG generation step server-side (like AI Document
+    // Chat). Resolve the same parameter set so the model receives proper context.
+    const collectionSettings = await this.getCollectionSettings(options.collection);
+    const topK        = options.topK != null ? parseInt(options.topK) : (collectionSettings.topK || 5);
+    const temperature = options.temperature !== undefined ? options.temperature : collectionSettings.temperature;
+    const contextSize = options.contextSize || collectionSettings.contextSize;
+    const tokenLimit  = options.tokenLimit  || collectionSettings.tokenLimit;
+    return await window.hybridSearchCommon.performHybridSearch(query, options.collection, topK, {
+      model: options.model,
+      temperature,
+      contextSize,
+      tokenLimit
+    });
   }
 
   async performAIDocumentChat(query, options) {

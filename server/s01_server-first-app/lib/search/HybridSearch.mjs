@@ -21,7 +21,16 @@ export class HybridSearch {
   }
 
   async search(query, options = {}) {
-    const { collection = null, keywordWeight = 0.3, semanticWeight = 0.7, topK = 5 } = options;
+    const {
+      collection = null,
+      keywordWeight = 0.3,
+      semanticWeight = 0.7,
+      topK = 5,
+      model = null,
+      temperature = 0.3,
+      contextSize = 4096,
+      tokenLimit = null
+    } = options;
     
     try {
       console.log(`Hybrid search for: "${query}" in ${collection}`);
@@ -44,9 +53,42 @@ export class HybridSearch {
         keywordWeight,
         semanticWeight
       );
-      
+
+      const topResults = combinedResults.slice(0, topK);
+
+      // RAG generation step: package the reranked hybrid results into a prompt and
+      // send to the LLM for a grounded answer. When no model is supplied, fall back
+      // to retrieval-only output (ranked excerpts) for backward compatibility.
+      if (model) {
+        const { response: aiResponse, fullPrompt } = await this.generateAIResponse(
+          query, topResults, model, temperature, contextSize, tokenLimit, collection
+        );
+
+        const finalResponse = aiResponse + this.addSourceLinks(topResults, collection);
+
+        return {
+          results: [{
+            id: `hybrid_search_${Date.now()}`,
+            title: 'Hybrid Analysis',
+            excerpt: finalResponse,
+            score: 0.8,
+            source: `${topResults.length} reranked documents`,
+            chunks: topResults.map(doc => ({
+              filename: doc.filename,
+              chunk_index: doc.chunk_index ?? null,
+              content: doc.content,
+              similarity: doc.semanticScore ?? doc.hybridScore ?? null
+            }))
+          }],
+          method: 'hybrid-search',
+          total: 1,
+          fullPrompt
+        };
+      }
+
+      // Retrieval-only fallback (no model): return reranked document excerpts.
       return {
-        results: combinedResults.slice(0, topK).map(doc => {
+        results: topResults.map(doc => {
           const documentPath = `http://localhost:56306/api/documents/${doc.collection}/${encodeURIComponent(doc.filename)}/view`;
           const scoreBreakdown = `**Hybrid Score: ${Math.round(doc.hybridScore * 100)}%**\n` +
             `Keyword: ${Math.round(doc.keywordScore * 100)}% × ${keywordWeight} + ` +
@@ -73,6 +115,88 @@ export class HybridSearch {
     } catch (error) {
       throw new Error(`Hybrid search failed: ${error.message}`);
     }
+  }
+
+  // Build a RAG prompt from the reranked hybrid documents and send to Ollama.
+  // Mirrors the AI Document Chat prompt structure so FullPrompt capture and scoring
+  // behave consistently across the two generative document methods.
+  async generateAIResponse(query, docs, model, temperature = 0.3, contextSize = 4096, tokenLimit = null, collection = null) {
+    const context = docs.map((doc, index) =>
+      `**Source ${index + 1}: ${doc.filename}**\n${doc.content}`
+    ).join('\n\n');
+
+    const options = {
+      temperature: temperature,
+      num_ctx: contextSize,
+      thinking: false
+    };
+    if (tokenLimit && tokenLimit !== 'No Limit') {
+      options.num_predict = parseInt(tokenLimit);
+    }
+
+    // Load collection Fabric pattern vocabulary as domain context (same as AI Document Chat)
+    let domainContext = '';
+    if (collection) {
+      try {
+        const patternPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'fabric-pattern.md');
+        const pattern = await secureFs.readFile(patternPath, 'utf8');
+        const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
+        if (vocabMatch) domainContext = `Domain vocabulary for this collection: ${vocabMatch[1].trim()}\n\n`;
+      } catch { /* no pattern file */ }
+    }
+
+    const enhancedPrompt = `${domainContext}You are analyzing document excerpts to answer a question. Follow these steps:
+1. Identify which excerpts contain information relevant to the question
+2. Extract the specific facts from each relevant excerpt
+3. Connect facts across excerpts where they relate to the same entity (e.g. same patient, same topic)
+4. Synthesize a complete answer
+5. If the information is not present, say so clearly
+
+Document excerpts:
+${context}
+
+Question: ${query}
+
+Answer (be specific, reference source numbers):`;
+
+    const response = await fetch('http://localhost:11434/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: enhancedPrompt }],
+        stream: false,
+        think: false,
+        options: options
+      }),
+      signal: AbortSignal.timeout(300000)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status} - model may not be available`);
+    }
+
+    const result = await response.json();
+    const modelResponse = result.message?.content || 'No response generated';
+    return { response: modelResponse, fullPrompt: enhancedPrompt };
+  }
+
+  // Append clickable source links for the documents used in the answer.
+  addSourceLinks(docs, collection) {
+    if (!docs || docs.length === 0) return '';
+    const uniqueFiles = new Map();
+    docs.forEach((doc, index) => {
+      if (!uniqueFiles.has(doc.filename)) {
+        uniqueFiles.set(doc.filename, { doc, sourceNum: index + 1 });
+      }
+    });
+    let sourceSection = '\n\n---\n\n**Source Documents:**\n\n';
+    Array.from(uniqueFiles.values()).forEach(({ doc, sourceNum }) => {
+      const docCollection = doc.collection || collection || 'default';
+      const docLink = `[${doc.filename}](http://localhost:56306/api/documents/${docCollection}/${encodeURIComponent(doc.filename)}/view)`;
+      sourceSection += `${sourceNum}. ${docLink}\n`;
+    });
+    return sourceSection;
   }
 
   async ensureInitialized(collection) {

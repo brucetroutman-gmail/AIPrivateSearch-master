@@ -33,8 +33,9 @@ window.responseDisplayCommon = {
             return;
         }
 
-        // AI Document Chat — render as a full answer, not a result card
-        if (searchResult.method === 'ai-document-chat') {
+        // AI Document Chat and Hybrid Search (RAG) — render as a full answer, not a result card.
+        // Both return a single generated answer as results[0].excerpt.
+        if (searchResult.method === 'ai-document-chat' || searchResult.method === 'hybrid-search') {
             const firstResult = searchResult.results[0];
             const answerDiv = document.createElement('div');
             answerDiv.className = 'ai-chat-answer';
@@ -150,7 +151,7 @@ window.responseDisplayCommon = {
         }
         
         // Use common formatter for search types that need document links
-        if (searchResult.method === 'ai-direct' || searchResult.method === 'smart-search' || searchResult.method === 'hybrid-search') {
+        if (searchResult.method === 'ai-direct' || searchResult.method === 'smart-search') {
             const formattedElement = window.CommonResultFormatter.formatSearchResults(searchResult.results, {
                 resultType: searchResult.method,
                 showScore: true,
