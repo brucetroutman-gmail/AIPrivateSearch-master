@@ -145,19 +145,22 @@ export class HybridSearch {
       } catch { /* no pattern file */ }
     }
 
-    const enhancedPrompt = `${domainContext}You are analyzing document excerpts to answer a question. Follow these steps:
-1. Identify which excerpts contain information relevant to the question
-2. Extract the specific facts from each relevant excerpt
-3. Connect facts across excerpts where they relate to the same entity (e.g. same patient, same topic)
-4. Synthesize a complete answer
-5. If the information is not present, say so clearly
+    const enhancedPrompt = `${domainContext}You are analyzing document excerpts to answer a question.
+
+Work through the following internally — do NOT include these steps, their numbers, or any description of your process in your reply:
+- Identify which excerpts are relevant to the question
+- Extract the specific facts from each relevant excerpt
+- Connect facts across excerpts that refer to the same entity (e.g. same patient, same client, same topic)
+- If the information is not present in the excerpts, say so clearly
 
 Document excerpts:
 ${context}
 
 Question: ${query}
 
-Answer (be specific, reference source numbers):`;
+Write only the final answer below. Be specific and cite source numbers (e.g. "Source 3"). Do not restate the question or describe your reasoning steps.
+
+Answer:`;
 
     const response = await fetch('http://localhost:11434/api/chat', {
       method: 'POST',
