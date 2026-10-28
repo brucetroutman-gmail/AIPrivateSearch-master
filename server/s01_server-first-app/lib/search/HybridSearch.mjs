@@ -71,6 +71,9 @@ export class HybridSearch {
             id: `hybrid_search_${Date.now()}`,
             title: 'Hybrid Analysis',
             excerpt: finalResponse,
+            // Model prose only (no server-appended source links). Used for scoring so
+            // the non-answer guard sees the real answer, not the boilerplate link list.
+            answerOnly: aiResponse,
             score: 0.8,
             source: `${topResults.length} reranked documents`,
             chunks: topResults.map(doc => ({

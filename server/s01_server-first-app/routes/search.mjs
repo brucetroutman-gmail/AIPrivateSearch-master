@@ -131,6 +131,10 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     logger.log('Collection:', collection);
     
     let searchResponse;
+    // Answer text passed to the scorer. Defaults to searchResponse, but RAG methods
+    // override it with the model's prose only (no server-appended source links), so
+    // the scorer's non-answer guard evaluates the real answer rather than boilerplate.
+    let answerForScoring = null;
     let searchMetrics = null;
     let chunks = null;
     let feedbackToken = null;
@@ -209,6 +213,8 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
         // For AI Document Chat and Hybrid Search (RAG), use the generated response directly
         const firstResult = methodResult.results[0];
         searchResponse = firstResult.excerpt || firstResult.content || 'No content available';
+        // Score the model's prose only, excluding server-appended source links.
+        answerForScoring = firstResult.answerOnly || searchResponse;
         // Preserve feedback token for UI (AI Document Chat only)
         if (methodResult.feedbackToken) {
           feedbackToken = methodResult.feedbackToken;
@@ -291,7 +297,7 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let scoringMetrics = null;
     if (score && scoreModel) {
       try {
-        const scoringResult = await scoringService.score(query, searchResponse, scoreModel, 0.1, 2048, chunks);
+        const scoringResult = await scoringService.score(query, answerForScoring || searchResponse, scoreModel, 0.1, 2048, chunks);
         scores = scoringResult.scores;
         scoringMetrics = scoringResult.metrics;
       } catch (error) {

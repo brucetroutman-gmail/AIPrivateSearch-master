@@ -161,6 +161,9 @@ export class AIDocumentChat {
           id: `ai_document_chat_${Date.now()}`,
           title: 'Chat Analysis',
           excerpt: finalResponse,
+          // Model prose only (no truncation warning, no server-appended source links).
+          // Used for scoring so the non-answer guard sees the real answer.
+          answerOnly: aiResponse,
           score: 0.8,
           source: `${relevantChunks.length} relevant chunks`
         }],
