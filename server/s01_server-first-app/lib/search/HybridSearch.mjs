@@ -137,18 +137,7 @@ export class HybridSearch {
       options.num_predict = parseInt(tokenLimit);
     }
 
-    // Load collection Fabric pattern vocabulary as domain context (same as AI Document Chat)
-    let domainContext = '';
-    if (collection) {
-      try {
-        const patternPath = path.join(CollectionsUtil.getCollectionsPath(), collection, 'fabric-pattern.md');
-        const pattern = await secureFs.readFile(patternPath, 'utf8');
-        const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
-        if (vocabMatch) domainContext = `Domain vocabulary for this collection: ${vocabMatch[1].trim()}\n\n`;
-      } catch { /* no pattern file */ }
-    }
-
-    const enhancedPrompt = `${domainContext}You are analyzing document excerpts to answer a question.
+    const enhancedPrompt = `You are analyzing document excerpts to answer a question.
 
 Work through the following internally — do NOT include these steps, their numbers, or any description of your process in your reply:
 - Identify which excerpts are relevant to the question

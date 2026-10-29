@@ -2238,20 +2238,6 @@ mark.search-highlight,
 }
 
 /* ===== shared: search.html / ai-search.html (enhance button) ===== */
-.btn-enhance {
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-.btn-enhance:hover { opacity: 0.85; }
-.btn-enhance:disabled { opacity: 0.5; cursor: not-allowed; }
-
 /* ===== ai-search.html ===== */
 .param-group { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 100px; }
 .param-group label { font-size: 0.85rem; margin-bottom: 0.25rem; }
@@ -2544,64 +2530,6 @@ mark.search-highlight,
 }
 
 /* ===== shared: search.html / ai-search.html (enhance preview) ===== */
-.enhance-preview {
-  margin-bottom: 1rem;
-}
-.enhance-preview-row {
-  margin-bottom: 0.5rem;
-}
-.enhance-preview-row-enhanced {
-  margin-bottom: 0.75rem;
-}
-.enhance-preview-label-original {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-.enhance-preview-label-enhanced {
-  font-weight: 600;
-  color: var(--primary);
-  font-size: 0.8rem;
-}
-.enhance-preview-original {
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 0.6rem;
-  font-size: 0.85rem;
-  color: var(--text-color);
-}
-.enhance-preview-enhanced {
-  background: var(--input-bg);
-  border: 1px solid var(--primary);
-  border-radius: 4px;
-  padding: 0.6rem;
-  font-size: 0.85rem;
-  color: var(--text-color);
-  white-space: pre-wrap;
-}
-.enhance-preview-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-.enhance-btn-cancel {
-  padding: 0.4rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text-color);
-  cursor: pointer;
-}
-.enhance-btn-use {
-  padding: 0.4rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background: var(--primary);
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
-}
-
 /* ===== model.html ===== */
 :root {
     --success-bg: #d4edda;
@@ -3159,16 +3087,6 @@ mark.search-highlight,
 .ce-index-input { width: 100%; padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); }
 .ce-index-textarea { width: 100%; height: 60px; padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color); resize: vertical; }
 .ce-index-footer { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
-.fabric-pattern-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-.fabric-pattern-box { background: var(--card-bg); border-radius: 8px; padding: 2rem; max-width: 750px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
-.fabric-pattern-heading { margin-bottom: 0.5rem; color: var(--text-color); }
-.fabric-pattern-name { color: var(--primary); }
-.fabric-pattern-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
-.fabric-pattern-textarea { width: 100%; height: 300px; padding: 0.75rem; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.85rem; font-family: monospace; resize: vertical; }
-.fabric-pattern-status { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; min-height: 1.2rem; }
-.fabric-pattern-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
-.fabric-pattern-cancel { padding: 0.6rem 1.2rem; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-color); cursor: pointer; }
-.fabric-pattern-save { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; background: var(--primary); color: white; cursor: pointer; font-weight: 600; }
 
 /* ===== user-management.html inline-style replacements ===== */
 .um-debug-row { margin-top: 10px; text-align: center; }

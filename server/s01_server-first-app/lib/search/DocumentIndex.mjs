@@ -295,17 +295,8 @@ export class DocumentIndex {
           console.log(`Updated ${filename} with DocID: ${docId}`);
         }
         
-        // Load fabric vocabulary for domain context
-        let fabricVocab = '';
-        try {
-          const patternPath = path.join(collectionPath, 'fabric-pattern.md');
-          const pattern = fs.readFileSync(patternPath, 'utf8');
-          const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
-          if (vocabMatch) fabricVocab = `Domain vocabulary: ${vocabMatch[1].trim()}\n\n`;
-        } catch { /* no pattern file */ }
-
         // Unified prompt — same as indexSingleDocument for consistent index cards
-        const analysisPrompt = `${fabricVocab}Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
+        const analysisPrompt = `Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
         
         const aiResponse = await ollamaService.generateText(analysisPrompt, modelName);
         
@@ -766,16 +757,7 @@ export class DocumentIndex {
       
       // Fast AI analysis with timeout and reduced content
       try {
-        // Load fabric vocabulary for domain context
-        let fabricVocab = '';
-        try {
-          const patternPath = path.join(collectionPath, 'fabric-pattern.md');
-          const pattern = fs.readFileSync(patternPath, 'utf8');
-          const vocabMatch = pattern.match(/Key domain vocabulary[^:]*:\s*([^\n]+)/);
-          if (vocabMatch) fabricVocab = `Domain vocabulary: ${vocabMatch[1].trim()}\n\n`;
-        } catch { /* no pattern file */ }
-
-        const shortPrompt = `${fabricVocab}Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
+        const shortPrompt = `Analyze this document and extract structured information.\n\nFilename: ${filename}\nContent: ${content.substring(0, 2000)}\n\nProvide exactly:\n1. Title: (real title or subject, not filename)\n2. Type: (email/legal/medical/report/article/other)\n3. Summary: (2-3 sentences)\n4. Topics: (comma-separated main subjects)\n5. Keywords: (comma-separated key terms)\n6. Entities: (people, organizations, places mentioned)\n7. Dates: (any dates referenced)\n8. Amounts: (money, quantities, measurements)\n9. Actions: (requests, tasks, follow-ups required)\n10. Sentiment: (positive/negative/neutral/formal)`;
         
         // Get document-index model from config
         const modelListPath = path.join(process.cwd(), '../../client/c01_client-first-app/config/models-list.json');

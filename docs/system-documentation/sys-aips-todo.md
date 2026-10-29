@@ -84,12 +84,6 @@ Proposed: min(45, max(10, ceil(n * 0.042 + log2(n+1) * 2.2)))
 - [ ] Re-run Process Source Files on all collections
 - [ ] Verify My-Literature topK increases from 30 to ~45
 
-### A-006 — Medical-Practice Fabric Pattern
-Current auto-generated pattern lacks medical synonyms. Update manually with cancer/sarcoma/tumor/diabetes vocabulary.
-- [ ] Update `fabric-pattern.md` for Sample_Medical-Practice
-- [ ] Update `fabric-pattern.md` for Sample_Medical-Practice-II
-- [ ] Test cancer and diabetes queries after update
-
 ### A-007 — Breadcrumb Logging Fixes
 - [ ] Verify `search_submitted` crumb appears after search on AI Search page
 - [ ] Verify `search_submitted` crumb appears after search on Search page

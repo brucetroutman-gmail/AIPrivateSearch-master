@@ -80,8 +80,6 @@
           <button class="btn btn-danger" onclick="removeEmbeddings()">Remove Embeds</button>
           <button class="btn btn-success" onclick="testSearch()">Test Search</button>
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
-          <button class="btn btn-success" onclick="generateFabricPatternOnly()">✨ Generate Fabric Pattern</button>
-          <button class="btn btn-info" onclick="viewFabricPattern()">✨ View/Edit Fabric Pattern</button>
         </div>
       </div>
       
@@ -461,7 +459,7 @@
         return;
       }
       
-      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Generate Fabric Pattern\n3. Embed Converted Files\n4. Calculate Search Settings\n\nThis may take several minutes.`)) {
+      if (!await secureConfirm(`Process ${selected.length} selected files?\n\nThis will:\n1. Convert all files to Markdown\n2. Embed Converted Files\n3. Calculate Search Settings\n\nThis may take several minutes.`)) {
         return;
       }
       
@@ -506,23 +504,8 @@
           return;
         }
         
-        // Step 2: Generate Fabric pattern
-        showLog(`\n--- STEP 2: GENERATING FABRIC PATTERN ---`, 'processing');
-        try {
-          const fabricResponse = await fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
-            body: JSON.stringify({ collection: currentCollection })
-          });
-          const fabricData = await fabricResponse.json();
-          if (fabricData.success) showLog(`✨ Fabric pattern generated (${fabricData.docCount} docs)`, 'success');
-          else showLog(`⚠️ Fabric pattern skipped: ${fabricData.error || fabricData.reason || 'unknown'}`, 'warning');
-        } catch (error) {
-          showLog(`⚠️ Fabric pattern error: ${error.message}`, 'warning');
-        }
-
-        // Step 3: Embed Converted Files
-        showLog(`\n--- STEP 3: EMBEDDING CONVERTED FILES ---`, 'processing');
+        // Step 2: Embed Converted Files
+        showLog(`\n--- STEP 2: EMBEDDING CONVERTED FILES ---`, 'processing');
 
         // Wipe embeddings.db before batch embed — ensures no stale data
         await window.csrfManager.fetch(`${window.API_BASE_URL}/api/documents/collections/${currentCollection}/embeddings`, {
@@ -1315,76 +1298,5 @@
     }
   </script>
 
-  <!-- Fabric Pattern Modal -->
-  <div id="fabricPatternModal" class="fabric-pattern-modal hidden">
-    <div class="fabric-pattern-box">
-      <h3 class="fabric-pattern-heading">✨ Fabric Pattern: <span id="fabricPatternName" class="fabric-pattern-name"></span></h3>
-      <p class="fabric-pattern-desc">This pattern is used to enhance prompts for this collection. Edit and save to update on the Fabric server.</p>
-      <textarea id="fabricPatternText" class="fabric-pattern-textarea"></textarea>
-      <div id="fabricPatternStatus" class="fabric-pattern-status"></div>
-      <div class="fabric-pattern-actions">
-        <button onclick="document.getElementById('fabricPatternModal').classList.add('hidden')" class="fabric-pattern-cancel">Close</button>
-        <button onclick="saveFabricPattern()" class="fabric-pattern-save">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    async function generateFabricPatternOnly() {
-      showLog(`\n--- GENERATING FABRIC PATTERN ---`, 'processing');
-      try {
-        const response = await fetch(`${window.API_BASE_URL}/api/fabric/generate-pattern`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
-          body: JSON.stringify({ collection: currentCollection })
-        });
-        const data = await response.json();
-        if (data.success) showLog(`✨ Fabric pattern generated for ${currentCollection} (${data.docCount} docs)`, 'success');
-        else showLog(`⚠️ Fabric pattern skipped: ${data.error || data.reason || 'unknown'}`, 'warning');
-      } catch (err) {
-        showLog(`✗ Fabric pattern generation failed: ${err.message}`, 'error');
-      }
-    }
-
-    async function viewFabricPattern() {
-      const patternName = `enhance_${currentCollection}`;
-      document.getElementById('fabricPatternName').textContent = patternName;
-      document.getElementById('fabricPatternText').value = 'Loading...';
-      document.getElementById('fabricPatternStatus').textContent = '';
-      document.getElementById('fabricPatternModal').classList.remove('hidden');
-
-      try {
-        const response = await fetch(`${window.API_BASE_URL}/api/fabric/pattern/${encodeURIComponent(currentCollection)}`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Failed to load pattern');
-        document.getElementById('fabricPatternText').value = data.pattern || '';
-        document.getElementById('fabricPatternStatus').textContent = data.exists ? 'Pattern loaded from local collection folder.' : 'No pattern exists yet — click Generate Fabric Pattern to create one.';
-      } catch (err) {
-        document.getElementById('fabricPatternText').value = '';
-        document.getElementById('fabricPatternStatus').textContent = `⚠️ ${err.message}`;
-      }
-    }
-
-    async function saveFabricPattern() {
-      const pattern = document.getElementById('fabricPatternText').value.trim();
-      if (!pattern) return;
-      document.getElementById('fabricPatternStatus').textContent = 'Saving...';
-
-      try {
-        const response = await fetch(`${window.API_BASE_URL}/api/fabric/pattern/${encodeURIComponent(currentCollection)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionId')}` },
-          body: JSON.stringify({ pattern })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Save failed');
-        document.getElementById('fabricPatternStatus').textContent = '✅ Pattern saved to collection folder.';
-      } catch (err) {
-        document.getElementById('fabricPatternStatus').textContent = `✗ ${err.message}`;
-      }
-    }
-  </script>
 </body>
 </html>

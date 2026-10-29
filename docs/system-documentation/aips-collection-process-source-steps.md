@@ -41,38 +41,16 @@ Converts each selected source file to Markdown (`.md`). Supported source formats
 
 ---
 
-## Step 2 — Generate Fabric Pattern
-
-**API**: `POST /api/fabric/generate-pattern`
-
-Awaited — processing waits for completion before moving to Step 3.
-
-Analyzes all converted `.md` files in the collection and generates a `fabric-pattern.md` file containing:
-- Collection description
-- Document count
-- Key domain vocabulary (top 25 terms extracted from content by frequency)
-- Query enhancement instructions for the AI
-
-**Output**: `fabric-pattern.md` saved in the collection folder.
-
-**Used by**:
-- AI Document Chat — injects domain vocabulary into the prompt as context
-- Smart Search / Hybrid Search — query enhancement
-
-**On failure**: Warning logged in processing log, processing continues to Step 3.
-
----
-
-## Step 3 — Embed Converted Files
+## Step 2 — Embed Converted Files
 
 **API**: `DELETE /api/documents/collections/:collection/embeddings` (wipe first)
 **API**: `POST /api/documents/collections/:collection/index/:filename` (per file)
 
-### 3a — Wipe existing embeddings
+### 2a — Wipe existing embeddings
 
 Deletes `embeddings.db` before batch embedding to ensure no stale chunks remain. This guarantees a clean rebuild every time Process Source Files is run.
 
-### 3b — Embed each file
+### 2b — Embed each file
 
 For each converted `.md` file:
 
@@ -87,7 +65,7 @@ For each converted `.md` file:
 
 ---
 
-## Step 4 — Calculate Search Settings
+## Step 3 — Calculate Search Settings
 
 **API**: `POST /api/documents/collections/:collection/search-settings`
 
@@ -171,9 +149,8 @@ After a successful Process Source Files run, the collection folder contains:
 | File | Created by | Used by |
 |------|-----------|---------| 
 | `*.md` | Step 1 | All search methods |
-| `fabric-pattern.md` | Step 2 | AI Document Chat, Smart Search |
-| `embeddings.db` | Step 3 | Smart Search, Hybrid Search, AI Document Chat |
-| `collection.json` (updated) | Step 4 | AI Search, Search page (all 4 settings) |
+| `embeddings.db` | Step 2 | Smart Search, Hybrid Search, AI Document Chat |
+| `collection.json` (updated) | Step 3 | AI Search, Search page (all 4 settings) |
 
 ---
 
@@ -182,7 +159,6 @@ After a successful Process Source Files run, the collection folder contains:
 | Scenario | Behavior |
 |----------|----------|
 | Conversion fails | Processing stops, error shown in log |
-| Fabric generation fails | Warning logged, processing continues |
 | Single file embed fails | Error logged, next file continues |
 | Search settings fails | Warning logged, settings not saved — defaults used |
 
@@ -192,8 +168,8 @@ After a successful Process Source Files run, the collection folder contains:
 
 Safe to re-run at any time:
 - Step 1 overwrites existing `.md` files
-- Step 3 wipes `embeddings.db` before rebuilding — no stale data
-- Steps 2 and 4 regenerate `fabric-pattern.md` and `searchSettings` fresh
+- Step 2 wipes `embeddings.db` before rebuilding — no stale data
+- Step 3 regenerates `searchSettings` fresh
 
 **Note**: Re-running is required after any source file changes, or after chunking/embedding code updates.
 

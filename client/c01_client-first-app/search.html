@@ -153,25 +153,6 @@
               <textarea id="query" required placeholder="Ask me anything or select from User Prompts above…"></textarea>
             </div>
 
-            <div class="field">
-              <button id="enhanceBtn" class="btn-enhance hidden" onclick="enhancePrompt()">✨ Enhance Prompt</button>
-            </div>
-
-            <!-- Enhance Preview -->
-            <div id="enhancePreview" class="enhance-preview hidden">
-              <div class="enhance-preview-row">
-                <label class="enhance-preview-label-original">ORIGINAL</label>
-                <div id="originalPromptPreview" class="enhance-preview-original"></div>
-              </div>
-              <div class="enhance-preview-row-enhanced">
-                <label class="enhance-preview-label-enhanced">ENHANCED</label>
-                <div id="enhancedPromptPreview" class="enhance-preview-enhanced"></div>
-              </div>
-              <div class="enhance-preview-actions">
-                <button onclick="cancelEnhance()" class="enhance-btn-cancel">Cancel</button>
-                <button onclick="useEnhanced()" class="enhance-btn-use">Use This Prompt</button>
-              </div>
-            </div>
           </fieldset>
 
           <!-- Options & Actions Section -->
@@ -258,12 +239,6 @@
   </div>
   <div id="footer-placeholder"></div>
 
-  <script src="shared/utils/enhancePrompt.js"></script>
   <script type="module" src="./search.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      window.initEnhancePrompt('query', 'collection');
-    });
-  </script>
 </body>
 </html>
