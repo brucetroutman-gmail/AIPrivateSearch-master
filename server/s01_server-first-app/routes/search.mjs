@@ -8,6 +8,7 @@ const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 import { DeviceLicenseClient } from '../lib/licensing/device-license-client.mjs';
 import { SearchLogger } from '../lib/utils/searchLogger.mjs';
+import { sanitizeChunks } from '../lib/utils/chunkSanitizer.mjs';
 import { QueryAnalyzer } from '../lib/search/QueryAnalyzer.mjs';
 import { ErrorLogger } from '../lib/utils/errorLogger.mjs';
 
@@ -297,7 +298,10 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
     let scoringMetrics = null;
     if (score && scoreModel) {
       try {
-        const scoringResult = await scoringService.score(query, answerForScoring || searchResponse, scoreModel, 0.1, 2048, chunks);
+        // Strip display-only markup from chunks so the judge sees clean document text,
+        // consistent with what the RAG prompt builders now feed the answering model.
+        const scoringChunks = sanitizeChunks(chunks);
+        const scoringResult = await scoringService.score(query, answerForScoring || searchResponse, scoreModel, 0.1, 2048, scoringChunks);
         scores = scoringResult.scores;
         scoringMetrics = scoringResult.metrics;
       } catch (error) {

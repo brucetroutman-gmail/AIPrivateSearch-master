@@ -120,7 +120,11 @@ export class SmartSearch {
 
   createSmartExcerpt(content, query) {
     const queryWords = query.toLowerCase().split(/\s+/);
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    // Split on sentence terminators only when followed by whitespace or end-of-text.
+    // A bare "split(/[.!?]+/)" also breaks inside tokens like email addresses
+    // ("autoshop@a.com" -> "...a", "com"), which produced stray fragments such as a
+    // leading "com" in excerpts. Requiring trailing whitespace/EOT keeps such tokens intact.
+    const sentences = content.split(/[.!?]+(?=\s|$)/).filter(s => s.trim().length > 10);
     
     // Find sentences that contain query words or related concepts
     const relevantSentences = sentences.filter(sentence => {

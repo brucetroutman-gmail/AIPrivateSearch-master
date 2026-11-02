@@ -3,6 +3,7 @@
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
+import { sanitizeChunkText } from '../utils/chunkSanitizer.mjs';
 import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
@@ -125,7 +126,7 @@ export class HybridSearch {
   // behave consistently across the two generative document methods.
   async generateAIResponse(query, docs, model, temperature = 0.3, contextSize = 4096, tokenLimit = null, collection = null) {
     const context = docs.map((doc, index) =>
-      `**Source ${index + 1}: ${doc.filename}**\n${doc.content}`
+      `**Source ${index + 1}: ${doc.filename}**\n${sanitizeChunkText(doc.content)}`
     ).join('\n\n');
 
     const options = {

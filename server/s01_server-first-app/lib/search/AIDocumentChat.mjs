@@ -3,6 +3,7 @@
 import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { detectQueryType, applyQueryModifiers } from '../utils/queryTypeDetector.mjs';
+import { sanitizeChunkText } from '../utils/chunkSanitizer.mjs';
 import crypto from 'crypto';
 
 export class AIDocumentChat {
@@ -216,7 +217,7 @@ export class AIDocumentChat {
   async generateAIResponse(query, chunks, model, temperature = 0.3, contextSize = 1024, tokenLimit = null, collection = null) {
     // Use full chunk content — no truncation
     const context = chunks.map((chunk, index) => 
-      `**Source ${index + 1}: ${chunk.filename}**\n${chunk.content}`
+      `**Source ${index + 1}: ${chunk.filename}**\n${sanitizeChunkText(chunk.content)}`
     ).join('\n\n');
     
     const options = {
