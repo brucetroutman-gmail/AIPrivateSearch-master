@@ -118,9 +118,23 @@ Respond with only three numbers, one per line.`;
       if (!scores || scores.accuracy === null) return; // nothing parsed; leave as-is
       if (!chunks || !chunks.length) return;            // no sources to contradict a refusal
 
-      const answerText = String(answer || '');
+      // Strip the appended "--- Source Documents" footer before measuring the answer, so a
+      // long source list can't inflate the length and the length gate reflects real content.
+      const answerText = String(answer || '').split(/\n+---\n+\*\*Source Documents/i)[0];
+
+      // Length gate: a genuine refusal is short ("there is no information ...").
+      // A long answer that merely opens with a refusal-sounding hedge (e.g. "the documents
+      // do not contain a single consolidated comparison, however ...") and then answers
+      // correctly must NOT be clamped — let the judge score the substantive content.
+      // Observed true refusals are <150 chars; false-positive hedges run into the thousands.
+      const REFUSAL_MAX_LEN = 400;
+      if (answerText.trim().length > REFUSAL_MAX_LEN) return;
+
       const refusalPatterns = [
         /there (?:is|are|was|were) no (?:information|data|mention|record|details?)/i,
+        // "there are no <X> provided/found/available in the sources" — X is any noun phrase,
+        // e.g. "there are no durable power of attorney documents provided in the given sources".
+        /there (?:is|are|was|were) no\b[^.?!]*\b(?:provided|found|available|present|mentioned|listed|included)\b[^.?!]*\b(?:sources?|documents?|context|data|records?)\b/i,
         /\bno (?:information|data|mention|records?|details?)\b.*\b(?:available|found|provided|in the (?:sources?|documents?|context))/i,
         /(?:does|do|did) not (?:contain|include|have|mention|provide)/i,
         /(?:is|are) not (?:available|present|found|mentioned) in the (?:provided )?(?:sources?|documents?|context)/i,
