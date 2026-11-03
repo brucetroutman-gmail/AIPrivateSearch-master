@@ -197,27 +197,58 @@ Respond with only three numbers, one per line.`;
         overallComments: 'Scores extracted from model response'
       };
 
-      // Look for lines with accuracy, relevance, organization and extract numbers
+      // Extract the score for a labelled criterion line. The judge is asked to emit
+      // "<Label>: <digit>", so the score is the FIRST 1-3 digit after the colon. Taking the
+      // first (not last) digit after the colon avoids both failure modes: digits embedded in
+      // the label before the colon ("Accuracy (1-3 scale): 3") and trailing scale references
+      // after the score ("2 out of 3", "2/3"). When there is no colon we take the first 1-3
+      // digit on the line, since the score trails the label word ("Accuracy 3").
+      const extractScore = (line) => {
+        const afterColon = line.includes(':') ? line.slice(line.lastIndexOf(':') + 1) : line;
+        // Drop a trailing "out of N" / "/ N" so the denominator can't be read as the score.
+        const cleaned = afterColon.replace(/\b(?:out\s+of|\/)\s*[0-9]+/g, ' ');
+        const m = cleaned.match(/[1-3]/);
+        return m ? Number(m[0]) : null;
+      };
+
+      // Look for lines with accuracy, relevance, organization and extract their scores.
       const lines = text.toLowerCase().split('\n');
       let accuracy = null, relevance = null, organization = null;
-      
+
       for (const line of lines) {
-        const num = line.match(/[1-3]/)?.[0];
-        if (num) {
-          if (line.includes('accuracy')) accuracy = Number(num);
-          else if (line.includes('relevance')) relevance = Number(num);
-          else if (line.includes('organization')) organization = Number(num);
+        // Skip rubric/scale definition lines ("1 = Poor", "3 = Excellent") so the scale
+        // legend is never mistaken for an actual score.
+        if (/^\s*[1-3]\s*=/.test(line)) continue;
+
+        if (line.includes('accuracy') && accuracy === null) {
+          const s = extractScore(line);
+          if (s !== null) accuracy = s;
+        } else if (line.includes('relevance') && relevance === null) {
+          const s = extractScore(line);
+          if (s !== null) relevance = s;
+        } else if (line.includes('organization') && organization === null) {
+          const s = extractScore(line);
+          if (s !== null) organization = s;
         }
       }
-      
-      // Fallback: extract first 3 numbers if specific parsing failed
+
+      // Fallback: the judge was asked for "three numbers, one per line" with no labels.
+      // Collect at most one score digit from each non-scale line and use the first three,
+      // rather than grabbing the first three digits from anywhere (which could pick up
+      // digits inside prose or the scale legend).
       if (accuracy === null || relevance === null || organization === null) {
-        const allNumbers = text.match(/[1-3]/g);
-        logger.log('Fallback - Found numbers 1-3:', allNumbers);
-        if (allNumbers && allNumbers.length >= 3) {
-          accuracy = accuracy || Number(allNumbers[0]);
-          relevance = relevance || Number(allNumbers[1]);
-          organization = organization || Number(allNumbers[2]);
+        const lineScores = lines
+          .filter((line) => !/^\s*[1-3]\s*=/.test(line))
+          .map((line) => {
+            const m = line.match(/[1-3]/);
+            return m ? Number(m[0]) : null;
+          })
+          .filter((n) => n !== null);
+        logger.log('Fallback - per-line scores 1-3:', lineScores);
+        if (lineScores.length >= 3) {
+          accuracy = accuracy ?? lineScores[0];
+          relevance = relevance ?? lineScores[1];
+          organization = organization ?? lineScores[2];
         }
       }
       
