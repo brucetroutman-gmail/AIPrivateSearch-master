@@ -430,6 +430,21 @@ export class UnifiedEmbeddingService {
     return stmt.all();
   }
 
+  // Return each embedded document with its full text, sourced ONLY from embeddings.db
+  // (the documents table joined to collection_documents). This is the authoritative
+  // set of content for the collection — used by keyword/TF-IDF search so it can never
+  // surface a file that was not embedded (e.g. a stray .json left in the source folder).
+  async getCollectionDocumentsWithContent(collection) {
+    await this.setupDatabase(collection);
+    const db = await this.getCollectionDb(collection);
+    const stmt = db.prepare(`
+      SELECT cd.filename, d.full_content
+      FROM collection_documents cd
+      JOIN documents d ON cd.document_id = d.id
+    `);
+    return stmt.all();
+  }
+
   async getChunkCounts(collection) {
     await this.setupDatabase(collection);
     const db = await this.getCollectionDb(collection);

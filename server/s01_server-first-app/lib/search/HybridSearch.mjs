@@ -1,10 +1,7 @@
  
  
-import { secureFs } from '../utils/secureFileOps.mjs';
-import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { sanitizeChunkText } from '../utils/chunkSanitizer.mjs';
-import path from 'path';
 import natural from 'natural';
 const { TfIdf } = natural;
 import { LineSearch } from './LineSearch.mjs';
@@ -206,25 +203,27 @@ Answer:`;
   }
 
   async indexCollection(collection) {
-    const collectionPath = path.join(CollectionsUtil.getCollectionsPath(), collection);
-    
-    const files = await secureFs.readdir(collectionPath);
-    const documentFiles = files.filter(file => 
-      !file.startsWith('DOCIDX_') && 
-      (file.endsWith('.md') || file.endsWith('.json'))
-    );
-    
-    console.log(`Indexing ${documentFiles.length} documents for hybrid search`);
+    // Source keyword/TF-IDF documents from embeddings.db ONLY (the authoritative
+    // embedded content), NOT from a directory glob. Previously this did
+    // secureFs.readdir(collectionPath) and indexed every .md/.json on disk, which
+    // let a file that was never embedded (e.g. a stale or malformed .json left in
+    // the source folder) leak its raw content into the RAG prompt via the keyword
+    // branch. Reading from embeddings.db guarantees keyword search can only surface
+    // documents that were actually embedded, keeping retrieval consistent with the
+    // semantic branch and honoring "only use embeddings.db for chunking".
+    const embeddingService = this.vectorSearch.embeddingService;
+    const embeddedDocs = await embeddingService.getCollectionDocumentsWithContent(collection);
+
+    console.log(`Indexing ${embeddedDocs.length} embedded documents for hybrid search (from embeddings.db)`);
 
     // Fresh state scoped to this collection so TF-IDF document positions line up
     // exactly with this.documents iteration order.
     this.documents = new Map();
     this.tfidf = new TfIdf();
 
-    for (const filename of documentFiles) {
-      const filePath = path.join(collectionPath, filename);
-      const content = await secureFs.readFile(filePath, 'utf-8');
-      
+    for (const { filename, full_content: content } of embeddedDocs) {
+      if (!content) continue;
+
       const documentId = `${collection}_${filename}`;
       this.documents.set(documentId, {
         id: documentId,
@@ -232,7 +231,7 @@ Answer:`;
         content,
         collection
       });
-      
+
       // Add to TF-IDF index (position matches insertion order in this.documents)
       this.tfidf.addDocument(content);
     }
