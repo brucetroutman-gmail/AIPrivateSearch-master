@@ -56,6 +56,23 @@ class ParameterManager {
     el.addEventListener('change', () => localStorage.setItem(storageKey, el.value));
   }
 
+  // Make sure the <select> has an <option> for `value`, inserted in numeric order.
+  // Collection settings are computed (e.g. contextSize 32768, tokenLimit 1024) and are not
+  // guaranteed to be in the shared config lists (context.json stops at 16384, tokens.json
+  // has no 1024). Assigning select.value to a missing option blanks the select, so the page
+  // would then submit an empty value instead of the collection's recommended one.
+  _ensureOption(el, value) {
+    const v = String(value);
+    const options = Array.from(el.options);
+    if (options.some(o => o.value === v)) return;
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = v;
+    const n = Number(v);
+    const next = Number.isFinite(n) ? options.find(o => Number(o.value) > n) : null;
+    el.insertBefore(opt, next || null);
+  }
+
   // Apply collection searchSettings to all 4 dropdowns, overwriting user's last value
   applyCollectionSettings(settings) {
     if (!settings) return;
@@ -73,6 +90,7 @@ class ParameterManager {
       if (value == null) return;
       const el = document.getElementById(id);
       if (!el) return;
+      this._ensureOption(el, value);
       el.value = String(value);
       localStorage.setItem(key, String(value));
     });

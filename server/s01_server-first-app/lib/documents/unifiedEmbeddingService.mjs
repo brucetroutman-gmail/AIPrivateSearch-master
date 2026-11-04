@@ -430,17 +430,19 @@ export class UnifiedEmbeddingService {
     return stmt.all();
   }
 
-  // Return each embedded document with its full text, sourced ONLY from embeddings.db
-  // (the documents table joined to collection_documents). This is the authoritative
-  // set of content for the collection — used by keyword/TF-IDF search so it can never
-  // surface a file that was not embedded (e.g. a stray .json left in the source folder).
-  async getCollectionDocumentsWithContent(collection) {
+  // Return every embedded CHUNK (not whole documents) with its filename and chunk_index,
+  // sourced ONLY from embeddings.db. Keyword/TF-IDF search indexes these chunks — the same
+  // granularity the semantic branch retrieves — so a RAG prompt never has to embed an
+  // entire document just because one of its chunks matched a keyword. This keeps prompt
+  // size proportional to topK x chunk size, matching the assumption the search-settings
+  // contextSize formula makes.
+  async getCollectionChunks(collection) {
     await this.setupDatabase(collection);
     const db = await this.getCollectionDb(collection);
     const stmt = db.prepare(`
-      SELECT cd.filename, d.full_content
+      SELECT cd.filename, c.chunk_index, c.content
       FROM collection_documents cd
-      JOIN documents d ON cd.document_id = d.id
+      JOIN chunks c ON cd.document_id = c.document_id
     `);
     return stmt.all();
   }

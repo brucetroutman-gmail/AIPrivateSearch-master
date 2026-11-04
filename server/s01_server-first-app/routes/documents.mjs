@@ -6,6 +6,7 @@ import { secureFs } from '../lib/utils/secureFileOps.mjs';
 import { UnifiedEmbeddingService } from '../lib/documents/unifiedEmbeddingService.mjs';
 import { DocumentProcessor } from '../lib/documents/documentProcessor.mjs';
 import { CollectionsUtil } from '../lib/utils/collectionsUtil.mjs';
+import { calculateSearchSettings } from '../lib/utils/searchSettings.mjs';
 import path from 'path';
 import XLSX from 'xlsx';
 
@@ -599,28 +600,8 @@ router.post('/collections/:collection/search-settings', async (req, res) => {
     const stats = await embeddingService.getStats(collection);
     const { chunks: totalChunks, documents: totalDocs, avgChunkSize } = stats;
 
-    // topK: 5% of chunks, capped 10-30
-    const topK = Math.min(30, Math.max(10, Math.ceil(totalChunks * 0.05)));
-
-    // Detect collection profile from avg chunk size and doc ratio
-    // short structured: emails, small records (avg < 600 chars or 1 chunk per doc)
-    // long prose: literature, historical (avg > 1500, few docs many chunks)
-    // structured records: medical, HR, law (avg 800-1800, header-chunked)
-    const chunksPerDoc = totalDocs > 0 ? totalChunks / totalDocs : 1;
-    const isShortDocs   = avgChunkSize < 600 || chunksPerDoc <= 1.5;
-    const isLongProse   = avgChunkSize > 1500 && chunksPerDoc > 10;
-    const isStructured  = !isShortDocs && !isLongProse;
-
-    // Temperature: factual/structured=0.1, analytical/prose=0.3, creative=0.5
-    const temperature = isShortDocs ? 0.1 : isLongProse ? 0.3 : 0.1;
-
-    // Context size: topK × avgChunkSize / 4 (chars→tokens) + 1024 overhead, rounded to next power of 2
-    const tokensNeeded = Math.ceil((topK * avgChunkSize) / 4) + 1024;
-    const nextPow2 = (n) => Math.pow(2, Math.ceil(Math.log2(n)));
-    const contextSize = Math.min(32768, Math.max(4096, nextPow2(tokensNeeded)));
-
-    // Token limit: short structured=1024, long prose=2048, structured records=1024
-    const tokenLimit = isLongProse ? 2048 : 1024;
+    const { topK, temperature, contextSize, tokenLimit, estimatedPromptTokens } =
+      calculateSearchSettings({ totalChunks, totalDocs, avgChunkSize });
 
     const settings = {
       topK,
@@ -634,7 +615,9 @@ router.post('/collections/:collection/search-settings', async (req, res) => {
     };
     await CollectionsUtil.updateSearchSettings(collection, settings);
 
-    console.log(`[search-settings] ${collection}: topK=${topK} temp=${temperature} ctx=${contextSize} tokens=${tokenLimit} (${totalChunks} chunks, avg=${avgChunkSize} chars)`);
+    console.log(`[search-settings] ${collection}: topK=${topK} temp=${temperature} ctx=${contextSize} ` +
+      `tokens=${tokenLimit} (${totalChunks} chunks, avg=${avgChunkSize} chars, ` +
+      `est. prompt=${estimatedPromptTokens} tok)`);
     res.json({ success: true, settings });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

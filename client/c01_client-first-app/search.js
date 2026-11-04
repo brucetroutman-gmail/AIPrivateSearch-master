@@ -913,8 +913,10 @@ function generateTestCode() {
   const tempMap = { 0.1:'1', 0.2:'2', 0.3:'3', 0.4:'4', 0.5:'5', 0.6:'6', 0.7:'7', 0.8:'8', 0.9:'9' };
   testCode += tempMap[parseFloat(temperatureEl.value)] || '3';
   
-  // Position 8: Context (1-5 = 1024/2048/4096/8192/16384)
-  const contextMap = { 1024:'1', 2048:'2', 4096:'3', 8192:'4', 16384:'5' };
+  // Position 8: Context (1-6 = 1024/2048/4096/8192/16384/32768)
+  // 32768 is not in context.json but is a computed collection setting; without its own
+  // code it would fall through to the '3' default and be recorded as 4096.
+  const contextMap = { 1024:'1', 2048:'2', 4096:'3', 8192:'4', 16384:'5', 32768:'6' };
   testCode += contextMap[parseInt(contextEl.value)] || '3';
   
   // Position 9: Tokens (1-6 = 200/512/1024/2048/4096/8192)
