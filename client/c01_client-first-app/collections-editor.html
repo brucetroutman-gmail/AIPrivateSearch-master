@@ -90,7 +90,9 @@
         <p class="method-description">
           Run this collection's saved user prompts across the selected models and score each
           answer. Builds the data the AI Search page uses to recommend the best models for
-          this collection. This runs several models and can take a few minutes.
+          this collection. If no prompts have been authored for this collection, a few
+          generic prompts are used automatically. This runs several models and can take a
+          few minutes.
         </p>
         <div class="benchmark-controls">
           <div class="field">
@@ -1392,17 +1394,32 @@
       }
     }
 
+    // Collection-agnostic fallback prompts, used only when a collection has no authored
+    // user prompts yet. They cover the three query shapes the scorer distinguishes
+    // (fact / analysis / creative) so a cold-start benchmark still exercises retrieval and
+    // reasoning. These are NOT written to user-prompts.json — they are a run-time default
+    // so the Benchmark button always works; the user can author collection-specific prompts
+    // later for a sharper benchmark.
+    const GENERIC_BENCHMARK_PROMPTS = [
+      'What are the main topics covered in these documents?',
+      'List the key facts or entities mentioned across these documents.',
+      'Compare and contrast the main ideas found in these documents.',
+      'Summarize the most important information in this collection.'
+    ];
+
     async function getCollectionBenchmarkPrompts(collection) {
-      // Benchmark queries = this collection's authored user prompts.
+      // Prefer this collection's authored user prompts; fall back to generic prompts so a
+      // freshly added collection can still be benchmarked.
       try {
         const r = await fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`);
         const d = await r.json();
         const list = (d.local_documents && d.local_documents[collection]) || [];
-        return list.map(p => p.prompt).filter(Boolean);
+        const authored = list.map(p => p.prompt).filter(Boolean);
+        if (authored.length > 0) return { prompts: authored, source: 'authored' };
       } catch (e) {
         console.error('[benchmark] getCollectionBenchmarkPrompts failed:', e);
-        return [];
       }
+      return { prompts: GENERIC_BENCHMARK_PROMPTS.slice(), source: 'generic' };
     }
 
     async function getCollectionSettings(collection) {
@@ -1427,10 +1444,13 @@
       if (!models.length) { log('Select at least one search model.', 'error'); return; }
       if (!scoreModel)    { log('Select a score model.', 'error'); return; }
 
-      const prompts = await getCollectionBenchmarkPrompts(collection);
+      const { prompts, source } = await getCollectionBenchmarkPrompts(collection);
       if (!prompts.length) {
-        log(`No saved user prompts found for "${collection}". Add prompts for this collection (config/user-prompts.json) before benchmarking.`, 'error');
+        log(`Could not load benchmark prompts for "${collection}".`, 'error');
         return;
+      }
+      if (source === 'generic') {
+        log(`No authored prompts for "${collection}" — using ${prompts.length} generic benchmark prompt(s). Add collection-specific prompts (config/user-prompts.json) for a sharper benchmark.`);
       }
 
       const settings = await getCollectionSettings(collection);
