@@ -658,6 +658,11 @@ async function exportToDatabase(result, testCategory = null, testDescription = n
     })(),
     'Duration-search-s': result.metrics?.search ? (result.metrics.search.total_duration / 1000000000) : null,
     'Load-search-ms': result.metrics?.search ? Math.round(result.metrics.search.load_duration / 1000000) : null,
+    // Per-run resource capture (v21.59): real resident footprint + loaded window + model
+    // digest, read from /api/ps after the search model ran. Null when not captured.
+    'ResidentMB-search': result.metrics?.search?.resident_mb ?? null,
+    'LoadedContext-search': result.metrics?.search?.loaded_context ?? null,
+    'ModelDigest-search': result.metrics?.search?.model_digest ?? null,
     'EvalTokensPerSecond-ssearch': (() => {
       const search = result.metrics?.search;
       if (!search || !search.eval_count || !search.eval_duration || search.eval_duration === 0) {

@@ -9,6 +9,7 @@ import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
 import { DeviceLicenseClient } from '../lib/licensing/device-license-client.mjs';
 import { SearchLogger } from '../lib/utils/searchLogger.mjs';
 import { sanitizeChunks } from '../lib/utils/chunkSanitizer.mjs';
+import { captureModelResources } from '../lib/utils/runResources.mjs';
 import { QueryAnalyzer } from '../lib/search/QueryAnalyzer.mjs';
 import { ErrorLogger } from '../lib/utils/errorLogger.mjs';
 
@@ -293,6 +294,17 @@ router.post('/', requireAuthWithRateLimit(30, 60000), async (req, res) => {
       };
     }
     
+    // Capture the search model's resident footprint before Phase 2 scoring loads a
+    // different model (which can evict it from /api/ps). Best-effort; never fails search.
+    if (searchMetrics) {
+      const res = await captureModelResources(model);
+      if (res) {
+        searchMetrics.resident_mb = res.residentMB;
+        searchMetrics.loaded_context = res.loadedContext;
+        searchMetrics.model_digest = res.digest;
+      }
+    }
+
     // Phase 2: Optional Scoring
     let scores = null;
     let scoringMetrics = null;

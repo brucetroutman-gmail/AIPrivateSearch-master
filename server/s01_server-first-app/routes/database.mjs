@@ -34,10 +34,11 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
         TestCode, TestCategory, TestDescription, UserEmail, PcCode, PcCPU, PcGraphics, PcRAM, PcOS, CreatedAt, SourceType, CollectionName, SystemPrompt, SystemPromptText, Prompt, OriginalPrompt, QueryWasImproved, DetectedQueryType,
         \`ModelName-search\`, \`ModelContextSize-search\`, \`ModelTemperature-search\`, \`ModelTopK-search\`, \`ModelTokenLimit-search\`,
         \`Duration-search-s\`, \`Load-search-ms\`, \`EvalTokensPerSecond-ssearch\`, \`Answer-search\`, FullPrompt, \`Chunks-search\`,
+        \`ResidentMB-search\`, \`LoadedContext-search\`, \`ModelDigest-search\`,
         \`ModelName-score\`, \`ModelContextSize-score\`, \`ModelTemperature-score\`, \`ModelTokenLimit-score\`,
         \`Duration-score-s\`, \`Load-score-ms\`, \`EvalTokensPerSecond-score\`,
         AccurateScore, RelevantScore, OrganizedScore, \`WeightedScore-pct\`, SimilarityScore
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const similarityScore = (() => {
@@ -78,7 +79,11 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       data['Answer-search'] || null,
       data.FullPrompt || null,
       data['Chunks-search'] || null,
-      
+
+      data['ResidentMB-search'] ?? null,
+      data['LoadedContext-search'] ?? null,
+      data['ModelDigest-search'] || null,
+
       data['ModelName-score'] || null,
       data['ModelContextSize-score'] || null,
       data['ModelTemperature-score'] || null,
