@@ -2,6 +2,7 @@
  
 import { secureFs } from '../utils/secureFileOps.mjs';
 import { CollectionsUtil } from '../utils/collectionsUtil.mjs';
+import { clampContextToModel } from '../utils/modelCapabilities.mjs';
 import path from 'path';
 
 export class AIDirectSearch {
@@ -98,7 +99,7 @@ export class AIDirectSearch {
   async performAISearch(documentContent, query, filename, collectionName, model = 'qwen2:0.5b', temperature = 0.3, contextSize = 1024, tokenLimit = null) {
     const options = {
       temperature: temperature,
-      num_ctx: contextSize,
+      num_ctx: (await clampContextToModel(model, contextSize)).contextSize,
       thinking: false
     };
     

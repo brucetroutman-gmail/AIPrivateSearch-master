@@ -139,6 +139,26 @@
     let allResults = [];
     let isProcessing = false;
 
+    // Cache of saved per-collection searchSettings, so a benchmark run uses the SAME
+    // contextSize/topK/tokenLimit/temperature that "Process Source Files" computed —
+    // rather than values hardcoded in TESTS that silently drift from the formula.
+    const settingsCache = new Map();
+    async function getCollectionSettings(collection) {
+      if (settingsCache.has(collection)) return settingsCache.get(collection);
+      let settings = null;
+      try {
+        const r = await fetch(`${window.API_BASE_URL}/api/documents/collections/${encodeURIComponent(collection)}/files`);
+        if (r.ok) {
+          const d = await r.json();
+          settings = d.searchSettings || null;
+        }
+      } catch (e) {
+        console.warn(`[test] could not load settings for ${collection}:`, e.message);
+      }
+      settingsCache.set(collection, settings);
+      return settings;
+    }
+
     // ── Render test checkboxes ──────────────────────────────────────────────
     function renderTests() {
       TESTS.forEach(t => {
@@ -272,15 +292,24 @@
     async function runQuery(test, model, scoreModel) {
       const start = Date.now();
       try {
+        // Prefer the collection's saved search settings (what Process Source Files
+        // computed) over the values hardcoded in TESTS, so the benchmark tracks the
+        // live formula. Fall back to the test's own value when settings are missing.
+        const s = await getCollectionSettings(test.collection) || {};
+        const contextSize = s.contextSize ?? test.contextSize;
+        const topK        = s.topK        ?? test.topK;
+        const tokenLimit  = s.tokenLimit  ?? test.tokenLimit;
+        const temperature = s.temperature ?? test.temperature;
+
         const data = await search(
           test.query,
           true,
           model,
-          test.temperature,
-          test.contextSize,
+          temperature,
+          contextSize,
           null,
           null,
-          test.tokenLimit,
+          tokenLimit,
           'Local Documents Only',
           test.testCode,
           test.collection,
@@ -288,11 +317,11 @@
           scoreModel,
           false,
           'auto',
-          test.topK
+          topK
         );
 
         const elapsed = Date.now() - start;
-        const dbSaved = await saveToDB({ ...data, testCode: test.testCode, tokenLimit: test.tokenLimit }, test);
+        const dbSaved = await saveToDB({ ...data, testCode: test.testCode, tokenLimit }, test);
 
         return {
           ...test, model, elapsed_ms: elapsed,

@@ -4,6 +4,7 @@ import { UnifiedEmbeddingService } from '../documents/unifiedEmbeddingService.mj
 import { SetupGuidance } from '../utils/setupGuidance.mjs';
 import { detectQueryType, applyQueryModifiers } from '../utils/queryTypeDetector.mjs';
 import { sanitizeChunkText } from '../utils/chunkSanitizer.mjs';
+import { clampContextToModel } from '../utils/modelCapabilities.mjs';
 import crypto from 'crypto';
 
 export class AIDocumentChat {
@@ -222,7 +223,7 @@ export class AIDocumentChat {
     
     const options = {
       temperature: temperature,
-      num_ctx: contextSize,
+      num_ctx: (await clampContextToModel(model, contextSize)).contextSize,
       thinking: false
     };
     
@@ -243,7 +244,7 @@ ${context}
 
 Question: ${query}
 
-Write only the final answer below. Be specific and cite source numbers (e.g. "Source 3"). Do not restate the question or describe your reasoning steps.
+Write only the final answer below. State the answer in words — describe what the relevant excerpts actually say. Cite source numbers in parentheses after each fact (e.g. "William Adams takes Metformin (Source 3)"). A list of source numbers alone is NOT an answer. Do not restate the question or describe your reasoning steps.
 
 Answer:`;
 
