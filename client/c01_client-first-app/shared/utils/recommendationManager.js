@@ -83,14 +83,17 @@ class RecommendationManager {
     const rec = await this.fetchModelRecommendation(collection);
     const best = rec && Array.isArray(rec.best) ? rec.best : [];
     if (!collection || best.length === 0) {
-      // Cold start or no data: say so quietly rather than showing a misleading hint.
+      // No data anywhere yet: stay silent rather than show a misleading hint.
       el.classList.add('hidden');
       return;
     }
 
+    const isFallback = rec.fallback === 'all-collections';
     const label = document.createElement('span');
     label.className = 'rec-label';
-    label.textContent = 'Recommended for this collection: ';
+    label.textContent = isFallback
+      ? 'No data for this collection yet. Top models across all collections: '
+      : 'Recommended for this collection: ';
     el.appendChild(label);
 
     best.forEach((m, i) => {
@@ -99,7 +102,9 @@ class RecommendationManager {
       chip.type = 'button';
       chip.className = 'rec-model-chip';
       chip.textContent = `${m.model} (${Math.round(m.avgScore)})`;
-      chip.title = `Avg score ${m.avgScore} over ${m.runs} run(s); proven-fit context ${m.maxFitContext}`;
+      chip.title = `Avg score ${m.avgScore} over ${m.runs} run(s)`
+        + (m.collections ? ` across ${m.collections} collection(s)` : '')
+        + (m.maxFitContext ? `; proven-fit context ${m.maxFitContext}` : '');
       // Clicking a chip selects that model in the dropdown and re-checks the context fit.
       chip.addEventListener('click', () => {
         const modelSel = document.getElementById('modelSelect');
@@ -113,7 +118,9 @@ class RecommendationManager {
 
     const note = document.createElement('span');
     note.className = 'rec-note';
-    note.textContent = ' (by observed score on this machine)';
+    note.textContent = isFallback
+      ? ' (benchmark this collection for a specific recommendation)'
+      : ' (by observed score on this machine)';
     el.appendChild(note);
 
     el.classList.remove('hidden');

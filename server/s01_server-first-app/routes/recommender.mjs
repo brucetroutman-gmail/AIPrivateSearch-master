@@ -3,7 +3,7 @@
 // validation is applied at registration in server.mjs.
 
 import express from 'express';
-import { adviseContext, recommendModels } from '../lib/utils/modelRecommender.mjs';
+import { adviseContext, recommendModels, recommendModelsForCollection } from '../lib/utils/modelRecommender.mjs';
 
 const router = express.Router();
 
@@ -35,12 +35,23 @@ router.get('/context', async (req, res) => {
 router.get('/models', async (req, res) => {
   try {
     const { collection, pcCode, ramBudgetMB, topN } = req.query;
-    const result = await recommendModels({
-      collection: collection || null,
-      pcCode: pcCode || null,
-      ramBudgetMB: ramBudgetMB != null ? Number(ramBudgetMB) : null,
-      topN: topN != null ? Math.max(1, Number(topN)) : 2
-    });
+    const n = topN != null ? Math.max(1, Number(topN)) : 2;
+    // A specific collection uses the cold-start fallback (global ranking when the
+    // collection has no eligible models yet); no collection returns the full per-collection
+    // list unchanged.
+    const result = collection
+      ? await recommendModelsForCollection({
+          collection,
+          pcCode: pcCode || null,
+          ramBudgetMB: ramBudgetMB != null ? Number(ramBudgetMB) : null,
+          topN: n
+        })
+      : await recommendModels({
+          collection: null,
+          pcCode: pcCode || null,
+          ramBudgetMB: ramBudgetMB != null ? Number(ramBudgetMB) : null,
+          topN: n
+        });
     res.json(result);
   } catch (error) {
     console.error('[recommender] /models failed:', error);

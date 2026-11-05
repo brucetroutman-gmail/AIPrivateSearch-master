@@ -212,7 +212,88 @@ export async function recommendModels({ collection = null, pcCode = null, ramBud
       });
     }
 
-    return collection ? (recommendations[0] || { collection, best: [], allRanked: [], note: 'no scored runs for this collection on this machine', budget }) : recommendations;
+    return collection
+      ? (recommendations[0] || { collection, best: [], allRanked: [], note: 'no scored runs for this collection on this machine', budget })
+      : recommendations;
+  } finally {
+    connection.release();
+  }
+}
+
+// Public: recommend models for a single collection, falling back to a global (all-
+// collection) ranking on this machine when the collection has no eligible models yet.
+// This removes the empty-state for a freshly added collection — rather than showing
+// nothing, the UI can show "no data for this collection yet; across all collections,
+// these models rank highest" — a cheap, zero-compute hint that is clearly labelled as a
+// fallback so it is not mistaken for collection-specific evidence.
+export async function recommendModelsForCollection({ collection, pcCode = null, ramBudgetMB = null, topN = 2 } = {}) {
+  const primary = await recommendModels({ collection, pcCode, ramBudgetMB, topN });
+  // recommendModels with a collection returns a single object (not an array).
+  if (primary && Array.isArray(primary.best) && primary.best.length > 0) {
+    return { ...primary, fallback: null };
+  }
+
+  // Cold start for this collection: compute a global ranking across all collections.
+  const global = await recommendGlobal({ pcCode, ramBudgetMB, topN });
+  return {
+    collection,
+    budget: global.budget,
+    best: global.best,
+    allRanked: global.allRanked,
+    fallback: 'all-collections',
+    note: global.best.length > 0
+      ? 'no data for this collection yet; showing models that rank highest across all collections on this machine'
+      : 'no benchmark data yet on this machine'
+  };
+}
+
+// Compute a machine-wide model ranking by averaging each model's observed weighted score
+// across every collection, filtered to models with a proven-fit context. Used as the
+// cold-start fallback for a collection with no history of its own.
+export async function recommendGlobal({ pcCode = null, ramBudgetMB = null, topN = 2 } = {}) {
+  const connection = await pool.getConnection();
+  try {
+    const [resourceRows, scoreRows] = await Promise.all([
+      fetchResourceCurves(connection, pcCode),
+      fetchScoreCurves(connection, pcCode)
+    ]);
+    const budget = resolveBudget(ramBudgetMB, await fetchPcRamMB(connection, pcCode));
+    const fitByModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
+
+    // Aggregate score rows (which are per collection+model) up to per model: weight each
+    // collection's average by its run count so a heavily-run collection is not drowned out
+    // by a lightly-run one.
+    const agg = new Map();
+    for (const r of scoreRows) {
+      const runs = Number(r.runs);
+      const avg = Number(r.avgScore);
+      if (!agg.has(r.model)) agg.set(r.model, { model: r.model, weightedSum: 0, totalRuns: 0, collections: 0 });
+      const a = agg.get(r.model);
+      a.weightedSum += avg * runs;
+      a.totalRuns += runs;
+      a.collections += 1;
+    }
+
+    const ranked = Array.from(agg.values())
+      .map(a => {
+        const fit = fitByModel.get(a.model);
+        const avgScore = a.totalRuns > 0 ? Math.round((a.weightedSum / a.totalRuns) * 10) / 10 : 0;
+        const eligible = a.totalRuns >= MIN_OBSERVATIONS_FOR_SCORE && !!fit && fit.maxFitContext != null;
+        return {
+          model: a.model,
+          avgScore,
+          runs: a.totalRuns,
+          collections: a.collections,
+          maxFitContext: fit ? fit.maxFitContext : null,
+          maxFitResidentMB: fit ? fit.maxFitResidentMB : null,
+          eligible,
+          fitKnown: !!fit
+        };
+      })
+      .sort((a, b) => b.avgScore - a.avgScore);
+
+    const eligible = ranked.filter(r => r.eligible);
+    return { budget, best: eligible.slice(0, topN), allRanked: ranked };
   } finally {
     connection.release();
   }

@@ -82,7 +82,32 @@
           <button class="btn btn-info" onclick="viewEmbeddings()">View Embeds</button>
         </div>
       </div>
-      
+
+      <div class="editor-section" id="benchmarkSection">
+        <div class="editor-header">
+          <div class="editor-title">Benchmark this collection</div>
+        </div>
+        <p class="method-description">
+          Run this collection's saved user prompts across the selected models and score each
+          answer. Builds the data the AI Search page uses to recommend the best models for
+          this collection. This runs several models and can take a few minutes.
+        </p>
+        <div class="benchmark-controls">
+          <div class="field">
+            <label>Search models</label>
+            <div id="benchmarkModelList" class="benchmark-model-list">Loading models…</div>
+          </div>
+          <div class="field">
+            <label for="benchmarkScoreModel">Score model</label>
+            <select id="benchmarkScoreModel" class="param-select"></select>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-success" id="runBenchmarkBtn" onclick="runCollectionBenchmark()">Run Benchmark</button>
+        </div>
+        <div id="benchmarkProgress" class="benchmark-progress hidden"></div>
+      </div>
+
       <div id="logOutput" class="log-output"></div>
     </main>
   </div>
@@ -1296,6 +1321,178 @@
         }
       }
     }
+
+    // Expose helpers the benchmark module (a separate ES module) needs, since the inline
+    // script's functions are not otherwise reachable from the module scope.
+    window.ceShowLog = showLog;
+    window.ceClearLog = clearLog;
+    window.ceGetCollection = () => currentCollection;
+    window.ceSetProcessingState = setProcessingState;
+  </script>
+
+  <script type="module">
+    // Per-collection benchmark (step iii, part 2). Reuses the exact run+score+save path of
+    // the test-collections harness, scoped to ONE collection. Benchmark queries come from
+    // this collection's saved user prompts (config/user-prompts.json → local_documents),
+    // so it works for any collection the user has authored prompts for — not just the four
+    // hardcoded sample collections in test-collections.html. Tuning params come from the
+    // collection's saved searchSettings (what Process Source Files computed), matching the
+    // harness. Results are scored and saved so the AI Search recommender gains
+    // collection-specific data.
+    import { exportToDatabase } from './shared/common.js';
+    import { search } from './services/api.js';
+
+    const log = (m, t = 'info') => (window.ceShowLog ? window.ceShowLog(m, t) : console.log(m));
+
+    async function loadSearchModels() {
+      const listEl = document.getElementById('benchmarkModelList');
+      const scoreEl = document.getElementById('benchmarkScoreModel');
+      try {
+        const r = await fetch(`${window.API_BASE_URL}/api/config/models-list.json`);
+        const d = await r.json();
+        const searchModels = [...new Set(d.models.filter(m => m.category === 'search').map(m => m.modelName))].sort();
+        const scoreModels = [...new Set(d.models.filter(m => m.category === 'score').map(m => m.modelName))].sort();
+
+        listEl.textContent = '';
+        if (searchModels.length === 0) {
+          listEl.textContent = 'No search models configured.';
+        } else {
+          searchModels.forEach(name => {
+            const label = document.createElement('label');
+            label.className = 'benchmark-model-item';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'benchmark-model-checkbox';
+            cb.value = name;
+            cb.checked = true;
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(' ' + name));
+            listEl.appendChild(label);
+          });
+        }
+
+        scoreEl.textContent = '';
+        const saved = localStorage.getItem('selectedScoreModel');
+        scoreModels.forEach((name, i) => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          if (saved ? name === saved : i === 0) opt.selected = true;
+          scoreEl.appendChild(opt);
+        });
+        if (scoreModels.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'No score models available';
+          scoreEl.appendChild(opt);
+        }
+      } catch (e) {
+        listEl.textContent = 'Failed to load models.';
+        console.error('[benchmark] loadSearchModels failed:', e);
+      }
+    }
+
+    async function getCollectionBenchmarkPrompts(collection) {
+      // Benchmark queries = this collection's authored user prompts.
+      try {
+        const r = await fetch(`${window.API_BASE_URL}/api/config/user-prompts.json`);
+        const d = await r.json();
+        const list = (d.local_documents && d.local_documents[collection]) || [];
+        return list.map(p => p.prompt).filter(Boolean);
+      } catch (e) {
+        console.error('[benchmark] getCollectionBenchmarkPrompts failed:', e);
+        return [];
+      }
+    }
+
+    async function getCollectionSettings(collection) {
+      try {
+        const r = await fetch(`${window.API_BASE_URL}/api/documents/collections/${encodeURIComponent(collection)}/files`);
+        if (r.ok) {
+          const d = await r.json();
+          return d.searchSettings || {};
+        }
+      } catch (e) {
+        console.warn('[benchmark] could not load settings:', e.message);
+      }
+      return {};
+    }
+
+    window.runCollectionBenchmark = async function runCollectionBenchmark() {
+      const collection = window.ceGetCollection ? window.ceGetCollection() : null;
+      if (!collection) { log('No collection selected.', 'error'); return; }
+
+      const models = Array.from(document.querySelectorAll('.benchmark-model-checkbox:checked')).map(cb => cb.value);
+      const scoreModel = document.getElementById('benchmarkScoreModel').value;
+      if (!models.length) { log('Select at least one search model.', 'error'); return; }
+      if (!scoreModel)    { log('Select a score model.', 'error'); return; }
+
+      const prompts = await getCollectionBenchmarkPrompts(collection);
+      if (!prompts.length) {
+        log(`No saved user prompts found for "${collection}". Add prompts for this collection (config/user-prompts.json) before benchmarking.`, 'error');
+        return;
+      }
+
+      const settings = await getCollectionSettings(collection);
+      const contextSize = settings.contextSize ?? 4096;
+      const topK        = settings.topK ?? 10;
+      const tokenLimit  = settings.tokenLimit ?? 2048;
+      const temperature = settings.temperature ?? 0.3;
+
+      const btn = document.getElementById('runBenchmarkBtn');
+      const progress = document.getElementById('benchmarkProgress');
+      if (window.ceSetProcessingState) window.ceSetProcessingState(true);
+      btn.disabled = true;
+      progress.classList.remove('hidden');
+
+      const queue = [];
+      prompts.forEach((q, qi) => models.forEach(model => queue.push({ q, qi, model })));
+      const total = queue.length;
+      let done = 0, saved = 0, errors = 0;
+      const scores = [];
+
+      log(`Benchmarking "${collection}": ${prompts.length} prompt(s) × ${models.length} model(s) = ${total} run(s). Scorer: ${scoreModel}.`);
+
+      for (const { q, qi, model } of queue) {
+        progress.textContent = `Running ${done + 1} of ${total} — [${model}] ${q.slice(0, 60)}${q.length > 60 ? '…' : ''}`;
+        try {
+          const testCode = `bench-${Date.now()}-${qi}`;
+          const data = await search(
+            q, true, model, temperature, contextSize,
+            null, null, tokenLimit, 'Local Documents Only', testCode,
+            collection, false, scoreModel, false, 'auto', topK
+          );
+          const total_pct = data.scores?.total ?? null;
+          if (total_pct != null) scores.push(total_pct);
+          try {
+            await exportToDatabase(
+              { ...data, testCode, tokenLimit },
+              'Benchmark',
+              `Benchmark ${collection}: ${q.slice(0, 60)}`
+            );
+            saved++;
+          } catch (e) {
+            errors++;
+            console.error('[benchmark] save failed:', e.message);
+          }
+          log(`✓ [${model}] ${q.slice(0, 50)}${q.length > 50 ? '…' : ''} — ${total_pct != null ? total_pct + '%' : 'no score'}`);
+        } catch (e) {
+          errors++;
+          log(`✗ [${model}] ${q.slice(0, 50)} — ${e.message}`, 'error');
+        }
+        done++;
+        await new Promise(r => setTimeout(r, 800));
+      }
+
+      const avg = scores.length ? Math.round(scores.reduce((s, v) => s + v, 0) / scores.length) : null;
+      progress.textContent = `Done: ${done} run(s), ${saved} saved${errors ? `, ${errors} error(s)` : ''}. Avg score: ${avg != null ? avg + '%' : '—'}.`;
+      log(`Benchmark complete for "${collection}": ${saved}/${total} saved, avg ${avg != null ? avg + '%' : '—'}. The AI Search page will now recommend models for this collection.`, 'success');
+
+      btn.disabled = false;
+      if (window.ceSetProcessingState) window.ceSetProcessingState(false);
+    };
+
+    loadSearchModels();
   </script>
 
 </body>
