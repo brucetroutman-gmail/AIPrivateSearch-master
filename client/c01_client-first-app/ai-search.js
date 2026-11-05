@@ -381,8 +381,11 @@ async function loadCollections() {
     const collectionSelect = document.getElementById('collectionSelect');
     if (collectionSelect && !collectionSelect.hasAttribute('data-prompt-listener')) {
         collectionSelect.addEventListener('change', loadUserPrompts);
-        collectionSelect.addEventListener('change', () => {
-            window.parameterManager.onCollectionChange(collectionSelect.value);
+        collectionSelect.addEventListener('change', async () => {
+            // Auto-fill params first, then recompute recommendations so the context-fit
+            // note reads the freshly auto-filled context value, not the previous one.
+            await window.parameterManager.onCollectionChange(collectionSelect.value);
+            refreshRecommendations();
         });
         collectionSelect.setAttribute('data-prompt-listener', 'true');
     }
@@ -391,11 +394,38 @@ async function loadCollections() {
     if (collectionSelect.value) {
         await window.parameterManager.onCollectionChange(collectionSelect.value);
     }
+    refreshRecommendations();
 }
 
 async function loadModels() {
     const models = await window.searchManager.loadModels('search');
     window.searchManager.populateSelect('modelSelect', models, 'selectedSearchModel');
+    const modelSelect = document.getElementById('modelSelect');
+    if (modelSelect && !modelSelect.hasAttribute('data-fit-listener')) {
+        modelSelect.addEventListener('change', refreshContextFit);
+        modelSelect.setAttribute('data-fit-listener', 'true');
+    }
+    const contextSelect = document.getElementById('contextSelect');
+    if (contextSelect && !contextSelect.hasAttribute('data-fit-listener')) {
+        contextSelect.addEventListener('change', refreshContextFit);
+        contextSelect.setAttribute('data-fit-listener', 'true');
+    }
+}
+
+// Advisory recommender hints (model/PC-aware). Best-effort; never blocks the user.
+function refreshRecommendations() {
+    const collection = document.getElementById('collectionSelect')?.value;
+    if (window.recommendationManager) {
+        window.recommendationManager.renderModelRecommendation(collection);
+    }
+    refreshContextFit();
+}
+
+function refreshContextFit() {
+    if (!window.recommendationManager) return;
+    const model = document.getElementById('modelSelect')?.value;
+    const context = parseInt(document.getElementById('contextSelect')?.value || '0', 10);
+    window.recommendationManager.renderContextFit(model, context || null);
 }
 
 async function loadUserPrompts() {

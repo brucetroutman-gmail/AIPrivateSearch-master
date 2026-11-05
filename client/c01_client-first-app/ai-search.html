@@ -29,6 +29,7 @@
     <script src="shared/utils/aiDirectCommon.js"></script>
     <script src="shared/utils/searchManager.js"></script>
     <script src="shared/utils/parameterManager.js"></script>
+    <script src="shared/utils/recommendationManager.js"></script>
     <script src="shared/utils/highlightRenderer.js"></script>
     <script src="shared/utils/commonResultFormatter.js"></script>
     <script type="module" src="shared/utils/domSanitizer.js"></script>
@@ -87,6 +88,7 @@
                 <div class="param-group prem-only">
                     <label for="contextSelect">Context</label>
                     <select id="contextSelect" class="param-select"></select>
+                    <div id="contextFitNote" class="fit-note hidden" role="status" aria-live="polite"></div>
                 </div>
                 <div class="param-group prem-only">
                     <label for="tokensSelect">Tokens</label>
@@ -97,6 +99,7 @@
                     <select id="topKSelect" class="param-select"></select>
                 </div>
             </div>
+            <div id="modelRecommendation" class="model-recommendation hidden" aria-live="polite"></div>
         </div>
 
         <!-- Advanced (manual) method selection -->

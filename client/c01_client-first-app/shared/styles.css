@@ -5109,3 +5109,55 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
   border-radius: 4px;
   margin: 10px 0;
 }
+
+/* Model/PC-aware recommender hints (step iii) */
+.model-recommendation {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.model-recommendation .rec-label {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.model-recommendation .rec-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.rec-model-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  margin: 0 0.15rem;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 12px;
+  background: var(--surface-color, #f3f4f6);
+  color: var(--text-color);
+  font-size: 0.82rem;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+}
+
+.rec-model-chip:hover,
+.rec-model-chip:focus {
+  background: var(--primary-color, #2563eb);
+  color: #fff;
+  border-color: var(--primary-color, #2563eb);
+}
+
+.fit-note {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.fit-note.fit-ok {
+  color: var(--success-color, #16a34a);
+}
+
+.fit-note.fit-warn {
+  color: var(--warning-color, #b45309);
+  font-weight: 500;
+}
