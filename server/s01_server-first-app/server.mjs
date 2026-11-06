@@ -185,7 +185,7 @@ app.use('/api/licensing', licensingRouter);
 app.use('/api/device-licensing', licensingRouter);
 app.use('/api/breadcrumbs', breadcrumbsRouter);
 app.use('/api/search-feedback', validateOrigin, feedbackRouter);
-app.use('/api/recommender', validateOrigin, recommenderRouter);
+app.use('/api/recommender', validateOrigin, validateCSRFToken, recommenderRouter);
 app.use('/api', membersRouter);
 app.use('/api', testResultsRouter);
 

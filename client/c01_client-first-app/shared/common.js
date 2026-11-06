@@ -614,7 +614,11 @@ async function loadScoreModels(selectElementId) {
   }
 }
 
-// Common database export function with retry logic
+// Common database export function with retry logic.
+// REMOTE DB — TEST HARNESS ONLY. The remote MySQL DB is a testing sink: only
+// test-collections.html and test-nodocuments.html may call this. Every other page (the
+// Benchmark button, the legacy search page export, anything end-user) must use
+// recordLocalRun() instead, because in normal use the remote DB is not available.
 async function exportToDatabase(result, testCategory = null, testDescription = null, testParams = null, retryCount = 0) {
   const dbData = {
     TestCode: result.testCode || '',
@@ -807,8 +811,34 @@ if (typeof window !== 'undefined') {
   };
 }
 
+// Record one completed /api/search result into this machine's LOCAL recommender store
+// (resident footprint + weighted score). This is the end-user counterpart to
+// exportToDatabase(): it never touches the remote DB. Only the few fields the recommender
+// needs are sent — not the prompt, answer or chunks.
+async function recordLocalRun(result) {
+  const s = result?.metrics?.search;
+  const body = {
+    collection: result?.collection || null,
+    model: s?.model || null,
+    digest: s?.model_digest ?? null,
+    loadedContext: s?.loaded_context ?? null,
+    residentMB: s?.resident_mb ?? null,
+    score: result?.scores?.total ?? null
+  };
+  const response = await window.csrfManager.fetch(`${window.API_BASE_URL}/api/recommender/record`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || `HTTP ${response.status}`);
+  }
+  return data;
+}
+
 // Export functions for module imports
-export { loadScoreModels, exportToDatabase };
+export { loadScoreModels, exportToDatabase, recordLocalRun };
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {

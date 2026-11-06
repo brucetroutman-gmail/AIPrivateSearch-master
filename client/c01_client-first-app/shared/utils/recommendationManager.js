@@ -16,41 +16,16 @@
 // to satisfy the security lint.
 
 class RecommendationManager {
-  constructor() {
-    this._pcCode = undefined; // undefined = not yet fetched; null = unavailable
-  }
-
-  // Resolve this machine's PcCode once so recommendations are scoped to the PC the user is
-  // actually on. If it cannot be determined, requests omit pcCode and the server falls
-  // back to all-machine data rather than failing.
-  async _getPcCode() {
-    if (this._pcCode !== undefined) return this._pcCode;
-    try {
-      const res = await fetch(`${window.API_BASE_URL}/api/system-info`);
-      if (res.ok) {
-        const data = await res.json();
-        // Treat the server's 'Unknown' sentinel as "no PcCode" so requests fall back to
-        // all-machine data rather than querying for a PcCode that never appears in rows.
-        this._pcCode = data.pcCode && data.pcCode !== 'Unknown' ? data.pcCode : null;
-      } else {
-        this._pcCode = null;
-      }
-    } catch {
-      this._pcCode = null;
-    }
-    return this._pcCode;
-  }
-
   _qs(params) {
     const pairs = Object.entries(params).filter(([, v]) => v != null && v !== '');
     return pairs.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   }
 
-  // Fetch best-N models for a collection, scoped to this PC.
+  // Fetch best-N models for a collection. The server answers from this machine's local
+  // recommender store, so no machine identifier is needed.
   async fetchModelRecommendation(collection, topN = 2) {
     if (!collection) return null;
-    const pcCode = await this._getPcCode();
-    const qs = this._qs({ collection, pcCode, topN });
+    const qs = this._qs({ collection, topN });
     try {
       const res = await fetch(`${window.API_BASE_URL}/api/recommender/models?${qs}`);
       if (!res.ok) return null;
@@ -60,11 +35,10 @@ class RecommendationManager {
     }
   }
 
-  // Fetch context advice for a model + requested context, scoped to this PC.
+  // Fetch context advice for a model + requested context.
   async fetchContextAdvice(model, requestedContext) {
     if (!model) return null;
-    const pcCode = await this._getPcCode();
-    const qs = this._qs({ model, requestedContext, pcCode });
+    const qs = this._qs({ model, requestedContext });
     try {
       const res = await fetch(`${window.API_BASE_URL}/api/recommender/context?${qs}`);
       if (!res.ok) return null;

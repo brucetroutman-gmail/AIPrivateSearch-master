@@ -3,9 +3,27 @@
 import express from 'express';
 import { SearchOrchestrator } from '../lib/search/SearchOrchestrator.mjs';
 import { ErrorLogger } from '../lib/utils/errorLogger.mjs';
+import { captureModelResources } from '../lib/utils/runResources.mjs';
+import { recordRun } from '../lib/utils/recommenderStore.mjs';
 
 const router = express.Router();
 const searchOrchestrator = new SearchOrchestrator();
+
+// Interactive (end-user) searches feed the machine-local recommender store with what the
+// answering model actually cost to run (resident MB at its loaded context). Resource data is
+// cheap to capture and needs no scoring, so every interactive run contributes to the
+// context-fit evidence. Best-effort: never delays or fails the search it follows.
+async function recordInteractiveResources(options) {
+  try {
+    const model = options && typeof options.model === 'string' ? options.model : null;
+    if (!model) return;
+    const res = await captureModelResources(model);
+    if (!res) return;
+    await recordRun({ model, digest: res.digest, loadedContext: res.loadedContext, residentMB: res.residentMB });
+  } catch (error) {
+    console.warn(`[multi-search] could not record interactive resources: ${error.message}`);
+  }
+}
 
 // Multi-method search endpoint
 router.post('/multi-method', async (req, res) => {
@@ -87,6 +105,7 @@ router.post('/hybrid-search', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
     const result = await searchOrchestrator.search(query, ['hybrid-search'], options);
+    await recordInteractiveResources(options);
     res.json(result.results['hybrid-search']);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -97,6 +116,7 @@ router.post('/ai-direct', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
     const result = await searchOrchestrator.search(query, ['ai-direct'], options);
+    await recordInteractiveResources(options);
     res.json(result.results['ai-direct']);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -107,6 +127,7 @@ router.post('/ai-document-chat', async (req, res) => {
   try {
     const { query, options = {} } = req.body;
     const result = await searchOrchestrator.search(query, ['ai-document-chat'], options);
+    await recordInteractiveResources(options);
     res.json(result.results['ai-document-chat']);
   } catch (error) {
     res.status(500).json({ error: error.message });

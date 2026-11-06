@@ -1,6 +1,6 @@
 import { search } from './services/api.js';
 import { logger } from './shared/utils/logger.js';
-import { loadScoreModels, exportToDatabase } from './shared/common.js';
+import { loadScoreModels, recordLocalRun } from './shared/common.js';
 
 // Import showUserMessage from global scope - wait for it to be available
 let showUserMessage = function(msg, type) { logger.log(`${type}: ${msg}`); };
@@ -1544,8 +1544,8 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// Use the shared exportToDatabase function from common.js
-// (function is already available globally)
+// Database export on this page goes through recordLocalRun (shared/common.js) into the
+// machine-local recommender store; exportToDatabase (remote DB) is harness-only.
 
 // Add event listener for export button
 // Export handler function
@@ -1729,15 +1729,17 @@ async function handleExport() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } else if (exportFormat === 'database') {
-    // Export to database using common function
+    // "Database" export on this (non-harness) page records into this machine's LOCAL
+    // recommender store. The remote DB is a testing sink reserved for the two test-harness
+    // pages and is unavailable in normal use.
     try {
-      const result = await exportToDatabase(window.currentResult, null, null, null);
-      logger.log(`Successfully saved to database with ID: ${result.insertId}`);
-      showUserMessage(`Successfully saved to database (ID: ${result.insertId})`, 'success');
+      await recordLocalRun(window.currentResult);
+      logger.log('Successfully recorded result to the local recommender store');
+      showUserMessage('Saved to this machine\'s local recommender store', 'success');
     } catch (error) {
       // logger sanitizes all inputs to prevent log injection
-      logger.error('Database save error:', error.message);
-      showUserMessage(`Database save failed: ${error.message}`, 'error');
+      logger.error('Local record error:', error.message);
+      showUserMessage(`Save failed: ${error.message}`, 'error');
     }
   }
 }

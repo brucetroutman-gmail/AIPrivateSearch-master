@@ -1,30 +1,33 @@
 // Model/PC-aware recommender (step iii).
 //
 // Steps i and ii gave us a model-aware context clamp (native max from /api/show) and a
-// per-run resource capture (real resident MB, loaded context, digest written to the
-// `searches` row). This module is the consumer of that observational data. It answers two
-// questions, both grounded ONLY in what has actually been measured on the target machine
-// — never an analytical KV-cache estimate, which was shown to be wrong for gemma4
-// (interleaved attention) and qwen3.5:
+// per-run resource capture (real resident MB, loaded context, digest). This module consumes
+// that observational data to answer two questions, grounded ONLY in what has actually been
+// measured on THIS machine — never an analytical KV-cache estimate, which was shown to be
+// wrong for gemma4 (interleaved attention) and qwen3.5:
 //
-//   1. advise context per model: given a machine's RAM budget and the resident-MB-vs-
-//      context curve we have observed for a model, what is the largest context we have
-//      evidence will fit, and should a requested context be clamped?
+//   1. advise context per model: given this machine's RAM budget and the resident-MB-vs-
+//      context curve observed for a model, what is the largest context with evidence of
+//      fitting, and should a requested context be clamped?
 //
-//   2. recommend best-2 models per collection: rank models by their observed weighted
-//      score on that collection, keeping only models that fit the machine, and return the
-//      top two.
+//   2. recommend best-2 models per collection: rank models by observed weighted score on that
+//      collection, keeping only models that fit the machine, and return the top two.
 //
-// Cold start is honest: a model/context we have never observed returns "unknown" rather
-// than a guess. The data is self-healing — new rows accrue as the machine runs, and a
-// re-quantized model gets a new digest so stale rows are not reused for a different build.
+// DATA SOURCE: the machine-local recommender store (recommenderStore.mjs). The remote MySQL
+// DB is a testing sink only and is NOT used here; in normal use it is unavailable. Each
+// machine stands on its own observations — nothing is seeded from test data.
+//
+// Cold start is honest: a model/context never observed returns "unknown" rather than a guess.
 
-import pool from '../db.mjs';
+import { getObservations, parseRamToMB } from './recommenderStore.mjs';
+
+export { parseRamToMB };
+
+const OLLAMA_HOST = 'http://localhost:11434';
 
 // Fraction of total RAM we are willing to let a single resident model occupy. The OS, the
 // Node server, the embedding store and Ollama's own overhead all need headroom, so we do
-// not budget the whole machine. 0.65 of 16 GB ~= 10.6 GB, which comfortably covers every
-// model/context combination observed so far (peak ~9.2 GB) while leaving margin.
+// not budget the whole machine. 0.65 of 16 GB ~= 10.6 GB.
 const DEFAULT_RAM_BUDGET_FRACTION = 0.65;
 
 // A model needs at least this many observed runs at a given context before we treat that
@@ -35,62 +38,33 @@ const MIN_OBSERVATIONS_FOR_FIT = 2;
 // single outlier score does not win or lose a recommendation.
 const MIN_OBSERVATIONS_FOR_SCORE = 2;
 
-// Parse a PcRAM string such as "16 GB" / "16GB" / "16384 MB" into megabytes. Returns null
-// when it cannot be parsed, so the caller can fall back rather than trust a bad budget.
-export function parseRamToMB(pcRam) {
-  if (pcRam == null) return null;
-  const s = String(pcRam).trim();
-  const match = s.match(/([\d.]+)\s*(gb|mb|g|m)?/i);
-  if (!match) return null;
-  const value = parseFloat(match[1]);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const unit = (match[2] || 'gb').toLowerCase();
-  if (unit === 'mb' || unit === 'm') return Math.round(value);
-  return Math.round(value * 1024); // gb
+// Models Ollama currently has installed, so a model the user has since deleted stops being
+// recommended. Best-effort: null (= do not filter) when Ollama is unreachable or reports none.
+async function getInstalledModels() {
+  try {
+    const res = await fetch(`${OLLAMA_HOST}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const names = new Set();
+    for (const m of data.models || []) {
+      if (m.name) names.add(m.name);
+      if (m.model) names.add(m.model);
+    }
+    return names.size > 0 ? names : null;
+  } catch {
+    return null;
+  }
 }
 
-// Pull the observed resident-MB-vs-context curve for every model seen on a machine.
-// Keyed on model + loaded context; we take the MAX resident MB at each point (the
-// worst case we must budget for), plus the run count and the most recent digest.
-async function fetchResourceCurves(connection, pcCode) {
-  const where = pcCode ? 'WHERE `ResidentMB-search` IS NOT NULL AND PcCode = ?' : 'WHERE `ResidentMB-search` IS NOT NULL';
-  const params = pcCode ? [pcCode] : [];
-  const [rows] = await connection.execute(
-    `SELECT \`ModelName-search\` AS model,
-            \`LoadedContext-search\` AS ctx,
-            COUNT(*) AS runs,
-            MAX(\`ResidentMB-search\`) AS maxResidentMB,
-            ROUND(AVG(\`ResidentMB-search\`)) AS avgResidentMB,
-            MAX(\`ModelDigest-search\`) AS digest
-       FROM \`searches\`
-       ${where}
-       GROUP BY model, ctx
-       ORDER BY model, ctx`,
-    params
-  );
-  return rows;
-}
-
-// Observed weighted score per model per collection on a machine.
-async function fetchScoreCurves(connection, pcCode) {
-  const where = pcCode
-    ? 'WHERE `WeightedScore-pct` IS NOT NULL AND CollectionName IS NOT NULL AND PcCode = ?'
-    : 'WHERE `WeightedScore-pct` IS NOT NULL AND CollectionName IS NOT NULL';
-  const params = pcCode ? [pcCode] : [];
-  const [rows] = await connection.execute(
-    `SELECT CollectionName AS collection,
-            \`ModelName-search\` AS model,
-            COUNT(*) AS runs,
-            ROUND(AVG(\`WeightedScore-pct\`), 1) AS avgScore,
-            MIN(\`WeightedScore-pct\`) AS minScore,
-            MAX(\`WeightedScore-pct\`) AS maxScore
-       FROM \`searches\`
-       ${where}
-       GROUP BY collection, model
-       ORDER BY collection, avgScore DESC`,
-    params
-  );
-  return rows;
+// Load this machine's observations, restricted to still-installed models.
+async function loadObservations() {
+  const [obs, installed] = await Promise.all([getObservations(), getInstalledModels()]);
+  const keep = m => !installed || installed.has(m);
+  return {
+    pcRamMB: obs.pcRamMB,
+    resourceRows: obs.resourceRows.filter(r => keep(r.model)),
+    scoreRows: obs.scoreRows.filter(r => keep(r.model))
+  };
 }
 
 // Build, per model, the list of contexts observed and the largest context proven to fit
@@ -116,192 +90,8 @@ function buildFitByModel(resourceRows, ramBudgetMB) {
   return byModel;
 }
 
-// Public: advise a context for a model against a RAM budget.
-//   - If we have proven a context >= requested fits, approve the requested value.
-//   - If requested exceeds the largest proven-fit context, advise clamping down to it.
-//   - If we have never observed this model at all, return status "unknown" (no guess).
-export async function adviseContext({ model, requestedContext, pcCode = null, ramBudgetMB = null } = {}) {
-  if (!model) return { status: 'unknown', reason: 'no model specified' };
-  const connection = await pool.getConnection();
-  try {
-    const resourceRows = await fetchResourceCurves(connection, pcCode);
-    const budget = resolveBudget(ramBudgetMB, await fetchPcRamMB(connection, pcCode));
-    const byModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
-    const m = byModel.get(model);
-    if (!m || m.observations.length === 0) {
-      return { status: 'unknown', model, reason: 'no observed runs for this model on this machine', budget };
-    }
-    const requested = Number(requestedContext) || null;
-    const result = {
-      status: 'ok',
-      model,
-      digest: m.digest,
-      budget,
-      observations: m.observations.sort((a, b) => a.context - b.context),
-      maxFitContext: m.maxFitContext,
-      maxFitResidentMB: m.maxFitResidentMB,
-      requestedContext: requested
-    };
-    if (requested == null) {
-      result.advisedContext = m.maxFitContext;
-      result.clamped = false;
-    } else if (m.maxFitContext != null && requested > m.maxFitContext) {
-      result.advisedContext = m.maxFitContext;
-      result.clamped = true;
-      result.reason = `requested ${requested} exceeds largest context proven to fit (${m.maxFitContext}) within RAM budget ${budget.ramBudgetMB} MB`;
-    } else {
-      result.advisedContext = requested;
-      result.clamped = false;
-    }
-    return result;
-  } finally {
-    connection.release();
-  }
-}
-
-// Public: recommend the best-2 models for a collection (or all collections when none is
-// given). A model is eligible only if it has >= MIN_OBSERVATIONS_FOR_SCORE scored runs on
-// the collection and at least one context proven to fit the RAM budget.
-export async function recommendModels({ collection = null, pcCode = null, ramBudgetMB = null, topN = 2 } = {}) {
-  const connection = await pool.getConnection();
-  try {
-    const [resourceRows, scoreRows] = await Promise.all([
-      fetchResourceCurves(connection, pcCode),
-      fetchScoreCurves(connection, pcCode)
-    ]);
-    const budget = resolveBudget(ramBudgetMB, await fetchPcRamMB(connection, pcCode));
-    const fitByModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
-
-    // Group scores by collection.
-    const byCollection = new Map();
-    for (const r of scoreRows) {
-      if (collection && r.collection !== collection) continue;
-      if (!byCollection.has(r.collection)) byCollection.set(r.collection, []);
-      byCollection.get(r.collection).push(r);
-    }
-
-    const recommendations = [];
-    for (const [coll, rows] of byCollection) {
-      const ranked = rows
-        .map(r => {
-          const fit = fitByModel.get(r.model);
-          const eligible = Number(r.runs) >= MIN_OBSERVATIONS_FOR_SCORE && !!fit && fit.maxFitContext != null;
-          return {
-            model: r.model,
-            avgScore: Number(r.avgScore),
-            minScore: Number(r.minScore),
-            maxScore: Number(r.maxScore),
-            runs: Number(r.runs),
-            maxFitContext: fit ? fit.maxFitContext : null,
-            maxFitResidentMB: fit ? fit.maxFitResidentMB : null,
-            eligible,
-            fitKnown: !!fit
-          };
-        })
-        .sort((a, b) => b.avgScore - a.avgScore);
-
-      const eligible = ranked.filter(r => r.eligible);
-      recommendations.push({
-        collection: coll,
-        budget,
-        best: eligible.slice(0, topN),
-        allRanked: ranked,
-        note: eligible.length < topN
-          ? `only ${eligible.length} model(s) have both enough scored runs and a proven-fit context; others are still cold-start or unfit`
-          : null
-      });
-    }
-
-    return collection
-      ? (recommendations[0] || { collection, best: [], allRanked: [], note: 'no scored runs for this collection on this machine', budget })
-      : recommendations;
-  } finally {
-    connection.release();
-  }
-}
-
-// Public: recommend models for a single collection, falling back to a global (all-
-// collection) ranking on this machine when the collection has no eligible models yet.
-// This removes the empty-state for a freshly added collection — rather than showing
-// nothing, the UI can show "no data for this collection yet; across all collections,
-// these models rank highest" — a cheap, zero-compute hint that is clearly labelled as a
-// fallback so it is not mistaken for collection-specific evidence.
-export async function recommendModelsForCollection({ collection, pcCode = null, ramBudgetMB = null, topN = 2 } = {}) {
-  const primary = await recommendModels({ collection, pcCode, ramBudgetMB, topN });
-  // recommendModels with a collection returns a single object (not an array).
-  if (primary && Array.isArray(primary.best) && primary.best.length > 0) {
-    return { ...primary, fallback: null };
-  }
-
-  // Cold start for this collection: compute a global ranking across all collections.
-  const global = await recommendGlobal({ pcCode, ramBudgetMB, topN });
-  return {
-    collection,
-    budget: global.budget,
-    best: global.best,
-    allRanked: global.allRanked,
-    fallback: 'all-collections',
-    note: global.best.length > 0
-      ? 'no data for this collection yet; showing models that rank highest across all collections on this machine'
-      : 'no benchmark data yet on this machine'
-  };
-}
-
-// Compute a machine-wide model ranking by averaging each model's observed weighted score
-// across every collection, filtered to models with a proven-fit context. Used as the
-// cold-start fallback for a collection with no history of its own.
-export async function recommendGlobal({ pcCode = null, ramBudgetMB = null, topN = 2 } = {}) {
-  const connection = await pool.getConnection();
-  try {
-    const [resourceRows, scoreRows] = await Promise.all([
-      fetchResourceCurves(connection, pcCode),
-      fetchScoreCurves(connection, pcCode)
-    ]);
-    const budget = resolveBudget(ramBudgetMB, await fetchPcRamMB(connection, pcCode));
-    const fitByModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
-
-    // Aggregate score rows (which are per collection+model) up to per model: weight each
-    // collection's average by its run count so a heavily-run collection is not drowned out
-    // by a lightly-run one.
-    const agg = new Map();
-    for (const r of scoreRows) {
-      const runs = Number(r.runs);
-      const avg = Number(r.avgScore);
-      if (!agg.has(r.model)) agg.set(r.model, { model: r.model, weightedSum: 0, totalRuns: 0, collections: 0 });
-      const a = agg.get(r.model);
-      a.weightedSum += avg * runs;
-      a.totalRuns += runs;
-      a.collections += 1;
-    }
-
-    const ranked = Array.from(agg.values())
-      .map(a => {
-        const fit = fitByModel.get(a.model);
-        const avgScore = a.totalRuns > 0 ? Math.round((a.weightedSum / a.totalRuns) * 10) / 10 : 0;
-        const eligible = a.totalRuns >= MIN_OBSERVATIONS_FOR_SCORE && !!fit && fit.maxFitContext != null;
-        return {
-          model: a.model,
-          avgScore,
-          runs: a.totalRuns,
-          collections: a.collections,
-          maxFitContext: fit ? fit.maxFitContext : null,
-          maxFitResidentMB: fit ? fit.maxFitResidentMB : null,
-          eligible,
-          fitKnown: !!fit
-        };
-      })
-      .sort((a, b) => b.avgScore - a.avgScore);
-
-    const eligible = ranked.filter(r => r.eligible);
-    return { budget, best: eligible.slice(0, topN), allRanked: ranked };
-  } finally {
-    connection.release();
-  }
-}
-
 // Resolve the RAM budget: an explicit override wins; otherwise take a fraction of the
-// machine's total RAM (from the PcRAM observed in the data). Returns the budget plus how
-// it was derived, so callers can show the basis.
+// machine's total RAM. Returns the budget plus how it was derived, so callers can show the basis.
 function resolveBudget(explicitBudgetMB, pcRamMB) {
   if (Number.isFinite(explicitBudgetMB) && explicitBudgetMB > 0) {
     return { ramBudgetMB: Math.round(explicitBudgetMB), totalRamMB: pcRamMB, source: 'explicit' };
@@ -319,14 +109,161 @@ function resolveBudget(explicitBudgetMB, pcRamMB) {
   return { ramBudgetMB: 8192, totalRamMB: null, source: 'fallback' };
 }
 
-// Read the machine's total RAM (in MB) from the most recent row that has a PcRAM value.
-async function fetchPcRamMB(connection, pcCode) {
-  const where = pcCode ? 'WHERE PcRAM IS NOT NULL AND PcCode = ?' : 'WHERE PcRAM IS NOT NULL';
-  const params = pcCode ? [pcCode] : [];
-  const [rows] = await connection.execute(
-    `SELECT PcRAM FROM \`searches\` ${where} ORDER BY Id DESC LIMIT 1`,
-    params
-  );
-  if (!rows.length) return null;
-  return parseRamToMB(rows[0].PcRAM);
+// Public: advise a context for a model against a RAM budget.
+//   - If we have proven a context >= requested fits, approve the requested value.
+//   - If requested exceeds the largest proven-fit context, advise clamping down to it.
+//   - If we have never observed this model at all, return status "unknown" (no guess).
+export async function adviseContext({ model, requestedContext, ramBudgetMB = null } = {}) {
+  if (!model) return { status: 'unknown', reason: 'no model specified' };
+  const { resourceRows, pcRamMB } = await loadObservations();
+  const budget = resolveBudget(ramBudgetMB, pcRamMB);
+  const m = buildFitByModel(resourceRows, budget.ramBudgetMB).get(model);
+  if (!m || m.observations.length === 0) {
+    return { status: 'unknown', model, reason: 'no observed runs for this model on this machine', budget };
+  }
+  const requested = Number(requestedContext) || null;
+  const result = {
+    status: 'ok',
+    model,
+    digest: m.digest,
+    budget,
+    observations: m.observations.sort((a, b) => a.context - b.context),
+    maxFitContext: m.maxFitContext,
+    maxFitResidentMB: m.maxFitResidentMB,
+    requestedContext: requested
+  };
+  if (requested == null) {
+    result.advisedContext = m.maxFitContext;
+    result.clamped = false;
+  } else if (m.maxFitContext != null && requested > m.maxFitContext) {
+    result.advisedContext = m.maxFitContext;
+    result.clamped = true;
+    result.reason = `requested ${requested} exceeds largest context proven to fit (${m.maxFitContext}) within RAM budget ${budget.ramBudgetMB} MB`;
+  } else {
+    result.advisedContext = requested;
+    result.clamped = false;
+  }
+  return result;
+}
+
+// Public: recommend the best-N models for a collection (or all collections when none is
+// given). A model is eligible only if it has >= MIN_OBSERVATIONS_FOR_SCORE scored runs on
+// the collection and at least one context proven to fit the RAM budget.
+export async function recommendModels({ collection = null, ramBudgetMB = null, topN = 2 } = {}) {
+  const { resourceRows, scoreRows, pcRamMB } = await loadObservations();
+  const budget = resolveBudget(ramBudgetMB, pcRamMB);
+  const fitByModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
+
+  // Group scores by collection.
+  const byCollection = new Map();
+  for (const r of scoreRows) {
+    if (collection && r.collection !== collection) continue;
+    if (!byCollection.has(r.collection)) byCollection.set(r.collection, []);
+    byCollection.get(r.collection).push(r);
+  }
+
+  const recommendations = [];
+  for (const [coll, rows] of byCollection) {
+    const ranked = rows
+      .map(r => {
+        const fit = fitByModel.get(r.model);
+        const eligible = Number(r.runs) >= MIN_OBSERVATIONS_FOR_SCORE && !!fit && fit.maxFitContext != null;
+        return {
+          model: r.model,
+          avgScore: Number(r.avgScore),
+          minScore: Number(r.minScore),
+          maxScore: Number(r.maxScore),
+          runs: Number(r.runs),
+          maxFitContext: fit ? fit.maxFitContext : null,
+          maxFitResidentMB: fit ? fit.maxFitResidentMB : null,
+          eligible,
+          fitKnown: !!fit
+        };
+      })
+      .sort((a, b) => b.avgScore - a.avgScore);
+
+    const eligible = ranked.filter(r => r.eligible);
+    recommendations.push({
+      collection: coll,
+      budget,
+      best: eligible.slice(0, topN),
+      allRanked: ranked,
+      note: eligible.length < topN
+        ? `only ${eligible.length} model(s) have both enough scored runs and a proven-fit context; others are still cold-start or unfit`
+        : null
+    });
+  }
+
+  return collection
+    ? (recommendations[0] || { collection, best: [], allRanked: [], note: 'no scored runs for this collection on this machine', budget })
+    : recommendations;
+}
+
+// Public: recommend models for a single collection, falling back to a global (all-
+// collection) ranking on this machine when the collection has no eligible models yet.
+// Rather than showing nothing for a freshly added collection, the UI can show "no data for
+// this collection yet; across all collections, these models rank highest" — a zero-compute
+// hint that is clearly labelled as a fallback so it is not mistaken for collection-specific
+// evidence.
+export async function recommendModelsForCollection({ collection, ramBudgetMB = null, topN = 2 } = {}) {
+  const primary = await recommendModels({ collection, ramBudgetMB, topN });
+  // recommendModels with a collection returns a single object (not an array).
+  if (primary && Array.isArray(primary.best) && primary.best.length > 0) {
+    return { ...primary, fallback: null };
+  }
+
+  const global = await recommendGlobal({ ramBudgetMB, topN });
+  return {
+    collection,
+    budget: global.budget,
+    best: global.best,
+    allRanked: global.allRanked,
+    fallback: 'all-collections',
+    note: global.best.length > 0
+      ? 'no data for this collection yet; showing models that rank highest across all collections on this machine'
+      : 'no benchmark data yet on this machine'
+  };
+}
+
+// Compute a machine-wide model ranking by averaging each model's observed weighted score
+// across every collection, filtered to models with a proven-fit context. Used as the
+// cold-start fallback for a collection with no history of its own.
+export async function recommendGlobal({ ramBudgetMB = null, topN = 2 } = {}) {
+  const { resourceRows, scoreRows, pcRamMB } = await loadObservations();
+  const budget = resolveBudget(ramBudgetMB, pcRamMB);
+  const fitByModel = buildFitByModel(resourceRows, budget.ramBudgetMB);
+
+  // Aggregate score rows (per collection+model) up to per model, weighting each collection's
+  // average by its run count so a heavily-run collection is not drowned out by a lightly-run one.
+  const agg = new Map();
+  for (const r of scoreRows) {
+    const runs = Number(r.runs);
+    const avg = Number(r.avgScore);
+    if (!agg.has(r.model)) agg.set(r.model, { model: r.model, weightedSum: 0, totalRuns: 0, collections: 0 });
+    const a = agg.get(r.model);
+    a.weightedSum += avg * runs;
+    a.totalRuns += runs;
+    a.collections += 1;
+  }
+
+  const ranked = Array.from(agg.values())
+    .map(a => {
+      const fit = fitByModel.get(a.model);
+      const avgScore = a.totalRuns > 0 ? Math.round((a.weightedSum / a.totalRuns) * 10) / 10 : 0;
+      const eligible = a.totalRuns >= MIN_OBSERVATIONS_FOR_SCORE && !!fit && fit.maxFitContext != null;
+      return {
+        model: a.model,
+        avgScore,
+        runs: a.totalRuns,
+        collections: a.collections,
+        maxFitContext: fit ? fit.maxFitContext : null,
+        maxFitResidentMB: fit ? fit.maxFitResidentMB : null,
+        eligible,
+        fitKnown: !!fit
+      };
+    })
+    .sort((a, b) => b.avgScore - a.avgScore);
+
+  const eligible = ranked.filter(r => r.eligible);
+  return { budget, best: eligible.slice(0, topN), allRanked: ranked };
 }

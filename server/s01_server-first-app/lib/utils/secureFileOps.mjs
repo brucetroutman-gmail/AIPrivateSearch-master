@@ -12,7 +12,11 @@ const ALLOWED_DIRS = [
     '/Users/Shared/AIPrivateSearch/data',
     '/Users/Shared/AIPrivateSearch/sources',
     '/Users/Shared/AIPrivateSearch/config',
-    '/Users/Shared/AIPrivateSearch/logs'
+    '/Users/Shared/AIPrivateSearch/logs',
+    // Machine-local recommender store (observed model resource + score aggregates).
+    // Deliberately NOT under data/: data/ is git-tracked and rsynced into the repo on
+    // release, and this file is per-machine state that must never be committed.
+    '/Users/Shared/AIPrivateSearch/recommender'
 ];
 
 function validatePath(filePath) {
@@ -58,6 +62,14 @@ export const secureFs = {
     async unlink(filePath) {
         const safePath = validatePath(filePath);
         return fs.unlink(safePath);
+    },
+
+    // Both ends are validated, so a rename can never move a file out of (or into) a
+    // disallowed directory. Used for atomic write-temp-then-rename persistence.
+    async rename(fromPath, toPath) {
+        const safeFrom = validatePath(fromPath);
+        const safeTo = validatePath(toPath);
+        return fs.rename(safeFrom, safeTo);
     },
 
     async rmdir(dirPath, options) {

@@ -1333,15 +1333,16 @@
   </script>
 
   <script type="module">
-    // Per-collection benchmark (step iii, part 2). Reuses the exact run+score+save path of
-    // the test-collections harness, scoped to ONE collection. Benchmark queries come from
-    // this collection's saved user prompts (config/user-prompts.json → local_documents),
-    // so it works for any collection the user has authored prompts for — not just the four
-    // hardcoded sample collections in test-collections.html. Tuning params come from the
-    // collection's saved searchSettings (what Process Source Files computed), matching the
-    // harness. Results are scored and saved so the AI Search recommender gains
-    // collection-specific data.
-    import { exportToDatabase } from './shared/common.js';
+    // Per-collection benchmark (step iii, part 2). Reuses the run+score path of the
+    // test-collections harness, scoped to ONE collection. Benchmark queries come from this
+    // collection's saved user prompts (config/user-prompts.json → local_documents), falling
+    // back to generic prompts, so it works for any collection. Tuning params come from the
+    // collection's saved searchSettings (what Process Source Files computed).
+    //
+    // This is END-USER activity, so results are recorded to this machine's LOCAL recommender
+    // store (recordLocalRun) — never the remote DB, which is a testing sink used only by the
+    // two test-harness pages and is unavailable in normal use.
+    import { recordLocalRun } from './shared/common.js';
     import { search } from './services/api.js';
 
     const log = (m, t = 'info') => (window.ceShowLog ? window.ceShowLog(m, t) : console.log(m));
@@ -1485,15 +1486,11 @@
           const total_pct = data.scores?.total ?? null;
           if (total_pct != null) scores.push(total_pct);
           try {
-            await exportToDatabase(
-              { ...data, testCode, tokenLimit },
-              'Benchmark',
-              `Benchmark ${collection}: ${q.slice(0, 60)}`
-            );
+            await recordLocalRun(data);
             saved++;
           } catch (e) {
             errors++;
-            console.error('[benchmark] save failed:', e.message);
+            console.error('[benchmark] local record failed:', e.message);
           }
           log(`✓ [${model}] ${q.slice(0, 50)}${q.length > 50 ? '…' : ''} — ${total_pct != null ? total_pct + '%' : 'no score'}`);
         } catch (e) {
@@ -1505,8 +1502,8 @@
       }
 
       const avg = scores.length ? Math.round(scores.reduce((s, v) => s + v, 0) / scores.length) : null;
-      progress.textContent = `Done: ${done} run(s), ${saved} saved${errors ? `, ${errors} error(s)` : ''}. Avg score: ${avg != null ? avg + '%' : '—'}.`;
-      log(`Benchmark complete for "${collection}": ${saved}/${total} saved, avg ${avg != null ? avg + '%' : '—'}. The AI Search page will now recommend models for this collection.`, 'success');
+      progress.textContent = `Done: ${done} run(s), ${saved} recorded locally${errors ? `, ${errors} error(s)` : ''}. Avg score: ${avg != null ? avg + '%' : '—'}.`;
+      log(`Benchmark complete for "${collection}": ${saved}/${total} recorded to this machine's local store, avg ${avg != null ? avg + '%' : '—'}. The AI Search page will now recommend models for this collection.`, 'success');
 
       btn.disabled = false;
       if (window.ceSetProcessingState) window.ceSetProcessingState(false);
