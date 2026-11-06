@@ -53,10 +53,6 @@
                     <label>&nbsp;</label>
                     <button class="btn btn-primary" onclick="loadLogs()">Filter Logs</button>
                 </div>
-                <div class="filter-group prem-only">
-                    <label>&nbsp;</label>
-                    <button class="btn btn-success" onclick="exportToDatabase()">Export to Database</button>
-                </div>
             </div>
 
             <div class="logs-table">
@@ -168,36 +164,6 @@
             
             noLogs.classList.add('hidden');
             table.classList.remove('hidden');
-        }
-        
-        async function exportToDatabase() {
-            if (!allLogs || allLogs.length === 0) {
-                alert('No logs to export. Please load logs first.');
-                return;
-            }
-            
-            if (!confirm(`Export ${allLogs.length} log entries to database?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${window.API_BASE_URL}/api/search-logs/export-logs-to-database`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ logs: allLogs })
-                });
-                
-                if (!response.ok) throw new Error('Export failed');
-                
-                const result = await response.json();
-                alert(`Successfully exported ${result.exported} logs to database.`);
-                
-            } catch (error) {
-                console.error('Export error:', error);
-                alert('Export failed: ' + error.message);
-            }
         }
         
         // Page initialization (template pattern)

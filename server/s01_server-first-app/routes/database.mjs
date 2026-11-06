@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import loggerPkg from '../../../shared/utils/logger.mjs';
 const { logger } = loggerPkg;
 import { requireAuthWithRateLimit } from '../middleware/auth.mjs';
-import pool from '../lib/db.mjs';
+import { getPool } from '../lib/db.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +19,7 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
   
   while (retries > 0) {
     try {
-      if (!pool) {
+      if (!getPool()) {
         return res.status(500).json({ success: false, error: 'Database not configured' });
       }
       
@@ -27,7 +27,7 @@ router.post('/save', requireAuthWithRateLimit(50, 60000), async (req, res) => {
       logger.log('Database save request received');
       logger.log('CreatedAt value:', data.CreatedAt);
       
-      connection = await pool.getConnection();
+      connection = await getPool().getConnection();
     
     const insertQuery = `
       INSERT INTO searches (
@@ -137,10 +137,10 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
   let retries = 3;
   while (retries > 0) {
     try {
-      if (!pool) {
+      if (!getPool()) {
         return res.status(500).json({ success: false, error: 'Database not configured' });
       }
-      connection = await pool.getConnection();
+      connection = await getPool().getConnection();
       const [rows] = await connection.execute(
         'SELECT * FROM `searches-testresults` ORDER BY CreatedAt DESC'
       );
@@ -165,8 +165,8 @@ router.get('/tests', requireAuthWithRateLimit(20, 60000), async (req, res) => {
 router.get('/searches-filter-options', requireAuthWithRateLimit(20, 60000), async (req, res) => {
   let connection;
   try {
-    if (!pool) return res.status(500).json({ success: false, error: 'Database not configured' });
-    connection = await pool.getConnection();
+    if (!getPool()) return res.status(500).json({ success: false, error: 'Database not configured' });
+    connection = await getPool().getConnection();
     const [categories] = await connection.execute('SELECT DISTINCT TestCategory FROM `searches` WHERE TestCategory IS NOT NULL ORDER BY TestCategory');
     const [pcCodes] = await connection.execute('SELECT DISTINCT PcCode FROM `searches` WHERE PcCode IS NOT NULL ORDER BY PcCode');
     return res.json({ success: true, categories: categories.map(r => r.TestCategory), pcCodes: pcCodes.map(r => r.PcCode) });
@@ -182,10 +182,10 @@ router.get('/searches-filter-options', requireAuthWithRateLimit(20, 60000), asyn
 router.post('/transfer-to-testresults', requireAuthWithRateLimit(10, 60000), async (req, res) => {
   let connection;
   try {
-    if (!pool) return res.status(500).json({ success: false, error: 'Database not configured' });
+    if (!getPool()) return res.status(500).json({ success: false, error: 'Database not configured' });
     const { testCategory, pcCode } = req.body;
     if (!testCategory || !pcCode) return res.status(400).json({ success: false, error: 'testCategory and pcCode are required' });
-    connection = await pool.getConnection();
+    connection = await getPool().getConnection();
     await connection.beginTransaction();
     const [del] = await connection.execute(
       'DELETE FROM `searches-testresults` WHERE TestCategory = ? AND PcCode = ?',
