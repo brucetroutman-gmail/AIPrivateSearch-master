@@ -375,7 +375,10 @@
                 userPrompt: userPromptEntry.prompt,
                 temperature,
                 context,
-                tokens: tokens === 'No Limit' ? null : parseInt(tokens),
+                // "No Limit" is sent as the explicit string the server and the AI Search page use.
+                // null here made the server record token_limit = null, which exportToDatabase
+                // (correctly) refuses to save, so the run succeeded but could not be stored.
+                tokens: tokens === 'No Limit' ? 'No Limit' : parseInt(tokens),
                 generateScores,
                 testCategory,
                 testDescription
