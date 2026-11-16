@@ -5110,7 +5110,43 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
   margin: 10px 0;
 }
 
-/* Model/PC-aware recommender (step iii): context-fit note under the Context dropdown */
+/* Model/PC-aware recommender hints (step iii) */
+.model-recommendation {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.model-recommendation .rec-label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.model-recommendation .rec-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.rec-model-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  margin: 0 0.15rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-size: 0.82rem;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+}
+
+.rec-model-chip:hover,
+.rec-model-chip:focus {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 .fit-note {
   margin-top: 0.35rem;
   font-size: 0.8rem;
@@ -5124,20 +5160,6 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
 .fit-note.fit-warn {
   color: var(--warning);
   font-weight: 500;
-}
-
-/* Model(s) dropdown keeps its own full-width row above the parameter boxes */
-.model-group {
-  flex: 1 1 100%;
-}
-
-/* One section per model when the "Recommended Model List" option runs several models */
-.model-result-section {
-  margin-bottom: 1.5rem;
-}
-
-.model-result-heading {
-  margin: 0 0 0.5rem 0;
 }
 
 /* Per-collection benchmark panel (step iii, part 2) */
