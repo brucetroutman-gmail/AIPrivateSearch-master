@@ -1,7 +1,7 @@
 # AIPrivateSearch — Test Plan (Remote Mini)
 
 **Target machine:** Mac mini (PcCode `G934T7`, Apple M4, 16 GB)
-**Build under test:** v21.67 (changes since v21.59: recommender, local store, DB-optional startup, search-logs export removal, test-nodocuments fixes)
+**Build under test:** v21.69 (changes since v21.59: recommender, local store, DB-optional startup, search-logs export removal, test-nodocuments fixes)
 **How to use:** tick the box when a test passes. If a test fails, leave it unticked and write what you saw on the `Result:` line (error text, server log line, or console error).
 
 Legend: `[x]` done / passed · `[ ]` not yet run · `[!]` failed (add a note)
@@ -35,7 +35,7 @@ DB access: `mysql -h 92.112.184.206 -P 3306 -u aips-readwrite -p aiprivatesearch
 | A. DB-optional startup | T1–T3 | done (run on v21.65) |
 | B. Remote DB = testing only | T4–T6 | done (T4, T5, T6 pass) |
 | C. Local recommender store | T7–T9 | T7, T8 done · T9 next |
-| D. Recommender UI | T10–T13 | not started |
+| D. Recommender UI | T10, T10b, T11–T13 | reworked in v21.69 (chips replaced by dropdown entry) — re-test |
 | E. Search-logs removal | T14–T15 | not started |
 | F. Regression sanity | T16–T17 | not started |
 
@@ -142,19 +142,26 @@ DB access: `mysql -h 92.112.184.206 -P 3306 -u aips-readwrite -p aiprivatesearch
 
 ## D. Recommender UI
 
-- [ ] **T10 — Collection-specific recommendation.** After T8, on `ai-search.html` select the benchmarked collection.
-  - Pass: under the model dropdown, `Recommended for this collection: <model> (NN), <model> (NN)`; clicking a chip selects that model.
-  - Expected from the T8 data for `Sample_Medical-Practice`: chips `gemma4:12b (97)` then `qwen3.5:9b (78)`.
-  - Result on v21.67: **not visible.** Console check showed the data and render are correct (`fetchModelRecommendation` returned `best: gemma4:12b 96.6, qwen3.5:9b 77.6`; `#modelRecommendation` was un-hidden with child content). Cause (likely): the chip/label CSS referenced theme variables that don't exist in this project, so dark mode (the default) fell back to light-gray chips with light text (~1.2:1 contrast). Fixed in v21.68 by using the project's own variables. **Re-test on v21.68.**
-  - Result:under ai-search page
+- [ ] **T10 — "Model(s)" title and Recommended Model List entry.** On `ai-search.html` select the benchmarked collection (`Sample_Medical-Practice`).
+  - Pass: a **Model(s)** title sits above the model dropdown, and the **first entry** in the dropdown reads `Recommended Model List: gemma4:12b, qwen3.5:9b` (order = best score first). The list is enabled and your current model selection is unchanged. There are no chips under the dropdown.
+  - History: v21.61–v21.68 showed a line of chips instead; it rendered correctly but was not visible on screen, so that approach was dropped in v21.69.
+  - Result:
+
+- [ ] **T10b — Choosing the Recommended Model List runs each model.** Select **Recommended Model List**, enter a query, and search (Auto mode, or Advanced with one or more methods ticked).
+  - Pass: the results column shows one headed section per model — `Model: gemma4:12b`, then `Model: qwen3.5:9b`. While the first model runs, the second shows `Waiting...`; it changes to `Searching...` only after the first has finished (models run **one after another**, never together). The performance table has one row per method and model, labelled like `Hybrid Search · gemma4:12b`.
+  - Also check: re-reading `/Users/Shared/AIPrivateSearch/recommender/recommender-*.json` shows `updatedAt` moved and `runs` increased for both models.
+  - Also check: picking a single real model still behaves as before — no `Model:` headings, one result.
+  - Result:
 
 - [ ] **T11 — Cold-start fallback.** Select a collection that has **not** been benchmarked (after at least one other benchmark exists).
-  - Pass: the hint reads `No data for this collection yet. Top models across all collections: …` with the "benchmark this collection" nudge.
+  - Pass: the first dropdown entry reads `Recommended Model List (all collections): <models>` (a machine-wide ranking, clearly labelled). If the store has no scores at all, the entry is disabled and reads `Recommended Model List (none yet — run a benchmark)`.
+  - Also check: with the recommended entry **selected**, switching to a collection that has no data at all moves the selection to the first real model.
   - Result:
 
 - [ ] **T12 — Context-fit note.** Pick a benchmarked model and set Context **above** its observed value (e.g. 32768).
   - Pass: a ⚠ note appears (`… has only been observed to fit <N> …; … will be clamped`). Setting Context to the observed value shows a ✓ "fits" note.
   - Expected from the T8 data: `gemma4:12b` observed only at 8192 → 16384 or 32768 shows ⚠, 8192 or 4096 shows ✓. `qwen3.5:9b` proven at 4096 and 8192 → 12288 also shows ⚠ (only 1 run there; the rule needs at least 2 observations), 8192 or 4096 shows ✓.
+  - Also check with **Recommended Model List** selected and Context 32768: one ⚠ line naming the models that would be clamped (e.g. `gemma4:12b → 8192`); at 4096 a ✓ `fits every recommended model`.
   - Result:
 
 - [ ] **T13 — Empty store shows nothing (optional).** With an empty/fresh store, select any collection.

@@ -78,9 +78,12 @@
                 <input type="text" id="searchQuery" placeholder="Enter your search query..." class="search-input">
             </div>
             <div class="controls-container">
-                <select id="modelSelect" class="model-select" required>
-                    <option value="" disabled selected>Select Model</option>
-                </select>
+                <div class="param-group model-group">
+                    <label for="modelSelect">Model(s)</label>
+                    <select id="modelSelect" class="model-select" required>
+                        <option value="" disabled selected>Select Model</option>
+                    </select>
+                </div>
                 <div class="param-group prem-only">
                     <label for="temperatureSelect">Temperature</label>
                     <select id="temperatureSelect" class="param-select"></select>
@@ -99,7 +102,6 @@
                     <select id="topKSelect" class="param-select"></select>
                 </div>
             </div>
-            <div id="modelRecommendation" class="model-recommendation hidden" aria-live="polite"></div>
         </div>
 
         <!-- Advanced (manual) method selection -->
