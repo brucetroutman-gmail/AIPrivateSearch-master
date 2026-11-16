@@ -61,7 +61,6 @@ npm run security-full
 
 ### Configuration Files
 - `eslint.security.config.mjs` - Main security-focused ESLint configuration
-- `.eslintrc.js` - Legacy configuration with security rules
 - `security-fixes.mjs` - Automated security fix script
 
 ## Security Fixes Applied
