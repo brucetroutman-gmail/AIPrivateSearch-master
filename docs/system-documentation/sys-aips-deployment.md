@@ -97,8 +97,6 @@ DB_PORT=3306
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DATABASE=aiprivatesearch
-FABRIC_URL=https://fabric.formr.net
-FABRIC_API_KEY=your_key
 ```
 
 ---
@@ -120,16 +118,6 @@ ollama pull qwen2.5:3b
 # Check service
 curl http://localhost:11434/api/tags
 ```
-
----
-
-## Fabric (Optional)
-
-Fabric runs on Ubuntu server `formr` via systemd, exposed via Caddy.
-
-- URL: `https://fabric.formr.net`
-- Port: 8081 (internal)
-- Managed via: `systemctl start/stop/status fabric`
 
 ---
 

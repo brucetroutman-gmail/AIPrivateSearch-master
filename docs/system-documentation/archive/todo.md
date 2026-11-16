@@ -26,34 +26,6 @@ to do AIPrivateSearch
    - [ ] Step 10: Test empty/no prompts state — select a collection with no configured prompts, confirm dropdown shows "Select a prompt..." without errors
 
 ### Core System Improvements
-2-047. Fabric Integration Implementation
-   **Phase 1: Core Integration**
-   - [ ] Create `FabricService.mjs` in `server/s01_server-first-app/lib/services/` with enhance prompt, pattern exists check, SSE collection, 8-10s timeout, 1-2 retries, circuit breaker
-   - [ ] Create `fabric.mjs` route in `server/s01_server-first-app/routes/` with rate limiting and query sanitization
-   - [ ] Register fabric route in `server.mjs`
-   - [ ] Add `FABRIC_URL=https://fabric.formr.net` and `FABRIC_API_KEY` to `.env-aips`
-   - [ ] Add `fabricEnabled: true/false` toggle to `app.json`
-   - [ ] Add "Enhance" button to `search.html` and `multi-mode-search.html` with spinner and cancel
-   - [ ] Implement graceful degradation — fallback to `addMetaPrompt` with toast if Fabric unreachable
-   - [ ] Test Phase 1: USA-History query, sensitive collection, offline mode, malformed collection name
-
-   **Phase 2: Pattern Management**
-   - [ ] Create `safeDomainContext.json` in `client/c01_client-first-app/config/` with sanitized domain templates per collection type
-   - [ ] Create `generatePattern.mjs` in `server/s01_server-first-app/scripts/` using `safeDomainContext.json` (no PII)
-   - [ ] Add pattern generation trigger to `POST /collections/create` in `documents.mjs` (fire-and-forget)
-   - [ ] Add pattern generation trigger to `POST /collections/:collection/upload` in `documents.mjs`
-   - [ ] Add pattern generation trigger to `DELETE /collections/:collection/files/:filename` in `documents.mjs`
-   - [ ] Add pattern generation trigger to `POST /document-index-create` in `multiSearch.mjs`
-   - [ ] Add "Generate Pattern" button to `collections.html`
-   - [ ] Test Phase 2: Generate pattern for USA-History, verify `enhance_USA-History` in Fabric, run Enhance and verify domain-specific improvement
-
-   **Phase 3: Polish**
-   - [ ] Add local pattern existence cache with last-checked timestamp
-   - [ ] Add enhance level selector (Concise / Balanced / Thorough)
-   - [ ] Show before/after diff of enhanced prompt
-   - [ ] Add auto-enhance toggle per collection (with warning for sensitive collections)
-   - [ ] Test Phase 3: Disable Fabric, confirm fallback toast shown and search completes normally
-
 2-006. Fix Smart Search to return only matches (currently returns both matches and non-matches)
 2-007. Make Response matches and View Document consistent across all types, add View Index Card to Doc Index Cards response
 2-008. Create testCodes for DocumentSearch performance optimization

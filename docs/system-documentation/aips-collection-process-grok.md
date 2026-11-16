@@ -18,7 +18,6 @@ This system provides a complete pipeline for turning raw documents into intellig
 - Structured logging + analytics
 - Automatic parameter optimization
 - User feedback loop
-- Smart Search with Fabric pattern enhancement
 
 ---
 
@@ -102,7 +101,7 @@ API Endpoints
 
 Method,Route,Description
 POST,/api/search,Standard adaptive search
-POST,/api/smart-search,Fabric-enhanced smart search
+POST,/api/smart-search,Smart search
 POST,/api/search-feedback,Submit thumbs up/down + comment
 GET,/api/search-analytics,Dashboard statistics
 POST,/api/collections/:collection/search-settings,Regenerate settings
@@ -190,7 +189,7 @@ text
 
 
 
-MethodRouteDescriptionPOST/api/searchStandard adaptive searchPOST/api/smart-searchFabric-enhanced smart searchPOST/api/search-feedbackSubmit thumbs up/down + commentGET/api/search-analyticsDashboard statisticsPOST/api/collections/:collection/search-settingsRegenerate settings
+MethodRouteDescriptionPOST/api/searchStandard adaptive searchPOST/api/smart-searchSmart searchPOST/api/search-feedbackSubmit thumbs up/down + commentGET/api/search-analyticsDashboard statisticsPOST/api/collections/:collection/search-settingsRegenerate settings
 
 Usage Examples
 Basic Search:

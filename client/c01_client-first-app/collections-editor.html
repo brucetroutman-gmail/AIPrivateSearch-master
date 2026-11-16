@@ -247,7 +247,7 @@
         const sourceExt = isManifestDoc ? doc.sourceExt : null;
 
         // Skip database and system files (legacy mode)
-        if (!isManifestDoc && (fileName === 'index-cards.db' || fileName === 'embeddings.db' || fileName === 'fabric-pattern.md' || fileName === 'collection.json')) {
+        if (!isManifestDoc && (fileName === 'index-cards.db' || fileName === 'embeddings.db' || fileName === 'collection.json')) {
           return;
         }
         // Manifest mode — use rich metadata directly

@@ -13,7 +13,7 @@ The workflow runs 4 sequential steps — all awaited, none fire-and-forget.
 - A collection must exist with a valid `collection.json` manifest
 - The `collection.json` `name` field must match the folder name exactly
 - At least one source file must be selected in the document table
-- The server must be running with Ollama available for embedding and Fabric pattern generation
+- The server must be running with Ollama available for embedding
 
 ---
 

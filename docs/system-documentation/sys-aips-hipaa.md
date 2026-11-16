@@ -39,7 +39,6 @@ Being local-only does not automatically mean HIPAA-compliant. HIPAA requires:
 ✅ **Rate limiting** — prevents brute force on API endpoints
 ✅ **Input validation** — path traversal prevention, query sanitization
 ✅ **No telemetry** — no usage data sent externally
-✅ **Fabric privacy** — only the search query is sent for prompt enhancement, never document content
 
 ### What is missing for full HIPAA compliance
 
@@ -134,16 +133,6 @@ Until full HIPAA compliance is achieved, be accurate:
 **Do not say:**
 - "HIPAA-compliant" — without completing the steps above
 - "Fully secure" — without documented encryption and audit controls
-
----
-
-## Fabric and PHI
-
-Fabric (prompt enhancement) sends only the **search query** to the remote server — never document content. However:
-
-- If a user types PHI directly into the search query (e.g. "find records for John Smith DOB 01/01/1980"), that query would be sent to Fabric
-- Mitigation: add a warning when Fabric is enabled in collections that may contain PHI
-- Long-term: implement query sanitization to detect and strip potential PHI before sending to Fabric
 
 ---
 

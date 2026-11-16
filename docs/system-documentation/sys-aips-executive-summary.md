@@ -75,7 +75,6 @@ Most AI search tools send your documents to cloud servers for processing. For me
 | AI Models | Ollama (local) |
 | Vector Search | LanceDB |
 | Database | MySQL (required, for test results) |
-| Prompt Enhancement | Fabric (optional, via fabric.formr.net) |
 | Platform | macOS (tested on macOS 12+) |
 
 ---
@@ -100,14 +99,12 @@ Most AI search tools send your documents to cloud servers for processing. For me
 ✅ Session authentication
 ✅ MySQL result storage
 ✅ Focused search pages (Exact Search, AI Search)
-✅ Fabric prompt enhancement pipeline (tested)
 ✅ Remote Mac deployment via `aiprivatesearch.app` Start App
 
 ---
 
 ## Near-Term Roadmap
 
-- Fabric integration into search UI (enhance button, graceful fallback)
 - RAG upgrade: Level 2 → Level 4 (hybrid search + cross-encoder reranking)
 - User prompts by source type and collection
 - Mobile-responsive design improvements

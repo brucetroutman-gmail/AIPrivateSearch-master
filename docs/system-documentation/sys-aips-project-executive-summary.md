@@ -103,7 +103,7 @@ All tiers include a **60-day free trial** — users can search their own documen
 
 | App | Version | Status |
 |-----|---------|--------|
-| aiprivatesearch | v20.22 | Production — all 7 search methods working, Fabric pipeline tested |
+| aiprivatesearch | v20.22 | Production — all 7 search methods working |
 | aiprivatesearchcustmgr | v2.06 | Production — Stripe sandbox tested, go-live checklist pending |
 | aiprivatesearchweb | v1.60 | Production — marketing site live |
 
@@ -112,7 +112,6 @@ All tiers include a **60-day free trial** — users can search their own documen
 ## Near-Term Roadmap
 
 - custmgr go-live: Stripe production keys, live customer onboarding
-- Fabric integration into search UI (enhance button, graceful fallback)
 - RAG upgrade: Level 2 → Level 4 (better semantic accuracy)
 - HIPAA compliance hardening (encryption at rest, audit logs)
 - Mobile-responsive design
@@ -129,5 +128,4 @@ All tiers include a **60-day free trial** — users can search their own documen
 | Vector Search | LanceDB |
 | Payments | Stripe |
 | Database | MySQL |
-| Prompt Enhancement | Fabric (optional) |
 | Platform | macOS (tested on macOS 14+) |

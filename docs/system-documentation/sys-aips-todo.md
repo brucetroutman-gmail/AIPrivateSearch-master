@@ -99,7 +99,6 @@ Proposed: min(45, max(10, ceil(n * 0.042 + log2(n+1) * 2.2)))
 P001 (Osteosarcoma) and P007 (Ewing sarcoma) not appearing in top chunks for cancer query.
 Low cosine similarity to "cancer" query despite being cancer patients.
 - [ ] Investigate why P001/P007 rank below topK threshold
-- [ ] Consider if fabric pattern vocabulary injection helps
 - [ ] Test after embedding-based query type detection (A-001) is implemented
 
 ### Q-002 — Exhaustive Query Detection Refinement
@@ -254,7 +253,7 @@ For structured record collections (Medical, HR, Law), build a simple entity inde
 
 **Tasks**:
 - [ ] Define entity schema per collection profile (medical / legal / HR / general)
-- [ ] Add entity extraction step to Process Source Files (Step 2b — after Fabric, before Embed)
+- [ ] Add entity extraction step to Process Source Files (Step 2b — before Embed)
 - [ ] Store `entity-index.json` in collection folder
 - [ ] Add entity index lookup to AIDocumentChat for relationship queries
 - [ ] Fall back to standard PRF expansion when no entity index exists

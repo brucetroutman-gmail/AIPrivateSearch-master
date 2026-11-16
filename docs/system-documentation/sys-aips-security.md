@@ -94,7 +94,6 @@ All file operations validate paths against directory traversal:
 - `.env-aips` lives at `/Users/Shared/AIPrivateSearch/.env-aips` — never in repo
 - `.gitignore` includes `.env` and `.env-aips`
 - No credentials hardcoded in source
-- Fabric API key stored in `.env-aips` only
 
 ---
 
@@ -123,7 +122,6 @@ ls .git/hooks/pre-commit
 - All document content stays on-device — never sent to external AI services
 - Ollama runs locally at `http://localhost:11434`
 - MySQL (required) stores test results only — no document content
-- Fabric integration (optional) sends only the search query for prompt enhancement — not document content
 
 ---
 

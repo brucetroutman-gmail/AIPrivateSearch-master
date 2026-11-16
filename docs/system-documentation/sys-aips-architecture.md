@@ -160,7 +160,6 @@ Weighted percentage = `(accuracy×3 + relevance×2 + organization×1) / 18 × 10
 - **Config outside repo** — allows config changes without git commits on deployed machines
 - **Ollama local** — installed at `/Users/Shared/AIPrivateSearch/ollama`, added to PATH via `~/.zshrc`
 - **MySQL required** — the server fails fast at startup if DB configuration is missing; used for test result persistence
-- **Fabric integration** — optional prompt enhancement via `https://fabric.formr.net` (Ubuntu server, port 8081, systemd)
 
 ---
 

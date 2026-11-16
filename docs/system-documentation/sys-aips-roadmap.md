@@ -19,32 +19,12 @@ AIPrivateSearch becomes the standard tool for private AI document search in regu
 ✅ Role-based access control (tier + role)
 ✅ Session authentication
 ✅ MySQL result storage
-✅ Fabric prompt enhancement pipeline (tested, not yet in UI)
 ✅ Remote Mac deployment
 ✅ Multi-app suite (search, custmgr, web)
 
 ---
 
 ## Near-Term (v20.x)
-
-### Fabric Integration (2-047)
-Bring the tested Fabric+Ollama pipeline into the search UI.
-
-**Phase 1 — Core**
-- `FabricService.mjs` with timeout, retry, circuit breaker
-- "Enhance" button on AI Search with spinner and cancel
-- Graceful fallback to standard prompt if Fabric unreachable
-- `fabricEnabled` toggle in `app.json`
-
-**Phase 2 — Pattern Management**
-- `safeDomainContext.json` — sanitized domain templates per collection
-- Auto-generate Fabric patterns when collections are created/updated
-- "Generate Pattern" button in Collections
-
-**Phase 3 — Polish**
-- Enhance level selector (Concise / Balanced / Thorough)
-- Before/after diff of enhanced prompt
-- Auto-enhance toggle per collection
 
 ### Search Quality
 - Fix Smart Search to return only matches (2-006)
