@@ -5119,7 +5119,7 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
 
 .model-recommendation .rec-label {
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-color);
 }
 
 .model-recommendation .rec-note {
@@ -5131,9 +5131,9 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
   display: inline-block;
   padding: 0.15rem 0.5rem;
   margin: 0 0.15rem;
-  border: 1px solid var(--border-color, #ccc);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  background: var(--surface-color, #f3f4f6);
+  background: var(--card-bg);
   color: var(--text-color);
   font-size: 0.82rem;
   font-family: var(--font-mono, monospace);
@@ -5142,9 +5142,9 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
 
 .rec-model-chip:hover,
 .rec-model-chip:focus {
-  background: var(--primary-color, #2563eb);
+  background: var(--primary);
   color: #fff;
-  border-color: var(--primary-color, #2563eb);
+  border-color: var(--primary);
 }
 
 .fit-note {
@@ -5154,11 +5154,11 @@ body.test-app-token-page { font-family: Arial, sans-serif; margin: 20px; backgro
 }
 
 .fit-note.fit-ok {
-  color: var(--success-color, #16a34a);
+  color: var(--success);
 }
 
 .fit-note.fit-warn {
-  color: var(--warning-color, #b45309);
+  color: var(--warning);
   font-weight: 500;
 }
 
