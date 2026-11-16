@@ -11,3 +11,7 @@ yarn.lock
 .vscode/
 *.log
 
+
+# Runtime state and local tooling that must not be tracked
+data/sessions.json
+.claude/skills/llm-council/

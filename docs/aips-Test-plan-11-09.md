@@ -198,6 +198,10 @@ DB access: `mysql -h 92.112.184.206 -P 3306 -u aips-readwrite -p aiprivatesearch
   - Pass: no uncaught errors; recommender fetch failures degrade silently rather than throw.
   - Result:
 
+- [ ] **T18 — Licensing and startup still work after the clean-up (v21.71).** v21.71 removed the old, unmounted licensing router and the legacy vector-store code.
+  - Pass: the app starts; opening any page does **not** bounce to `license-activation.html` (on an already-activated machine); `curl -s -o /dev/null -w "%{http_code}\n" http://localhost:56306/api/licensing/status` returns `200`; a normal search and a Process Source Files run on one small collection both complete.
+  - Result:
+
 ---
 
 ## Open items (not part of pass/fail)
