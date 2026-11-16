@@ -131,8 +131,6 @@ Fabric runs on Ubuntu server `formr` via systemd, exposed via Caddy.
 - Port: 8081 (internal)
 - Managed via: `systemctl start/stop/status fabric`
 
-See `aips-fabric-install.md` for full setup details.
-
 ---
 
 ## Troubleshooting

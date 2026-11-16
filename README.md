@@ -111,7 +111,6 @@ All system documentation is in `docs/system-documentation/`. Key docs:
 | `sys-aips-security.md` | Auth, authorization, security practices |
 | `sys-aips-licensing.md` | Tier system and license validation |
 | `sys-aips-hipaa.md` | HIPAA and PII compliance posture |
-| `sys-aips-fabric.md` | Fabric prompt enhancement integration |
 | `sys-aips-contributing.md` | Development standards and workflow |
 | `sys-aips-changelog.md` | Version history |
 | `sys-aips-roadmap.md` | Product direction |
@@ -151,4 +150,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 21.71 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch
+**Version**: 21.72 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch
