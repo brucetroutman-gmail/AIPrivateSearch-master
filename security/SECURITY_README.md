@@ -44,6 +44,7 @@ npm run security-full
 - `security/eslint.security.config.mjs` - ESLint security configuration
 - `security/security-fixes.mjs` - Automated security fixes
 - `security/SECURITY_README.md` - This documentation
+- `security/setup-vscode-eslint.sh` - Optional: installs the VS Code ESLint extension so findings show as you type (`bash security/setup-vscode-eslint.sh`)
 🎯 Next Steps:
 Move hardcoded credentials to environment variables
 
