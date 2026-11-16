@@ -33,28 +33,87 @@ const searchMethods = {
 let performanceData = [];
 let currentSort = { column: null, direction: 'asc' };
 
-function renderResults(containerId, searchResult) {
-    const container = document.getElementById(containerId);
+function renderResultsInto(element, searchResult) {
     const collection = document.getElementById('collectionSelect').value;
-    window.responseDisplayCommon.renderSearchResults(container, searchResult, collection);
+    window.responseDisplayCommon.renderSearchResults(element, searchResult, collection);
 }
 
-function updatePerformanceTable(results) {
-    performanceData = [];
-    AI_METHODS.forEach(method => {
-        if (results[method]) {
-            const data = results[method];
-            const avgScore = data.results.length > 0
-                ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length)
-                : 0;
-            performanceData.push({
-                method: searchMethods[method].name,
-                results: data.results.length,
-                time: data.time / 1000,
-                score: avgScore
+function setStatus(element, text) {
+    while (element.firstChild) element.removeChild(element.firstChild);
+    const status = document.createElement('div');
+    status.className = 'loading';
+    status.textContent = text;
+    element.appendChild(status);
+}
+
+// Prepare each selected method's result column for the models about to run. With several
+// models each gets its own headed section so every result stays attributable to a model;
+// with a single model the container is used directly, exactly as before.
+function prepareModelSections(methods, models, multi) {
+    const sections = {}; // method -> Map(model -> element to render into)
+    methods.forEach(method => {
+        const container = document.getElementById(`${method}-container`);
+        if (!container) return;
+        while (container.firstChild) container.removeChild(container.firstChild);
+        const byModel = new Map();
+        models.forEach((model, i) => {
+            let body = container;
+            if (multi) {
+                const section = document.createElement('div');
+                section.className = 'model-result-section';
+                const heading = document.createElement('h4');
+                heading.className = 'model-result-heading';
+                heading.textContent = `Model: ${model}`;
+                body = document.createElement('div');
+                section.appendChild(heading);
+                section.appendChild(body);
+                container.appendChild(section);
+            }
+            setStatus(body, i === 0 ? 'Searching...' : 'Waiting...');
+            byModel.set(model, body);
+        });
+        sections[method] = byModel;
+    });
+    return sections;
+}
+
+// Run the models ONE AFTER ANOTHER, never in parallel: on a 16 GB machine two large models
+// resident at once would evict each other and thrash memory. The selected methods for a
+// single model still run together, as before. Returns the rows for the performance table.
+async function runModels({ models, multi, methods, query, baseOptions, sections }) {
+    const rows = [];
+    for (let i = 0; i < models.length; i++) {
+        const model = models[i];
+        if (i > 0) {
+            methods.forEach(method => {
+                const body = sections[method] && sections[method].get(model);
+                if (body) setStatus(body, 'Searching...');
             });
         }
-    });
+        const results = await Promise.all(methods.map(method =>
+            window.searchManager.executeSearch(method, query, { ...baseOptions, model })));
+        methods.forEach((method, idx) => {
+            const body = sections[method] && sections[method].get(model);
+            if (body) renderResultsInto(body, results[idx]);
+            rows.push({
+                label: multi ? `${searchMethods[method].name} · ${model}` : searchMethods[method].name,
+                data: results[idx]
+            });
+        });
+    }
+    return rows;
+}
+
+// rows: [{ label, data }] where data is a search result ({ results, time }).
+function updatePerformanceTableRows(rows) {
+    performanceData = rows.map(({ label, data }) => ({
+        method: label,
+        results: data.results.length,
+        time: data.time / 1000,
+        score: data.results.length > 0
+            ? (data.results.reduce((sum, r) => sum + r.score, 0) / data.results.length)
+            : 0
+    }));
     renderPerformanceTable();
     performanceSection.classList.remove('hidden');
     performanceSection.style.display = 'block';
@@ -98,7 +157,9 @@ function sortPerformanceTable(column) {
 async function performAllSearches() {
     const query = DOMSanitizer.sanitizeText(searchQueryEl.value.trim());
     const collection = DOMSanitizer.sanitizeText(document.getElementById('collectionSelect').value);
-    const model = DOMSanitizer.sanitizeText(document.getElementById('modelSelect').value);
+    // Checked models from the Models list (one box = one model); sanitized like the old dropdown value.
+    const models = (window.modelSelector ? window.modelSelector.getSelected() : []).map(m => DOMSanitizer.sanitizeText(m)).filter(Boolean);
+    const multi = models.length > 1;
     const temperatureEl = document.getElementById('temperatureSelect');
     const contextEl = document.getElementById('contextSelect');
     const tokensEl = document.getElementById('tokensSelect');
@@ -109,64 +170,54 @@ async function performAllSearches() {
 
     if (!query) { window.showUserMessage('Please enter a search query', 'error'); return; }
     if (!collection) { window.showUserMessage('Please select a collection', 'error'); return; }
-    if (!model) { window.showUserMessage('Please select a model', 'error'); return; }
+    if (models.length === 0) { window.showUserMessage('Please select at least one model', 'error'); return; }
 
     window._lastSearchQuery = query;
-    if (window.logger) window.logger.crumb('search_submitted', { methods: getSelectedMethods().join(','), collection, model, temperature, contextSize });
+    if (window.logger) window.logger.crumb('search_submitted', { methods: getSelectedMethods().join(','), collection, models: models.join(','), temperature, contextSize });
 
     searchAllBtn.textContent = 'Searching...';
     searchAllBtn.disabled = true;
 
+    const restoreButton = () => {
+        searchAllBtn.textContent = 'Search Selected Methods';
+        searchAllBtn.disabled = false;
+    };
+
     const selectedMethods = getSelectedMethods();
     if (selectedMethods.length === 0) {
         window.showUserMessage('Please select at least one search method', 'error');
-        searchAllBtn.textContent = 'Search Selected Methods';
-        searchAllBtn.disabled = false;
+        restoreButton();
         return;
     }
 
-    // Clear containers
-    AI_METHODS.forEach(method => {
-        const container = document.getElementById(`${method}-container`);
-        while (container.firstChild) container.removeChild(container.firstChild);
-        const notSelected = document.createElement('div');
-        notSelected.className = 'no-results';
-        notSelected.textContent = 'Not selected';
-        container.appendChild(notSelected);
-    });
-
-    // Show loading for selected
-    selectedMethods.forEach(method => {
-        const container = document.getElementById(`${method}-container`);
-        while (container.firstChild) container.removeChild(container.firstChild);
-        const loading = document.createElement('div');
-        loading.className = 'loading';
-        loading.textContent = 'Searching...';
-        container.appendChild(loading);
-    });
-
     try {
-        const searchPromises = [];
-        const methodMap = {};
-        selectedMethods.forEach(method => {
-            const options = { collection, model, temperature, contextSize, tokenLimit, topK };
-            searchPromises.push(window.searchManager.executeSearch(method, query, options));
-            methodMap[method] = searchPromises.length - 1;
+        // Clear containers
+        AI_METHODS.forEach(method => {
+            const container = document.getElementById(`${method}-container`);
+            while (container.firstChild) container.removeChild(container.firstChild);
+            const notSelected = document.createElement('div');
+            notSelected.className = 'no-results';
+            notSelected.textContent = 'Not selected';
+            container.appendChild(notSelected);
         });
 
-        const results = await Promise.all(searchPromises);
-        const perfData = {};
-        Object.entries(methodMap).forEach(([method, index]) => {
-            renderResults(`${method}-container`, results[index]);
-            perfData[method] = results[index];
+        // Show loading for the selected methods (one section per model when running several)
+        const sections = prepareModelSections(selectedMethods, models, multi);
+
+        const rows = await runModels({
+            models,
+            multi,
+            methods: selectedMethods,
+            query,
+            baseOptions: { collection, temperature, contextSize, tokenLimit, topK },
+            sections
         });
-        updatePerformanceTable(perfData);
+        updatePerformanceTableRows(rows);
     } catch (err) {
         if (window.logger) window.logger.crumb('search_error', { error: err?.message || 'unknown' });
         window.showUserMessage('Search failed. Please try again.', 'error');
     } finally {
-        searchAllBtn.textContent = 'Search Selected Methods';
-        searchAllBtn.disabled = false;
+        restoreButton();
     }
 }
 // Handle search mode toggle (Auto vs Advanced)
@@ -232,7 +283,9 @@ function displayQueryMetadata(metadata, resolvedMethod) {
 async function performAutoSearch() {
     const query = DOMSanitizer.sanitizeText(searchQueryEl.value.trim());
     const collection = DOMSanitizer.sanitizeText(document.getElementById('collectionSelect').value);
-    const model = DOMSanitizer.sanitizeText(document.getElementById('modelSelect').value);
+    // Checked models from the Models list (one box = one model); sanitized like the old dropdown value.
+    const models = (window.modelSelector ? window.modelSelector.getSelected() : []).map(m => DOMSanitizer.sanitizeText(m)).filter(Boolean);
+    const multi = models.length > 1;
     const temperatureEl = document.getElementById('temperatureSelect');
     const contextEl = document.getElementById('contextSelect');
     const tokensEl = document.getElementById('tokensSelect');
@@ -243,10 +296,10 @@ async function performAutoSearch() {
 
     if (!query) { window.showUserMessage('Please enter a search query', 'error'); return; }
     if (!collection) { window.showUserMessage('Please select a collection', 'error'); return; }
-    if (!model) { window.showUserMessage('Please select a model', 'error'); return; }
+    if (models.length === 0) { window.showUserMessage('Please select at least one model', 'error'); return; }
 
     window._lastSearchQuery = query;
-    if (window.logger) window.logger.crumb('auto_search_submitted', { collection, model, temperature, contextSize });
+    if (window.logger) window.logger.crumb('auto_search_submitted', { collection, models: models.join(','), temperature, contextSize });
 
     autoSearchBtn.textContent = 'Analyzing...';
     autoSearchBtn.disabled = true;
@@ -282,7 +335,7 @@ async function performAutoSearch() {
         };
         displayQueryMetadata(metadata, method);
 
-        // Step 2: Run only the recommended method
+        // Step 2: Run only the recommended method (once per model)
         autoSearchBtn.textContent = 'Searching...';
 
         // Show only the selected method's result column
@@ -290,19 +343,17 @@ async function performAutoSearch() {
         const activeCol = document.getElementById(`${method}-results`);
         if (activeCol) activeCol.style.display = 'block';
 
-        const container = document.getElementById(`${method}-container`);
-        if (container) {
-            while (container.firstChild) container.removeChild(container.firstChild);
-            const loading = document.createElement('div');
-            loading.className = 'loading';
-            loading.textContent = 'Searching...';
-            container.appendChild(loading);
-        }
+        const sections = prepareModelSections([method], models, multi);
 
-        const options = { collection, model, temperature, contextSize, tokenLimit, topK };
-        const result = await window.searchManager.executeSearch(method, effectiveQuery, options);
-        renderResults(`${method}-container`, result);
-        updatePerformanceTable({ [method]: result });
+        const rows = await runModels({
+            models,
+            multi,
+            methods: [method],
+            query: effectiveQuery,
+            baseOptions: { collection, temperature, contextSize, tokenLimit, topK },
+            sections
+        });
+        updatePerformanceTableRows(rows);
     } catch (err) {
         if (window.logger) window.logger.crumb('auto_search_error', { error: err?.message || 'unknown' });
         window.showUserMessage('Auto search failed. Please try again.', 'error');
@@ -311,7 +362,6 @@ async function performAutoSearch() {
         autoSearchBtn.disabled = false;
     }
 }
-
 
 function getSelectedMethods() {
     const selected = [];
@@ -394,17 +444,16 @@ async function loadCollections() {
     if (collectionSelect.value) {
         await window.parameterManager.onCollectionChange(collectionSelect.value);
     }
-    refreshRecommendations();
+    // Wait for the recommendation so the page is fully set up (models pre-checked) when
+    // startup finishes, instead of changing under the user a moment after they start typing.
+    await refreshRecommendations();
 }
 
 async function loadModels() {
     const models = await window.searchManager.loadModels('search');
-    window.searchManager.populateSelect('modelSelect', models, 'selectedSearchModel');
-    const modelSelect = document.getElementById('modelSelect');
-    if (modelSelect && !modelSelect.hasAttribute('data-fit-listener')) {
-        modelSelect.addEventListener('change', refreshContextFit);
-        modelSelect.setAttribute('data-fit-listener', 'true');
-    }
+    window.modelSelector.build(models);
+    // Re-check the context fit whenever the checked models change.
+    window.modelSelector.onChange(refreshContextFit);
     const contextSelect = document.getElementById('contextSelect');
     if (contextSelect && !contextSelect.hasAttribute('data-fit-listener')) {
         contextSelect.addEventListener('change', refreshContextFit);
@@ -412,20 +461,21 @@ async function loadModels() {
     }
 }
 
-// Advisory recommender hints (model/PC-aware). Best-effort; never blocks the user.
-function refreshRecommendations() {
+// Model/PC-aware recommender: pre-check (and star) the recommended models for the selected
+// collection, then refresh the context-fit note. Best-effort; never blocks the user.
+async function refreshRecommendations() {
     const collection = document.getElementById('collectionSelect')?.value;
-    if (window.recommendationManager) {
-        window.recommendationManager.renderModelRecommendation(collection);
+    if (window.modelSelector) {
+        await window.modelSelector.applyRecommendation(collection);
     }
     refreshContextFit();
 }
 
 function refreshContextFit() {
-    if (!window.recommendationManager) return;
-    const model = document.getElementById('modelSelect')?.value;
+    if (!window.recommendationManager || !window.modelSelector) return;
+    const models = window.modelSelector.getSelected();
     const context = parseInt(document.getElementById('contextSelect')?.value || '0', 10);
-    window.recommendationManager.renderContextFit(model, context || null);
+    window.recommendationManager.renderContextFit(models, context || null);
 }
 
 async function loadUserPrompts() {
@@ -488,8 +538,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const savedQuery = localStorage.getItem('aiSearchQuery');
     if (savedQuery) searchQueryEl.value = DOMSanitizer.sanitizeText(savedQuery);
 
+    await loadModels();
     await loadCollections();
-    loadModels();
     await window.parameterManager.loadAllDropdowns({
       temperature: 'temperatureSelect',
       context: 'contextSelect',

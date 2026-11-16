@@ -1,21 +1,27 @@
 // Client surface for the model/PC-aware recommender (step iii). Calls the read-only
-// /api/recommender endpoints and renders two unobtrusive hints on the search page:
+// /api/recommender endpoints and drives two things on the AI Search page:
 //
-//   1. a "best models for this collection" line under the model dropdown, refreshed when
-//      the collection changes, so the user has an evidence-based starting point for which
-//      model to run (ranked by observed weighted score, filtered to models that fit RAM).
+//   1. fetchModelRecommendation(): the best models for a collection, ranked by observed
+//      weighted score on this machine and filtered to models that fit RAM. The Models
+//      checkbox list (modelSelector.js) uses it to star and pre-check those models.
 //
-//   2. a context-fit note under the Context dropdown, refreshed when the model or context
-//      changes, that warns when the chosen context exceeds the largest value we have
-//      actually observed to fit this model on this machine — surfacing the clamp that
-//      otherwise happens silently server-side.
+//   2. a context-fit note under the Context dropdown, refreshed when the checked models or
+//      the context changes. It warns when the chosen context exceeds the largest value we
+//      have actually observed to fit a model on this machine, surfacing the clamp that
+//      otherwise happens silently server-side. With several models checked it names each
+//      model that would be clamped.
 //
 // Everything here is advisory and best-effort: the recommender has no bearing on whether a
 // search can run, so any fetch failure or cold-start ("unknown") hides the hint rather
-// than blocking the user. All DOM is built with createElement/textContent (no innerHTML)
-// to satisfy the security lint.
+// than blocking the user. All DOM is built with textContent (no innerHTML) to satisfy the
+// security lint.
 
 class RecommendationManager {
+  constructor() {
+    // Guards against a slow response for an older selection overwriting a newer note.
+    this._fitSeq = 0;
+  }
+
   _qs(params) {
     const pairs = Object.entries(params).filter(([, v]) => v != null && v !== '');
     return pairs.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
@@ -48,84 +54,56 @@ class RecommendationManager {
     }
   }
 
-  // Render the collection model recommendation into #modelRecommendation.
-  async renderModelRecommendation(collection, elementId = 'modelRecommendation') {
+  // Render the context-fit note into #contextFitNote for one model or a list of models.
+  async renderContextFit(modelOrModels, requestedContext, elementId = 'contextFitNote') {
     const el = document.getElementById(elementId);
     if (!el) return;
-    this._clear(el);
+    const seq = ++this._fitSeq;
+    const stale = () => seq !== this._fitSeq;
 
-    const rec = await this.fetchModelRecommendation(collection);
-    const best = rec && Array.isArray(rec.best) ? rec.best : [];
-    if (!collection || best.length === 0) {
-      // No data anywhere yet: stay silent rather than show a misleading hint.
+    const reset = () => {
+      this._clear(el);
+      el.classList.remove('fit-warn', 'fit-ok', 'fit-unknown');
+    };
+    reset();
+
+    const models = (Array.isArray(modelOrModels) ? modelOrModels : [modelOrModels]).filter(Boolean);
+    if (models.length === 0 || !requestedContext) {
       el.classList.add('hidden');
       return;
     }
 
-    const isFallback = rec.fallback === 'all-collections';
-    const label = document.createElement('span');
-    label.className = 'rec-label';
-    label.textContent = isFallback
-      ? 'No data for this collection yet. Top models across all collections: '
-      : 'Recommended for this collection: ';
-    el.appendChild(label);
+    const advice = await Promise.all(models.map(m => this.fetchContextAdvice(m, requestedContext)));
+    if (stale()) return;
 
-    best.forEach((m, i) => {
-      if (i > 0) el.appendChild(document.createTextNode(', '));
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'rec-model-chip';
-      chip.textContent = `${m.model} (${Math.round(m.avgScore)})`;
-      chip.title = `Avg score ${m.avgScore} over ${m.runs} run(s)`
-        + (m.collections ? ` across ${m.collections} collection(s)` : '')
-        + (m.maxFitContext ? `; proven-fit context ${m.maxFitContext}` : '');
-      // Clicking a chip selects that model in the dropdown and re-checks the context fit.
-      chip.addEventListener('click', () => {
-        const modelSel = document.getElementById('modelSelect');
-        if (modelSel) {
-          modelSel.value = m.model;
-          modelSel.dispatchEvent(new Event('change'));
-        }
-      });
-      el.appendChild(chip);
-    });
-
-    const note = document.createElement('span');
-    note.className = 'rec-note';
-    note.textContent = isFallback
-      ? ' (benchmark this collection for a specific recommendation)'
-      : ' (by observed score on this machine)';
-    el.appendChild(note);
-
-    el.classList.remove('hidden');
-  }
-
-  // Render the context-fit note into #contextFitNote for the given model + context.
-  async renderContextFit(model, requestedContext, elementId = 'contextFitNote') {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    this._clear(el);
-    el.classList.remove('fit-warn', 'fit-ok', 'fit-unknown');
-
-    if (!model) {
+    // Only models we have actually observed can be judged; never-seen models are skipped.
+    const known = advice
+      .map((a, i) => ({ model: models[i], a }))
+      .filter(x => x.a && x.a.status === 'ok');
+    if (known.length === 0) {
       el.classList.add('hidden');
       return;
     }
 
-    const advice = await this.fetchContextAdvice(model, requestedContext);
-    if (!advice || advice.status === 'unknown') {
-      // No observed data for this model yet: cold start, stay silent.
-      el.classList.add('hidden');
-      return;
-    }
-
-    if (advice.clamped) {
+    reset();
+    const clamped = known.filter(x => x.a.clamped);
+    if (models.length === 1) {
+      const { model, a } = known[0];
+      if (a.clamped) {
+        el.classList.add('fit-warn');
+        el.textContent = `⚠ ${model} has only been observed to fit ${a.advisedContext} tokens on this machine; `
+          + `${requestedContext} will be clamped down. Lower Context to ${a.advisedContext} to match.`;
+      } else {
+        el.classList.add('fit-ok');
+        el.textContent = `✓ Context ${requestedContext} fits ${model} (proven to ${a.maxFitContext} on this machine).`;
+      }
+    } else if (clamped.length > 0) {
       el.classList.add('fit-warn');
-      el.textContent = `⚠ ${model} has only been observed to fit ${advice.advisedContext} tokens on this machine; `
-        + `${requestedContext} will be clamped down. Lower Context to ${advice.advisedContext} to match.`;
+      el.textContent = `⚠ Context ${requestedContext} will be clamped on this machine: `
+        + clamped.map(x => `${x.model} → ${x.a.advisedContext}`).join(', ') + '.';
     } else {
       el.classList.add('fit-ok');
-      el.textContent = `✓ Context ${requestedContext} fits ${model} (proven to ${advice.maxFitContext} on this machine).`;
+      el.textContent = `✓ Context ${requestedContext} fits every selected model.`;
     }
     el.classList.remove('hidden');
   }
