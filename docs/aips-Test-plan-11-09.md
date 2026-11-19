@@ -34,7 +34,7 @@ DB access: `mysql -h 92.112.184.206 -P 3306 -u aips-readwrite -p aiprivatesearch
 | Pre-flight | T0 | done (run on v21.65) |
 | A. DB-optional startup | T1–T3 | done (run on v21.65) |
 | B. Remote DB = testing only | T4–T6 | done (T4, T5, T6 pass) |
-| C. Local recommender store | T7–T9 | T7, T8 done · T9 next |
+| C. Local recommender store | T7–T9 | T7, T8, T9 done |
 | D. Recommender UI | T10, T10b, T11–T13 | reworked in v21.70 (chips replaced by a Models checkbox list) — re-test |
 | E. Search-logs removal | T14–T15 | not started |
 | F. Regression sanity | T16–T17 | not started |
@@ -134,31 +134,31 @@ DB access: `mysql -h 92.112.184.206 -P 3306 -u aips-readwrite -p aiprivatesearch
   - Pass: the log says `recorded to this machine's local store`; the local JSON now has `scores` entries (`collection|model` with runs and average); remote `MAX(Id)` is unchanged.
   - Result: PASS (reported) — remote `MAX(Id)` 3038 → 3038 (unchanged), so the benchmark wrote nothing to the remote DB. Verified from the local JSON: `Sample_Medical-Practice` has 5 scored runs each for `gemma4:12b` (avg 96.6, range 83–100) and `qwen3.5:9b` (avg 77.6, range 58–100) — 5 prompts × 2 models. Resource entries: gemma4 @8192 (5 runs, peak 9125 MB); qwen3.5:9b @4096 (3 runs, peak 7762 MB), @8192 (6 runs, peak 7650 MB), @12288 (1 run, 7779 MB). RAM budget 16384 × 0.65 = 10649 MB, so all fit.
 
-- [ ] **T9 — Generic-prompt fallback.** Run **Run Benchmark** on a collection with **no** authored prompts.
+- [x] **T9 — Generic-prompt fallback.** Run **Run Benchmark** on a collection with **no** authored prompts.
   - Pass: the log notes it is using generic benchmark prompts; the run completes and records `scores` entries locally.
-  - Result:
+  - Result: PASS (v21.76, mini). Collection `Sample_Skills` (no authored prompts): log showed the generic-prompt notice, 16/16 runs recorded, avg 93%. Store has 4 `scores` entries for `Sample_Skills` (4 runs each): gemma4:12b 100, qwen3.5:9b 100, mistral:7b avg 92, llama3.1:8b avg 81.
 
 ---
 
 ## D. Recommender UI
 
-- [ ] **T10 — "Models" checkbox list with the recommendation pre-checked.** On `ai-search.html` select the benchmarked collection (`Sample_Medical-Practice`).
+- [x] **T10 — "Models" checkbox list with the recommendation pre-checked.** On `ai-search.html` select the benchmarked collection (`Sample_Medical-Practice`).
   - Pass: a **Models** title sits above a row of checkboxes, one per installed search model. `gemma4:12b ★ 97` and `qwen3.5:9b ★ 78` are **checked and starred**; the other models are unchecked. The line beside the list reads `★ recommended for this collection by observed score on this machine. 2 models selected; they run one after another.` There are no chips.
   - History: v21.61–v21.68 showed a line of chips whose click only selected one model; v21.69 tried a "Recommended Model List" dropdown entry and was rolled back. The checkbox list replaces both (v21.70).
-  - Result:
+  - Result: PASS (v21.76, mini). Collection `Sample_Skills`: gemma4:12b and qwen3.5:9b checked with ★ scores.
 
-- [ ] **T10b — Checked models are run one after another.** With both recommended models checked, enter a query and search (Auto mode, or Advanced with one or more methods ticked).
+- [x] **T10b — Checked models are run one after another.** With both recommended models checked, enter a query and search (Auto mode, or Advanced with one or more methods ticked).
   - Pass: the results column shows one headed section per model (`Model: gemma4:12b`, then `Model: qwen3.5:9b`). While the first model runs the second shows `Waiting...`; it changes to `Searching...` only after the first finishes (never both at once). The performance table has one row per method and model, labelled like `Hybrid Search · gemma4:12b`.
   - Also check: unchecking one model and searching runs only the other, with **no** `Model:` headings (single-model layout as before). With none checked, the page shows `Please select at least one model` and nothing runs.
   - Also check: after changing the boxes by hand, a **Use recommended** link appears next to the note; clicking it re-checks exactly the recommended models and the link disappears.
   - Also check: `/Users/Shared/AIPrivateSearch/recommender/recommender-*.json` — `updatedAt` moved and `runs` increased for each model that ran.
-  - Result:
+  - Result: PASS (v21.76, mini). Two headed sections run in sequence, second showed `Waiting...` until the first finished; table rows `AI Document Chat · gemma4:12b` (45.29 s) and `· qwen3.5:9b` (28.80 s).
 
-- [ ] **T11 — Cold-start fallback.** Select a collection that has **not** been benchmarked (after at least one other benchmark exists).
+- [x] **T11 — Cold-start fallback.** Select a collection that has **not** been benchmarked (after at least one other benchmark exists).
   - Pass: the machine-wide top models are starred and pre-checked, and the note reads `★ top models across all collections (no data for this collection yet).`
   - Also check: if the store has no scores at all, nothing is starred, the note reads `No benchmark data for recommendations yet.`, and the checked model is your last saved choice (or the first model on a fresh machine).
   - Also check: switching from a collection with a recommendation to one with none clears the stars and returns to your saved choice.
-  - Result:
+  - Result: PASS (v21.76, mini).
 
 - [ ] **T12 — Context-fit note.** Check a single benchmarked model and set Context **above** its observed value (e.g. 32768).
   - Pass: a ⚠ note appears (`… has only been observed to fit <N> …; … will be clamped`). Setting Context to the observed value shows a ✓ "fits" note.

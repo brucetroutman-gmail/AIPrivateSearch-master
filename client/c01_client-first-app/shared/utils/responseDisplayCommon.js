@@ -1,8 +1,25 @@
 // Common response display functionality for both search and multi-mode pages
 
 window.responseDisplayCommon = {
-    // Render search results using multi-mode format
+    // Methods that show an elapsed-time line under their results (the AI-backed methods).
+    ELAPSED_METHODS: ['ai-document-chat', 'hybrid-search', 'ai-direct', 'smart-search', 'vector'],
+
+    // Render search results using multi-mode format, then add the elapsed-time line.
+    // searchResult.time is the milliseconds measured by searchManager (same value as the
+    // performance table's TIME column).
     renderSearchResults(container, searchResult, collection = null) {
+        this.renderSearchResultsBody(container, searchResult, collection);
+        if (searchResult && Number.isFinite(searchResult.time) &&
+            this.ELAPSED_METHODS.includes(searchResult.method)) {
+            const elapsed = document.createElement('div');
+            elapsed.className = 'search-elapsed-time';
+            elapsed.style.cssText = 'margin-top:0.75rem;font-size:0.85rem;color:var(--text-color);';
+            elapsed.textContent = `\u23F1 Elapsed time: ${(searchResult.time / 1000).toFixed(1)}s`;
+            container.appendChild(elapsed);
+        }
+    },
+
+    renderSearchResultsBody(container, searchResult, collection = null) {
         if (!searchResult.results || searchResult.results.length === 0) {
             const noResultsDiv = document.createElement('div');
             noResultsDiv.className = 'no-results';
